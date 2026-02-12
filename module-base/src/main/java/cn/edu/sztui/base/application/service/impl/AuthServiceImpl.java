@@ -1,6 +1,7 @@
 package cn.edu.sztui.base.application.service.impl;
 
 import cn.edu.sztui.base.application.dto.command.LoginRequestCommand;
+import cn.edu.sztui.base.application.service.AcademicService;
 import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.domain.model.loginhandle.HandleCluster;
@@ -49,6 +50,8 @@ public class AuthServiceImpl implements AuthService {
     private PlaywrightBrowserPool browserPool;
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
+    @Resource
+    private AcademicService academicService;
     @Resource
     private CaptchaOcrUtil captchaOcrUtil;
     @Resource
@@ -187,7 +190,7 @@ public class AuthServiceImpl implements AuthService {
             APIResponse ajaxRes = loginHandle.loginVerification(context, cmd);
             // 获取类重构
             String ajaxBody = ajaxRes.text();
-            log.info("AJAX验证响应: {}", ajaxBody); // 一般是响应 {"loginFailed":"false"}
+            // log.info("AJAX验证响应: {}", ajaxBody); // 一般是响应 {"loginFailed":"false"}
             // jackson 库中的核心类
             JsonNode json = objectMapper.readTree(ajaxBody);
             boolean loginFailed = json.path("loginFailed").asBoolean(true);
@@ -199,11 +202,17 @@ public class AuthServiceImpl implements AuthService {
             // 获取类重构
             APIResponse formRes = loginHandle.loginRedirect(context, cmd);
 
-            log.info("表单提交状态: {}", formRes.status());
+            // log.info("表单提交状态: {}", formRes.status());
             log.info("表单提交后 cookies: {}", context.cookies());
             // log.info("表单结束的文本内容{}", formRes.text());
-            // ============ 更新cookie，完成登录  ============
+
+            // ============ 第三步：更新网关的cookie  ============
             authSessionCacheUtil.sessionLoginBind(wxId, cmd.getUserId(), context.cookies());
+
+            // ============ 第四步：获取教务cookie（处理重定向链） ============
+            academicService.init();
+            log.info("获取到的 教务cookies: {}", context.cookies());
+
             ret.setWxId(wxId);
             ret.setLogined(true);
             return ret;

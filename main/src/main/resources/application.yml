@@ -13,7 +13,7 @@ management:
       exposure:
         include: 'loggers,health,prometheus'
 middleware:
-  redis: "192.168.3.35"
+  redis: ${dev.localhost}
 #  rocketmq: "192.168.18.79"
 #  kafka: "192.168.1.132"
 #  nacos: "192.168.18.79"
@@ -38,12 +38,19 @@ spring:
       password: ${passwd.redis}
       database: 0
 
-
-school:
-  url:
-    gateway: https://home.sztu.edu.cn/bmportal
-    login: https://auth-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/idp/authcenter/ActionAuthChain
-    sms-send: https://auth-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/idp/sendSMSCheckCode.do
+#xxl:
+#  job:
+#    admin:
+#      addresses: http://${dev.localhost}/xxl-job-admin #xxl-job服务地址
+#    accessToken: kN7yG0tM0oG6jN4x
+#    executor:
+#      appname: ${program.name}-${service.name}-${spring.profiles.active}
+#      address:
+#      ip:
+#      port: 9999
+#      jobgroup: ${server.servlet.xxl-job-group}
+#      logpath: /data/applogs/xxl-job/jobhandler
+#      logretentiondays: 30
 
 playwright:
   pool:

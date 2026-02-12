@@ -1,44 +1,101 @@
 plugins {
-    id 'java'
+    // 外部插件需要在根项目统一管理版本
     id 'org.springframework.boot' version '3.3.1' apply false
-    id 'io.spring.dependency-management' version '1.1.5'
+    id 'io.spring.dependency-management' version '1.1.5' apply false
 }
 
+// 全局版本统一管理
+ext {
+    // 基础工具
+    lombokVersion = '1.18.34'
+    commonsLang3Version = '3.14.0'
+    hutoolVersion = '5.8.23'
+
+    // JSON/序列化
+    fastjson2Version = '2.0.48'
+    jjwtVersion = '0.11.5'
+
+    // 任务调度
+    xxlJobVersion = '2.4.0'
+
+    // 网络请求（Playwright可能需要）
+    httpClientVersion = '4.5.14'
+    httpCoreVersion = '4.4.16'
+
+    // Redis
+    jedisVersion = '5.0.0'
+}
+
+// 所有项目公共配置
 allprojects {
     group = 'cn.edu.sztui'
     version = '1.0.0'
 
     repositories {
         mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/spring/' }  // ← 添加
+        maven { url 'https://repo.spring.io/release/' }              // ← 添加
     }
-
-    apply plugin: 'java'
 }
 
+// 子项目统一配置
 subprojects {
-    dependencies {
-        // Lombok
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
+    // ✅ 直接应用Java插件（核心插件用apply，不用在plugins块中声明）
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
 
-        // Spring Boot
-        implementation 'org.springframework.boot:spring-boot-starter'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        // hutool
-        implementation 'cn.hutool:hutool-all:5.8.23'
-
-        // 包含 DateUtils、StopWatch 等时间工具类
-        implementation 'org.apache.commons:commons-lang3:3.14.0'
-        implementation 'com.alibaba.fastjson2:fastjson2:2.0.48'
-
-        // JJWT 核心 API（编译时依赖）
-        implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-        // JJWT 实现（运行时依赖，必须加）
-        runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-        // JJWT JSON 解析（Jackson 实现，处理 JWT 载荷序列化，必须加）
-        runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    }
-
+    // 统一Java版本
     sourceCompatibility = '17'
     targetCompatibility = '17'
+
+    // 字符编码
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    // 全局依赖版本锁定
+    configurations.all {
+        resolutionStrategy {
+            force "org.apache.httpcomponents:httpclient:${httpClientVersion}"
+            force "org.apache.httpcomponents:httpcore:${httpCoreVersion}"
+            force "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+            force "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+            force "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+        }
+    }
+
+    dependencies {
+        // ========== 1. Lombok（所有模块都需要） ==========
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+        // ========== 2. Spring Boot 基础（大部分模块需要） ==========
+        implementation 'org.springframework.boot:spring-boot-starter'
+
+        // ========== 3. 通用工具类（所有模块都需要） ==========
+        implementation "cn.hutool:hutool-all:${hutoolVersion}"
+        implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+
+        // ========== 4. JSON处理（所有模块都需要） ==========
+        implementation "com.alibaba.fastjson2:fastjson2:${fastjson2Version}"
+
+        // ========== 5. 测试依赖（所有模块都需要） ==========
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation platform('org.junit:junit-bom:5.10.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testImplementation 'org.mockito:mockito-core:5.5.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+    }
+
+    // 测试配置
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events 'PASSED', 'FAILED', 'SKIPPED'
+            showStandardStreams = false
+        }
+    }
 }

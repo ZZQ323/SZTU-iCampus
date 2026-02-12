@@ -1,4 +1,5 @@
 plugins {
+    id 'java-library'  // ← 添加这行（java-library 包含 java 功能）
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
 }
@@ -22,4 +23,12 @@ dependencies {
     implementation 'org.springframework.security:spring-security-core'
     // RedisTemplate 是 Spring Data Redis 框架的核心类
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // JWT 依赖（common模块需要提供JWT工具类）
+    api "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // 如果JwtAuthFilter是Filter，可能还需要Servlet API
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 }

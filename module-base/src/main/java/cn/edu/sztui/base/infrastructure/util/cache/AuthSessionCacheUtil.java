@@ -14,9 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 代理会话缓存工具
@@ -27,10 +25,14 @@ import java.util.Objects;
 @Component
 public class AuthSessionCacheUtil {
     private static final String UNIONID_SESSION_KEY = "auth:miniapp:";
+    // 所有会话共享同一个 TTL（过期时间），每次 hset 单个会话时设置的过期时间会应用到整个 Hash
+    // 所以不设置任何过期时间
+     private static final long MACHINE_SESSION_EXPIRE = -1;
+     private static final long LOGIN_SESSION_EXPIRE = -1;
     // 机器会话过期时间：30分钟
-    private static final long MACHINE_SESSION_EXPIRE = 3600;
+    // private static final long MACHINE_SESSION_EXPIRE = -1;
     // 登录会话过期时间：1小时
-    private static final long LOGIN_SESSION_EXPIRE = 7200;
+    // private static final long LOGIN_SESSION_EXPIRE = -1;
 
     @Resource
     private CacheUtil cacheUtil;
@@ -45,6 +47,22 @@ public class AuthSessionCacheUtil {
         Object obj = cacheUtil.hget(UNIONID_SESSION_KEY, wxId);
         if (obj == null) return null;
         return JSON.parseObject(obj.toString(), ProxySession.class);
+    }
+
+    /**
+     * 获取所有会话
+     * @return Map<wxId, ProxySession>
+     */
+    public Map<String, ProxySession> getAllSessions() {
+        Map<Object, Object> rawMap = cacheUtil.hmget(UNIONID_SESSION_KEY);
+        if (rawMap == null || rawMap.isEmpty()) return Collections.emptyMap();
+        Map<String, ProxySession> result = new HashMap<>();
+        rawMap.forEach((key, value) -> {
+            String wxId = key.toString();
+            ProxySession session = JSON.parseObject(value.toString(), ProxySession.class);
+            result.put(wxId, session);
+        });
+        return result;
     }
 
     /**

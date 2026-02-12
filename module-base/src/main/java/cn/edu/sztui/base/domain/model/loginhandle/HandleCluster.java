@@ -4,10 +4,9 @@ import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -16,9 +15,6 @@ import java.util.Map;
 @Slf4j
 @Component
 public class HandleCluster {
-
-    private static final Logger log = LoggerFactory.getLogger(HandleCluster.class);
-
     private final Map<LoginType, LoginHandle> handleMap = new EnumMap<>(LoginType.class);
 
     @Autowired(required = false)  // 添加 required = false，避免没有处理器时启动失败
