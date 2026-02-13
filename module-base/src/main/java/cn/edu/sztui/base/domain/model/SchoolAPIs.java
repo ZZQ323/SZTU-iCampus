@@ -15,7 +15,7 @@ public interface SchoolAPIs {
     // academic administration system
     final String AASysGatewayURL ="https://jwxt-sztu-edu-cn.webvpn.sztu.edu.cn:8118/";
     final String AASysSwitchPort = "https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/jsxsd/framework/xsrkxz.htmlx";
-    final String AcdemAdminSysURL = "https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/jsxsd/framework/xsMain.jsp";
+    final String AcdemAdminSysURL = "https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/jsxsd/framework/xsMain";;
     final String acdemAdminSysGatewayStartURL = "https://home-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/bmportal/index.portal";
     final String scheduleTableURL = "https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/jsxsd/xskb/xskb_list.do";
 }

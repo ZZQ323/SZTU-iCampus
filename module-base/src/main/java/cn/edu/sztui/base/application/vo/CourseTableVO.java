@@ -10,6 +10,7 @@ import java.util.List;
 public class CourseTableVO {
 
     private List<CourseInfo> courses;
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

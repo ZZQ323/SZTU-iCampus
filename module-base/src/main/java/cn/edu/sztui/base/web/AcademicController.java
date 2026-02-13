@@ -13,6 +13,11 @@ public class AcademicController {
     @Autowired
     private AcademicService academicService;
 
+    @GetMapping("/v1/refresh/cookies")
+    public Result refreshCookies() {
+        return Result.ok(academicService.init());
+    }
+
     /**
      * 获取课表，直接返回课表table
      *

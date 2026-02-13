@@ -91,11 +91,8 @@ public class AuthServiceImpl implements AuthService {
 
     private LoginResultsVo refreshingCookies(String wxId, ProxySession session) {
         return browserPool.executeWithContext(context -> {
-            boolean isUpdated = false;
-            if (!Objects.isNull(session)) {
+            if (!Objects.isNull(session))
                 context.addCookies(CookieConverter.fromCookieDTOs(session.getCookiesJson()));
-                isUpdated = true;
-            }
             // 访问登录页面
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);
@@ -128,8 +125,7 @@ public class AuthServiceImpl implements AuthService {
                 log.error("会话初始化出现错误：" + e.getMessage());
                 throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "会话初始化出现错误：" + e.getMessage(), ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
             }
-            if (isUpdated) authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
-            else authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
+            authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
             return ret;
         });
     }
