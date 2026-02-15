@@ -20,7 +20,6 @@ public class AcademicController {
 
     /**
      * 获取课表，直接返回课表table
-     *
      * @param
      * @return
      */

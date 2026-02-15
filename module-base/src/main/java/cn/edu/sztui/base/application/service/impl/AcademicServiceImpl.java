@@ -9,7 +9,6 @@ import cn.edu.sztui.base.infrastructure.util.browserpool.PlaywrightBrowserPool;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.dto.ProxySession;
 import cn.edu.sztui.base.infrastructure.util.praser.HtmlBodyParser;
-import cn.edu.sztui.base.infrastructure.util.praser.URLPraser;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
@@ -88,34 +87,33 @@ public class AcademicServiceImpl implements AcademicService {
             }
             // 访问登录页面
             APIRequestContext req = context.request();
-            // 重要！必须是表单形式
-            FormData formData = FormData.create();
-            // cj0701id=&zc=&demo=&xnxq01id=2024-2025-1&sfFD=1&wkbkc=1&kbjcmsid=EB5693B95B204102B2E28C5624C6E9ED
-            // cj0701id=
-            // zc=
-            // demo=
-            // xnxq01id=2024-2025-2
-            // sfFD=1
-            // wkbkc=1
-            // kbjcmsid=EB5693B95B204102B2E28C5624C6E9ED
-            // xstzd 显示通知单编号
-            // xswk 显示网课群号及链接
-            formData.set("cj0701id", "");   // 无意义
-            formData.set("zc", query.getWeek());         // 第几周
-            formData.set("demo", "");       // 无意义
-            formData.set("xnxq01id", query.getSemester());   // 学年学期
-            formData.set("sfFD", "1");       // 是否放大
-            formData.set("wkbkc", "1");     // 显示无课表课程
-            formData.set("kbjcmsid", "EB5693B95B204102B2E28C5624C6E9ED");   // 时间模式
-            APIResponse res = req.post(scheduleTableURL + "?sf_request_type=ajax",
-                RequestOptions.create()
-                    .setForm(formData)
-                    .setHeader("X-Requested-With", "XMLHttpRequest")
-                    .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                    .setHeader("Referer", gatewayFirstEndURL)
-                    .setHeader("Origin", URLPraser.extractOrigin(smsURL))
-                    .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
-            );
+            APIResponse res;
+            if( Objects.isNull(query.getWeek()) && Objects.isNull(query.getSemester())){
+                res = req.get(scheduleTableURL + "?sf_request_type=ajax",
+                    RequestOptions.create()
+                        .setHeader("X-Requested-With", "XMLHttpRequest")
+                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                        .setHeader("Referer", gatewayFirstEndURL)
+                        .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0"));
+            }else {
+                // 重要！必须是表单形式
+                FormData formData = FormData.create();
+                formData.set("zc", query.getWeek());                            // 第几周
+                formData.set("xnxq01id", query.getSemester());                  // 学年学期
+                formData.set("cj0701id", "");                                   // 无意义
+                formData.set("demo", "");                                       // 无意义
+                formData.set("sfFD", "1");                                      // 是否放大
+                formData.set("wkbkc", "1");                                     // 显示无课表课程
+                formData.set("kbjcmsid", "EB5693B95B204102B2E28C5624C6E9ED");   // 时间模式
+                res = req.post(scheduleTableURL + "?sf_request_type=ajax",
+                    RequestOptions.create()
+                        .setForm(formData)
+                        .setHeader("X-Requested-With", "XMLHttpRequest")
+                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                        .setHeader("Referer", gatewayFirstEndURL)
+                        .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
+                );
+            }
             authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
             return htmlBodyParser.parseCourseTable(res.text());
         });

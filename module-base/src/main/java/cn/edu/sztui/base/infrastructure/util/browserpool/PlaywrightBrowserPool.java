@@ -81,7 +81,7 @@ public class PlaywrightBrowserPool{
         if (userAgent != null && !userAgent.isEmpty())
             options.setUserAgent(userAgent);
         BrowserContext context = browser.newContext(options);
-        context.setDefaultTimeout(timeoutReqSeconds);
+        context.setDefaultTimeout(timeoutReqSeconds*1000);
         return context;
     }
 
