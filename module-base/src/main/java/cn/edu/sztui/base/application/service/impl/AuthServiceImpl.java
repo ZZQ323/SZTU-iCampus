@@ -89,7 +89,8 @@ public class AuthServiceImpl implements AuthService {
         return refreshingCookies(wxId, authSessionCacheUtil.getSession(wxId));
     }
 
-    private LoginResultsVo refreshingCookies(String wxId, ProxySession session) {
+    private LoginResultsVo refreshingCookies(String wxId, ProxySession session)
+    {
         return browserPool.executeWithContext(context -> {
             if (!Objects.isNull(session))
                 context.addCookies(CookieConverter.fromCookieDTOs(session.getCookiesJson()));
@@ -101,13 +102,14 @@ public class AuthServiceImpl implements AuthService {
                 // page.navigate(gatewayStartURL);
                 // page.waitForURL(gatewayEndURL);
                 Response response = page.waitForResponse(
-                        resp -> resp.url().equals(gatewayFirstEndURL)
-                                || resp.url().equals(gatewaySecondEndURL)
-                                || resp.url().equals(acdemAdminSysGatewayStartURL),
+                    resp -> resp.url().equals(gatewayFirstEndURL)
+                        || resp.url().equals(gatewaySecondEndURL)
+                        || resp.url().equals(acdemAdminSysGatewayStartURL),
                         () -> page.navigate(gatewayStartURL)  // 这是在等待期间执行的动作
                 );
                 if( response.url().equals(acdemAdminSysGatewayStartURL)){
                     ret.setLogined(true);
+                    UserContext.getContext().setLoginTime(System.currentTimeMillis());
                     // log.info("表单结束的文本内容{}", response.text());
                     HtmlPraser.extractByRegex(ret,response.text());
                 }else if( response.url().equals(gatewayFirstEndURL) ){
@@ -119,13 +121,13 @@ public class AuthServiceImpl implements AuthService {
                     typeLists.add(LoginType.PASSWORD);
                     ret.setLoginTypes(typeLists);
                 }else{
-                    throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "未知的页面网络！！！" , ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
+                    throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "未知的页面URL！！！" , ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
                 }
             } catch (Exception e) {
                 log.error("会话初始化出现错误：" + e.getMessage());
                 throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "会话初始化出现错误：" + e.getMessage(), ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
             }
-            authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
+            authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
             return ret;
         });
     }
@@ -162,7 +164,7 @@ public class AuthServiceImpl implements AuthService {
             // log.info("SMS响应体: {}", res.text());
 
             // FIXME 如何确保 webvpn的cookie到账？
-            authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
+            authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
             return null;
         });
     }

@@ -70,7 +70,7 @@ public class AcademicServiceImpl implements AcademicService {
             }
             // ============ 第二步：更新网关的cookie  ============
             log.info("用户 {}，获得cookies{}", wxId, context.cookies());
-            authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
+            authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
             return ret;
         });
     }
@@ -114,7 +114,7 @@ public class AcademicServiceImpl implements AcademicService {
                         .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
                 );
             }
-            authSessionCacheUtil.saveOrUpdateSession(wxId, context.cookies());
+            authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
             return htmlBodyParser.parseCourseTable(res.text());
         });
     }

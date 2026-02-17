@@ -3,9 +3,6 @@ package cn.edu.sztui.common.cache.util;
 import cn.edu.sztui.common.cache.redis.RedisKeyGenerator;
 import cn.edu.sztui.common.cache.util.service.CacheService;
 import jakarta.annotation.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -14,7 +11,6 @@ import java.util.Map;
 
 @Component
 public class CacheUtil {
-    private static final Logger log = LoggerFactory.getLogger(CacheUtil.class);
     @Resource
     RedisKeyGenerator redisKeyGenerator;
     @Resource

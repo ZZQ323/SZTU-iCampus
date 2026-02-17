@@ -1,6 +1,5 @@
 package cn.edu.sztui.common.util.jwt;
 
-import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -9,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -16,7 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * JWT 配置和工具类
+ * JWT 配置和工具类（common 包）
+ * <p>
+ * 设计要点：
+ * 1. JWT claims 只放 openId、unionId，不放 sessionKey（敏感信息存 Redis）
+ * 2. claim key 用小写（openid / unionid），与 JwtAuthFilter 读取一致
+ * 3. expired 验证结果也携带 claims，方便提取 openId 用于刷新判断
  */
 @Data
 @Component
@@ -24,89 +29,54 @@ import java.util.Map;
 public class JwtConfig {
 
     private static final Logger log = LoggerFactory.getLogger(JwtConfig.class);
-
-    /**
-     * 密钥字符串（从配置文件读取）
-     */
     private String secret;
-
-    /**
-     * 过期时间（秒）
-     */
-    private Long expire;
-
-    /**
-     * token 前缀
-     */
-    private String tokenPrefix;
-
-    /**
-     * 请求头名称
-     */
-    private String header;
-
-    /**
-     * 签名密钥
-     */
+    private Long expire;          // 默认过期时间（秒），建议 14400（4小时）
+    private String tokenPrefix;   // "Bearer "
+    private String header;        // "Authorization"
     private SecretKey secretKey;
 
-    /**
-     * 初始化密钥
-     */
     @PostConstruct
     public void init() {
-        // 使用 HMAC-SHA256 算法，密钥至少需要 256 位
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
+    // ==================== 生成 Token ====================
+
     /**
-     * 生成 Token
-     *
-     * @param  session    用户的会话信息
-     * @return JWT token
+     * 生成 Token（使用默认过期时间）
      */
-    public String generateToken(WxMaJscode2SessionResult session) {
-        return generateToken(session, expire);
+    public String generateToken(String openId, String unionId) {
+        return generateToken(openId, unionId, expire);
     }
 
     /**
      * 生成 Token（指定过期时间）
-     *
-     * @param  session    用户的会话信息
-     * @param expireSeconds 过期时间（秒）
-     * @return JWT token
+     * <p>
+     * claims 中只放 openid 和 unionid（小写 key，与 Filter 一致）。
+     * 不放 sessionKey，避免客户端解码获得敏感信息。
      */
-    public String generateToken(WxMaJscode2SessionResult session, long expireSeconds) {
+    public String generateToken(String openId, String unionId, long expireSeconds) {
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + expireSeconds * 1000);
-        // 可以在 claims 中放入更多信息
+
         Map<String, Object> claims = new HashMap<>();
-        claims.put("openid", session.getOpenid());
-        claims.put("unionid", session.getUnionid());
-        claims.put("sessionkey", session.getSessionKey());
+        claims.put("openid", openId);          // 小写，与 Filter 中 claims.get("openid") 一致
+        claims.put("unionid", unionId);        // 可能为 null
+        claims.put("createdTime", now.getTime());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject( session.getUnionid() )              // 主题（用户标识）
-                .setIssuedAt(now)                               // 签发时间
-                .setExpiration(expireDate)                      // 过期时间
-                .signWith(secretKey, SignatureAlgorithm.HS256)  // 签名算法和密钥
+                .setSubject(openId)                            // subject = openId
+                .setIssuedAt(now)
+                .setExpiration(expireDate)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    /**
-     * 解析 Token
-     *
-     * @param token JWT token
-     * @return Claims
-     * @throws JwtException 解析失败时抛出异常
-     */
+    // ==================== 解析 & 验证 ====================
+
     public Claims parseToken(String token) {
-        // 移除 Bearer 前缀
-//        log.info("parseToken 收到{}", token);
-        if (token != null && token.startsWith(tokenPrefix)) {
-            token = token.substring(tokenPrefix.length()).trim();
-        }
+        token = stripPrefix(token);
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -115,10 +85,10 @@ public class JwtConfig {
     }
 
     /**
-     * 验证 Token 是否有效
-     *
-     * @param token JWT token
-     * @return 验证结果
+     * 验证 Token
+     * <p>
+     * 注意：expired 结果也携带 claims（从 ExpiredJwtException 中提取），
+     * 这样调用方可以提取 openId 用于刷新判断。
      */
     public TokenValidationResult validateToken(String token) {
         try {
@@ -126,7 +96,7 @@ public class JwtConfig {
             return TokenValidationResult.success(claims);
         } catch (ExpiredJwtException e) {
             log.warn("Token 已过期: {}", e.getMessage());
-            return TokenValidationResult.expired();
+            return TokenValidationResult.expired(e.getClaims());
         } catch (SignatureException e) {
             log.warn("Token 签名无效: {}", e.getMessage());
             return TokenValidationResult.invalid("签名无效");
@@ -140,22 +110,13 @@ public class JwtConfig {
     }
 
     /**
-     * 从 Token 中获取 unionid（不验证是否过期）
+     * 从 Token 中提取 openId（即使 token 已过期也能提取）
      */
-    public String getOpenidFromToken(String token) {
+    public String getOpenIdFromToken(String token) {
         try {
-            // 移除 Bearer 前缀
-            if (token != null && token.startsWith(tokenPrefix))
-                token = token.substring(tokenPrefix.length()).trim();
-            // 即使过期也能解析出 claims
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+            Claims claims = parseToken(token);
             return claims.getSubject();
         } catch (ExpiredJwtException e) {
-            // 过期的 token 也能获取 openid
             return e.getClaims().getSubject();
         } catch (Exception e) {
             return null;
@@ -163,26 +124,27 @@ public class JwtConfig {
     }
 
     /**
-     * 判断 Token 是否即将过期（剩余时间小于指定时间）
-     *
-     * @param token       JWT token
-     * @param minSeconds  最小剩余时间（秒）
-     * @return 是否即将过期
+     * 判断 Token 是否即将过期
      */
     public boolean isTokenExpiringSoon(String token, long minSeconds) {
         try {
             Claims claims = parseToken(token);
-            Date expiration = claims.getExpiration();
-            long remainingTime = expiration.getTime() - System.currentTimeMillis();
-            return remainingTime < minSeconds * 1000;
+            long remaining = claims.getExpiration().getTime() - System.currentTimeMillis();
+            return remaining < minSeconds * 1000;
         } catch (Exception e) {
             return true;
         }
     }
 
-    /**
-     * Token 验证结果
-     */
+    private String stripPrefix(String token) {
+        if (token != null && tokenPrefix != null && token.startsWith(tokenPrefix)) {
+            return token.substring(tokenPrefix.length()).trim();
+        }
+        return token;
+    }
+
+    // ==================== 验证结果 ====================
+
     public static class TokenValidationResult {
         private boolean valid;
         private boolean expired;
@@ -190,30 +152,35 @@ public class JwtConfig {
         private Claims claims;
 
         public static TokenValidationResult success(Claims claims) {
-            TokenValidationResult result = new TokenValidationResult();
-            result.valid = true;
-            result.expired = false;
-            result.claims = claims;
-            return result;
+            TokenValidationResult r = new TokenValidationResult();
+            r.valid = true;
+            r.expired = false;
+            r.claims = claims;
+            return r;
         }
 
-        public static TokenValidationResult expired() {
-            TokenValidationResult result = new TokenValidationResult();
-            result.valid = false;
-            result.expired = true;
-            result.message = "Token已过期";
-            return result;
+        /**
+         * 过期但仍携带 claims
+         * Filter 中用于返回 401；
+         * TokenRefreshService 中用于提取 openId 判断是否可刷新。
+         */
+        public static TokenValidationResult expired(Claims claims) {
+            TokenValidationResult r = new TokenValidationResult();
+            r.valid = false;
+            r.expired = true;
+            r.claims = claims;
+            r.message = "Token已过期";
+            return r;
         }
 
         public static TokenValidationResult invalid(String message) {
-            TokenValidationResult result = new TokenValidationResult();
-            result.valid = false;
-            result.expired = false;
-            result.message = message;
-            return result;
+            TokenValidationResult r = new TokenValidationResult();
+            r.valid = false;
+            r.expired = false;
+            r.message = message;
+            return r;
         }
 
-        // Getter
         public boolean isValid() { return valid; }
         public boolean isExpired() { return expired; }
         public String getMessage() { return message; }

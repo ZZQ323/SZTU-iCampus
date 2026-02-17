@@ -8,7 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Slf4j
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "cn.edu.sztui")
-public class BaseMain {
+public class BaseMain
+{
     public static void main(String[] args) {
         try {
             SpringApplication.run(BaseMain.class, args);
