@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,28 +35,49 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/wx-auth/v1/get-token",
-            "/notice/list",      // 公告列表
-            "/calendar/**"      // 活动日历
+            "/wx-auth/v1/refresh-token",
+            "/notice/list",
+            "/calendar/**"
+    );
+
+    /**
+     * 可选认证接口（有 token 就解析，没有也放行）
+     */
+    private static final List<String> OPTIONAL_AUTH_PATHS = Arrays.asList(
+            // 如果有些接口希望匿名也能访问，加在这里
     );
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response,FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
         try {
             String path = request.getServletPath();
-            // 公开接口直接放行
+
+            // 1. 公开接口直接放行
             if (isPublicPath(path)) {
                 chain.doFilter(request, response);
                 return;
             }
-            // 获取 Token
+
+            // 2. 获取 Token
             String token = getTokenFromRequest(request);
+
+            // 3. 判断是否是可选认证接口
+            boolean isOptionalAuth = isOptionalAuthPath(path);
+
+            // 4. 无 token 的处理
             if (!StringUtils.hasText(token)) {
-                // 无 token，但也允许访问（匿名用户）
-                // 如果某些接口必须登录，可以在 Controller 层判断
-                chain.doFilter(request, response);
+                if (isOptionalAuth) {
+                    // 可选认证：无 token 也放行
+                    chain.doFilter(request, response);
+                } else {
+                    // 必须认证：返回 401
+                    writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "请先登录");
+                }
                 return;
             }
-            // 验证 Token
+
+            // 5. 验证 Token
             JwtConfig.TokenValidationResult result = jwtConfig.validateToken(token);
 
             if (!result.isValid()) {
@@ -66,49 +88,51 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
                 return;
             }
-            // 构建用户上下文
+
+            // 6. 构建用户上下文
             Claims claims = result.getClaims();
             TokenMessage context = new TokenMessage();
-            context.setUnionId(claims.getSubject());
-            context.setOpenId((String) claims.get("openid"));           // 添加
-            context.setUnionId((String) claims.get("unionid"));           // 添加
-            context.setSessionKey((String) claims.get("sessionkey"));   // 添加
-            // 5. 存入 ThreadLocal
+            context.setOpenId((String) claims.get("openid"));
+            context.setUnionId((String) claims.get("unionid"));
+            context.setSessionKey((String) claims.get("sessionkey"));
+
+            // 7. 存入 ThreadLocal
             UserContext.setContext(context);
-            // 6. 继续执行
+
+            // 8. 继续执行
             chain.doFilter(request, response);
         } finally {
-            // 7. 清理 ThreadLocal
+            // 9. 清理 ThreadLocal
             UserContext.clear();
         }
     }
 
-    /**
-     * 从请求中获取 Token
-     */
     private String getTokenFromRequest(HttpServletRequest request) {
-        // 优先从 Header 获取
-        String token = request.getHeader(jwtConfig.getHeader());
-        // 也支持从请求参数获取（兼容某些场景）
-        if (!StringUtils.hasText(token))
-            token = request.getParameter("token");
-        return token;
+        String bearerToken = request.getHeader(jwtConfig.getHeader());
+        // 处理 "Bearer xxx" 格式
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        // 也支持直接传 token
+        if (StringUtils.hasText(bearerToken)) {
+            return bearerToken;
+        }
+        // 兼容从参数获取
+        return request.getParameter("token");
     }
 
-    /**
-     * 判断是否为公开接口
-     */
     private boolean isPublicPath(String path) {
         return PUBLIC_PATHS.stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
-    /**
-     * 写入错误响应
-     */
-    private void writeErrorResponse(HttpServletResponse response,
-                                    HttpStatus status,
-                                    String message) throws IOException {
+    private boolean isOptionalAuthPath(String path) {
+        return OPTIONAL_AUTH_PATHS.stream()
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
+    }
+
+    private void writeErrorResponse(HttpServletResponse response, HttpStatus status, String message)
+            throws IOException {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
