@@ -163,7 +163,7 @@ public class AuthServiceImpl implements AuthService {
             // log.info("SMS响应头: {}", res.headers());
             // log.info("SMS响应体: {}", res.text());
 
-            // FIXME 如何确保 webvpn的cookie到账？
+
             authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
             return null;
         });

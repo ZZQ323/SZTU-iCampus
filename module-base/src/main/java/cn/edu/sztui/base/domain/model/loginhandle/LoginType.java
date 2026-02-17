@@ -7,7 +7,6 @@ public enum LoginType {
     PASSWORD("账号密码登录"),
     OTP("动态口令登录");
 
-
     private final String chineseName;
 
     LoginType(String chineseName) {this.chineseName = chineseName;}
