@@ -183,7 +183,8 @@ public class AuthServiceImpl implements AuthService {
 
     // ==================== 核心：Cookie 刷新逻辑 ====================
 
-    private LoginResultsVo doRefreshCookies(String wxId, ProxySession session, int timeoutSeconds) {
+    private LoginResultsVo doRefreshCookies(String wxId, ProxySession session, int timeoutSeconds)
+    {
         return browserPool.executeWithContext(context -> {
             if (!Objects.isNull(session) && session.getCookiesJson() != null && !session.getCookiesJson().isEmpty()) {
                 context.addCookies(CookieConverter.fromCookieDTOs(session.getCookiesJson()));
@@ -307,6 +308,17 @@ public class AuthServiceImpl implements AuthService {
             // ============ 第二步：模拟表单提交 ============
             APIResponse formRes = loginHandle.loginRedirect(context, cmd);
             // log.info("表单提交后 cookies: {}", context.cookies());
+
+            Page page = context.newPage();
+            Response response = page.waitForResponse(
+                    resp -> resp.url().equals(acdemAdminSysGatewayStartURL),
+                    () -> page.navigate(gatewayStartURL)
+            );
+            // ============ 访问最终页面获取用户信息 ============
+            if (response.url().equals(acdemAdminSysGatewayStartURL)) {
+                UserInfoPraser.extractByRegex(ret, response.text());
+                log.info("从最终页面解析到用户信息: userId={}, realName={}", ret.getUserId(), ret.getRealName());
+            }
 
             UserInfoPraser.extractByRegex(ret, formRes.text());
             log.info("解析到用户信息: userId={}, realName={}", ret.getUserId(), ret.getRealName());
