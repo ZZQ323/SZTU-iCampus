@@ -41,6 +41,29 @@ spring:
       port: 6379
       password: ${passwd.redis}
       database: 0
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: -1ms
+    # 定时任务配置
+    # @EnableScheduling 已在 SchedulePushTask 中启用
+    # 如果需要配置线程池，可以添加:
+    task:
+      scheduling:
+        pool:
+          size: 2  # 定时任务线程池大小
+        thread-name-prefix: schedule-task-
+
+
+# 日志配置 (可选，用于调试)
+logging:
+  level:
+    cn.edu.sztui.base.infrastructure.sse: DEBUG
+    cn.edu.sztui.base.infrastructure.stream: DEBUG
+    cn.edu.sztui.base.infrastructure.scheduler: INFO
 
 # 分布式定时任务
 #xxl:

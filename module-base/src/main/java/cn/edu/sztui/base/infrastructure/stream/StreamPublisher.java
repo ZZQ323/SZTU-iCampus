@@ -8,7 +8,6 @@ import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.connection.stream.StringRecord;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-
 import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
