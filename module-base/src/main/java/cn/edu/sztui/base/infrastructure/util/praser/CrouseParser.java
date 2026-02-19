@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Service
-public class HtmlBodyParser {
+public class CrouseParser
+{
 
     // 匹配时间格式，如 08:30-10:00
     private static final Pattern TIME_PATTERN = Pattern.compile("(\\d{2}:\\d{2}-\\d{2}:\\d{2})");

@@ -8,7 +8,7 @@ import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
 import cn.edu.sztui.base.infrastructure.util.browserpool.PlaywrightBrowserPool;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.dto.ProxySession;
-import cn.edu.sztui.base.infrastructure.util.praser.HtmlBodyParser;
+import cn.edu.sztui.base.infrastructure.util.praser.CrouseParser;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
@@ -38,7 +38,7 @@ public class AcademicServiceImpl implements AcademicService {
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
     @Resource
-    private HtmlBodyParser htmlBodyParser;
+    private CrouseParser crouseParser;
 
     @Override
     public LoginResultsVo init() {
@@ -115,7 +115,7 @@ public class AcademicServiceImpl implements AcademicService {
                 );
             }
             authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
-            return htmlBodyParser.parseCourseTable(res.text());
+            return crouseParser.parseCourseTable(res.text());
         });
     }
 }

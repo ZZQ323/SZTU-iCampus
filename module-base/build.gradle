@@ -24,7 +24,8 @@ dependencies {
     // Apache Commons Pool2（对象池核心）
     implementation 'org.apache.commons:commons-pool2:2.12.0'
     implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
-
+    // SpringDoc OpenAPI 启动器（包含 Swagger 3 注解、UI 界面、自动配置）
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     //  依赖公共包
     implementation project(':module-common')
 }

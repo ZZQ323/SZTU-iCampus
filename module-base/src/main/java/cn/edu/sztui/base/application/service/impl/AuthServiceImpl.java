@@ -4,6 +4,7 @@ import cn.edu.sztui.base.application.dto.command.LoginRequestCommand;
 import cn.edu.sztui.base.application.service.AcademicService;
 import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
+import cn.edu.sztui.base.application.vo.LoginStatusVo;
 import cn.edu.sztui.base.domain.model.loginhandle.HandleCluster;
 import cn.edu.sztui.base.domain.model.loginhandle.LoginHandle;
 import cn.edu.sztui.base.domain.model.loginhandle.LoginType;
@@ -12,10 +13,8 @@ import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
 import cn.edu.sztui.base.infrastructure.util.browserpool.PlaywrightBrowserPool;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.dto.ProxySession;
-import cn.edu.sztui.base.infrastructure.util.ocr.CaptchaOcrUtil;
-import cn.edu.sztui.base.infrastructure.util.praser.HtmlPraser;
 import cn.edu.sztui.base.infrastructure.util.praser.URLPraser;
-import cn.edu.sztui.base.infrastructure.wx.WxMaUserService;
+import cn.edu.sztui.base.infrastructure.util.praser.UserInfoPraser;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
@@ -42,6 +41,9 @@ import java.util.Objects;
 
 import static cn.edu.sztui.base.domain.model.SchoolAPIs.*;
 
+/**
+ * 认证服务实现（修复版 - 添加用户信息解析）
+ */
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -52,189 +54,295 @@ public class AuthServiceImpl implements AuthService {
     private AuthSessionCacheUtil authSessionCacheUtil;
     @Resource
     private AcademicService academicService;
-    @Resource
-    private CaptchaOcrUtil captchaOcrUtil;
-    @Resource
-    private WxMaUserService wxMaUserService;
     @Autowired
-    private ObjectMapper  objectMapper;
+    private ObjectMapper objectMapper;
     @Autowired
     private HandleCluster handleCluster;
 
-    /**
-     * 检测小程序账号的cookie活性
-     */
+    // ==================== 状态查询 ====================
+
+    @Override
+    public LoginStatusVo getStatus() {
+        TokenMessage tokenMessage = UserContext.getContext();
+        String wxId = tokenMessage.getOpenId();
+        log.debug("用户 {} 查询登录状态", wxId);
+
+        // 1. 优先从缓存读取状态
+        LoginStatusVo cachedStatus = authSessionCacheUtil.getCachedStatus(wxId);
+        if (cachedStatus != null) {
+            log.debug("命中状态缓存: openId={}, logined={}", wxId, cachedStatus.isLogined());
+            return cachedStatus;
+        }
+
+        // 2. 检查 Cookie 是否可能过期
+        if (authSessionCacheUtil.isCookiePossiblyExpired(wxId)) {
+            log.info("Cookie 可能已过期，清除旧 Cookie: openId={}", wxId);
+            authSessionCacheUtil.clearSessionCookies(wxId);
+        }
+
+        // 3. 缓存未命中，使用【默认超时】获取真实状态
+        LoginResultsVo result = doRefreshCookies(wxId, authSessionCacheUtil.getSession(wxId),
+                browserPool.getSlowTimeoutSeconds());
+
+        // 4. 转换并缓存
+        LoginStatusVo status = LoginStatusVo.from(result);
+        status.setCookieExpiringSoon(authSessionCacheUtil.isCookieExpiringSoon(wxId));
+        authSessionCacheUtil.cacheStatus(wxId, status);
+
+        return status;
+    }
+
     @Override
     public boolean getSessionStatus() {
-        TokenMessage tokenmesage = UserContext.getContext();
-        String wxId = tokenmesage.getOpenId();
+        TokenMessage tokenMessage = UserContext.getContext();
+        String wxId = tokenMessage.getOpenId();
         return authSessionCacheUtil.hasSession(wxId);
     }
 
     @Override
     public List<String> getPossibleUsrId() {
-        TokenMessage tokenmesage = UserContext.getContext();
-        ProxySession session = authSessionCacheUtil.getSession(tokenmesage.getOpenId());
-        if(Objects.isNull(session)){
+        TokenMessage tokenMessage = UserContext.getContext();
+        ProxySession session = authSessionCacheUtil.getSession(tokenMessage.getOpenId());
+        if (Objects.isNull(session)) {
             return Collections.emptyList();
         }
         return session.getUserIds();
     }
 
+    // ==================== 会话管理 ====================
+
     @Override
-    public LoginResultsVo init() {
-        TokenMessage tokenmesage = UserContext.getContext();
-        log.info("用户{} 进行初始化",tokenmesage);
-        String wxId = tokenmesage.getOpenId();
-        return refreshingCookies(wxId, authSessionCacheUtil.getSession(wxId));
+    public LoginResultsVo initSession() {
+        TokenMessage tokenMessage = UserContext.getContext();
+        String wxId = tokenMessage.getOpenId();
+
+        int slowTimeout = browserPool.getSlowTimeoutSeconds();
+        log.info("用户 {} 初始化会话（首次加载，使用长超时 {}s）", wxId, slowTimeout);
+
+        // 1. 清除旧缓存，强制重新获取
+        authSessionCacheUtil.invalidateStatusCache(wxId);
+        authSessionCacheUtil.clearSessionCookies(wxId);
+
+        // 2. 使用【长超时】执行 Playwright 流程
+        LoginResultsVo result = doRefreshCookies(wxId, null, slowTimeout);
+
+        // 3. 更新状态缓存
+        LoginStatusVo status = LoginStatusVo.from(result);
+        authSessionCacheUtil.cacheStatus(wxId, status);
+
+        return result;
     }
 
-    private LoginResultsVo refreshingCookies(String wxId, ProxySession session)
-    {
+    @Override
+    public LoginResultsVo refreshSession() {
+        TokenMessage tokenMessage = UserContext.getContext();
+        String wxId = tokenMessage.getOpenId();
+        log.info("用户 {} 刷新会话（使用默认超时）", wxId);
+
+        // 1. 检查是否有会话
+        ProxySession session = authSessionCacheUtil.getSession(wxId);
+        if (session == null) {
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "会话不存在，请先初始化",
+                    ResultCodeEnum.BAD_REQUEST.getCode()
+            );
+        }
+
+        // 2. 检查 Cookie 是否可能过期
+        if (authSessionCacheUtil.isCookiePossiblyExpired(wxId)) {
+            log.warn("Cookie 可能已过期，建议重新初始化: openId={}", wxId);
+        }
+
+        // 3. 使用【默认超时】执行刷新
+        LoginResultsVo result = doRefreshCookies(wxId, session, browserPool.getDefaultTimeoutSeconds());
+
+        // 4. 检查刷新结果
+        if (!result.isLogined()) {
+            authSessionCacheUtil.invalidateStatusCache(wxId);
+            authSessionCacheUtil.clearSessionCookies(wxId);
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "会话已过期，请重新登录",
+                    ResultCodeEnum.UNAUTHORIZED.getCode()
+            );
+        }
+
+        // 5. 更新状态缓存
+        LoginStatusVo status = LoginStatusVo.from(result);
+        authSessionCacheUtil.cacheStatus(wxId, status);
+
+        return result;
+    }
+
+    @Override
+    @Deprecated
+    public LoginResultsVo refresh() {
+        return initSession();
+    }
+
+    // ==================== 核心：Cookie 刷新逻辑 ====================
+
+    private LoginResultsVo doRefreshCookies(String wxId, ProxySession session, int timeoutSeconds) {
         return browserPool.executeWithContext(context -> {
-            if (!Objects.isNull(session))
+            if (!Objects.isNull(session) && session.getCookiesJson() != null && !session.getCookiesJson().isEmpty()) {
                 context.addCookies(CookieConverter.fromCookieDTOs(session.getCookiesJson()));
-            // 访问登录页面
+            }
+
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);
             try {
                 Page page = context.newPage();
-                // page.navigate(gatewayStartURL);
-                // page.waitForURL(gatewayEndURL);
                 Response response = page.waitForResponse(
                     resp -> resp.url().equals(gatewayFirstEndURL)
                         || resp.url().equals(gatewaySecondEndURL)
                         || resp.url().equals(acdemAdminSysGatewayStartURL),
-                        () -> page.navigate(gatewayStartURL)  // 这是在等待期间执行的动作
+                    () -> page.navigate(gatewayStartURL)
                 );
-                if( response.url().equals(acdemAdminSysGatewayStartURL)){
+
+                if (response.url().equals(acdemAdminSysGatewayStartURL)) {
                     ret.setLogined(true);
                     UserContext.getContext().setLoginTime(System.currentTimeMillis());
-                    // log.info("表单结束的文本内容{}", response.text());
-                    HtmlPraser.extractByRegex(ret,response.text());
-                }else if( response.url().equals(gatewayFirstEndURL) ){
+                    // 解析用户信息
+                    UserInfoPraser.extractByRegex(ret, response.text());
+                } else if (response.url().equals(gatewayFirstEndURL)) {
                     ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
-                }else if( response.url().equals(gatewaySecondEndURL) ){
-                    // Collections.singletonList返回的是一个不可变的列表，只包含一个元素
+                } else if (response.url().equals(gatewaySecondEndURL)) {
                     List<LoginType> typeLists = new ArrayList<>();
                     typeLists.add(LoginType.SMS);
                     typeLists.add(LoginType.PASSWORD);
                     ret.setLoginTypes(typeLists);
-                }else{
-                    throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "未知的页面URL！！！" , ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
+                } else {
+                    throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "未知的页面URL：" + response.url(),
+                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+                    );
                 }
+            } catch (com.microsoft.playwright.TimeoutError e) {
+                log.error("Playwright 超时（{}s）: {}", timeoutSeconds, e.getMessage());
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "学校服务器响应超时，请稍后重试",
+                        ResultCodeEnum.GATEWAY_TIMEOUT.getCode()
+                );
+            } catch (BusinessException e) {
+                throw e;
             } catch (Exception e) {
-                log.error("会话初始化出现错误：" + e.getMessage());
-                throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "会话初始化出现错误：" + e.getMessage(), ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
+                log.error("会话刷新出现错误：{}", e.getMessage());
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "会话刷新出现错误：" + e.getMessage(),
+                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+                );
             }
+            log.info("解析到用户信息: userId={}, realName={}", ret.getUserId(), ret.getRealName());
             authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
             return ret;
-        });
+        }, timeoutSeconds);
     }
+
+    // ==================== 登录/登出 ====================
 
     @Override
     public void getSms(String usrId) {
         browserPool.executeWithContext(context -> {
-            TokenMessage tokenmesage = UserContext.getContext();
-            String wxId = tokenmesage.getOpenId();
-            // 缓存检测
+            TokenMessage tokenMessage = UserContext.getContext();
+            String wxId = tokenMessage.getOpenId();
+
             if (authSessionCacheUtil.hasSession(wxId)) {
                 ProxySession session = authSessionCacheUtil.getSession(wxId);
                 List<Cookie> preCookies = CookieConverter.fromCookieDTOs(session.getCookiesJson());
                 context.addCookies(preCookies);
             }
-            // 访问登录页面
+
             APIRequestContext req = context.request();
-            // 重要！必须是表单形式
             FormData formData = FormData.create();
             formData.set("j_username", CharacterConverter.toSBC(usrId));
-            // formData.put("j_authMethodID", "41");
-            APIResponse res = req.post(smsURL+ "?sf_request_type=ajax",
-                RequestOptions.create()
-                .setForm(formData)
-                .setHeader("X-Requested-With", "XMLHttpRequest")
-                .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                .setHeader("Referer", gatewayFirstEndURL)
-                .setHeader("Origin", URLPraser.extractOrigin(smsURL))
-                .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
-            );
-            // log.info("SMS请求URL: {}", smsURL);
-            // log.info("SMS请求状态: {}", res.status());
-            // log.info("SMS响应头: {}", res.headers());
-            // log.info("SMS响应体: {}", res.text());
 
+            APIResponse res = req.post(smsURL + "?sf_request_type=ajax",
+                    RequestOptions.create()
+                            .setForm(formData)
+                            .setHeader("X-Requested-With", "XMLHttpRequest")
+                            .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                            .setHeader("Referer", gatewayFirstEndURL)
+                            .setHeader("Origin", URLPraser.extractOrigin(smsURL))
+                            .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
+            );
 
             authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
             return null;
         });
     }
 
+    @Override
     public LoginResultsVo loginFrame(LoginRequestCommand cmd) {
         return browserPool.executeWithContext(context -> {
-            TokenMessage tokenmesage = UserContext.getContext();
-            String wxId = tokenmesage.getOpenId();
+            TokenMessage tokenMessage = UserContext.getContext();
+            String wxId = tokenMessage.getOpenId();
 
             LoginResultsVo ret = new LoginResultsVo();
             if (authSessionCacheUtil.hasSession(wxId)) {
-                // 缓存检测
                 ProxySession session = authSessionCacheUtil.getSession(wxId);
                 List<Cookie> preCookies = CookieConverter.fromCookieDTOs(session.getCookiesJson());
                 context.addCookies(preCookies);
             }
 
             // ============ 第一步：AJAX 验证 ============
-            // 访问登录页面
             LoginHandle loginHandle = handleCluster.getSpringLoginHandle(cmd.getLoginType());
             APIResponse ajaxRes = loginHandle.loginVerification(context, cmd);
-            // 获取类重构
+
             String ajaxBody = ajaxRes.text();
-            // log.info("AJAX验证响应: {}", ajaxBody); // 一般是响应 {"loginFailed":"false"}
-            // jackson 库中的核心类
             JsonNode json = objectMapper.readTree(ajaxBody);
             boolean loginFailed = json.path("loginFailed").asBoolean(true);
 
-            if (loginFailed)
-                throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "登录验证失败: " + ajaxBody, ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
+            if (loginFailed) {
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "登录验证失败: " + ajaxBody,
+                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+                );
+            }
 
-            // ============ 第二步：模拟表单提交（处理重定向链） ============
-            // 获取类重构
+            // ============ 第二步：模拟表单提交 ============
             APIResponse formRes = loginHandle.loginRedirect(context, cmd);
+            // log.info("表单提交后 cookies: {}", context.cookies());
 
-            // log.info("表单提交状态: {}", formRes.status());
-            log.info("表单提交后 cookies: {}", context.cookies());
-            // log.info("表单结束的文本内容{}", formRes.text());
+            UserInfoPraser.extractByRegex(ret, formRes.text());
+            log.info("解析到用户信息: userId={}, realName={}", ret.getUserId(), ret.getRealName());
 
-            // ============ 第三步：更新网关的cookie  ============
+            // ============ 第三步：更新网关的 Cookie ============
             authSessionCacheUtil.sessionLoginBind(wxId, cmd.getUserId(), context.cookies());
 
-            // ============ 第四步：获取教务cookie（处理重定向链） ============
-            academicService.init();
-            log.info("获取到的 教务cookies: {}", context.cookies());
+            // ============ 第四步：使状态缓存失效 ============
+            authSessionCacheUtil.invalidateStatusCache(wxId);
 
             ret.setWxId(wxId);
             ret.setLogined(true);
             return ret;
-        });
+        },browserPool.getSlowTimeoutSeconds());
     }
 
     @Override
     public LoginResultsVo logout(LoginRequestCommand cmd) {
         return browserPool.executeWithContext(context -> {
-            TokenMessage tokenmesage = UserContext.getContext();
-            String wxId = tokenmesage.getOpenId();
-            // 缓存检测
+            TokenMessage tokenMessage = UserContext.getContext();
+            String wxId = tokenMessage.getOpenId();
+
             if (authSessionCacheUtil.hasSession(wxId)) {
                 ProxySession session = authSessionCacheUtil.getSession(wxId);
                 List<Cookie> preCookies = CookieConverter.fromCookieDTOs(session.getCookiesJson());
                 context.addCookies(preCookies);
             }
-            // 访问登录页面
+
             APIRequestContext req = context.request();
             APIResponse res = req.get(logoutURL);
-//            log.info("退出响应:{} {}", res.status(),res.text());
-            
-            authSessionCacheUtil.sessionLogoutBind( wxId );
+
+            authSessionCacheUtil.sessionLogoutBind(wxId);
+            authSessionCacheUtil.invalidateStatusCache(wxId);
+
             LoginResultsVo ret = new LoginResultsVo();
+            ret.setLogined(false);
             return ret;
         });
     }
