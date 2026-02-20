@@ -1,13 +1,14 @@
 package cn.edu.sztui.stream.application.service;
 
 import cn.edu.sztui.base.application.vo.CourseTableVO;
-import cn.edu.sztui.base.infrastructure.sse.SseEmitterManager;
-import cn.edu.sztui.base.infrastructure.sse.dto.SseMessage;
-import cn.edu.sztui.base.infrastructure.stream.StreamKeys;
-import cn.edu.sztui.base.infrastructure.stream.StreamPublisher;
+import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
+import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
+import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
+import cn.edu.sztui.stream.infrastructure.stream.StreamPublisher;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
+
 import java.util.Collection;
 import java.util.Map;
 

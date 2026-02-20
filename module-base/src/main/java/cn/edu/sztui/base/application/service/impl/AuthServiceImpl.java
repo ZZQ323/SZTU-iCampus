@@ -62,7 +62,8 @@ public class AuthServiceImpl implements AuthService {
     // ==================== 状态查询 ====================
 
     @Override
-    public LoginStatusVo getStatus() {
+    public LoginStatusVo getStatus()
+    {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
         log.debug("用户 {} 查询登录状态", wxId);

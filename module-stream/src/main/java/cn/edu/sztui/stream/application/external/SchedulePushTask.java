@@ -1,11 +1,11 @@
-package cn.edu.sztui.stream.infrastructure.scheduler;
+package cn.edu.sztui.stream.application.external;
 
 import cn.edu.sztui.base.application.service.AcademicService;
-import cn.edu.sztui.base.infrastructure.sse.SseEmitterManager;
-import cn.edu.sztui.base.infrastructure.sse.dto.SseMessage;
-import cn.edu.sztui.base.infrastructure.stream.StreamKeys;
-import cn.edu.sztui.base.infrastructure.stream.StreamPublisher;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
+import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
+import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
+import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
+import cn.edu.sztui.stream.infrastructure.stream.StreamPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -40,13 +40,16 @@ public class SchedulePushTask {
     
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     
-    /**
-     * 每天早上 7:00 推送当日课表
-     * 
-     * cron: 秒 分 时 日 月 周
-     */
-    @Scheduled(cron = "0 0 7 * * ?")
-    public void pushDailySchedule() {
+
+    // cron: 秒 分 时 日 月 周
+    // 每天早上 7:00 推送当日课表
+    // @Scheduled(cron = "0 0 7 * * ?")
+    // 每分钟推送一次
+    // @Scheduled(cron = "0 * * * * ?")
+    // 每15分钟
+    @Scheduled(cron = "0 15 * * * ?")
+    public void pushDailySchedule()
+    {
         log.info("======== 开始每日课表推送任务 ========");
         
         // 获取所有订阅了 schedule 的用户
@@ -108,7 +111,8 @@ public class SchedulePushTask {
      * 每 5 分钟发送心跳，保持连接活跃
      */
     @Scheduled(fixedRate = 5 * 60 * 1000)
-    public void sendHeartbeat() {
+    public void sendHeartbeat()
+    {
         int totalConnections = sseEmitterManager.getTotalConnectionCount();
         
         if (totalConnections > 0) {
@@ -124,7 +128,8 @@ public class SchedulePushTask {
      * 每小时检测并清理过期连接
      */
     @Scheduled(fixedRate = 60 * 60 * 1000)
-    public void cleanupConnections() {
+    public void cleanupConnections()
+    {
         int before = sseEmitterManager.getTotalConnectionCount();
         
         // 发送一个空消息来触发连接检测
