@@ -31,7 +31,7 @@ import java.util.Map;
 @Slf4j
 @Tag(name = "认证管理", description = "学校登录状态管理相关接口")
 @RestController
-@RequestMapping("/auth/v1")
+@RequestMapping("/auth")
 public class AuthController {
 
     @Resource
@@ -46,7 +46,7 @@ public class AuthController {
      * 返回内容包含：是否已登录、可用登录方式、Cookie 是否即将过期。
      */
     @Operation(summary = "获取登录状态", description = "轻量级状态查询，优先读取缓存，30秒TTL")
-    @GetMapping("/status")
+    @GetMapping("/v1/status")
     public Result getStatus() {
         LoginStatusVo status = authService.getStatus();
         return Result.ok(status);
@@ -58,7 +58,7 @@ public class AuthController {
      */
     @Operation(summary = "检查 session 存在性", description = "仅检查 Redis 中是否有记录")
     @Deprecated
-    @GetMapping("/status/session")
+    @GetMapping("/v1/status/session")
     public Result getSessionStatus() {
         boolean hasSession = authService.getSessionStatus();
         return Result.ok(Map.of("hasSession", hasSession));
@@ -68,7 +68,7 @@ public class AuthController {
      * 获取历史登录过的学号列表
      */
     @Operation(summary = "获取历史学号", description = "返回该微信账号曾经登录过的学号列表")
-    @GetMapping("/history")
+    @GetMapping("/v1/history")
     public Result getHistory() {
         List<String> userIds = authService.getPossibleUsrId();
         return Result.ok(userIds);
@@ -87,7 +87,7 @@ public class AuthController {
      * </ul>
      */
     @Operation(summary = "初始化会话", description = "强制重建 Cookie，清除旧状态")
-    @PostMapping("/session/init")
+    @PostMapping("/v1/session/init")
     public Result initSession() {
         LoginResultsVo result = authService.initSession();
         return Result.ok(result);
@@ -100,7 +100,7 @@ public class AuthController {
      * 如果会话已过期，返回错误码引导前端走登录流程。
      */
     @Operation(summary = "刷新会话", description = "刷新已登录会话的 SESSION_ID，延长有效期")
-    @PostMapping("/session/refresh")
+    @PostMapping("/v1/session/refresh")
     public Result refreshSession() {
         LoginResultsVo result = authService.refreshSession();
         return Result.ok(result);
@@ -113,7 +113,7 @@ public class AuthController {
      */
     @Operation(summary = "刷新 Cookie（旧接口）", description = "兼容旧前端，建议迁移到新接口")
     @Deprecated
-    @PostMapping("/cookie/refresh")
+    @PostMapping("/v1/cookie/refresh")
     public Result refreshCookie() {
         // 兼容旧逻辑：相当于 initSession
         LoginResultsVo result = authService.initSession();
@@ -126,7 +126,7 @@ public class AuthController {
      * 请求发送短信验证码
      */
     @Operation(summary = "请求短信验证码", description = "向指定学号发送短信验证码")
-    @PostMapping("/request/sms")
+    @PostMapping("/v1/request/sms")
     public Result requestSms(@RequestBody Map<String, String> body) {
         String userId = body.get("userId");
         if (userId == null || userId.isBlank()) {
@@ -140,7 +140,7 @@ public class AuthController {
      * 登录学校系统
      */
     @Operation(summary = "登录学校系统", description = "支持短信验证码和密码两种登录方式")
-    @PostMapping("/login")
+    @PostMapping("/v1/login")
     public Result login(@RequestBody LoginRequestCommand cmd) {
         LoginResultsVo result = authService.loginFrame(cmd);
         return Result.ok(result);
@@ -150,7 +150,7 @@ public class AuthController {
      * 登出学校系统
      */
     @Operation(summary = "登出学校系统")
-    @PostMapping("/logout")
+    @PostMapping("/v1/logout")
     public Result logout(@RequestBody LoginRequestCommand cmd) {
         LoginResultsVo result = authService.logout(cmd);
         return Result.ok(result);

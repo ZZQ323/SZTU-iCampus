@@ -22,12 +22,21 @@ import com.microsoft.playwright.options.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
 
 import static cn.edu.sztui.base.domain.model.SchoolAPIs.*;
 
-//学院信息服务
+/**
+ * 教务系统服务实现
+ * <p>
+ * 更新内容：
+ * <ol>
+ *   <li>【新增】getCrouseTableByOpenId 方法，支持直接传入 wxOpenId</li>
+ *   <li>【重构】抽取 doGetCrouseTable 核心逻辑</li>
+ * </ol>
+ */
 @Slf4j
 @Service
 public class AcademicServiceImpl implements AcademicService {
@@ -39,82 +48,195 @@ public class AcademicServiceImpl implements AcademicService {
     @Resource
     private CrouseParser crouseParser;
 
+    // ==================== 初始化 ====================
+
     @Override
     public LoginResultsVo init() {
-        TokenMessage tokenmesage = UserContext.getContext();
-        String wxId = tokenmesage.getOpenId();
+        TokenMessage tokenMessage = UserContext.getContext();
+        String wxId = tokenMessage.getOpenId();
+
+        if (!authSessionCacheUtil.isSchoolLoggedIn(wxId)) {
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "请先登录学校系统",
+                    ResultCodeEnum.UNAUTHORIZED.getCode()
+            );
+        }
+        log.info("用户 {} 初始化教务系统会话", wxId);
         return refreshingCookies(wxId);
     }
 
     private LoginResultsVo refreshingCookies(String wxId) {
         return browserPool.executeWithContext(context -> {
             ProxySession session = authSessionCacheUtil.getSession(wxId);
-            if (Objects.isNull(session))
-                throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "登录验证失败:", ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
+            if (Objects.isNull(session) || !session.isSchoolLoggedIn()) {
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "会话不存在或未登录，请先登录学校系统",
+                        ResultCodeEnum.UNAUTHORIZED.getCode()
+                );
+            }
+
             context.addCookies(CookieConverter.fromCookieDTOs(session.getCookiesJson()));
 
-            // 第一步：访问教务页面，然后静等更新cookie
             LoginResultsVo ret = new LoginResultsVo();
             try {
                 Page page = context.newPage();
                 Response response = page.navigate(AASysGatewayURL, new Page.NavigateOptions()
-                    .setWaitUntil(WaitUntilState.COMMIT));
+                        .setWaitUntil(WaitUntilState.COMMIT));
                 page.waitForLoadState(LoadState.NETWORKIDLE);
-                // 正是选课期间，可以进行礼貌的提醒
-                if (response.url().equals(AASysSwitchPort)) ret.setComents("最近正在选课！");
+
+                if (response.url().equals(AASysSwitchPort)) {
+                    ret.setComents("最近正在选课！");
+                }
+                ret.setLogined(true);
+            } catch (com.microsoft.playwright.TimeoutError e) {
+                log.error("教务系统访问超时: {}", e.getMessage());
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "教务系统响应超时，请稍后重试",
+                        ResultCodeEnum.GATEWAY_TIMEOUT.getCode()
+                );
+            } catch (BusinessException e) {
+                throw e;
             } catch (Exception e) {
-                log.error("会话初始化出现错误：" + e.getMessage());
-                throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(), "会话初始化出现错误：" + e.getMessage(),
-                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
+                log.error("教务系统初始化出现错误: {}", e.getMessage());
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "教务系统初始化失败：" + e.getMessage(),
+                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+                );
             }
-            // ============ 第二步：更新网关的cookie  ============
-            log.info("用户 {}，获得cookies{}", wxId, context.cookies());
+
+            log.info("用户 {} 教务系统 Cookie 已更新", wxId);
             authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
+            authSessionCacheUtil.invalidateStatusCache(wxId);
+
             return ret;
-        });
+        }, browserPool.getSlowTimeoutSeconds());
     }
 
+    // ==================== 获取课表 ====================
+
+    /**
+     * 获取课表（从 UserContext 获取 wxId）
+     * <p>
+     * 用于 HTTP 请求场景
+     */
     @Override
     public CourseTableVO getCrouseTable(CrouseTableQuery query) {
+        TokenMessage tokenMessage = UserContext.getContext();
+        String wxId = tokenMessage.getOpenId();
+        return doGetCrouseTable(wxId, query);
+    }
+
+    /**
+     * 【新增】获取课表（直接传入 wxOpenId）
+     * <p>
+     * 用于异步场景（SSE 推送、定时任务）
+     */
+    @Override
+    public CourseTableVO getCrouseTableByOpenId(String wxOpenId, CrouseTableQuery query) {
+        return doGetCrouseTable(wxOpenId, query);
+    }
+
+    /**
+     * 【核心逻辑】获取课表
+     *
+     * @param wxId  微信 OpenId
+     * @param query 查询参数
+     * @return 课表数据
+     */
+    private CourseTableVO doGetCrouseTable(String wxId, CrouseTableQuery query) {
+        // 检查是否已登录
+        if (!authSessionCacheUtil.isSchoolLoggedIn(wxId)) {
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "请先登录学校系统",
+                    ResultCodeEnum.UNAUTHORIZED.getCode()
+            );
+        }
+
+        // 检查 Cookie 是否可能过期
+        if (authSessionCacheUtil.isCookiePossiblyExpired(wxId)) {
+            log.warn("Cookie 可能已过期: openId={}", wxId);
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "会话已过期，请重新初始化教务系统",
+                    ResultCodeEnum.UNAUTHORIZED.getCode()
+            );
+        }
+
         return browserPool.executeWithContext(context -> {
-            TokenMessage tokenmesage = UserContext.getContext();
-            String wxId = tokenmesage.getOpenId();
-            if (authSessionCacheUtil.hasSession(wxId)) {
-                ProxySession session = authSessionCacheUtil.getSession(wxId);
+            ProxySession session = authSessionCacheUtil.getSession(wxId);
+            if (session != null && session.getCookiesJson() != null) {
                 List<Cookie> preCookies = CookieConverter.fromCookieDTOs(session.getCookiesJson());
                 context.addCookies(preCookies);
             }
-            // 访问登录页面
+
             APIRequestContext req = context.request();
             APIResponse res;
-            if( Objects.isNull(query.getWeek()) && Objects.isNull(query.getSemester())){
-                res = req.get(scheduleTableURL + "?sf_request_type=ajax",
-                    RequestOptions.create()
-                        .setHeader("X-Requested-With", "XMLHttpRequest")
-                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                        .setHeader("Referer", gatewayFirstEndURL)
-                        .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0"));
-            }else {
-                // 重要！必须是表单形式
-                FormData formData = FormData.create();
-                formData.set("zc", query.getWeek());                            // 第几周
-                formData.set("xnxq01id", query.getSemester());                  // 学年学期
-                formData.set("cj0701id", "");                                   // 无意义
-                formData.set("demo", "");                                       // 无意义
-                formData.set("sfFD", "1");                                      // 是否放大
-                formData.set("wkbkc", "1");                                     // 显示无课表课程
-                formData.set("kbjcmsid", "EB5693B95B204102B2E28C5624C6E9ED");   // 时间模式
-                res = req.post(scheduleTableURL + "?sf_request_type=ajax",
-                    RequestOptions.create()
-                        .setForm(formData)
-                        .setHeader("X-Requested-With", "XMLHttpRequest")
-                        .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
-                        .setHeader("Referer", gatewayFirstEndURL)
-                        .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
+
+            try {
+                if (Objects.isNull(query.getWeek()) && Objects.isNull(query.getSemester())) {
+                    // 默认查询（当前周、当前学期）
+                    res = req.get(scheduleTableURL + "?sf_request_type=ajax",
+                            RequestOptions.create()
+                                    .setHeader("X-Requested-With", "XMLHttpRequest")
+                                    .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                                    .setHeader("Referer", gatewayFirstEndURL)
+                                    .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0"));
+                } else {
+                    // 指定周/学期查询
+                    FormData formData = FormData.create();
+                    formData.set("zc", query.getWeek());
+                    formData.set("xnxq01id", query.getSemester());
+                    formData.set("cj0701id", "");
+                    formData.set("demo", "");
+                    formData.set("sfFD", "1");
+                    formData.set("wkbkc", "1");
+                    formData.set("kbjcmsid", "EB5693B95B204102B2E28C5624C6E9ED");
+
+                    res = req.post(scheduleTableURL + "?sf_request_type=ajax",
+                            RequestOptions.create()
+                                    .setForm(formData)
+                                    .setHeader("X-Requested-With", "XMLHttpRequest")
+                                    .setHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+                                    .setHeader("Referer", gatewayFirstEndURL)
+                                    .setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0"));
+                }
+
+                if (res.status() != 200) {
+                    log.error("课程表请求失败: status={}, openId={}", res.status(), wxId);
+                    throw new BusinessException(
+                            SysReturnCode.BASE_PROXY.getCode(),
+                            "课程表获取失败，请稍后重试",
+                            ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+                    );
+                }
+
+            } catch (com.microsoft.playwright.TimeoutError e) {
+                log.error("课程表请求超时: openId={}, error={}", wxId, e.getMessage());
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "教务系统响应超时，请稍后重试",
+                        ResultCodeEnum.GATEWAY_TIMEOUT.getCode()
+                );
+            } catch (BusinessException e) {
+                throw e;
+            } catch (Exception e) {
+                log.error("课程表请求出错: openId={}, error={}", wxId, e.getMessage());
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "课程表获取失败：" + e.getMessage(),
+                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
                 );
             }
+
+            // 更新 Cookie
             authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, context.cookies());
+
             return crouseParser.parseCourseTable(res.text());
-        });
+        }, browserPool.getDefaultTimeoutSeconds());
     }
 }

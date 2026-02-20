@@ -120,14 +120,14 @@ public class AuthServiceImpl implements AuthService {
         int slowTimeout = browserPool.getSlowTimeoutSeconds();
         log.info("用户 {} 初始化会话（首次加载，使用长超时 {}s）", wxId, slowTimeout);
 
-        // 1. 清除旧缓存，强制重新获取
+        // 清除旧缓存，强制重新获取
         authSessionCacheUtil.invalidateStatusCache(wxId);
         authSessionCacheUtil.clearSessionCookies(wxId);
 
-        // 2. 使用【长超时】执行 Playwright 流程
+        // 使用【长超时】执行 Playwright 流程
         LoginResultsVo result = doRefreshCookies(wxId, null, slowTimeout);
 
-        // 3. 更新状态缓存
+        // 更新状态缓存
         LoginStatusVo status = LoginStatusVo.from(result);
         authSessionCacheUtil.cacheStatus(wxId, status);
 
