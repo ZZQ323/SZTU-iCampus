@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.util.cache.dto;
+package cn.edu.sztui.common.cache.dto;
 
 import lombok.Data;
 import java.io.Serializable;

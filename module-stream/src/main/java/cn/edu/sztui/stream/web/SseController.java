@@ -1,19 +1,20 @@
-package cn.edu.sztui.base.web;
+package cn.edu.sztui.stream.web;
 
 import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
 import cn.edu.sztui.base.application.service.AcademicService;
 import cn.edu.sztui.base.application.vo.CourseTableVO;
-import cn.edu.sztui.base.infrastructure.sse.SseEmitterManager;
-import cn.edu.sztui.base.infrastructure.sse.dto.SseMessage;
-import cn.edu.sztui.base.infrastructure.stream.StreamKeys;
+
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
+import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
+import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
+import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import jakarta.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -63,7 +64,7 @@ public class SseController {
                 
                 // 构建消息并推送
                 SseMessage<CourseTableVO> message = SseMessage.data(
-                        StreamKeys.TYPE_SCHEDULE_DATA, 
+                        StreamKeys.TYPE_SCHEDULE_DATA,
                         currentSchedule
                 );
                 

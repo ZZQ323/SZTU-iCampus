@@ -2,7 +2,7 @@ package cn.edu.sztui.base.application.service;
 
 import cn.edu.sztui.base.application.vo.TokenAuthVo;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.base.infrastructure.util.cache.dto.TokenMeta;
+import cn.edu.sztui.common.cache.dto.TokenMeta;
 import cn.edu.sztui.common.util.jwt.JwtConfig;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

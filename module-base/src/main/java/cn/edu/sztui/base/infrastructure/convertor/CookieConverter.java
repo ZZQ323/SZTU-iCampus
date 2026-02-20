@@ -1,6 +1,6 @@
 package cn.edu.sztui.base.infrastructure.convertor;
 
-import cn.edu.sztui.base.infrastructure.util.cache.dto.CookieDTO;
+import cn.edu.sztui.common.cache.dto.CookieDTO;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.microsoft.playwright.options.Cookie;

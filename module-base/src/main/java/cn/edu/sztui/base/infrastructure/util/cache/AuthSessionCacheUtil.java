@@ -2,8 +2,8 @@ package cn.edu.sztui.base.infrastructure.util.cache;
 
 import cn.edu.sztui.base.application.vo.LoginStatusVo;
 import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
-import cn.edu.sztui.base.infrastructure.util.cache.dto.ProxySession;
-import cn.edu.sztui.base.infrastructure.util.cache.dto.TokenMeta;
+import cn.edu.sztui.common.cache.dto.ProxySession;
+import cn.edu.sztui.common.cache.dto.TokenMeta;
 import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;

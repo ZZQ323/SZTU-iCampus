@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.util.wx;
+package cn.edu.sztui.base.infrastructure.wx;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;

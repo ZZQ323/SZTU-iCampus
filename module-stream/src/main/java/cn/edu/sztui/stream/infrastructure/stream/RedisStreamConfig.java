@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.stream;
+package cn.edu.sztui.stream.infrastructure.stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

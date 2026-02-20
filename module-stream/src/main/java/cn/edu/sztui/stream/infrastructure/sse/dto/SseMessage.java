@@ -1,5 +1,6 @@
-package cn.edu.sztui.base.infrastructure.sse.dto;
+package cn.edu.sztui.stream.infrastructure.sse.dto;
 
+import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class SseMessage<T> implements Serializable {
     
     /**
      * 消息类型
-     * @see cn.edu.sztui.base.infrastructure.stream.StreamKeys
+     * @see StreamKeys
      */
     private String type;
     

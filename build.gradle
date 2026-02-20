@@ -41,7 +41,7 @@ allprojects {
 
 // 子项目统一配置
 subprojects {
-    // ✅ 直接应用Java插件（核心插件用apply，不用在plugins块中声明）
+    // 直接应用Java插件（核心插件用apply，不用在plugins块中声明）
     apply plugin: 'java'
     apply plugin: 'io.spring.dependency-management'
 

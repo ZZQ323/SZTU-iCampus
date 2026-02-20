@@ -1,6 +1,6 @@
-package cn.edu.sztui.base.infrastructure.stream;
+package cn.edu.sztui.stream.infrastructure.stream;
 
-import cn.edu.sztui.base.infrastructure.sse.dto.SseMessage;
+import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.RecordId;

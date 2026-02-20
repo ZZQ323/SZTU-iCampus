@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.scheduler;
+package cn.edu.sztui.stream.infrastructure.scheduler;
 
 import cn.edu.sztui.base.application.service.AcademicService;
 import cn.edu.sztui.base.infrastructure.sse.SseEmitterManager;

@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.util.browserpool;
+package cn.edu.sztui.common.util.browserpool;
 
 import cn.edu.sztui.common.util.exception.BusinessException;
 import com.microsoft.playwright.*;

@@ -1,6 +1,6 @@
-package cn.edu.sztui.base.infrastructure.sse;
+package cn.edu.sztui.stream.infrastructure.sse;
 
-import cn.edu.sztui.base.infrastructure.sse.dto.SseMessage;
+import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 /**
  * SSE Emitter 连接管理器

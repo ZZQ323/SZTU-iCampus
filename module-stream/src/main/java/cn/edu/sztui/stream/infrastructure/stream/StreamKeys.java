@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.stream;
+package cn.edu.sztui.stream.infrastructure.stream;
 
 /**
  * Redis Stream Key 常量定义

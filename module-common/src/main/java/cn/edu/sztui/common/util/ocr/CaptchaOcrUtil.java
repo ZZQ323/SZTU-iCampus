@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.util.ocr;
+package cn.edu.sztui.common.util.ocr;
 
 import jakarta.annotation.Resource;
 import net.sourceforge.tess4j.Tesseract;

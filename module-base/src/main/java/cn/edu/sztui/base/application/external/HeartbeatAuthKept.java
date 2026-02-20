@@ -2,7 +2,7 @@ package cn.edu.sztui.base.application.external;
 
 import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.base.infrastructure.util.cache.dto.ProxySession;
+import cn.edu.sztui.common.cache.dto.ProxySession;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -13,20 +13,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    // implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    // Redis 核心依赖（包含 Stream 相关类）
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // 定时任务（如果用Spring Scheduler就不需要xxl-job）
     // implementation "com.xuxueli:xxl-job-core:${xxlJobVersion}"
+    // implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
     // WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     // Playwright（浏览器自动化）
     implementation 'com.microsoft.playwright:playwright:1.43.0'
-    // Apache Commons Pool2（对象池核心）
-    implementation 'org.apache.commons:commons-pool2:2.12.0'
-    implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
+
     // SpringDoc OpenAPI 启动器（包含 Swagger 3 注解、UI 界面、自动配置）
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     //  依赖公共包

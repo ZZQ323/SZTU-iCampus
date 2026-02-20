@@ -5,9 +5,9 @@ import cn.edu.sztui.base.application.service.AcademicService;
 import cn.edu.sztui.base.application.vo.CourseTableVO;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
-import cn.edu.sztui.base.infrastructure.util.browserpool.PlaywrightBrowserPool;
+import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPool;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.base.infrastructure.util.cache.dto.ProxySession;
+import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.base.infrastructure.util.praser.CrouseParser;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
@@ -22,7 +22,6 @@ import com.microsoft.playwright.options.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Objects;
 
