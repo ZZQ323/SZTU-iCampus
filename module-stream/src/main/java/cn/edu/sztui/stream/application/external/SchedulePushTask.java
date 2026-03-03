@@ -2,7 +2,7 @@ package cn.edu.sztui.stream.application.external;
 
 import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
 import cn.edu.sztui.base.application.service.AcademicService;
-import cn.edu.sztui.base.application.vo.CourseTableVO;
+import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
 import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
@@ -98,13 +98,13 @@ public class SchedulePushTask {
                 }
                 
                 // 3. 使用 getCrouseTableByOpenId 获取课表
-                CourseTableVO schedule = academicService.getCrouseTableByOpenId(
+                CourseTableVo schedule = academicService.getCrouseTableByOpenId(
                         wxOpenId, 
                         new CrouseTableQuery()
                 );
                 
                 // 4. 推送课表数据
-                SseMessage<CourseTableVO> dataMsg = SseMessage.dataTo(
+                SseMessage<CourseTableVo> dataMsg = SseMessage.dataTo(
                         StreamKeys.TYPE_SCHEDULE_DATA,
                         schedule,
                         wxOpenId

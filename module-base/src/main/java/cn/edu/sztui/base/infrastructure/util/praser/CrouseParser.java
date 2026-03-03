@@ -1,7 +1,7 @@
 package cn.edu.sztui.base.infrastructure.util.praser;
 
-import cn.edu.sztui.base.application.vo.CourseTableVO;
-import cn.edu.sztui.base.application.vo.CourseTableVO.CourseInfo;
+import cn.edu.sztui.base.application.vo.CourseTableVo;
+import cn.edu.sztui.base.application.vo.CourseTableVo.CourseInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,7 +22,7 @@ public class CrouseParser
     // 匹配时间格式，如 08:30-10:00
     private static final Pattern TIME_PATTERN = Pattern.compile("(\\d{2}:\\d{2}-\\d{2}:\\d{2})");
 
-    public CourseTableVO parseCourseTable(String html) {
+    public CourseTableVo parseCourseTable(String html) {
         Document doc = Jsoup.parse(html);
         Element table = doc.getElementById("timetable");  // 定位课程表
         Elements rows = table.select("tr");
@@ -68,7 +68,7 @@ public class CrouseParser
             }
         }
 
-        CourseTableVO vo = new CourseTableVO();
+        CourseTableVo vo = new CourseTableVo();
         vo.setCourses(courseList);
         return vo;
     }

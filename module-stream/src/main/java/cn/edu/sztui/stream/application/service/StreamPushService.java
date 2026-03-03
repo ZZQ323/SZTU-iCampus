@@ -1,6 +1,6 @@
 package cn.edu.sztui.stream.application.service;
 
-import cn.edu.sztui.base.application.vo.CourseTableVO;
+import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
 import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
 import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
@@ -35,8 +35,8 @@ public class StreamPushService {
      * @param wxOpenId 用户微信OpenId
      * @param schedule 课表数据
      */
-    public void pushScheduleToUser(String wxOpenId, CourseTableVO schedule) {
-        SseMessage<CourseTableVO> message = SseMessage.dataTo(
+    public void pushScheduleToUser(String wxOpenId, CourseTableVo schedule) {
+        SseMessage<CourseTableVo> message = SseMessage.dataTo(
                 StreamKeys.TYPE_SCHEDULE_DATA,
                 schedule,
                 wxOpenId
@@ -51,8 +51,8 @@ public class StreamPushService {
      * 注意: 通常不需要广播课表，因为每个用户的课表不同
      * 这个方法主要用于测试或特殊场景
      */
-    public void broadcastSchedule(CourseTableVO schedule) {
-        SseMessage<CourseTableVO> message = SseMessage.data(
+    public void broadcastSchedule(CourseTableVo schedule) {
+        SseMessage<CourseTableVo> message = SseMessage.data(
                 StreamKeys.TYPE_SCHEDULE_DATA,
                 schedule
         );

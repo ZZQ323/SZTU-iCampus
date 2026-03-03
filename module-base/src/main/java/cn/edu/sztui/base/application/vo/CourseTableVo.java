@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-public class CourseTableVO {
+public class CourseTableVo {
 
     private List<CourseInfo> courses;
 

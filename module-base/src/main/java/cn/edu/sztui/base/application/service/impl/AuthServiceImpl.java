@@ -20,6 +20,7 @@ import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
+import cn.edu.sztui.stream.infrastructure.cookie.CookieSourceManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.playwright.APIRequestContext;
@@ -54,6 +55,8 @@ public class AuthServiceImpl implements AuthService {
     private AuthSessionCacheUtil authSessionCacheUtil;
     @Resource
     private AcademicService academicService;
+    @Resource
+    private CookieSourceManager cookieSourceManager;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -196,10 +199,10 @@ public class AuthServiceImpl implements AuthService {
             try {
                 Page page = context.newPage();
                 Response response = page.waitForResponse(
-                    resp -> resp.url().equals(gatewayFirstEndURL)
-                        || resp.url().equals(gatewaySecondEndURL)
-                        || resp.url().equals(acdemAdminSysGatewayStartURL),
-                    () -> page.navigate(gatewayStartURL)
+                        resp -> resp.url().equals(gatewayFirstEndURL)
+                                || resp.url().equals(gatewaySecondEndURL)
+                                || resp.url().equals(acdemAdminSysGatewayStartURL),
+                        () -> page.navigate(gatewayStartURL)
                 );
 
                 if (response.url().equals(acdemAdminSysGatewayStartURL)) {
@@ -216,9 +219,9 @@ public class AuthServiceImpl implements AuthService {
                     ret.setLoginTypes(typeLists);
                 } else {
                     throw new BusinessException(
-                        SysReturnCode.BASE_PROXY.getCode(),
-                        "未知的页面URL：" + response.url(),
-                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+                            SysReturnCode.BASE_PROXY.getCode(),
+                            "未知的页面URL：" + response.url(),
+                            ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
                     );
                 }
             } catch (com.microsoft.playwright.TimeoutError e) {
@@ -329,6 +332,9 @@ public class AuthServiceImpl implements AuthService {
 
             // ============ 第四步：使状态缓存失效 ============
             authSessionCacheUtil.invalidateStatusCache(wxId);
+
+            // ============ 第五步：通知 CookieSourceManager 用户登录 ============
+            cookieSourceManager.onUserLogin(wxId);
 
             ret.setWxId(wxId);
             ret.setLogined(true);

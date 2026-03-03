@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CaptchaVO {
+public class CaptchaVo {
     List<Cookie> cookies;
     String captchaBase64;
 }

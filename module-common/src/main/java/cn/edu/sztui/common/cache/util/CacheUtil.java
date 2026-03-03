@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class CacheUtil {
+public class CacheUtil
+{
     @Resource
     RedisKeyGenerator redisKeyGenerator;
     @Resource

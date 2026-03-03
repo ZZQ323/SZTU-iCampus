@@ -1,7 +1,7 @@
 package cn.edu.sztui.base.application.service;
 
 import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
-import cn.edu.sztui.base.application.vo.CourseTableVO;
+import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 
 /**
@@ -21,7 +21,7 @@ public interface AcademicService {
      * <p>
      * 从 UserContext 获取 wxOpenId
      */
-    CourseTableVO getCrouseTable(CrouseTableQuery query);
+    CourseTableVo getCrouseTable(CrouseTableQuery query);
     
     /**
      * 【新增】获取课程表（直接传入 wxOpenId）
@@ -32,5 +32,5 @@ public interface AcademicService {
      * @param query    查询参数
      * @return 课表数据
      */
-    CourseTableVO getCrouseTableByOpenId(String wxOpenId, CrouseTableQuery query);
+    CourseTableVo getCrouseTableByOpenId(String wxOpenId, CrouseTableQuery query);
 }

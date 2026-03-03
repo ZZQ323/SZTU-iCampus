@@ -2,7 +2,7 @@ package cn.edu.sztui.base.application.service.impl;
 
 import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
 import cn.edu.sztui.base.application.service.AcademicService;
-import cn.edu.sztui.base.application.vo.CourseTableVO;
+import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
 import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPool;
@@ -124,7 +124,7 @@ public class AcademicServiceImpl implements AcademicService {
      * 用于 HTTP 请求场景
      */
     @Override
-    public CourseTableVO getCrouseTable(CrouseTableQuery query) {
+    public CourseTableVo getCrouseTable(CrouseTableQuery query) {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
         return doGetCrouseTable(wxId, query);
@@ -136,7 +136,7 @@ public class AcademicServiceImpl implements AcademicService {
      * 用于异步场景（SSE 推送、定时任务）
      */
     @Override
-    public CourseTableVO getCrouseTableByOpenId(String wxOpenId, CrouseTableQuery query) {
+    public CourseTableVo getCrouseTableByOpenId(String wxOpenId, CrouseTableQuery query) {
         return doGetCrouseTable(wxOpenId, query);
     }
 
@@ -147,7 +147,7 @@ public class AcademicServiceImpl implements AcademicService {
      * @param query 查询参数
      * @return 课表数据
      */
-    private CourseTableVO doGetCrouseTable(String wxId, CrouseTableQuery query) {
+    private CourseTableVo doGetCrouseTable(String wxId, CrouseTableQuery query) {
         // 检查是否已登录
         if (!authSessionCacheUtil.isSchoolLoggedIn(wxId)) {
             throw new BusinessException(
