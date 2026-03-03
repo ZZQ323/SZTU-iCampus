@@ -14,6 +14,9 @@ public class AnnouncementMetaVo {
     /** 文章ID，全局唯一 */
     private String id;
 
+    /** 文章ID，全局唯一 */
+    // private String author;
+
     /** 相对路径，如 info/1018/50731.htm */
     private String url;
 

@@ -1,4 +1,4 @@
-package cn.edu.sztui.stream.application.external;
+package cn.edu.sztui.stream.application.external.schedule;
 
 import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
 import cn.edu.sztui.base.application.service.AcademicService;

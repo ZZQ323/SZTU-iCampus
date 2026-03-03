@@ -30,7 +30,7 @@ public class AnnouncementContentVo {
     private String plainText;
 
     /** 附件列表 */
-    private List<Attachment> attachments;
+    private List<AttachmentVo> attachments;
 
     /** 上一篇 ID */
     private String prevId;

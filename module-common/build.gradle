@@ -1,3 +1,4 @@
+// module-common
 plugins {
     id 'java-library'  // ← 添加这行（java-library 包含 java 功能）
     id 'org.springframework.boot'

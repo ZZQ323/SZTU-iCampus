@@ -2,13 +2,15 @@ package cn.edu.sztui.stream.infrastructure.sse;
 
 import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import jakarta.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,32 +130,38 @@ public class SseEmitterManager {
      * @param message 消息
      */
     public void broadcast(String topic, SseMessage<?> message) {
-        Map<String, SseEmitter> emitters = topicEmitters.get(topic);
-        if (emitters == null || emitters.isEmpty()) {
-            log.debug("topic {} 无订阅者，跳过广播", topic);
+        Map<String, SseEmitter> topicEmitters1 = topicEmitters.get(topic);
+        if (topicEmitters1 == null || topicEmitters1.isEmpty()) {
             return;
         }
-        
-        String jsonData = toJson(message);
-        int successCount = 0;
-        int failCount = 0;
-        
-        for (Map.Entry<String, SseEmitter> entry : emitters.entrySet()) {
-            String wxOpenId = entry.getKey();
-            SseEmitter emitter = entry.getValue();
+
+        List<String> failedUsers = new ArrayList<>();
+
+        for (Map.Entry<String, SseEmitter> entry : topicEmitters1.entrySet()) {
             try {
-                emitter.send(SseEmitter.event()
-                        .name(topic)
-                        .data(jsonData, MediaType.APPLICATION_JSON));
-                successCount++;
-            } catch (IOException e) {
-                log.warn("广播消息失败 - topic: {}, user: {}, error: {}", topic, wxOpenId, e.getMessage());
-                remove(topic, wxOpenId);
-                failCount++;
+                entry.getValue().send(SseEmitter.event()
+                        .name(message.getType())
+                        .data(message));
+            } catch (Exception e) {
+                failedUsers.add(entry.getKey());
+                log.warn("广播失败 - topic: {}, user: {}", topic, entry.getKey());
             }
         }
-        
-        log.info("广播完成 - topic: {}, 成功: {}, 失败: {}", topic, successCount, failCount);
+
+        // 清理失败的连接
+        for (String user : failedUsers) {
+            unsubscribe(topic, user);
+        }
+    }
+
+    /**
+     * 向所有 topic 的所有用户广播
+     */
+    public void broadcastAll(String type, Object data) {
+        SseMessage<Object> message = SseMessage.data(type, data);
+        broadcast("schedule", message);
+        broadcast("announcement", message);
+        broadcast("calendar", message);
     }
     
     /**
@@ -281,4 +289,7 @@ public class SseEmitterManager {
             return "{}";
         }
     }
+
+
 }
+

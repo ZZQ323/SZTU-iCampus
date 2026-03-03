@@ -6,13 +6,13 @@ import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
-import cn.edu.sztui.stream.infrastructure.cookie.CookieSourceManager;
 import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
 import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
 import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -22,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * SSE 订阅控制器
+ * <p>
+ * 文件：module-stream/src/main/java/cn/edu/sztui/stream/web/SseController.java
  */
 @Slf4j
 @RestController
@@ -37,8 +39,7 @@ public class SseController {
     @Resource
     private AnnouncementCacheUtil announcementCacheUtil;
 
-    @Resource
-    private CookieSourceManager cookieSourceManager;
+    // ⭐ 删除 CookieSourceManager 引用
 
     private static final long SSE_TIMEOUT = 30 * 60 * 1000L;
 
@@ -52,16 +53,12 @@ public class SseController {
 
         log.info("用户 {} 订阅课表流", wxOpenId);
 
-        // 注册 SSE 连接
         SseEmitter emitter = sseEmitterManager.subscribe("schedule", wxOpenId, SSE_TIMEOUT);
 
-        // 【关键】在主线程获取 wxOpenId，传递给异步线程
-        // 异步线程无法使用 UserContext（ThreadLocal 不会传递）
         CompletableFuture.runAsync(() -> {
             try {
                 Thread.sleep(100);
 
-                // 【修复】使用 getCrouseTableByOpenId，直接传入 wxOpenId
                 CourseTableVo currentSchedule = academicService.getCrouseTableByOpenId(
                         wxOpenId,
                         new CrouseTableQuery()
@@ -78,7 +75,6 @@ public class SseController {
             } catch (Exception e) {
                 log.error("推送初始课表失败 - user: {}, error: {}", wxOpenId, e.getMessage());
 
-                // 认证问题，推送提醒
                 if (e.getMessage() != null &&
                         (e.getMessage().contains("登录") || e.getMessage().contains("过期"))) {
                     SseMessage<Void> authMsg = SseMessage.authRequired(wxOpenId, "请重新登录以获取课表");
@@ -92,8 +88,6 @@ public class SseController {
 
     /**
      * 订阅公告更新流
-     * <p>
-     * 订阅后立即推送当前公告系统状态（latestId 等）
      */
     @GetMapping(value = "/announcement", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeAnnouncement() {
@@ -102,10 +96,8 @@ public class SseController {
 
         log.info("用户 {} 订阅公告流", wxOpenId);
 
-        // 注册 SSE 连接
         SseEmitter emitter = sseEmitterManager.subscribe("announcement", wxOpenId, SSE_TIMEOUT);
 
-        // 异步推送初始状态
         CompletableFuture.runAsync(() -> {
             try {
                 Thread.sleep(100);
@@ -114,7 +106,8 @@ public class SseController {
                 Map<String, Object> statusData = new HashMap<>();
                 statusData.put("latestId", announcementCacheUtil.getLatestId());
                 statusData.put("totalCount", announcementCacheUtil.getTotalCount());
-                statusData.put("operational", cookieSourceManager.isSystemOperational());
+                // ⭐ 修改：使用 AnnouncementCacheUtil 判断系统是否可用
+                statusData.put("operational", StringUtils.hasText(announcementCacheUtil.getActiveSourceOpenId()));
                 statusData.put("lastCrawlTime", announcementCacheUtil.getLastCrawlTime());
 
                 SseMessage<Map<String, Object>> message = SseMessage.data(
@@ -161,12 +154,12 @@ public class SseController {
      * 获取连接状态 (调试用)
      */
     @GetMapping("/status")
-    public Object getStatus() {
-        return new Object() {
-            public int scheduleConnections = sseEmitterManager.getConnectionCount("schedule");
-            public int announcementConnections = sseEmitterManager.getConnectionCount("announcement");
-            public int calendarConnections = sseEmitterManager.getConnectionCount("calendar");
-            public int totalConnections = sseEmitterManager.getTotalConnectionCount();
-        };
+    public Map<String, Object> getStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("scheduleConnections", sseEmitterManager.getConnectionCount("schedule"));
+        status.put("announcementConnections", sseEmitterManager.getConnectionCount("announcement"));
+        status.put("calendarConnections", sseEmitterManager.getConnectionCount("calendar"));
+        status.put("totalConnections", sseEmitterManager.getTotalConnectionCount());
+        return status;
     }
 }

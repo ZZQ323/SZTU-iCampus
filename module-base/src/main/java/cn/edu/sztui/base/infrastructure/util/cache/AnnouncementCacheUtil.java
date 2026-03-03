@@ -316,4 +316,12 @@ public class AnnouncementCacheUtil {
     private String generateKey(String key) {
         return redisKeyGenerator.generate("cache:" + key);
     }
+
+    /**
+     * 清除活跃的Cookie来源
+     */
+    public void clearActiveSource() {
+        cacheUtil.hset(SYSTEM_KEY, "activeSourceOpenId", "");
+        log.info("已清除 Cookie 来源");
+    }
 }

@@ -8,52 +8,46 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 公告列表页解析器
- * <p>
- * 解析学校公文通列表页 HTML，提取公告元数据
+ * 公告列表页 HTML 解析器
  */
 @Slf4j
 @Component
 public class AnnouncementListParser {
 
-    /** 分类代码 → 名称映射 */
-    private static final Map<String, String> CATEGORY_MAP = Map.of(
-            "1018", "教务",
-            "1019", "科研",
-            "1020", "行政",
-            "1021", "学工",
-            "1022", "校园",
-            "1029", "全部"
-    );
+    /** 分类映射 */
+    private static final Map<String, String> CATEGORY_MAP = new LinkedHashMap<>();
 
-    /** URL 提取 ID 的正则：info/1018/49003.htm */
-    private static final Pattern URL_PATTERN = Pattern.compile("info/(\\d+)/(\\d+)\\.htm");
+    static {
+        CATEGORY_MAP.put("1018", "教务");
+        CATEGORY_MAP.put("1019", "科研");
+        CATEGORY_MAP.put("1020", "行政");
+        CATEGORY_MAP.put("1021", "学工");
+        CATEGORY_MAP.put("1022", "校园");
+    }
 
-    /** 总条数正则：共287条 */
-    private static final Pattern TOTAL_PATTERN = Pattern.compile("共(\\d+)条");
+    /** 从 href 提取 ID 的正则：info/1018/49003.htm → 49003 */
+    private static final Pattern ID_PATTERN = Pattern.compile("info/\\d+/(\\d+)\\.htm");
 
-    /** wbtreeid 提取正则 */
-    private static final Pattern CATEGORY_PATTERN = Pattern.compile("wbtreeid=(\\d+)");
+    /** 从 href 提取分类的正则 */
+    private static final Pattern CATEGORY_PATTERN = Pattern.compile("info/(\\d+)/\\d+\\.htm");
+
+    /** 从 href 提取 totalpage 的正则 */
+    private static final Pattern TOTALPAGE_PATTERN = Pattern.compile("a1020514t=(\\d+)");
 
     /**
      * 解析列表页 HTML
-     *
-     * @param html 列表页完整 HTML
-     * @return 公告元数据列表
      */
     public List<AnnouncementMetaVo> parseList(String html) {
         List<AnnouncementMetaVo> result = new ArrayList<>();
 
         try {
             Document doc = Jsoup.parse(html);
-            Elements items = doc.select("ul.list-ul li.clearfix");
+            Elements items = doc.select("ul.news-list > li.clearfix");
 
             for (Element item : items) {
                 try {
@@ -66,116 +60,106 @@ public class AnnouncementListParser {
                 }
             }
 
-            log.info("成功解析 {} 条公告", result.size());
+            log.debug("解析列表页完成，获取 {} 条记录", result.size());
 
         } catch (Exception e) {
-            log.error("解析公告列表页失败", e);
+            log.error("解析列表页 HTML 失败: {}", e.getMessage());
         }
 
         return result;
     }
 
-    /**
-     * 解析单个列表项
-     * <p>
-     * HTML 结构:
-     * <pre>
-     * &lt;li class="clearfix"&gt;
-     *   &lt;div class="pull-left width01"&gt;&lt;a class="nav07" href="..."&gt;教务&lt;/a&gt;&lt;/div&gt;
-     *   &lt;div class="pull-left width02 txt-elise"&gt;&lt;a href="info/1018/49003.htm"&gt;研究生院&lt;/a&gt;&lt;/div&gt;
-     *   &lt;div class="pull-left width03 txt-elise text-left"&gt;&lt;a href="info/1018/49003.htm"&gt;标题...&lt;/a&gt;&lt;/div&gt;
-     *   &lt;div class="pull-left width04"&gt;2025-06-19&lt;/div&gt;
-     * &lt;/li&gt;
-     * </pre>
-     */
     private AnnouncementMetaVo parseListItem(Element item) {
         AnnouncementMetaVo meta = new AnnouncementMetaVo();
 
-        // 1. 类别
-        Element categoryEl = item.selectFirst(".width01 a");
-        if (categoryEl != null) {
-            meta.setCategoryName(categoryEl.text().trim());
-            String categoryHref = categoryEl.attr("href");
-            Matcher m = CATEGORY_PATTERN.matcher(categoryHref);
-            if (m.find()) {
-                meta.setCategory(m.group(1));
+        // 1. 解析分类
+        Element categoryLink = item.selectFirst(".width01 a");
+        if (categoryLink != null) {
+            String href = categoryLink.attr("href");
+            Matcher matcher = Pattern.compile("wbtreeid=(\\d+)").matcher(href);
+            if (matcher.find()) {
+                String categoryCode = matcher.group(1);
+                meta.setCategory(categoryCode);
+                meta.setCategoryName(CATEGORY_MAP.getOrDefault(categoryCode, "未知"));
             }
         }
 
-        // 2. 发文单位
-        Element deptEl = item.selectFirst(".width02 a");
-        if (deptEl != null) {
-            meta.setDepartment(deptEl.text().trim());
+        // 2. 解析发布部门
+        Element deptElem = item.selectFirst(".width02 a");
+        if (deptElem != null) {
+            meta.setDepartment(deptElem.text().trim());
         }
 
-        // 3. 标题和链接
-        Element titleEl = item.selectFirst(".width03 a");
-        if (titleEl != null) {
-            meta.setTitle(titleEl.text().trim());
-            String href = titleEl.attr("href");
-            meta.setUrl(href);
+        // 3. 解析标题和ID
+        Element titleLink = item.selectFirst(".width03 a");
+        if (titleLink != null) {
+            meta.setTitle(titleLink.text().trim());
 
-            Matcher matcher = URL_PATTERN.matcher(href);
-            if (matcher.find()) {
-                String category = matcher.group(1);
-                String id = matcher.group(2);
-                meta.setId(id);
-                // 如果从类别链接未提取到分类，则从URL提取
-                if (meta.getCategory() == null) {
-                    meta.setCategory(category);
-                    meta.setCategoryName(CATEGORY_MAP.getOrDefault(category, "未知"));
+            String href = titleLink.attr("href");
+            Matcher idMatcher = ID_PATTERN.matcher(href);
+            if (idMatcher.find()) {
+                meta.setId(idMatcher.group(1));
+            }
+
+            if (meta.getCategory() == null) {
+                Matcher catMatcher = CATEGORY_PATTERN.matcher(href);
+                if (catMatcher.find()) {
+                    String categoryCode = catMatcher.group(1);
+                    meta.setCategory(categoryCode);
+                    meta.setCategoryName(CATEGORY_MAP.getOrDefault(categoryCode, "未知"));
                 }
             }
         }
 
-        // 4. 发文日期
-        Element dateEl = item.selectFirst(".width04");
-        if (dateEl != null) {
-            meta.setPublishDate(dateEl.text().trim());
+        // 4. 解析发布日期
+        Element dateElem = item.selectFirst(".width04");
+        if (dateElem != null) {
+            meta.setPublishDate(dateElem.text().trim());
         }
-
-        // 5. 爬取时间
-        meta.setCrawledAt(System.currentTimeMillis());
 
         return meta;
     }
 
     /**
-     * 解析总条数
-     *
-     * @param html 列表页 HTML
-     * @return 总条数，解析失败返回 -1
+     * 解析总页数
      */
-    public int parseTotalCount(String html) {
+    public int parseTotalPage(String html) {
         try {
             Document doc = Jsoup.parse(html);
-            Element totalEl = doc.selectFirst(".p_t");
-            if (totalEl != null) {
-                Matcher matcher = TOTAL_PATTERN.matcher(totalEl.text());
+
+            Elements pageLinks = doc.select(".p_pages a");
+            for (Element link : pageLinks) {
+                String href = link.attr("href");
+                Matcher matcher = TOTALPAGE_PATTERN.matcher(href);
                 if (matcher.find()) {
-                    return Integer.parseInt(matcher.group(1));
+                    int totalPage = Integer.parseInt(matcher.group(1));
+                    log.info("解析到总页数: {}", totalPage);
+                    return totalPage;
                 }
             }
+
+            Element totalElem = doc.selectFirst(".p_t");
+            if (totalElem != null) {
+                String text = totalElem.text();
+                Matcher matcher = Pattern.compile("共(\\d+)条").matcher(text);
+                if (matcher.find()) {
+                    int totalCount = Integer.parseInt(matcher.group(1));
+                    int pageSize = 20;
+                    int totalPage = (totalCount + pageSize - 1) / pageSize;
+                    log.info("根据总条数计算总页数: {} 条 → {} 页", totalCount, totalPage);
+                    return totalPage;
+                }
+            }
+
+            return 1;
+
         } catch (Exception e) {
-            log.warn("解析总条数失败: {}", e.getMessage());
+            log.error("解析总页数失败: {}", e.getMessage());
+            return 1;
         }
-        return -1;
     }
 
-    /**
-     * 获取分类名称
-     *
-     * @param code 分类代码
-     * @return 分类名称
-     */
-    public static String getCategoryName(String code) {
-        return CATEGORY_MAP.getOrDefault(code, "未知");
-    }
-
-    /**
-     * 获取所有分类映射
-     */
     public static Map<String, String> getCategoryMap() {
-        return CATEGORY_MAP;
+        return Collections.unmodifiableMap(CATEGORY_MAP);
     }
 }

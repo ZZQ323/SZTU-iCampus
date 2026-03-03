@@ -1,3 +1,4 @@
+// module-base
 plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
@@ -30,5 +31,5 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     //  依赖公共包
     implementation project(':module-common')
-    implementation project(':module-stream')
+    // implementation project(':module-stream')
 }

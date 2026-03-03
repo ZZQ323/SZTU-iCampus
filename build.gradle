@@ -1,3 +1,4 @@
+// module-root
 plugins {
     // 外部插件需要在根项目统一管理版本
     id 'org.springframework.boot' version '3.3.1' apply false

@@ -160,4 +160,15 @@ public class StreamPublisher {
             log.warn("Stream 修剪失败 - stream: {}, error: {}", streamKey, e.getMessage());
         }
     }
+
+    /**
+     * ⭐ 新增：向所有公告订阅者广播消息
+     *
+     * @param type 消息类型（如 TYPE_NEW_ANNOUNCEMENTS）
+     * @param data 消息数据
+     */
+    public void publishToAll(String type, Object data) {
+        broadcast(StreamKeys.STREAM_ANNOUNCEMENT, type, data);
+        log.info("公告广播消息已发布 - type: {}", type);
+    }
 }

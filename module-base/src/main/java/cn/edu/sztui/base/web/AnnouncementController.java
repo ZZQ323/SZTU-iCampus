@@ -8,13 +8,14 @@ import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementListParser;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.result.Result;
-import cn.edu.sztui.stream.infrastructure.cookie.CookieSourceManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,6 @@ public class AnnouncementController {
     @Resource
     private AnnouncementCacheUtil announcementCacheUtil;
 
-    @Resource
-    private cn.edu.sztui.stream.infrastructure.cookie.CookieSourceManager cookieSourceManager;
 
     // ==================== 列表查询 ====================
 
@@ -51,7 +50,7 @@ public class AnnouncementController {
             @RequestParam(defaultValue = "1") Integer page,
             @Parameter(description = "每页数量，默认20")
             @RequestParam(defaultValue = "20") Integer pageSize) {
-
+        log.info("用户{} 获取公告列表", UserContext.getContext().getOpenId());
         AnnouncementListVo vo = announcementService.getList(category, page, pageSize);
         return Result.ok(vo);
     }
@@ -64,7 +63,7 @@ public class AnnouncementController {
     public Result getIncremental(
             @Parameter(description = "上次已读的最新ID", required = true)
             @RequestParam String lastId) {
-
+        log.info("用户{} 获取增量公告", UserContext.getContext().getOpenId());
         List<AnnouncementMetaVo> list = announcementService.getIncremental(lastId);
         return Result.ok(list);
     }
@@ -75,6 +74,7 @@ public class AnnouncementController {
     @GetMapping("/v1/latest")
     @Operation(summary = "获取最新公告ID", description = "用于前端判断是否有新公告")
     public Result getLatestId() {
+        log.info("用户{} 获取最新公告ID", UserContext.getContext().getOpenId());
         String latestId = announcementCacheUtil.getLatestId();
         Map<String, String> result = new HashMap<>();
         result.put("latestId", latestId != null ? latestId : "0");
@@ -91,7 +91,7 @@ public class AnnouncementController {
     public Result getDetail(
             @Parameter(description = "公告ID", required = true)
             @PathVariable String id) {
-
+        log.info("用户{} 获取公告详情", UserContext.getContext().getOpenId());
         String openId = UserContext.getContext().getOpenId();
         AnnouncementContentVo content = announcementService.getDetail(openId, id);
         return Result.ok(content);
@@ -109,7 +109,7 @@ public class AnnouncementController {
             @RequestParam String keyword,
             @Parameter(description = "最大返回数量，默认20")
             @RequestParam(defaultValue = "20") Integer limit) {
-
+        log.info("用户{} 进行标题搜索", UserContext.getContext().getOpenId());
         List<AnnouncementMetaVo> list = announcementService.searchByTitle(keyword, limit);
         return Result.ok(list);
     }
@@ -122,6 +122,7 @@ public class AnnouncementController {
     @GetMapping("/v1/categories")
     @Operation(summary = "获取分类列表", description = "获取所有公告分类及其代码")
     public Result getCategories() {
+        log.info("用户{} 获取分类列表", UserContext.getContext().getOpenId());
         return Result.ok(AnnouncementListParser.getCategoryMap());
     }
 
@@ -132,11 +133,11 @@ public class AnnouncementController {
     @Operation(summary = "获取系统状态", description = "获取公告系统当前状态")
     public Result getSystemStatus() {
         Map<String, Object> status = new HashMap<>();
-
+        log.info("用户{} 获取系统状态", UserContext.getContext().getOpenId());
         // 系统状态
-        CookieSourceManager.CookieSourceStatus sourceStatus = cookieSourceManager.getStatus();
-        status.put("initialized", sourceStatus.isInitialized());
-        status.put("operational", sourceStatus.isOperational());
+        // CookieSourceStatus sourceStatus = cookieSourceManager.getStatus();
+        // status.put("initialized", sourceStatus.isInitialized());
+        status.put("operational", StringUtils.hasText(announcementCacheUtil.getActiveSourceOpenId()));
 
         // 缓存统计
         status.put("totalCount", announcementCacheUtil.getTotalCount());
