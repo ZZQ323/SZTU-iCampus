@@ -136,6 +136,13 @@ playwright:
     viewport-height: null
     user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
 
+smart-http:
+  timeout-seconds: 30
+  slow-timeout-seconds: 90
+  max-connections: 500
+  max-connections-per-route: 100
+  user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0"
+
 sztu:
   constant:
     projectOrBrandName: ${program.name}

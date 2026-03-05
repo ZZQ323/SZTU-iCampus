@@ -5,15 +5,17 @@ plugins {
 }
 
 dependencies {
-    // jsoup 解析文档
-    implementation 'org.jsoup:jsoup:1.17.2'
 
+    // 微信类
     implementation("com.github.binarywang:weixin-java-miniapp:4.7.0")
 
     // 业务模块不需要 Spring Boot 插件，只需要基础依赖
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // RedisTemplate 是 Spring Data Redis 框架的核心类
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // 定时任务（如果用Spring Scheduler就不需要xxl-job）
     // implementation "com.xuxueli:xxl-job-core:${xxlJobVersion}"
@@ -23,9 +25,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     // Playwright（浏览器自动化）
     implementation 'com.microsoft.playwright:playwright:1.43.0'
+    // Apache HttpClient 5.x
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
-    // RedisTemplate 是 Spring Data Redis 框架的核心类
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // jsoup 解析文档
+    implementation 'org.jsoup:jsoup:1.17.2'
+    // Jackson（JSON 解析）
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+
+
 
     // SpringDoc OpenAPI 启动器（包含 Swagger 3 注解、UI 界面、自动配置）
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
