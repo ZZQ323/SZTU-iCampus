@@ -44,7 +44,7 @@ public class CookieConverter {
                     dto.setUrl(c.url);
                     dto.setDomain(c.domain);
                     dto.setPath(c.path);
-                    dto.setExpiryTime(c.expires != null ? c.expires.longValue() : 0);
+                    dto.setExpiryTime(c.expires != null ? c.expires.longValue() : 0l);
                     dto.setSecure(c.secure != null && c.secure);
                     dto.setHttpOnly(c.httpOnly != null && c.httpOnly);
                     dto.setSameSiteAttribute(c.sameSite);
@@ -93,7 +93,7 @@ public class CookieConverter {
                     dto.setValue(c.getValue());
                     dto.setDomain(c.getDomain());
                     dto.setPath(c.getPath());
-                    dto.setExpiryTime(c.getExpires() != null ? c.getExpires().getEpochSecond() : 0);
+                    dto.setExpiryTime(c.getExpires() != null ? c.getExpires().getEpochSecond() : 0l);
                     dto.setSecure(c.isSecure());
                     dto.setHttpOnly(c.isHttpOnly());
                     dto.setSameSiteAttribute(c.getSameSite() != null

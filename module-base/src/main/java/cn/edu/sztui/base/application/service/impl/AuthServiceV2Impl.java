@@ -35,12 +35,10 @@ import static cn.edu.sztui.base.domain.model.SchoolAPIs.*;
 /**
  * 认证服务 V2 实现（基于 SmartHttpClient，无浏览器）
  * <p>
- * 文件位置：module-base/src/main/java/cn/edu/sztui/base/application/service/impl/AuthServiceV2Impl.java
- * <p>
- * 【特性】：
- * - 使用纯 HTTP 请求，自动处理重定向
- * - 200 并发仅需 ~50MB 内存（对比 Playwright 需要 10-30GB）
- * - 支持 Location Header、Meta Refresh、JS 重定向
+ * 【修复版 - 参考 UsernameSmsImpl.java】：
+ * - 修复 SMS 登录表单字段：sms_checkcode（不是 j_checkcode）
+ * - 添加必要字段：op=login, spAuthChainCode
+ * - 添加 /por/ 页面处理
  */
 @Slf4j
 @Service("authServiceV2")
@@ -191,7 +189,12 @@ public class AuthServiceV2Impl implements AuthService {
             SmartResponse response = smartHttpClient.get(gatewayStartURL, smartSession);
 
             String finalUrl = response.getFinalUrl();
-            log.debug("最终 URL: {}, 重定向次数: {}", finalUrl, response.getRedirectCount());
+            log.info("最终 URL: {}, 重定向次数: {}", finalUrl, response.getRedirectCount());
+
+            // 打印重定向链，用于调试
+            if (log.isDebugEnabled()) {
+                log.debug("重定向链: {}", response.getRedirectChain());
+            }
 
             // 根据最终 URL 判断登录状态
             if (finalUrl.contains(acdemAdminSysGatewayStartURL) || finalUrl.contains("/bmportal/index.portal")) {
@@ -224,12 +227,21 @@ public class AuthServiceV2Impl implements AuthService {
                 // 未知状态，尝试从响应体判断
                 String body = response.getBody();
                 if (body != null) {
-                    if (body.contains("登录") || body.contains("login")) {
+                    if (body.contains("j_username") || body.contains("登录") || body.contains("login")) {
+                        // 包含登录表单，未登录状态
                         ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
-                    } else if (body.contains("bmportal") || body.contains("userInfo")) {
+                        log.info("根据页面内容判断为未登录状态");
+                    } else if (body.contains("bmportal") || body.contains("userInfo") || body.contains("个人中心")) {
+                        // 包含门户内容，已登录状态
                         ret.setLogined(true);
                         UserInfoPraser.extractByRegex(ret, body);
+                        log.info("根据页面内容判断为已登录状态");
+                    } else {
+                        // 默认为未登录
+                        ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
                     }
+                } else {
+                    ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
                 }
 
                 log.warn("未知的最终页面 URL: {}", finalUrl);
@@ -278,7 +290,7 @@ public class AuthServiceV2Impl implements AuthService {
 
         try (SmartSession smartSession = createSmartSession(authSessionCacheUtil.getSession(wxId))) {
 
-            // 构建表单数据
+            // 构建表单数据 - 参考 UsernameSmsImpl
             Map<String, String> formData = new HashMap<>();
             formData.put("j_username", CharacterConverter.toSBC(usrId));
 
@@ -295,7 +307,7 @@ public class AuthServiceV2Impl implements AuthService {
                     headers
             );
 
-            log.debug("短信请求响应: {}", response.getStatusCode());
+            log.debug("短信请求响应: status={}", response.getStatusCode());
 
             // 保存 Cookies
             saveSessionCookies(wxId, smartSession);
@@ -320,10 +332,18 @@ public class AuthServiceV2Impl implements AuthService {
         try (SmartSession smartSession = createSmartSession(authSessionCacheUtil.getSession(wxId))) {
 
             // ============ 第一步：AJAX 验证 ============
-            Map<String, String> verifyFormData = buildVerifyFormData(cmd);
+            // ⭐ 关键修复：使用正确的表单字段（参考 UsernameSmsImpl/UsernamePasswordImpl）
+            Map<String, String> verifyFormData = buildAjaxVerifyFormData(cmd);
             Map<String, String> verifyHeaders = new HashMap<>();
-            verifyHeaders.put("Referer", gatewayFirstEndURL);
+
+            // 根据登录类型设置正确的 Referer
+            String refererUrl = (cmd.getLoginType() == LoginType.SMS) ? gatewayFirstEndURL : gatewaySecondEndURL;
+            verifyHeaders.put("Referer", refererUrl);
             verifyHeaders.put("Origin", URLPraser.extractOrigin(loginURL));
+            verifyHeaders.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            verifyHeaders.put("Accept", "*/*");
+
+            log.debug("发送 AJAX 验证请求: url={}, formData={}", loginURL, verifyFormData);
 
             SmartResponse ajaxRes = smartHttpClient.postAjax(
                     loginURL + "?sf_request_type=ajax",
@@ -333,24 +353,45 @@ public class AuthServiceV2Impl implements AuthService {
             );
 
             String ajaxBody = ajaxRes.getBody();
-            log.debug("Login AJAX 响应: {}", ajaxBody);
+            log.debug("Login AJAX 响应: status={}, body={}", ajaxRes.getStatusCode(), ajaxBody);
+
+            // ⭐ 关键修复：检查响应是否为 HTML（被重定向）
+            if (ajaxBody == null || ajaxBody.trim().startsWith("<")) {
+                log.error("AJAX 请求返回了 HTML 而非 JSON，可能是 Cookie 丢失或被重定向");
+                log.error("响应内容前500字符: {}", ajaxBody != null ?
+                        ajaxBody.substring(0, Math.min(500, ajaxBody.length())) : "null");
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "登录会话已失效，请重新初始化",
+                        ResultCodeEnum.UNAUTHORIZED.getCode()
+                );
+            }
 
             JsonNode json = objectMapper.readTree(ajaxBody);
             boolean loginFailed = json.path("loginFailed").asBoolean(true)
                     || ajaxBody.contains("当前界面遇到了一些问题");
 
             if (loginFailed) {
+                String errorMsg = json.path("message").asText(json.path("msg").asText("验证失败"));
                 throw new BusinessException(
                         SysReturnCode.BASE_PROXY.getCode(),
-                        "登录验证失败: " + ajaxBody,
+                        "登录验证失败: " + errorMsg,
                         ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
                 );
             }
 
             // ============ 第二步：表单提交 ============
-            Map<String, String> loginFormData = buildLoginFormData(cmd);
-            String loginSubmitURL = A4tLoginSMSFormActionURL;
-            SmartResponse formRes = smartHttpClient.post(loginSubmitURL, loginFormData, smartSession);
+            // ⭐ 使用正确的表单提交 URL 和数据
+            String formSubmitUrl = getFormSubmitUrl(cmd.getLoginType());
+            Map<String, String> loginFormData = buildFormSubmitData(cmd);
+
+            Map<String, String> formHeaders = new HashMap<>();
+            formHeaders.put("Referer", refererUrl);
+            formHeaders.put("Origin", URLPraser.extractOrigin(loginURL));
+
+            log.debug("提交登录表单: url={}, formData={}", formSubmitUrl, loginFormData);
+
+            SmartResponse formRes = smartHttpClient.post(formSubmitUrl, loginFormData, smartSession);
 
             log.debug("表单提交后最终 URL: {}", formRes.getFinalUrl());
 
@@ -431,6 +472,65 @@ public class AuthServiceV2Impl implements AuthService {
         }
     }
 
+    // ==================== 表单构建方法（⭐关键修复） ====================
+
+    /**
+     * 构建 AJAX 验证表单数据
+     * <p>
+     * 参考 UsernameSmsImpl.loginVerification() 和 UsernamePasswordImpl.loginVerification()
+     */
+    private Map<String, String> buildAjaxVerifyFormData(LoginRequestCommand cmd) {
+        Map<String, String> formData = new HashMap<>();
+        formData.put("j_username", cmd.getUserId());  // 不需要 toSBC 转换
+        formData.put("j_checkcode", "验证码");        // 固定值
+        formData.put("op", "login");                  // ⭐ 必须字段
+
+        if (cmd.getLoginType() == LoginType.SMS) {
+            // SMS 登录：使用 sms_checkcode（不是 j_checkcode！）
+            formData.put("sms_checkcode", cmd.getSmsCode());
+            formData.put("spAuthChainCode", spAuthChainCodeSMS);  // ⭐ 必须字段
+        } else if (cmd.getLoginType() == LoginType.PASSWORD) {
+            // 密码登录
+            formData.put("j_password", cmd.getPassword());
+            formData.put("spAuthChainCode", spAuthChainCodePASSWORD);  // ⭐ 必须字段
+        }
+
+        return formData;
+    }
+
+    /**
+     * 构建表单提交数据
+     * <p>
+     * 参考 UsernameSmsImpl.loginRedirect() 和 UsernamePasswordImpl.loginRedirect()
+     */
+    private Map<String, String> buildFormSubmitData(LoginRequestCommand cmd) {
+        Map<String, String> formData = new HashMap<>();
+        formData.put("j_username", cmd.getUserId());
+        formData.put("j_checkcode", "验证码");
+        formData.put("op", "login");
+
+        if (cmd.getLoginType() == LoginType.SMS) {
+            formData.put("sms_checkcode", cmd.getSmsCode());
+            formData.put("spAuthChainCode", spAuthChainCodeSMS);
+        } else if (cmd.getLoginType() == LoginType.PASSWORD) {
+            formData.put("j_password", cmd.getPassword());
+            formData.put("spAuthChainCode", spAuthChainCodePASSWORD);
+        }
+
+        return formData;
+    }
+
+    /**
+     * 根据登录类型获取表单提交 URL
+     */
+    private String getFormSubmitUrl(LoginType loginType) {
+        if (loginType == LoginType.SMS) {
+            return A4tLoginSMSFormActionURL;
+        } else {
+            return A4tLoginPASSWORDFormActionURL;
+        }
+    }
+
     // ==================== 辅助方法 ====================
 
     /**
@@ -443,8 +543,8 @@ public class AuthServiceV2Impl implements AuthService {
         }
 
         try {
-            // cookiesJson 是 JSON 字符串，需要先解析
             List<SmartCookie> cookies = parseCookiesFromJson(proxySession.getCookiesJson());
+            log.debug("从缓存加载了 {} 个 Cookie", cookies.size());
             return smartHttpClient.newSession(cookies);
         } catch (Exception e) {
             log.warn("解析 Cookie JSON 失败: {}", e.getMessage());
@@ -454,12 +554,6 @@ public class AuthServiceV2Impl implements AuthService {
 
     /**
      * 从 JSON 字符串解析 Cookies
-     * <p>
-     * JSON 格式（与 Playwright Cookie 兼容）:
-     * [
-     * {"name": "xxx", "value": "yyy", "domain": "zzz", "path": "/", ...},
-     * ...
-     * ]
      */
     private List<SmartCookie> parseCookiesFromJson(String cookiesJson) throws Exception {
         JsonNode arrayNode = objectMapper.readTree(cookiesJson);
@@ -498,46 +592,11 @@ public class AuthServiceV2Impl implements AuthService {
     }
 
     /**
-     * 将 SmartCookie 转换为 Playwright Cookie（复用现有的缓存逻辑）
+     * 将 SmartCookie 转换为 Playwright Cookie
      */
     private List<com.microsoft.playwright.options.Cookie> convertToPlaywrightCookies(List<SmartCookie> smartCookies) {
         return smartCookies.stream()
                 .map(SmartCookie::toPlaywright)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * 构建验证表单数据
-     */
-    private Map<String, String> buildVerifyFormData(LoginRequestCommand cmd) {
-        Map<String, String> formData = new HashMap<>();
-        formData.put("j_username", CharacterConverter.toSBC(cmd.getUserId()));
-
-        if (cmd.getLoginType() == LoginType.SMS) {
-            formData.put("j_checkcode", cmd.getSmsCode());
-        } else if (cmd.getLoginType() == LoginType.PASSWORD) {
-            formData.put("j_password", cmd.getPassword());
-        }
-
-        return formData;
-    }
-
-    /**
-     * 构建登录表单数据
-     */
-    private Map<String, String> buildLoginFormData(LoginRequestCommand cmd) {
-        Map<String, String> formData = new HashMap<>();
-        formData.put("j_username", CharacterConverter.toSBC(cmd.getUserId()));
-
-        if (cmd.getLoginType() == LoginType.SMS) {
-            formData.put("j_checkcode", cmd.getSmsCode());
-        } else if (cmd.getLoginType() == LoginType.PASSWORD) {
-            formData.put("j_password", cmd.getPassword());
-        }
-
-        // 其他必要字段
-        formData.put("sf_request_type", "ajax");
-
-        return formData;
     }
 }
