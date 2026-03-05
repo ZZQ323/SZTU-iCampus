@@ -22,9 +22,10 @@ public class UserLoginEventListener {
     private AnnouncementInitTask announcementInitTask;
 
     /**
-     * 处理用户登录事件
+     * 异步处理用户登录事件
      *
-     * 使用 @Async 异步执行，不阻塞登录流程
+     * 注意：@Async 必须与 @EventListener 配合使用
+     * 并且需要 @EnableAsync 配置
      */
     @Async
     @EventListener

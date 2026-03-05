@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 认证控制器（重构版）
+ * 认证控制器
  * <p>
  * 接口拆分说明：
  * <ul>
