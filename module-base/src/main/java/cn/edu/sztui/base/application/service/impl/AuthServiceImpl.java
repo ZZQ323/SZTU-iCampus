@@ -17,7 +17,7 @@ import cn.edu.sztui.base.infrastructure.util.praser.UserInfoPraser;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
-import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPool;
+import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPoolCommonsVersion;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
@@ -51,7 +51,7 @@ import static cn.edu.sztui.base.domain.model.SchoolAPIs.*;
 public class AuthServiceImpl implements AuthService {
 
     @Resource
-    private PlaywrightBrowserPool browserPool;
+    private PlaywrightBrowserPoolCommonsVersion browserPool;
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
     @Resource
@@ -212,6 +212,13 @@ public class AuthServiceImpl implements AuthService {
                     UserContext.getContext().setLoginTime(System.currentTimeMillis());
                     // 解析用户信息
                     UserInfoPraser.extractByRegex(ret, response.text());
+
+                    // ⭐ 发布登录成功事件（异步触发公告初始化）
+                    eventPublisher.publishEvent(new UserLoginEvent(
+                            this,wxId,
+                            ret.getUserId(),
+                            ret.getRealName()
+                    ));
                 } else if (response.url().equals(gatewayFirstEndURL)) {
                     ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
                 } else if (response.url().equals(gatewaySecondEndURL)) {
@@ -300,8 +307,9 @@ public class AuthServiceImpl implements AuthService {
             APIResponse ajaxRes = loginHandle.loginVerification(context, cmd);
 
             String ajaxBody = ajaxRes.text();
+            // log.info("Login ajaxBody：{}",ajaxBody);
             JsonNode json = objectMapper.readTree(ajaxBody);
-            boolean loginFailed = json.path("loginFailed").asBoolean(true);
+            boolean loginFailed = json.path("loginFailed").asBoolean(true) || ajaxBody.contains("当前界面遇到了一些问题");
 
             if (loginFailed) {
                 throw new BusinessException(

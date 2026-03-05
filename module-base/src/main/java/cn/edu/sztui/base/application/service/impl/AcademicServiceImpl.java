@@ -5,12 +5,12 @@ import cn.edu.sztui.base.application.service.AcademicService;
 import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
-import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPool;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.base.infrastructure.util.praser.CrouseParser;
+import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
+import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPoolCommonsVersion;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
@@ -42,7 +42,7 @@ import static cn.edu.sztui.base.domain.model.SchoolAPIs.*;
 public class AcademicServiceImpl implements AcademicService {
 
     @Resource
-    private PlaywrightBrowserPool browserPool;
+    private PlaywrightBrowserPoolCommonsVersion browserPool;
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
     @Resource

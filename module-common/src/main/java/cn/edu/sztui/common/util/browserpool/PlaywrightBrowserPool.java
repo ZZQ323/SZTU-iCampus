@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@Deprecated
 public class PlaywrightBrowserPool {
 
     private Playwright playwright;

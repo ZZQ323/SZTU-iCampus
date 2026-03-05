@@ -10,7 +10,7 @@ import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementContentParser;
 import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementListParser;
 import cn.edu.sztui.common.cache.dto.ProxySession;
-import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPool;
+import cn.edu.sztui.common.util.browserpool.PlaywrightBrowserPoolCommonsVersion;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class AnnouncementServiceImpl  implements AnnouncementService {
     private AuthSessionCacheUtil authSessionCacheUtil;
 
     @Resource
-    private PlaywrightBrowserPool browserPool;
+    private PlaywrightBrowserPoolCommonsVersion browserPool;
 
     @Resource
     private AnnouncementListParser listParser;
