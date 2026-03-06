@@ -15,20 +15,17 @@ import java.util.List;
 
 /**
  * Cookie 转换器
- * <p>
+ * 
  * 支持以下格式之间的转换：
- * <ul>
- *   <li>Playwright Cookie (com.microsoft.playwright.options.Cookie)</li>
- *   <li>Apache HttpClient Cookie (org.apache.hc.client5.http.cookie.Cookie)</li>
- *   <li>SmartCookie (cn.edu.sztui.common.util.smarthttp.SmartCookie)</li>
- *   <li>CookieDTO (JSON 序列化格式)</li>
- *   <li>JSON String</li>
- * </ul>
+ * - Playwright Cookie (com.microsoft.playwright.options.Cookie)
+ * - Apache HttpClient Cookie (org.apache.hc.client5.http.cookie.Cookie)
+ * - SmartCookie (cn.edu.sztui.common.util.smarthttp.SmartCookie)
+ * - CookieDTO (JSON 序列化格式)
+ * - JSON String
  */
 public class CookieConverter {
 
-    private CookieConverter() {
-    }
+    private CookieConverter() {}
 
     // ==================== Playwright Cookie <-> JSON ====================
 
@@ -96,8 +93,8 @@ public class CookieConverter {
                     dto.setExpiryTime(c.getExpires() != null ? c.getExpires().getEpochSecond() : 0l);
                     dto.setSecure(c.isSecure());
                     dto.setHttpOnly(c.isHttpOnly());
-                    dto.setSameSiteAttribute(c.getSameSite() != null
-                            ? com.microsoft.playwright.options.SameSiteAttribute.valueOf(c.getSameSite())
+                    dto.setSameSiteAttribute(c.getSameSite() != null 
+                            ? com.microsoft.playwright.options.SameSiteAttribute.valueOf(c.getSameSite()) 
                             : null);
                     return dto;
                 })
@@ -119,13 +116,13 @@ public class CookieConverter {
                         .value(dto.getValue())
                         .domain(dto.getDomain())
                         .path(dto.getPath() != null ? dto.getPath() : "/")
-                        .expires(dto.getExpiryTime() > 0
-                                ? Instant.ofEpochSecond(dto.getExpiryTime())
+                        .expires(dto.getExpiryTime() > 0 
+                                ? Instant.ofEpochSecond(dto.getExpiryTime()) 
                                 : null)
                         .secure(dto.isSecure())
                         .httpOnly(dto.isHttpOnly())
-                        .sameSite(dto.getSameSiteAttribute() != null
-                                ? dto.getSameSiteAttribute().name()
+                        .sameSite(dto.getSameSiteAttribute() != null 
+                                ? dto.getSameSiteAttribute().name() 
                                 : null)
                         .build())
                 .toList();
@@ -143,8 +140,8 @@ public class CookieConverter {
                 .value(pw.value)
                 .domain(pw.domain)
                 .path(pw.path)
-                .expires(pw.expires != null && pw.expires > 0
-                        ? Instant.ofEpochSecond(pw.expires.longValue())
+                .expires(pw.expires != null && pw.expires > 0 
+                        ? Instant.ofEpochSecond(pw.expires.longValue()) 
                         : null)
                 .httpOnly(pw.httpOnly != null && pw.httpOnly)
                 .secure(pw.secure != null && pw.secure)

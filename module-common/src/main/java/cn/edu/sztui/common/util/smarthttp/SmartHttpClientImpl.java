@@ -97,11 +97,12 @@ public class SmartHttpClientImpl implements SmartHttpClient {
         
         // 4. 注册重定向处理器（按优先级排序）
         this.redirectHandlers = new ArrayList<>();
-        this.redirectHandlers.add(new LocationHeaderHandler());      // 优先级 1
-        this.redirectHandlers.add(new MetaRefreshHandler());         // 优先级 2
+        this.redirectHandlers.add(new LocationHeaderHandler());        // 优先级 1
+        this.redirectHandlers.add(new MetaRefreshHandler());           // 优先级 2
         this.redirectHandlers.add(new DataParameterRedirectHandler()); // 优先级 5
-        this.redirectHandlers.add(new GLinesRedirectHandler());      // 优先级 10
-        this.redirectHandlers.add(new JsRedirectHandler());          // 优先级 20
+        this.redirectHandlers.add(new PortalEntryRedirectHandler());   // 优先级 8
+        this.redirectHandlers.add(new GLinesRedirectHandler());        // 优先级 10
+        this.redirectHandlers.add(new JsRedirectHandler());            // 优先级 20
         
         // 按优先级排序
         this.redirectHandlers.sort(Comparator.comparingInt(RedirectHandler::getPriority));
@@ -253,6 +254,9 @@ public class SmartHttpClientImpl implements SmartHttpClient {
             String cookieHeader = session.buildCookieHeader(url);
             if (cookieHeader != null && !cookieHeader.isEmpty()) {
                 request.setHeader("Cookie", cookieHeader);
+                log.debug("发送请求: {} {} (带 {} 字符的 Cookie)", method, url, cookieHeader.length());
+            } else {
+                log.warn("发送请求: {} {} (无 Cookie!)", method, url);
             }
             
             // 执行请求

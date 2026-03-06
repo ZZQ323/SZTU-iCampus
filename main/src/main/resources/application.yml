@@ -61,6 +61,8 @@ spring:
 # 日志配置 (可选，用于调试)
 logging:
   level:
+    cn.edu.sztui.common.util.smarthttp: DEBUG
+    cn.edu.sztui.base.application.service.impl.AuthServiceV2Impl: DEBUG
     cn.edu.sztui.base.infrastructure.sse: DEBUG
     cn.edu.sztui.base.infrastructure.stream: DEBUG
     cn.edu.sztui.base.infrastructure.scheduler: INFO
@@ -137,11 +139,21 @@ playwright:
     user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
 
 smart-http:
+  # 默认超时（秒）- 普通接口
   timeout-seconds: 30
+  # 慢请求超时（秒）- 登录等耗时操作
   slow-timeout-seconds: 90
+  # 最大连接数
   max-connections: 500
+  # 每个路由最大连接数
   max-connections-per-route: 100
+  # User-Agent
   user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0"
+
+
+announcement:
+  service:
+    impl: announcementServiceV2
 
 sztu:
   constant:

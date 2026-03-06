@@ -72,13 +72,12 @@ public class SmartSessionImpl implements SmartSession {
     @Override
     public List<SmartCookie> getCookiesForDomain(String domain) {
         List<SmartCookie> result = new ArrayList<>();
-        String normalizedDomain = normalizeDomain(domain);
         
         for (Map.Entry<String, Map<String, SmartCookie>> entry : cookieStore.entrySet()) {
             String cookieDomain = entry.getKey();
             
-            // 检查域名匹配
-            if (normalizedDomain.equals(cookieDomain) || normalizedDomain.endsWith("." + cookieDomain)) {
+            // 使用统一的域名匹配逻辑
+            if (domainMatches(domain, cookieDomain)) {
                 for (SmartCookie cookie : entry.getValue().values()) {
                     if (!cookie.isExpired()) {
                         result.add(cookie);
@@ -102,32 +101,118 @@ public class SmartSessionImpl implements SmartSession {
             
             List<SmartCookie> matchingCookies = new ArrayList<>();
             
+            log.debug("构建 Cookie 头: url={}, host={}", url, host);
+            log.debug("Cookie 存储中的域名: {}", cookieStore.keySet());
+            
             for (Map.Entry<String, Map<String, SmartCookie>> entry : cookieStore.entrySet()) {
                 String cookieDomain = entry.getKey();
                 
-                // 检查域名匹配
-                if (host.equals(cookieDomain) || host.endsWith("." + cookieDomain)) {
+                // 检查域名匹配（更宽松的匹配规则）
+                if (domainMatches(host, cookieDomain)) {
                     for (SmartCookie cookie : entry.getValue().values()) {
                         // 检查过期和路径
                         if (!cookie.isExpired() && cookie.matchesPath(path)) {
                             matchingCookies.add(cookie);
+                            log.trace("匹配 Cookie: {}={} (domain={})", 
+                                    cookie.getName(), 
+                                    cookie.getValue().length() > 10 ? cookie.getValue().substring(0, 10) + "..." : cookie.getValue(),
+                                    cookieDomain);
                         }
                     }
                 }
             }
             
             if (matchingCookies.isEmpty()) {
+                log.warn("没有匹配的 Cookie! host={}, 存储的域名={}", host, cookieStore.keySet());
                 return null;
             }
             
-            return matchingCookies.stream()
+            String cookieHeader = matchingCookies.stream()
                     .map(SmartCookie::toHeaderValue)
                     .collect(Collectors.joining("; "));
+            
+            log.debug("发送 {} 个 Cookie: {}", matchingCookies.size(), 
+                    cookieHeader.length() > 100 ? cookieHeader.substring(0, 100) + "..." : cookieHeader);
+            
+            return cookieHeader;
                     
         } catch (Exception e) {
             log.warn("构建 Cookie 头失败: {}", e.getMessage());
             return null;
         }
+    }
+    
+    /**
+     * 检查域名是否匹配
+     * 
+     * 匹配规则：
+     * 1. 精确匹配
+     * 2. host 是 cookieDomain 的子域名
+     * 3. cookieDomain 是 host 的父域名
+     */
+    private boolean domainMatches(String host, String cookieDomain) {
+        if (host == null || cookieDomain == null) {
+            return false;
+        }
+        
+        host = host.toLowerCase();
+        cookieDomain = cookieDomain.toLowerCase();
+        
+        // 移除前导点
+        if (cookieDomain.startsWith(".")) {
+            cookieDomain = cookieDomain.substring(1);
+        }
+        if (host.startsWith(".")) {
+            host = host.substring(1);
+        }
+        
+        // 精确匹配
+        if (host.equals(cookieDomain)) {
+            return true;
+        }
+        
+        // host 是 cookieDomain 的子域名
+        // 例如: host="auth-sztu-edu-cn-s.webvpn.sztu.edu.cn", cookieDomain="webvpn.sztu.edu.cn"
+        if (host.endsWith("." + cookieDomain)) {
+            return true;
+        }
+        
+        // cookieDomain 是 host 的子域名（反向匹配，某些场景需要）
+        // 例如: host="webvpn.sztu.edu.cn", cookieDomain="auth-sztu-edu-cn-s.webvpn.sztu.edu.cn"
+        // 这种情况下，Cookie 也应该被发送（因为它们属于同一个根域）
+        if (cookieDomain.endsWith("." + host)) {
+            return true;
+        }
+        
+        // 共享父域名匹配
+        // 例如: host="auth-sztu-edu-cn-s.webvpn.sztu.edu.cn"
+        //       cookieDomain="home-sztu-edu-cn-s.webvpn.sztu.edu.cn"
+        // 它们共享 "webvpn.sztu.edu.cn"
+        String hostRoot = extractRootDomain(host);
+        String cookieRoot = extractRootDomain(cookieDomain);
+        if (hostRoot != null && hostRoot.equals(cookieRoot)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * 提取根域名（最后两段或三段）
+     */
+    private String extractRootDomain(String domain) {
+        if (domain == null) return null;
+        
+        String[] parts = domain.split("\\.");
+        if (parts.length < 2) return domain;
+        
+        // 对于 .edu.cn 这样的特殊后缀，取最后三段
+        if (parts.length >= 3 && "edu".equals(parts[parts.length - 2])) {
+            return parts[parts.length - 3] + "." + parts[parts.length - 2] + "." + parts[parts.length - 1];
+        }
+        
+        // 默认取最后两段
+        return parts[parts.length - 2] + "." + parts[parts.length - 1];
     }
     
     @Override
