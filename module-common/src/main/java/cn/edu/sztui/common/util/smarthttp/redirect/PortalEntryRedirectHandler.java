@@ -60,8 +60,10 @@ public class PortalEntryRedirectHandler implements RedirectHandler {
         
         log.debug("[PortalEntry] 检测到 WebVPN 入口页面: {}", currentUrl);
         
-        // 如果 body 包含 g_lines，让 GLinesRedirectHandler 处理
-        if (body != null && body.contains("g_lines") && body.contains("gotoLines")) {
+        // 如果 body 包含 g_lines 且包含 gotoLines，让 GLinesRedirectHandler 处理
+        // 但如果已经在 /por/ 路径下，我们需要自己处理
+        if (body != null && body.contains("g_lines") && body.contains("gotoLines") 
+                && !currentUrl.contains("/por/")) {
             log.debug("[PortalEntry] 包含 g_lines，交给 GLinesRedirectHandler 处理");
             return null;
         }
@@ -74,13 +76,18 @@ public class PortalEntryRedirectHandler implements RedirectHandler {
                 if (jsUrl.startsWith("http")) {
                     log.debug("[PortalEntry] 从 JS 中提取到重定向 URL: {}", jsUrl);
                     return jsUrl;
+                } else if (jsUrl.startsWith("/")) {
+                    // 相对路径，拼接完整 URL
+                    String fullUrl = "https://webvpn.sztu.edu.cn" + jsUrl;
+                    log.debug("[PortalEntry] 从 JS 中提取到相对路径重定向: {}", fullUrl);
+                    return fullUrl;
                 }
             }
         }
         
-        // 检查是否包含登录页面的标识
+        // 检查是否包含登录页面的标识，需要重定向到 thdportal_login
         if (body != null && (body.contains("/portal/#!/login") || body.contains("#!/login") 
-                || body.contains("avalon.state(\"login\")"))) {
+                || body.contains("avalon.state(\"login\")") || body.contains("\"login\""))) {
             // 提取 redirect_uri
             Matcher matcher = REDIRECT_URI_PATTERN.matcher(currentUrl);
             if (matcher.find()) {
@@ -94,6 +101,23 @@ public class PortalEntryRedirectHandler implements RedirectHandler {
                 String loginUrl = "https://webvpn.sztu.edu.cn/public/thdportal_login?redirect_uri=" + encodedUri;
                 
                 log.debug("[PortalEntry] 检测到登录页面，重定向到: {}", loginUrl);
+                return loginUrl;
+            }
+        }
+        
+        // 如果是 /por/ 页面但没有匹配到上面的规则，尝试默认重定向到 thdportal_login
+        if (currentUrl.contains("/por/")) {
+            Matcher matcher = REDIRECT_URI_PATTERN.matcher(currentUrl);
+            if (matcher.find()) {
+                String redirectUri = matcher.group(1);
+                try {
+                    redirectUri = URLDecoder.decode(redirectUri, StandardCharsets.UTF_8);
+                } catch (Exception ignored) {}
+                
+                String encodedUri = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+                String loginUrl = "https://webvpn.sztu.edu.cn/public/thdportal_login?redirect_uri=" + encodedUri;
+                
+                log.debug("[PortalEntry] /por/ 页面默认重定向到: {}", loginUrl);
                 return loginUrl;
             }
         }
