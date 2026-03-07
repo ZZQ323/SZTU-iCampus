@@ -16,12 +16,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 公告接口控制器
+ * 公告接口控制器（增强版）
+ * <p>
+ * 新增功能：
+ * - 缓存统计接口
+ * - 热门公告接口
  */
 @Slf4j
 @RestController
@@ -92,7 +97,7 @@ public class AnnouncementController {
     public Result getDetail(
             @Parameter(description = "公告ID", required = true)
             @PathVariable String id) {
-        log.info("用户{} 获取公告详情", UserContext.getContext().getOpenId());
+        log.info("用户{} 获取公告详情: id={}", UserContext.getContext().getOpenId(), id);
         String openId = UserContext.getContext().getOpenId();
         AnnouncementContentVo content = announcementService.getDetail(openId, id);
         return Result.ok(content);
@@ -110,9 +115,29 @@ public class AnnouncementController {
             @RequestParam String keyword,
             @Parameter(description = "最大返回数量，默认20")
             @RequestParam(defaultValue = "20") Integer limit) {
-        log.info("用户{} 进行标题搜索", UserContext.getContext().getOpenId());
+        log.info("用户{} 进行标题搜索: keyword={}", UserContext.getContext().getOpenId(), keyword);
         List<AnnouncementMetaVo> list = announcementService.searchByTitle(keyword, limit);
         return Result.ok(list);
+    }
+
+    /**
+     * 全文搜索
+     */
+    @GetMapping("/v1/search/full")
+    @Operation(summary = "全文搜索", description = "代理学校全文搜索接口")
+    public Result fullTextSearch(
+            @Parameter(description = "搜索关键词", required = true)
+            @RequestParam String keyword,
+            @Parameter(description = "搜索范围：1=全部, 2=标题, 3=正文")
+            @RequestParam(defaultValue = "1") Integer scope,
+            @Parameter(description = "分类代码")
+            @RequestParam(required = false) String category,
+            @Parameter(description = "页码")
+            @RequestParam(defaultValue = "1") Integer page) {
+        log.info("用户{} 进行全文搜索: keyword={}", UserContext.getContext().getOpenId(), keyword);
+        String openId = UserContext.getContext().getOpenId();
+        AnnouncementListVo vo = announcementService.fullTextSearch(openId, keyword, scope, category, page);
+        return Result.ok(vo);
     }
 
     // ==================== 元信息 ====================
@@ -135,15 +160,18 @@ public class AnnouncementController {
     public Result getSystemStatus() {
         Map<String, Object> status = new HashMap<>();
         log.info("用户{} 获取系统状态", UserContext.getContext().getOpenId());
+
         // 系统状态
-        // CookieSourceStatus sourceStatus = cookieSourceManager.getStatus();
-        // status.put("initialized", sourceStatus.isInitialized());
         status.put("operational", StringUtils.hasText(announcementCacheUtil.getActiveSourceOpenId()));
+        status.put("initialized", announcementCacheUtil.isSystemInitialized());
 
         // 缓存统计
         status.put("totalCount", announcementCacheUtil.getTotalCount());
         status.put("latestId", announcementCacheUtil.getLatestId());
         status.put("lastCrawlTime", announcementCacheUtil.getLastCrawlTime());
+
+        // 【新增】详情缓存统计
+        status.put("contentCache", announcementCacheUtil.getContentCacheStats());
 
         return Result.ok(status);
     }

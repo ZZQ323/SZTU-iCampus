@@ -13,10 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * 公告缓存工具
+ * 公告缓存工具（增强版）
  * <p>
  * Redis 存储结构：
  * <ul>
@@ -26,6 +27,14 @@ import java.util.stream.Collectors;
  *   <li>announcements:latest_id    - String，最新公告ID</li>
  *   <li>announcements:content:{id} - String，详情缓存（TTL=24h）</li>
  *   <li>announcements:system       - Hash，系统状态</li>
+ *   <li>announcements:hot-access   - ZSET，热点访问记录（score=访问时间戳）</li>
+ * </ul>
+ * <p>
+ * 新增功能：
+ * <ul>
+ *   <li>热点访问记录：记录每次详情访问，用于 LRU 淘汰</li>
+ *   <li>自动淘汰冷门缓存：当缓存数量超过阈值时，自动删除最少访问的内容</li>
+ *   <li>缓存统计：提供缓存命中率、总量等统计信息</li>
  * </ul>
  */
 @Slf4j
@@ -39,8 +48,25 @@ public class AnnouncementCacheUtil {
     private static final String CONTENT_KEY_PREFIX = "announcements:content:";
     private static final String SYSTEM_KEY = "announcements:system";
 
-    /** 详情缓存 TTL：24小时（秒） */
+    /**
+     * 热点访问记录 ZSET
+     */
+    private static final String HOT_ACCESS_KEY = "announcements:hot-access";
+
+    /**
+     * 详情缓存 TTL：24小时（秒）
+     */
     private static final long CONTENT_TTL_SECONDS = 24 * 60 * 60;
+
+    /**
+     * 最大缓存详情数量
+     */
+    private static final int MAX_CACHED_DETAILS = 500;
+
+    /**
+     * 淘汰触发阈值（超过此数量时触发淘汰）
+     */
+    private static final int EVICT_THRESHOLD = MAX_CACHED_DETAILS + 50;
 
     @Resource
     private CacheUtil cacheUtil;
@@ -171,7 +197,7 @@ public class AnnouncementCacheUtil {
     /**
      * 分页获取公告列表（按ID倒序）
      *
-     * @param page 页码，从1开始
+     * @param page     页码，从1开始
      * @param pageSize 每页数量
      * @return 公告元数据列表
      */
@@ -196,7 +222,7 @@ public class AnnouncementCacheUtil {
      * 按分类分页获取公告列表
      *
      * @param category 分类代码
-     * @param page 页码，从1开始
+     * @param page     页码，从1开始
      * @param pageSize 每页数量
      * @return 公告元数据列表
      */
@@ -260,7 +286,7 @@ public class AnnouncementCacheUtil {
         return redisTemplate.opsForZSet().size(key);
     }
 
-    // ==================== 详情缓存 ====================
+    // ==================== 详情缓存（增强版） ====================
 
     /**
      * 保存详情内容（TTL=24h）
@@ -281,6 +307,131 @@ public class AnnouncementCacheUtil {
         return JSON.parseObject(val.toString(), AnnouncementContentVo.class);
     }
 
+    /**
+     * 检查详情是否已缓存
+     *
+     * @param id 公告ID
+     * @return 是否存在缓存
+     */
+    public boolean hasContent(String id) {
+        String key = generateKey(CONTENT_KEY_PREFIX + id);
+        return Boolean.TRUE.equals(cacheService.hasKey(key));
+    }
+
+    // ==================== 热点访问管理（新增） ====================
+
+    /**
+     * 记录热点访问
+     * <p>
+     * 每次访问详情时调用，用于 LRU 淘汰策略
+     *
+     * @param id 公告ID
+     */
+    public void recordAccess(String id) {
+        String key = generateKey(HOT_ACCESS_KEY);
+        redisTemplate.opsForZSet().add(key, id, System.currentTimeMillis());
+
+        // 异步检查是否需要淘汰冷门缓存
+        CompletableFuture.runAsync(this::evictColdContentIfNeeded);
+    }
+
+    /**
+     * 检查并淘汰冷门缓存（如果需要）
+     * <p>
+     * 当缓存数量超过阈值时，删除最少访问的内容
+     */
+    private void evictColdContentIfNeeded() {
+        try {
+            String hotKey = generateKey(HOT_ACCESS_KEY);
+            Long count = redisTemplate.opsForZSet().size(hotKey);
+
+            if (count == null || count <= EVICT_THRESHOLD) {
+                return;
+            }
+
+            // 计算需要淘汰的数量
+            int toEvict = count.intValue() - MAX_CACHED_DETAILS;
+
+            // 获取最冷门的 N 条（score 最小的，即最久未访问的）
+            Set<Object> coldIds = redisTemplate.opsForZSet().range(hotKey, 0, toEvict - 1);
+
+            if (coldIds != null && !coldIds.isEmpty()) {
+                for (Object id : coldIds) {
+                    // 删除详情缓存
+                    String contentKey = generateKey(CONTENT_KEY_PREFIX + id.toString());
+                    cacheService.del(contentKey);
+
+                    // 从热点记录中移除
+                    redisTemplate.opsForZSet().remove(hotKey, id);
+                }
+
+                log.info("淘汰冷门详情缓存: {} 条，当前剩余: {}", coldIds.size(), MAX_CACHED_DETAILS);
+            }
+
+        } catch (Exception e) {
+            log.warn("淘汰冷门缓存失败: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 获取热点公告ID列表
+     *
+     * @param limit 数量限制
+     * @return 按热度排序的公告ID列表（最热的在前）
+     */
+    public List<String> getHotIds(int limit) {
+        String key = generateKey(HOT_ACCESS_KEY);
+        Set<Object> ids = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
+
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return ids.stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取缓存统计信息
+     *
+     * @return 统计信息 Map
+     */
+    public Map<String, Object> getContentCacheStats() {
+        String hotKey = generateKey(HOT_ACCESS_KEY);
+        Long cachedCount = redisTemplate.opsForZSet().size(hotKey);
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("cachedCount", cachedCount != null ? cachedCount : 0);
+        stats.put("maxCount", MAX_CACHED_DETAILS);
+        stats.put("evictThreshold", EVICT_THRESHOLD);
+
+        return stats;
+    }
+
+    /**
+     * 批量预热详情缓存
+     * <p>
+     * 用于初始化时预爬取详情后，批量添加到热点记录
+     *
+     * @param ids 公告ID列表
+     */
+    public void warmUpAccess(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
+        String key = generateKey(HOT_ACCESS_KEY);
+        long now = System.currentTimeMillis();
+
+        // 批量添加，使用递减的时间戳，让最新的文章排在前面
+        for (int i = 0; i < ids.size(); i++) {
+            redisTemplate.opsForZSet().add(key, ids.get(i), now - i);
+        }
+
+        log.info("预热详情缓存记录: {} 条", ids.size());
+    }
+
     // ==================== 标题搜索 ====================
 
     /**
@@ -289,7 +440,7 @@ public class AnnouncementCacheUtil {
      * 注意：这是内存扫描，性能有限，建议限制返回数量
      *
      * @param keyword 搜索关键词
-     * @param limit 最大返回数量
+     * @param limit   最大返回数量
      * @return 匹配的公告列表
      */
     public List<AnnouncementMetaVo> searchByTitle(String keyword, int limit) {

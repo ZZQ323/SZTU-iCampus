@@ -296,20 +296,27 @@ public class AuthServiceV2Impl implements AuthService {
 
         log.info("📱 获取短信验证码: openId={}, userId={}", wxId, usrId);
 
-        try (SmartSession smartSession = createSmartSession(authSessionCacheUtil.getSession(wxId))) {
+        // ⭐ 关键修复：从 WebVPN 入口开始，建立完整的会话链路
+        // 而不是直接访问认证系统
+        try (SmartSession smartSession = smartHttpClient.newSession()) {
 
-            log.info("🍪 getSms 开始时有 {} 个 Cookie", smartSession.getCookies().size());
+            log.info("🍪 getSms 开始时有 0 个 Cookie（新会话）");
 
-            // ⭐ 关键修复：先访问登录页面，建立完整的会话上下文
-            // 这一步会收集所有必要的 Cookie（WebVPN SESSION、认证系统 SESSION 等）
-            log.info("📍 第一步：访问登录页面建立会话上下文...");
-            SmartResponse loginPageRes = smartHttpClient.get(gatewayFirstEndURL, smartSession);
-            log.info("📍 登录页面最终 URL: {}, Cookie 数量: {}", 
-                    loginPageRes.getFinalUrl(), smartSession.getCookies().size());
+            // ⭐ 第一步：访问 WebVPN 入口，建立完整的会话链路
+            // 使用 thdportal_login URL 跳过 /por/ 页面的 JS 重定向
+            String redirectUri = "https://home-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/bmportal";
+            String thdLoginUrl = "https://webvpn.sztu.edu.cn/public/thdportal_login?redirect_uri=" + 
+                    java.net.URLEncoder.encode(redirectUri, java.nio.charset.StandardCharsets.UTF_8);
             
-            // 打印收集到的 Cookie
+            log.info("📍 第一步：访问 WebVPN 入口建立会话链路...");
+            log.debug("📍 URL: {}", thdLoginUrl);
+            
+            SmartResponse loginPageRes = smartHttpClient.get(thdLoginUrl, smartSession);
+            
+            log.info("📍 登录页面最终 URL: {}", loginPageRes.getFinalUrl());
+            log.info("🍪 收集到 {} 个 Cookie", smartSession.getCookies().size());
             for (SmartCookie c : smartSession.getCookies()) {
-                log.debug("  🍪 收集到 Cookie: {}={} (domain={})", 
+                log.debug("  🍪 {}={} (domain={})", 
                         c.getName(), 
                         c.getValue().length() > 10 ? c.getValue().substring(0, 10) + "..." : c.getValue(),
                         c.getDomain());
@@ -318,16 +325,13 @@ public class AuthServiceV2Impl implements AuthService {
             // ⭐ 第二步：发送短信验证码请求
             log.info("📍 第二步：发送短信验证码请求...");
             
-            // 构建表单数据 - 参考 UsernameSmsImpl
             Map<String, String> formData = new HashMap<>();
             formData.put("j_username", CharacterConverter.toSBC(usrId));
 
-            // 构建额外请求头
             Map<String, String> headers = new HashMap<>();
-            headers.put("Referer", gatewayFirstEndURL);
+            headers.put("Referer", loginPageRes.getFinalUrl());
             headers.put("Origin", URLPraser.extractOrigin(smsURL));
 
-            // 发送 AJAX 请求获取短信
             SmartResponse response = smartHttpClient.postAjax(
                     smsURL + "?sf_request_type=ajax",
                     formData,
@@ -343,7 +347,7 @@ public class AuthServiceV2Impl implements AuthService {
                 log.error("❌ 短信请求返回错误页面");
                 throw new BusinessException(
                         SysReturnCode.BASE_PROXY.getCode(),
-                        "获取短信验证码失败，请重新初始化",
+                        "获取短信验证码失败，请重试",
                         ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
                 );
             }
@@ -357,7 +361,7 @@ public class AuthServiceV2Impl implements AuthService {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("获取短信验证码失败: {}", e.getMessage());
+            log.error("获取短信验证码失败: {}", e.getMessage(), e);
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
                     "获取短信验证码失败: " + e.getMessage(),
@@ -373,10 +377,12 @@ public class AuthServiceV2Impl implements AuthService {
 
         LoginResultsVo ret = new LoginResultsVo();
 
-        // ========== 调试：检查 ProxySession ==========
+        // 检查 ProxySession
         ProxySession cachedSession = authSessionCacheUtil.getSession(wxId);
-        if (cachedSession == null) {
-            log.error("❌ ProxySession 为空! openId={}", wxId);
+        if (cachedSession == null || cachedSession.getCookiesJson() == null 
+                || cachedSession.getCookiesJson().isEmpty() 
+                || cachedSession.getCookiesJson().equals("[]")) {
+            log.error("❌ ProxySession 为空或无 Cookie! openId={}", wxId);
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
                     "会话不存在，请先获取短信验证码",
@@ -384,14 +390,10 @@ public class AuthServiceV2Impl implements AuthService {
             );
         }
         
-        String cookiesJson = cachedSession.getCookiesJson();
-        log.info("📦 ProxySession.cookiesJson 长度: {}", 
-                cookiesJson != null ? cookiesJson.length() : 0);
-        // ========== 调试结束 ==========
+        log.info("📦 ProxySession.cookiesJson 长度: {}", cachedSession.getCookiesJson().length());
 
         try (SmartSession smartSession = createSmartSession(cachedSession)) {
 
-            // ========== 调试：检查 SmartSession ==========
             List<SmartCookie> loadedCookies = smartSession.getCookies();
             log.info("🍪 SmartSession 中加载了 {} 个 Cookie", loadedCookies.size());
             for (SmartCookie c : loadedCookies) {
@@ -401,23 +403,10 @@ public class AuthServiceV2Impl implements AuthService {
                         c.getDomain(), 
                         c.getPath());
             }
-            // ========== 调试结束 ==========
 
-            // ⭐ 关键修复：先访问登录页面，确保会话上下文正确
-            // 这一步会验证现有 Cookie 是否有效，并可能收集新的 Cookie
+            // ⭐ 关键修复：不再访问登录页面，直接发送 AJAX 验证请求
+            // 因为再次访问登录页面可能会重置服务器端的验证码状态
             String refererUrl = (cmd.getLoginType() == LoginType.SMS) ? gatewayFirstEndURL : gatewaySecondEndURL;
-            log.info("📍 第零步：访问登录页面确认会话...");
-            SmartResponse preCheckRes = smartHttpClient.get(refererUrl, smartSession);
-            log.info("📍 登录页面最终 URL: {}, Cookie 数量: {}", 
-                    preCheckRes.getFinalUrl(), smartSession.getCookies().size());
-            
-            // 检查是否到达了登录页面
-            String preCheckBody = preCheckRes.getBody();
-            if (preCheckBody != null && (preCheckBody.contains("j_username") || preCheckBody.contains("sms_checkcode"))) {
-                log.info("✅ 成功到达登录页面");
-            } else {
-                log.warn("⚠️ 可能没有到达登录页面，继续尝试登录...");
-            }
 
             // ============ 第一步：AJAX 验证 ============
             Map<String, String> verifyFormData = buildAjaxVerifyFormData(cmd);
@@ -443,7 +432,6 @@ public class AuthServiceV2Impl implements AuthService {
             log.info("📥 AJAX 响应: status={}, bodyLength={}", 
                     ajaxRes.getStatusCode(), ajaxBody != null ? ajaxBody.length() : 0);
             
-            // 打印响应内容用于调试
             if (ajaxBody != null) {
                 if (ajaxBody.length() < 500) {
                     log.debug("📥 响应内容: {}", ajaxBody);
@@ -452,12 +440,9 @@ public class AuthServiceV2Impl implements AuthService {
                 }
             }
 
-            // ⭐ 关键修复：检查响应是否为 HTML（被重定向）
+            // 检查响应是否为 HTML（被重定向或会话错误）
             if (ajaxBody == null || ajaxBody.trim().startsWith("<")) {
                 log.error("❌ AJAX 请求返回了 HTML 而非 JSON");
-                log.error("❌ 这通常意味着 Cookie 未正确发送或会话上下文错误");
-                
-                // 打印当前 session 中的 Cookie 用于调试
                 log.error("❌ 当前 session 中有 {} 个 Cookie:", smartSession.getCookies().size());
                 for (SmartCookie c : smartSession.getCookies()) {
                     log.error("  ❌ {}={} (domain={})", c.getName(), 

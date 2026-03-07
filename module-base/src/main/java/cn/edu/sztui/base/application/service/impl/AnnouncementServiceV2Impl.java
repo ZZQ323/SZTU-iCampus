@@ -24,27 +24,34 @@ import java.util.stream.Collectors;
 
 /**
  * 公告服务 V2 实现（基于 SmartHttpClient，无浏览器）
- * 
+ * <p>
  * 【特性】：
  * - 使用纯 HTTP 请求，无需 Playwright
  * - 支持更高并发
  * - 内存占用极低
  * - 实现全文搜索
+ * - 热点访问记录（新增）
  */
 @Slf4j
 @Service("announcementServiceV2")
 public class AnnouncementServiceV2Impl implements AnnouncementService {
 
-    /** 公告列表页 URL 模板 */
+    /**
+     * 公告列表页 URL 模板
+     */
     private static final String LIST_URL_TEMPLATE =
             "https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp" +
                     "?urltype=tree.TreeTempUrl&wbtreeid=%s&a1020514p=%d&a1020514c=20";
 
-    /** 公告详情页 URL 模板 */
+    /**
+     * 公告详情页 URL 模板
+     */
     private static final String DETAIL_URL_TEMPLATE =
             "https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/%s/%s.htm";
 
-    /** 全文搜索 URL */
+    /**
+     * 全文搜索 URL
+     */
     private static final String SEARCH_URL =
             "https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/ssjgkf.jsp?wbtreeid=1029";
 
@@ -96,6 +103,8 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
         AnnouncementContentVo cached = announcementCacheUtil.getContent(id);
         if (cached != null) {
             log.debug("命中详情缓存: id={}", id);
+            // 【新增】记录热点访问
+            announcementCacheUtil.recordAccess(id);
             return cached;
         }
 
@@ -109,6 +118,8 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
         // 4. 保存缓存
         if (content != null && content.getContent() != null) {
             announcementCacheUtil.saveContent(content);
+            // 【新增】记录热点访问
+            announcementCacheUtil.recordAccess(id);
         }
 
         return content;
@@ -142,7 +153,7 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
             // 构建搜索表单
             Map<String, String> formData = buildSearchFormData(keyword, scope, category, page);
 
-            log.debug("全文搜索: keyword={}, scope={}, category={}, page={}", 
+            log.debug("全文搜索: keyword={}, scope={}, category={}, page={}",
                     keyword, scope, category, page);
 
             // 发送 POST 请求
@@ -184,30 +195,30 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
 
     /**
      * 构建搜索表单数据
-     * 
+     * <p>
      * 参数说明：
      * - INTEXT: 搜索关键词
      * - sstj: 1=全部, 2=标题, 3=正文
      * - fwlb: 1018=教务, 1019=科研, 1020=行政, 1021=学工, 1022=校园
      * - a1020514p: 页码
      */
-    private Map<String, String> buildSearchFormData(String keyword, Integer scope, 
-                                                     String category, Integer page) {
+    private Map<String, String> buildSearchFormData(String keyword, Integer scope,
+                                                    String category, Integer page) {
         Map<String, String> form = new LinkedHashMap<>();
-        
+
         // 必填参数
         form.put("Find", "find");
         form.put("INTEXT", keyword != null ? keyword : "");
         form.put("sstj", scope != null ? String.valueOf(scope) : "1");  // 1=全部
         form.put("a1020514p", page != null ? String.valueOf(page) : "1");
-        
+
         // 分类筛选
         if (StringUtils.hasText(category)) {
             form.put("fwlb", category);
         } else {
             form.put("fwlb", "");  // 空=全部分类
         }
-        
+
         // 硬编码参数
         form.put("a1020514c", "20");
         form.put("a1020514t", "111");
@@ -217,7 +228,7 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
         form.put("y", "0");
         form.put("INTEXT2", "");
         form.put("news_search_code", "");
-        
+
         return form;
     }
 
@@ -269,13 +280,57 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
                 .max(Long::compareTo)
                 .map(String::valueOf)
                 .orElse(currentLatestId);
-        
+
         announcementCacheUtil.setLatestId(newLatestId);
         announcementCacheUtil.updateLastCrawlTime();
 
         log.info("发现 {} 条新公告，新 latestId: {}", newAnnouncements.size(), newLatestId);
 
+        // 【新增】预爬取新公告的详情
+        preloadNewAnnouncementDetails(sourceOpenId, newAnnouncements);
+
         return newAnnouncements;
+    }
+
+    /**
+     * 预爬取新公告的详情（增量更新时调用）
+     *
+     * @param openId        Cookie 来源
+     * @param announcements 新公告列表
+     */
+    private void preloadNewAnnouncementDetails(String openId, List<AnnouncementMetaVo> announcements) {
+        if (announcements.isEmpty()) {
+            return;
+        }
+
+        log.info("开始预爬取 {} 条新公告详情", announcements.size());
+
+        int success = 0;
+        for (AnnouncementMetaVo meta : announcements) {
+            try {
+                // 检查是否已缓存
+                if (announcementCacheUtil.hasContent(meta.getId())) {
+                    continue;
+                }
+
+                // 爬取详情
+                AnnouncementContentVo content = crawlDetail(openId, meta.getCategory(), meta.getId());
+
+                if (content != null && content.getContent() != null) {
+                    announcementCacheUtil.saveContent(content);
+                    announcementCacheUtil.recordAccess(meta.getId());
+                    success++;
+                }
+
+                // 间隔 200ms，避免请求过快
+                Thread.sleep(200);
+
+            } catch (Exception e) {
+                log.warn("预爬取新公告详情失败: id={}, error={}", meta.getId(), e.getMessage());
+            }
+        }
+
+        log.info("预爬取新公告详情完成: 成功 {}/{}", success, announcements.size());
     }
 
     @Override
@@ -292,9 +347,9 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
         try (SmartSession smartSession = createSmartSession(session)) {
             // 1029 = 全部分类
             String url = String.format(LIST_URL_TEMPLATE, "1029", page);
-            
+
             log.debug("爬取公告列表: url={}", url);
-            
+
             SmartResponse response = smartHttpClient.get(url, smartSession);
 
             if (!response.isSuccess()) {
@@ -325,9 +380,9 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
 
         try (SmartSession smartSession = createSmartSession(session)) {
             String url = String.format(DETAIL_URL_TEMPLATE, category, id);
-            
+
             log.debug("爬取公告详情: url={}", url);
-            
+
             SmartResponse response = smartHttpClient.get(url, smartSession);
 
             if (!response.isSuccess()) {
@@ -349,7 +404,7 @@ public class AnnouncementServiceV2Impl implements AnnouncementService {
      * 从 ProxySession 创建 SmartSession
      */
     private SmartSession createSmartSession(ProxySession proxySession) {
-        if (proxySession == null || proxySession.getCookiesJson() == null 
+        if (proxySession == null || proxySession.getCookiesJson() == null
                 || proxySession.getCookiesJson().isEmpty()) {
             return smartHttpClient.newSession();
         }
