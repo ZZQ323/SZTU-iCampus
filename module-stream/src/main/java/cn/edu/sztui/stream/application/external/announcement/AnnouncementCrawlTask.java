@@ -7,7 +7,6 @@ import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
 import cn.edu.sztui.stream.infrastructure.stream.StreamPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +22,6 @@ import java.util.Map;
 public class AnnouncementCrawlTask extends AbstractCrawlTask {
 
     @Resource
-    // @Qualifier("${announcement.service.impl:announcementService}")
-    @Qualifier("announcementServiceV2")
     private AnnouncementService announcementService;
 
     @Resource

@@ -62,7 +62,7 @@ spring:
 logging:
   level:
     cn.edu.sztui.common.util.smarthttp: DEBUG
-    cn.edu.sztui.base.application.service.impl.AuthServiceV2Impl: DEBUG
+    cn.edu.sztui.base.application.service.impl.cn.edu.sztui.base.application.service.impl.AuthServiceImpl: DEBUG
     cn.edu.sztui.base.infrastructure.sse: DEBUG
     cn.edu.sztui.base.infrastructure.stream: DEBUG
     cn.edu.sztui.base.infrastructure.scheduler: INFO

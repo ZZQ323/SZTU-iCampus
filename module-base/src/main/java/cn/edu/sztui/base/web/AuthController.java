@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +36,6 @@ import java.util.Map;
 public class AuthController {
 
     @Resource
-    @Qualifier("authServiceV2")  // 使用 V2
     private AuthService authService;
 
     // ==================== 状态查询 ====================

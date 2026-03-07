@@ -41,8 +41,8 @@ import static cn.edu.sztui.base.domain.model.SchoolAPIs.*;
  * - 添加 /por/ 页面处理
  */
 @Slf4j
-@Service("authServiceV2")
-public class AuthServiceV2Impl implements AuthService {
+@Service
+public class AuthServiceImpl implements AuthService {
 
     @Resource
     private SmartHttpClient smartHttpClient;

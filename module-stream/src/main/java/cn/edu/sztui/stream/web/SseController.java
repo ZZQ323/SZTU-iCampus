@@ -1,8 +1,5 @@
 package cn.edu.sztui.stream.web;
 
-import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
-import cn.edu.sztui.base.application.service.AcademicService;
-import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
@@ -33,8 +30,6 @@ public class SseController {
     @Resource
     private SseEmitterManager sseEmitterManager;
 
-    @Resource
-    private AcademicService academicService;
 
     @Resource
     private AnnouncementCacheUtil announcementCacheUtil;
@@ -55,33 +50,33 @@ public class SseController {
 
         SseEmitter emitter = sseEmitterManager.subscribe("schedule", wxOpenId, SSE_TIMEOUT);
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                Thread.sleep(100);
-
-                CourseTableVo currentSchedule = academicService.getCrouseTableByOpenId(
-                        wxOpenId,
-                        new CrouseTableQuery()
-                );
-
-                SseMessage<CourseTableVo> message = SseMessage.data(
-                        StreamKeys.TYPE_SCHEDULE_DATA,
-                        currentSchedule
-                );
-
-                sseEmitterManager.sendToUser("schedule", wxOpenId, message);
-                log.info("已推送初始课表给用户 {}", wxOpenId);
-
-            } catch (Exception e) {
-                log.error("推送初始课表失败 - user: {}, error: {}", wxOpenId, e.getMessage());
-
-                if (e.getMessage() != null &&
-                        (e.getMessage().contains("登录") || e.getMessage().contains("过期"))) {
-                    SseMessage<Void> authMsg = SseMessage.authRequired(wxOpenId, "请重新登录以获取课表");
-                    sseEmitterManager.sendToUser("schedule", wxOpenId, authMsg);
-                }
-            }
-        });
+//        CompletableFuture.runAsync(() -> {
+//            try {
+//                Thread.sleep(100);
+//
+//                // CourseTableVo currentSchedule = academicService.getCrouseTableByOpenId(
+//                //         wxOpenId,
+//                //         new CrouseTableQuery()
+//                // );
+//
+//                SseMessage<CourseTableVo> message = SseMessage.data(
+//                        StreamKeys.TYPE_SCHEDULE_DATA,
+//                        currentSchedule
+//                );
+//
+//                sseEmitterManager.sendToUser("schedule", wxOpenId, message);
+//                log.info("已推送初始课表给用户 {}", wxOpenId);
+//
+//            } catch (Exception e) {
+//                log.error("推送初始课表失败 - user: {}, error: {}", wxOpenId, e.getMessage());
+//
+//                if (e.getMessage() != null &&
+//                        (e.getMessage().contains("登录") || e.getMessage().contains("过期"))) {
+//                    SseMessage<Void> authMsg = SseMessage.authRequired(wxOpenId, "请重新登录以获取课表");
+//                    sseEmitterManager.sendToUser("schedule", wxOpenId, authMsg);
+//                }
+//            }
+//        });
 
         return emitter;
     }

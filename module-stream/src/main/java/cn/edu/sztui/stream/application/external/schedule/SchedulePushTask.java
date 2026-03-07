@@ -1,12 +1,7 @@
 package cn.edu.sztui.stream.application.external.schedule;
 
-import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
-import cn.edu.sztui.base.application.service.AcademicService;
-import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
-import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
-import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
 import cn.edu.sztui.stream.infrastructure.stream.StreamPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +26,7 @@ public class SchedulePushTask {
     
     @Resource
     private StreamPublisher streamPublisher;
-    
-    @Resource
-    private AcademicService academicService;
+
     
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
@@ -78,53 +71,53 @@ public class SchedulePushTask {
         int errorCount = 0;
         
         for (String wxOpenId : subscribers) {
-            try {
-                // 1. 检查是否已登录学校系统
-                if (!authSessionCacheUtil.isSchoolLoggedIn(wxOpenId)) {
-                    log.debug("用户 {} 未登录学校系统", wxOpenId);
-                    SseMessage<Void> authMsg = SseMessage.authRequired(wxOpenId, "请先登录学校系统");
-                    streamPublisher.publishSchedule(authMsg);
-                    authFailCount++;
-                    continue;
-                }
-                
-                // 2. 检查 Cookie 是否可能过期
-                if (authSessionCacheUtil.isCookiePossiblyExpired(wxOpenId)) {
-                    log.debug("用户 {} Cookie 可能已过期", wxOpenId);
-                    SseMessage<Void> expiredMsg = SseMessage.authRequired(wxOpenId, "会话已过期，请重新登录");
-                    streamPublisher.publishSchedule(expiredMsg);
-                    cookieExpiredCount++;
-                    continue;
-                }
-                
-                // 3. 使用 getCrouseTableByOpenId 获取课表
-                CourseTableVo schedule = academicService.getCrouseTableByOpenId(
-                        wxOpenId, 
-                        new CrouseTableQuery()
-                );
-                
-                // 4. 推送课表数据
-                SseMessage<CourseTableVo> dataMsg = SseMessage.dataTo(
-                        StreamKeys.TYPE_SCHEDULE_DATA,
-                        schedule,
-                        wxOpenId
-                );
-                streamPublisher.publishSchedule(dataMsg);
-                
-                successCount++;
-                log.debug("成功推送课表给用户 {}", wxOpenId);
-                
-            } catch (Exception e) {
-                log.error("推送课表给用户 {} 失败: {}", wxOpenId, e.getMessage());
-                errorCount++;
-                
-                // 推送错误提示给用户
-                try {
-                    SseMessage<Void> errorMsg = SseMessage.authRequired(wxOpenId, "获取课表失败，请稍后重试");
-                    sseEmitterManager.sendToUser("schedule", wxOpenId, errorMsg);
-                } catch (Exception ignored) {
-                }
-            }
+//            try {
+//                // 1. 检查是否已登录学校系统
+//                if (!authSessionCacheUtil.isSchoolLoggedIn(wxOpenId)) {
+//                    log.debug("用户 {} 未登录学校系统", wxOpenId);
+//                    SseMessage<Void> authMsg = SseMessage.authRequired(wxOpenId, "请先登录学校系统");
+//                    streamPublisher.publishSchedule(authMsg);
+//                    authFailCount++;
+//                    continue;
+//                }
+//
+//                // 2. 检查 Cookie 是否可能过期
+//                if (authSessionCacheUtil.isCookiePossiblyExpired(wxOpenId)) {
+//                    log.debug("用户 {} Cookie 可能已过期", wxOpenId);
+//                    SseMessage<Void> expiredMsg = SseMessage.authRequired(wxOpenId, "会话已过期，请重新登录");
+//                    streamPublisher.publishSchedule(expiredMsg);
+//                    cookieExpiredCount++;
+//                    continue;
+//                }
+//
+//                // 3. 使用 getCrouseTableByOpenId 获取课表
+//                // CourseTableVo schedule = academicService.getCrouseTableByOpenId(
+//                //         wxOpenId,
+//                //         new CrouseTableQuery()
+//                // );
+//
+//                // 4. 推送课表数据
+//                SseMessage<CourseTableVo> dataMsg = SseMessage.dataTo(
+//                        StreamKeys.TYPE_SCHEDULE_DATA,
+//                        schedule,
+//                        wxOpenId
+//                );
+//                streamPublisher.publishSchedule(dataMsg);
+//
+//                successCount++;
+//                log.debug("成功推送课表给用户 {}", wxOpenId);
+//
+//            } catch (Exception e) {
+//                log.error("推送课表给用户 {} 失败: {}", wxOpenId, e.getMessage());
+//                errorCount++;
+//
+//                // 推送错误提示给用户
+//                try {
+//                    SseMessage<Void> errorMsg = SseMessage.authRequired(wxOpenId, "获取课表失败，请稍后重试");
+//                    sseEmitterManager.sendToUser("schedule", wxOpenId, errorMsg);
+//                } catch (Exception ignored) {
+//                }
+//            }
         }
         
         log.info("课表推送完成 - 成功: {}, 未登录: {}, Cookie过期: {}, 错误: {}", 

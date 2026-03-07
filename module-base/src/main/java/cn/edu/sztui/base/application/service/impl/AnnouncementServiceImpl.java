@@ -13,13 +13,19 @@ import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
-import cn.edu.sztui.common.util.smarthttp.*;
+import cn.edu.sztui.common.util.smarthttp.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.SmartHttpClient;
+import cn.edu.sztui.common.util.smarthttp.SmartResponse;
+import cn.edu.sztui.common.util.smarthttp.SmartSession;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -33,8 +39,8 @@ import java.util.stream.Collectors;
  * - 热点访问记录（新增）
  */
 @Slf4j
-@Service("announcementServiceV2")
-public class AnnouncementServiceV2Impl implements AnnouncementService {
+@Service
+public class AnnouncementServiceImpl implements AnnouncementService {
 
     /**
      * 公告列表页 URL 模板
