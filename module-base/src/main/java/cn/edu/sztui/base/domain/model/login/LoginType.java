@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.domain.model.loginhandle;
+package cn.edu.sztui.base.domain.model.login;
 
 public enum LoginType {
     SMS("短信验证码登录"),

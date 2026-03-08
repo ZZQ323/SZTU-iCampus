@@ -1,6 +1,6 @@
 package cn.edu.sztui.base.application.vo;
 
-import cn.edu.sztui.base.domain.model.loginhandle.LoginType;
+import cn.edu.sztui.base.domain.model.login.LoginType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 

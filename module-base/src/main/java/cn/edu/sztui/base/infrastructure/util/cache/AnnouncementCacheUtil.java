@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * 公告缓存工具（增强版）
+ * 公告缓存工具（修正版）
  * <p>
  * Redis 存储结构：
  * <ul>
@@ -30,12 +30,9 @@ import java.util.stream.Collectors;
  *   <li>announcements:hot-access   - ZSET，热点访问记录（score=访问时间戳）</li>
  * </ul>
  * <p>
- * 新增功能：
- * <ul>
- *   <li>热点访问记录：记录每次详情访问，用于 LRU 淘汰</li>
- *   <li>自动淘汰冷门缓存：当缓存数量超过阈值时，自动删除最少访问的内容</li>
- *   <li>缓存统计：提供缓存命中率、总量等统计信息</li>
- * </ul>
+ * 热点缓存说明：
+ * - 最多缓存 50 篇详情（已解析为JSON结构）
+ * - 按最后访问时间排序，淘汰最久未访问的
  */
 @Slf4j
 @Component
@@ -59,14 +56,14 @@ public class AnnouncementCacheUtil {
     private static final long CONTENT_TTL_SECONDS = 24 * 60 * 60;
 
     /**
-     * 最大缓存详情数量
+     * 最大缓存详情数量（改为50）
      */
-    private static final int MAX_CACHED_DETAILS = 500;
+    private static final int MAX_CACHED_DETAILS = 50;
 
     /**
-     * 淘汰触发阈值（超过此数量时触发淘汰）
+     * 淘汰触发阈值
      */
-    private static final int EVICT_THRESHOLD = MAX_CACHED_DETAILS + 50;
+    private static final int EVICT_THRESHOLD = MAX_CACHED_DETAILS + 10;
 
     @Resource
     private CacheUtil cacheUtil;
@@ -82,65 +79,46 @@ public class AnnouncementCacheUtil {
 
     // ==================== 系统状态 ====================
 
-    /**
-     * 检查系统是否已初始化
-     */
     public boolean isSystemInitialized() {
         Object val = cacheUtil.hget(SYSTEM_KEY, "initialized");
         return "true".equals(String.valueOf(val));
     }
 
-    /**
-     * 设置系统初始化状态
-     */
     public void setSystemInitialized(boolean initialized) {
         cacheUtil.hset(SYSTEM_KEY, "initialized", String.valueOf(initialized));
     }
 
-    /**
-     * 获取当前活跃的Cookie来源OpenId
-     */
     public String getActiveSourceOpenId() {
         Object val = cacheUtil.hget(SYSTEM_KEY, "activeSourceOpenId");
         return val != null ? val.toString() : null;
     }
 
-    /**
-     * 设置当前活跃的Cookie来源OpenId
-     */
     public void setActiveSourceOpenId(String openId) {
         cacheUtil.hset(SYSTEM_KEY, "activeSourceOpenId", openId != null ? openId : "");
     }
 
-    /**
-     * 更新最后爬取时间
-     */
     public void updateLastCrawlTime() {
         cacheUtil.hset(SYSTEM_KEY, "lastCrawlTime", String.valueOf(System.currentTimeMillis()));
     }
 
-    /**
-     * 获取最后爬取时间
-     */
     public Long getLastCrawlTime() {
         Object val = cacheUtil.hget(SYSTEM_KEY, "lastCrawlTime");
         return val != null ? Long.parseLong(val.toString()) : null;
     }
 
+    public void clearActiveSource() {
+        cacheUtil.hset(SYSTEM_KEY, "activeSourceOpenId", "");
+        log.info("已清除 Cookie 来源");
+    }
+
     // ==================== 公告元数据 ====================
 
-    /**
-     * 保存公告元数据
-     */
     public void saveMeta(AnnouncementMetaVo meta) {
-        // 保存元数据到 Hash
         cacheUtil.hset(META_KEY, meta.getId(), JSON.toJSONString(meta));
 
-        // 添加到全局时间线 ZSET（score = id 数值）
         String timelineKey = generateKey(TIMELINE_KEY);
         redisTemplate.opsForZSet().add(timelineKey, meta.getId(), Double.parseDouble(meta.getId()));
 
-        // 添加到分类索引 ZSET
         if (StringUtils.hasText(meta.getCategory())) {
             String categoryKey = generateKey(CATEGORY_KEY_PREFIX + meta.getCategory());
             redisTemplate.opsForZSet().add(categoryKey, meta.getId(), Double.parseDouble(meta.getId()));
@@ -149,9 +127,6 @@ public class AnnouncementCacheUtil {
         log.debug("保存公告元数据: id={}, title={}", meta.getId(), meta.getTitle());
     }
 
-    /**
-     * 批量保存公告元数据
-     */
     public void saveMetaBatch(List<AnnouncementMetaVo> metas) {
         for (AnnouncementMetaVo meta : metas) {
             saveMeta(meta);
@@ -159,34 +134,22 @@ public class AnnouncementCacheUtil {
         log.info("批量保存公告元数据: count={}", metas.size());
     }
 
-    /**
-     * 获取公告元数据
-     */
     public AnnouncementMetaVo getMeta(String id) {
         Object val = cacheUtil.hget(META_KEY, id);
         if (val == null) return null;
         return JSON.parseObject(val.toString(), AnnouncementMetaVo.class);
     }
 
-    /**
-     * 检查公告是否存在
-     */
     public boolean hasMeta(String id) {
         return cacheUtil.hHasKey(META_KEY, id);
     }
 
-    /**
-     * 获取最新公告ID
-     */
     public String getLatestId() {
         String key = generateKey(LATEST_ID_KEY);
         Object val = cacheService.get(key);
         return val != null ? val.toString() : null;
     }
 
-    /**
-     * 设置最新公告ID
-     */
     public void setLatestId(String id) {
         String key = generateKey(LATEST_ID_KEY);
         cacheService.set(key, id);
@@ -194,13 +157,6 @@ public class AnnouncementCacheUtil {
 
     // ==================== 列表查询 ====================
 
-    /**
-     * 分页获取公告列表（按ID倒序）
-     *
-     * @param page     页码，从1开始
-     * @param pageSize 每页数量
-     * @return 公告元数据列表
-     */
     public List<AnnouncementMetaVo> getList(int page, int pageSize) {
         long start = (long) (page - 1) * pageSize;
         long end = start + pageSize - 1;
@@ -218,14 +174,6 @@ public class AnnouncementCacheUtil {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 按分类分页获取公告列表
-     *
-     * @param category 分类代码
-     * @param page     页码，从1开始
-     * @param pageSize 每页数量
-     * @return 公告元数据列表
-     */
     public List<AnnouncementMetaVo> getListByCategory(String category, int page, int pageSize) {
         long start = (long) (page - 1) * pageSize;
         long end = start + pageSize - 1;
@@ -243,12 +191,6 @@ public class AnnouncementCacheUtil {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 获取增量公告（id > lastId）
-     *
-     * @param lastId 上次已读的最新ID
-     * @return 新公告列表（按ID倒序）
-     */
     public List<AnnouncementMetaVo> getIncrementalList(String lastId) {
         if (!StringUtils.hasText(lastId)) {
             return Collections.emptyList();
@@ -270,26 +212,21 @@ public class AnnouncementCacheUtil {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 获取总数
-     */
     public Long getTotalCount() {
         String key = generateKey(TIMELINE_KEY);
         return redisTemplate.opsForZSet().size(key);
     }
 
-    /**
-     * 获取分类总数
-     */
     public Long getTotalCountByCategory(String category) {
         String key = generateKey(CATEGORY_KEY_PREFIX + category);
         return redisTemplate.opsForZSet().size(key);
     }
 
-    // ==================== 详情缓存（增强版） ====================
+    // ==================== 详情缓存（热点缓存） ====================
 
     /**
-     * 保存详情内容（TTL=24h）
+     * 保存详情内容（已解析为JSON结构）
+     * TTL=24h
      */
     public void saveContent(AnnouncementContentVo content) {
         String key = generateKey(CONTENT_KEY_PREFIX + content.getId());
@@ -298,7 +235,7 @@ public class AnnouncementCacheUtil {
     }
 
     /**
-     * 获取详情内容
+     * 获取详情内容（已解析的JSON结构）
      */
     public AnnouncementContentVo getContent(String id) {
         String key = generateKey(CONTENT_KEY_PREFIX + id);
@@ -309,23 +246,17 @@ public class AnnouncementCacheUtil {
 
     /**
      * 检查详情是否已缓存
-     *
-     * @param id 公告ID
-     * @return 是否存在缓存
      */
     public boolean hasContent(String id) {
         String key = generateKey(CONTENT_KEY_PREFIX + id);
         return Boolean.TRUE.equals(cacheService.hasKey(key));
     }
 
-    // ==================== 热点访问管理（新增） ====================
+    // ==================== 热点访问管理 ====================
 
     /**
      * 记录热点访问
-     * <p>
      * 每次访问详情时调用，用于 LRU 淘汰策略
-     *
-     * @param id 公告ID
      */
     public void recordAccess(String id) {
         String key = generateKey(HOT_ACCESS_KEY);
@@ -337,8 +268,7 @@ public class AnnouncementCacheUtil {
 
     /**
      * 检查并淘汰冷门缓存（如果需要）
-     * <p>
-     * 当缓存数量超过阈值时，删除最少访问的内容
+     * 当缓存数量超过50时，删除最久未访问的
      */
     private void evictColdContentIfNeeded() {
         try {
@@ -374,47 +304,8 @@ public class AnnouncementCacheUtil {
     }
 
     /**
-     * 获取热点公告ID列表
-     *
-     * @param limit 数量限制
-     * @return 按热度排序的公告ID列表（最热的在前）
-     */
-    public List<String> getHotIds(int limit) {
-        String key = generateKey(HOT_ACCESS_KEY);
-        Set<Object> ids = redisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
-
-        if (ids == null || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return ids.stream()
-                .map(Object::toString)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 获取缓存统计信息
-     *
-     * @return 统计信息 Map
-     */
-    public Map<String, Object> getContentCacheStats() {
-        String hotKey = generateKey(HOT_ACCESS_KEY);
-        Long cachedCount = redisTemplate.opsForZSet().size(hotKey);
-
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("cachedCount", cachedCount != null ? cachedCount : 0);
-        stats.put("maxCount", MAX_CACHED_DETAILS);
-        stats.put("evictThreshold", EVICT_THRESHOLD);
-
-        return stats;
-    }
-
-    /**
      * 批量预热详情缓存
-     * <p>
      * 用于初始化时预爬取详情后，批量添加到热点记录
-     *
-     * @param ids 公告ID列表
      */
     public void warmUpAccess(List<String> ids) {
         if (ids == null || ids.isEmpty()) {
@@ -432,17 +323,22 @@ public class AnnouncementCacheUtil {
         log.info("预热详情缓存记录: {} 条", ids.size());
     }
 
+    /**
+     * 获取缓存统计信息
+     */
+    public Map<String, Object> getContentCacheStats() {
+        String hotKey = generateKey(HOT_ACCESS_KEY);
+        Long cachedCount = redisTemplate.opsForZSet().size(hotKey);
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("cachedCount", cachedCount != null ? cachedCount : 0);
+        stats.put("maxCount", MAX_CACHED_DETAILS);
+
+        return stats;
+    }
+
     // ==================== 标题搜索 ====================
 
-    /**
-     * 标题模糊搜索
-     * <p>
-     * 注意：这是内存扫描，性能有限，建议限制返回数量
-     *
-     * @param keyword 搜索关键词
-     * @param limit   最大返回数量
-     * @return 匹配的公告列表
-     */
     public List<AnnouncementMetaVo> searchByTitle(String keyword, int limit) {
         Map<Object, Object> allMetas = cacheUtil.hmget(META_KEY);
         if (allMetas == null || allMetas.isEmpty()) {
@@ -461,18 +357,7 @@ public class AnnouncementCacheUtil {
 
     // ==================== 工具方法 ====================
 
-    /**
-     * 生成完整的 Redis key（带前缀）
-     */
     private String generateKey(String key) {
         return redisKeyGenerator.generate("cache:" + key);
-    }
-
-    /**
-     * 清除活跃的Cookie来源
-     */
-    public void clearActiveSource() {
-        cacheUtil.hset(SYSTEM_KEY, "activeSourceOpenId", "");
-        log.info("已清除 Cookie 来源");
     }
 }

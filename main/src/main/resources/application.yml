@@ -61,15 +61,15 @@ spring:
 # 日志配置 (可选，用于调试)
 logging:
   level:
-    cn.edu.sztui.common.util.smarthttp: DEBUG
-    cn.edu.sztui.base.application.service.impl.cn.edu.sztui.base.application.service.impl.AuthServiceImpl: DEBUG
-    cn.edu.sztui.base.infrastructure.sse: DEBUG
-    cn.edu.sztui.base.infrastructure.stream: DEBUG
+    cn.edu.sztui.common.util.smarthttp: INFO
+    cn.edu.sztui.base.application.service.impl.cn.edu.sztui.base.application.service.impl.AuthServiceImpl: INFO
+    cn.edu.sztui.base.infrastructure.sse: INFO
+    cn.edu.sztui.base.infrastructure.stream: INFO
     cn.edu.sztui.base.infrastructure.scheduler: INFO
     # Playwright 相关日志
-    cn.edu.sztui.base.domain.model.proxy.browser: DEBUG
-    cn.edu.sztui.base.domain.model.proxy.session: DEBUG
-    cn.edu.sztui.base.domain.model.proxy.login: DEBUG
+    # cn.edu.sztui.base.domain.model.proxy.browser: INFO
+    # cn.edu.sztui.base.domain.model.proxy.session: INFO
+    # cn.edu.sztui.base.domain.model.proxy.login: DEBUG
 
     # 应用层日志
     cn.edu.sztui.base.application.service: INFO

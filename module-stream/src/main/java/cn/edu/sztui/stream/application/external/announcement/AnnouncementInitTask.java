@@ -19,60 +19,35 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
- * 公告系统初始化任务 V2（基于 SmartHttpClient，无浏览器）
+ * 公告系统初始化任务（修正版）
  * <p>
- * 【优势】：
- *  <ul>
- *      <li>无浏览器进程，内存占用极低（~20MB vs Playwright ~750MB）</li>
- *      <li>支持更高并发（20-50 vs Playwright 的 5）</li>
- *      <li>失败任务可快速重试</li>
- *      <li>初始化速度提升 5 倍</li>
- *  </ul>
- * <p>
- * 【新增功能】：
+ * 功能：
  * <ul>
- *     <li>详情预爬取：初始化时预爬取最新 N 篇公告的详情</li>
- *     <li>热点缓存预热：将预爬取的详情添加到热点记录</li>
- * </ul>
- * <p>
- * 【触发时机】：
- * <ul>
- *     <li>首个用户登录成功后（通过 UserLoginEvent）</li>
- *     <li>手动调用（管理接口）</li>
+ *   <li>爬取全部公告元数据到 Redis</li>
+ *   <li>预爬取最新 50 篇公告详情（解析为JSON结构）</li>
  * </ul>
  */
 @Slf4j
 @Component
 public class AnnouncementInitTask {
 
-    /**
-     * 带总页数的列表 URL
-     */
     private static final String LIST_URL_TEMPLATE =
             "https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp" +
                     "?totalpage=%d&PAGENUM=%d&wbtreeid=1029";
 
-    /**
-     * 首页 URL（用于获取总页数）
-     */
     private static final String FIRST_PAGE_URL =
             "https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?wbtreeid=1029";
 
-    /**
-     * 详情页 URL 模板
-     */
     private static final String DETAIL_URL_TEMPLATE =
             "https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/%s/%s.htm";
 
     /**
-     * 并发数（SmartHttpClient 可以设更高）
-     * Playwright 版本只能设 5，HTTP 版本可以设 20-50
+     * 列表爬取并发数
      */
     private static final int BATCH_CONCURRENCY = 20;
 
     /**
-     * 批次间隔（毫秒），防止被封
-     * 由于并发更高，间隔可以更短
+     * 批次间隔（毫秒）
      */
     private static final long BATCH_DELAY_MS = 2000;
 
@@ -82,17 +57,17 @@ public class AnnouncementInitTask {
     private static final int REQUEST_TIMEOUT_SECONDS = 30;
 
     /**
-     * 【新增】预爬取详情的数量
+     * 预爬取详情的数量（改为50）
      */
-    private static final int PRELOAD_DETAIL_COUNT = 100;
+    private static final int PRELOAD_DETAIL_COUNT = 50;
 
     /**
-     * 【新增】详情预爬取并发数（控制在较低水平，避免被封）
+     * 详情预爬取并发数
      */
     private static final int DETAIL_BATCH_CONCURRENCY = 10;
 
     /**
-     * 【新增】详情预爬取批次间隔（毫秒）
+     * 详情预爬取批次间隔（毫秒）
      */
     private static final long DETAIL_BATCH_DELAY_MS = 1000;
 
@@ -111,15 +86,10 @@ public class AnnouncementInitTask {
     @Resource
     private AnnouncementContentParser contentParser;
 
-    /**
-     * 是否正在初始化
-     */
     private volatile boolean initializing = false;
 
     /**
-     * 触发初始化（由 UserLoginEventListener 调用）
-     *
-     * @param openId 登录用户的 openId（用于获取 Cookie）
+     * 触发初始化
      */
     public void triggerInit(String openId) {
         if (announcementCacheUtil.isSystemInitialized()) {
@@ -135,7 +105,7 @@ public class AnnouncementInitTask {
         initializing = true;
 
         try {
-            log.info("========== 开始公告系统初始化（SmartHttpClient V2）==========");
+            log.info("========== 开始公告系统初始化 ==========");
             long startTime = System.currentTimeMillis();
 
             doInit(openId);
@@ -150,9 +120,6 @@ public class AnnouncementInitTask {
         }
     }
 
-    /**
-     * 执行初始化
-     */
     private void doInit(String openId) {
         ProxySession session = authSessionCacheUtil.getSession(openId);
         if (session == null) {
@@ -160,7 +127,6 @@ public class AnnouncementInitTask {
             return;
         }
 
-        // 解析 Cookie
         List<SmartCookie> cookies = CookieConverter.jsonToSmartCookies(session.getCookiesJson());
         if (cookies.isEmpty()) {
             log.error("用户 Cookie 为空: {}", openId);
@@ -186,21 +152,17 @@ public class AnnouncementInitTask {
         // Step 3: 保存到 Redis
         saveMetaToRedis(allAnnouncements);
 
-        // Step 4: 【新增】预爬取最新 N 篇详情
-        log.info("========== 开始预爬取详情 ==========");
+        // Step 4: 预爬取最新 50 篇详情
+        log.info("========== 开始预爬取详情（最新50篇）==========");
         preloadDetails(cookies, allAnnouncements);
 
         log.info("公告系统初始化完成：共 {} 条公告", allAnnouncements.size());
     }
 
-    /**
-     * 爬取所有元数据
-     */
     private List<AnnouncementMetaVo> crawlAllMeta(List<SmartCookie> cookies, int totalPage) {
         List<AnnouncementMetaVo> allAnnouncements = new CopyOnWriteArrayList<>();
         int batchCount = (totalPage + BATCH_CONCURRENCY - 1) / BATCH_CONCURRENCY;
 
-        // 创建固定大小的线程池
         ExecutorService executor = Executors.newFixedThreadPool(BATCH_CONCURRENCY);
 
         try {
@@ -210,7 +172,6 @@ public class AnnouncementInitTask {
 
                 log.info("爬取批次 {}/{}: 第 {} - {} 页", batch + 1, batchCount, startPage, endPage);
 
-                // 提交当前批次的所有任务
                 List<Future<List<AnnouncementMetaVo>>> futures = new ArrayList<>();
 
                 for (int pageNum = startPage; pageNum <= endPage; pageNum++) {
@@ -222,7 +183,6 @@ public class AnnouncementInitTask {
                     ));
                 }
 
-                // 收集结果
                 int successCount = 0;
                 int failCount = 0;
 
@@ -251,7 +211,6 @@ public class AnnouncementInitTask {
                 log.info("批次 {}/{} 完成 - 成功: {}, 失败: {}, 累计: {} 条",
                         batch + 1, batchCount, successCount, failCount, allAnnouncements.size());
 
-                // 批次间隔（最后一批不需要）
                 if (batch < batchCount - 1) {
                     Thread.sleep(BATCH_DELAY_MS);
                 }
@@ -274,13 +233,9 @@ public class AnnouncementInitTask {
         return allAnnouncements;
     }
 
-    /**
-     * 保存元数据到 Redis
-     */
     private void saveMetaToRedis(List<AnnouncementMetaVo> allAnnouncements) {
         log.info("开始保存 {} 条公告到 Redis...", allAnnouncements.size());
 
-        // 分批保存，避免单次操作过大
         int saveStart = 0;
         int saveBatchSize = 500;
         while (saveStart < allAnnouncements.size()) {
@@ -291,7 +246,6 @@ public class AnnouncementInitTask {
             saveStart = saveEnd;
         }
 
-        // 设置最新 ID
         String latestId = allAnnouncements.stream()
                 .map(m -> {
                     try {
@@ -312,13 +266,10 @@ public class AnnouncementInitTask {
     }
 
     /**
-     * 【新增】预爬取详情
-     *
-     * @param cookies       共享的 Cookie 列表
-     * @param announcements 公告元数据列表
+     * 预爬取详情（最新50篇）
      */
     private void preloadDetails(List<SmartCookie> cookies, List<AnnouncementMetaVo> announcements) {
-        // 按 ID 倒序排列，取最新的 N 篇
+        // 按 ID 倒序排列，取最新的 50 篇
         List<AnnouncementMetaVo> toPreload = announcements.stream()
                 .sorted((a, b) -> {
                     try {
@@ -330,13 +281,12 @@ public class AnnouncementInitTask {
                 .limit(PRELOAD_DETAIL_COUNT)
                 .collect(Collectors.toList());
 
-        log.info("预爬取详情: 目标 {} 篇（共 {} 篇）", toPreload.size(), announcements.size());
+        log.info("预爬取详情: 目标 {} 篇", toPreload.size());
 
         if (toPreload.isEmpty()) {
             return;
         }
 
-        // 使用线程池并发爬取
         ExecutorService executor = Executors.newFixedThreadPool(DETAIL_BATCH_CONCURRENCY);
         List<String> preloadedIds = new CopyOnWriteArrayList<>();
 
@@ -350,18 +300,15 @@ public class AnnouncementInitTask {
 
                 log.debug("详情预爬取批次 {}/{}: {} 篇", batch + 1, batchCount, batchList.size());
 
-                // 提交当前批次任务
                 List<Future<Boolean>> futures = new ArrayList<>();
 
                 for (AnnouncementMetaVo meta : batchList) {
                     futures.add(executor.submit(() -> {
                         try {
-                            // 检查是否已缓存
                             if (announcementCacheUtil.hasContent(meta.getId())) {
                                 return true;
                             }
 
-                            // 爬取详情
                             AnnouncementContentVo content = fetchDetail(cookies, meta.getCategory(), meta.getId());
 
                             if (content != null && content.getContent() != null) {
@@ -379,7 +326,6 @@ public class AnnouncementInitTask {
                     }));
                 }
 
-                // 等待当前批次完成
                 int batchSuccess = 0;
                 for (Future<Boolean> future : futures) {
                     try {
@@ -394,7 +340,6 @@ public class AnnouncementInitTask {
                 log.debug("详情预爬取批次 {}/{} 完成: 成功 {}/{}",
                         batch + 1, batchCount, batchSuccess, batchList.size());
 
-                // 批次间隔
                 if (batch < batchCount - 1) {
                     Thread.sleep(DETAIL_BATCH_DELAY_MS);
                 }
@@ -422,9 +367,6 @@ public class AnnouncementInitTask {
         log.info("详情预爬取完成: 成功 {}/{} 篇", preloadedIds.size(), toPreload.size());
     }
 
-    /**
-     * 【新增】爬取单篇详情
-     */
     private AnnouncementContentVo fetchDetail(List<SmartCookie> cookies, String category, String id) {
         try (SmartSession session = smartHttpClient.newSession(cookies)) {
             String url = String.format(DETAIL_URL_TEMPLATE, category, id);
@@ -444,9 +386,6 @@ public class AnnouncementInitTask {
         }
     }
 
-    /**
-     * 获取总页数
-     */
     private int fetchTotalPage(List<SmartCookie> cookies) {
         try (SmartSession session = smartHttpClient.newSession(cookies)) {
             SmartResponse response = smartHttpClient.get(FIRST_PAGE_URL, session);
@@ -466,17 +405,8 @@ public class AnnouncementInitTask {
         }
     }
 
-    /**
-     * 爬取单页
-     *
-     * @param cookies   共享的 Cookie 列表
-     * @param totalPage 总页数
-     * @param pageNum   当前页码
-     * @return 解析到的公告列表
-     */
     private List<AnnouncementMetaVo> fetchSinglePage(List<SmartCookie> cookies,
                                                      int totalPage, int pageNum) {
-        // 每个任务创建独立的 SmartSession（共享连接池）
         try (SmartSession session = smartHttpClient.newSession(cookies)) {
             String url = String.format(LIST_URL_TEMPLATE, totalPage, pageNum);
 
@@ -497,25 +427,14 @@ public class AnnouncementInitTask {
         }
     }
 
-    // ==================== 状态查询 ====================
-
-    /**
-     * 是否已初始化
-     */
     public boolean isInitialized() {
         return announcementCacheUtil.isSystemInitialized();
     }
 
-    /**
-     * 是否正在初始化
-     */
     public boolean isInitializing() {
         return initializing;
     }
 
-    /**
-     * 获取初始化状态摘要
-     */
     public String getStatusSummary() {
         if (initializing) {
             return "初始化中...";

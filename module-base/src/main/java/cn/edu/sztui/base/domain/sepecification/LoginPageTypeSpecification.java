@@ -1,6 +1,6 @@
 package cn.edu.sztui.base.domain.sepecification;
 
-import cn.edu.sztui.base.domain.model.loginhandle.LoginType;
+import cn.edu.sztui.base.domain.model.login.LoginType;
 import cn.edu.sztui.common.ddd.AbstractSpecification;
 
 public class LoginPageTypeSpecification extends AbstractSpecification<LoginType> {

@@ -108,7 +108,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         // 1. 尝试从缓存获取
         AnnouncementContentVo cached = announcementCacheUtil.getContent(id);
         if (cached != null) {
-            log.debug("命中详情缓存: id={}", id);
+            log.info("命中详情缓存: id={}", id);
             // 【新增】记录热点访问
             announcementCacheUtil.recordAccess(id);
             return cached;
@@ -387,7 +387,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         try (SmartSession smartSession = createSmartSession(session)) {
             String url = String.format(DETAIL_URL_TEMPLATE, category, id);
 
-            log.debug("爬取公告详情: url={}", url);
+            log.info("爬取公告详情: url={}", url);
 
             SmartResponse response = smartHttpClient.get(url, smartSession);
 

@@ -54,11 +54,11 @@ public class AuthSessionCacheUtil {
     /** 状态缓存有效期：30 秒（毫秒） */
     public static final long STATUS_CACHE_TTL_MS = 30 * 1000L;
 
-    /** Cookie 保守过期时间：2 小时（毫秒）—— 超过此时间未刷新则视为可能过期 */
-    public static final long COOKIE_CONSERVATIVE_EXPIRE_MS = 2 * 60 * 60 * 1000L;
+    /** Cookie 保守过期时间：一天—— 超过此时间未刷新则视为可能过期 */
+    public static final long COOKIE_CONSERVATIVE_EXPIRE_MS = 24 * 60 * 60 * 1000L;
 
     /** Cookie 即将过期预警：30 分钟（毫秒） */
-    public static final long COOKIE_EXPIRING_SOON_MS = 30 * 60 * 1000L;
+    public static final long COOKIE_EXPIRING_SOON_MS = 23 * 60 * 1000L;
 
     @Resource
     private CacheUtil cacheUtil;

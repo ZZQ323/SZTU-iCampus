@@ -5,8 +5,7 @@ import cn.edu.sztui.base.application.external.UserLoginEvent;
 import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.application.vo.LoginStatusVo;
-import cn.edu.sztui.base.domain.model.loginhandle.HandleCluster;
-import cn.edu.sztui.base.domain.model.loginhandle.LoginType;
+import cn.edu.sztui.base.domain.model.login.LoginType;
 import cn.edu.sztui.base.infrastructure.convertor.CharacterConverter;
 import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
@@ -30,15 +29,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cn.edu.sztui.base.domain.model.SchoolAPIs.*;
+import static cn.edu.sztui.base.domain.model.login.SchoolAPIs.*;
 
 /**
  * 认证服务 V2 实现（基于 SmartHttpClient，无浏览器）
- * 
- * 【修复版 - 参考 UsernameSmsImpl.java】：
- * - 修复 SMS 登录表单字段：sms_checkcode（不是 j_checkcode）
- * - 添加必要字段：op=login, spAuthChainCode
- * - 添加 /por/ 页面处理
  */
 @Slf4j
 @Service
@@ -59,8 +53,6 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private HandleCluster handleCluster;
 
     // ==================== 状态查询 ====================
 
@@ -68,12 +60,12 @@ public class AuthServiceImpl implements AuthService {
     public LoginStatusVo getStatus() {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
-        log.debug("用户 {} 查询登录状态", wxId);
+        log.info("用户 {} 查询登录状态", wxId);
 
         // 1. 优先从缓存读取状态
         LoginStatusVo cachedStatus = authSessionCacheUtil.getCachedStatus(wxId);
         if (cachedStatus != null) {
-            log.debug("命中状态缓存: openId={}, logined={}", wxId, cachedStatus.isLogined());
+            log.info("命中状态缓存: openId={}, logined={}", wxId, cachedStatus.isLogined());
             return cachedStatus;
         }
 
@@ -218,11 +210,11 @@ public class AuthServiceImpl implements AuthService {
                         ret.getRealName()
                 ));
 
-            } else if (finalUrl.contains(gatewayFirstEndURL) || finalUrl.contains("/idp/authcenter/ActionAuthChain")) {
+            } else if (finalUrl.contains(gatewayFirstURL) || finalUrl.contains("/idp/authcenter/ActionAuthChain")) {
                 // 未登录，需要 SMS
                 ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
 
-            } else if (finalUrl.contains(gatewaySecondEndURL)) {
+            } else if (finalUrl.contains(gatewaySecondURL)) {
                 // 未登录，支持 SMS + PASSWORD
                 List<LoginType> typeLists = new ArrayList<>();
                 typeLists.add(LoginType.SMS);
@@ -330,10 +322,10 @@ public class AuthServiceImpl implements AuthService {
 
             Map<String, String> headers = new HashMap<>();
             headers.put("Referer", loginPageRes.getFinalUrl());
-            headers.put("Origin", URLPraser.extractOrigin(smsURL));
+            headers.put("Origin", URLPraser.extractOrigin(gatewaySmsURL));
 
             SmartResponse response = smartHttpClient.postAjax(
-                    smsURL + "?sf_request_type=ajax",
+                    gatewaySmsURL + "?sf_request_type=ajax",
                     formData,
                     smartSession,
                     headers
@@ -406,23 +398,23 @@ public class AuthServiceImpl implements AuthService {
 
             // ⭐ 关键修复：不再访问登录页面，直接发送 AJAX 验证请求
             // 因为再次访问登录页面可能会重置服务器端的验证码状态
-            String refererUrl = (cmd.getLoginType() == LoginType.SMS) ? gatewayFirstEndURL : gatewaySecondEndURL;
+            String refererUrl = (cmd.getLoginType() == LoginType.SMS) ? gatewayFirstURL : gatewaySecondURL;
 
             // ============ 第一步：AJAX 验证 ============
             Map<String, String> verifyFormData = buildAjaxVerifyFormData(cmd);
             Map<String, String> verifyHeaders = new HashMap<>();
             
             verifyHeaders.put("Referer", refererUrl);
-            verifyHeaders.put("Origin", URLPraser.extractOrigin(loginURL));
+            verifyHeaders.put("Origin", URLPraser.extractOrigin(gatewayLoginSubmitURL));
             verifyHeaders.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             verifyHeaders.put("Accept", "*/*");
             verifyHeaders.put("X-Requested-With", "XMLHttpRequest");
 
-            log.info("📤 发送 AJAX 验证请求: url={}", loginURL + "?sf_request_type=ajax");
+            log.info("📤 发送 AJAX 验证请求: url={}", gatewayLoginSubmitURL + "?sf_request_type=ajax");
             log.debug("📤 表单数据: {}", verifyFormData);
 
             SmartResponse ajaxRes = smartHttpClient.postAjax(
-                    loginURL + "?sf_request_type=ajax",
+                    gatewayLoginSubmitURL + "?sf_request_type=ajax",
                     verifyFormData,
                     smartSession,
                     verifyHeaders
@@ -479,7 +471,7 @@ public class AuthServiceImpl implements AuthService {
             
             Map<String, String> formHeaders = new HashMap<>();
             formHeaders.put("Referer", refererUrl);
-            formHeaders.put("Origin", URLPraser.extractOrigin(loginURL));
+            formHeaders.put("Origin", URLPraser.extractOrigin(gatewayLoginSubmitURL));
             
             log.info("📤 提交登录表单: url={}", formSubmitUrl);
             
@@ -542,7 +534,7 @@ public class AuthServiceImpl implements AuthService {
         try (SmartSession smartSession = createSmartSession(authSessionCacheUtil.getSession(wxId))) {
 
             // 访问登出 URL
-            smartHttpClient.get(logoutURL, smartSession);
+            smartHttpClient.get(logoutSubmitURL, smartSession);
 
             // 清除会话
             authSessionCacheUtil.sessionLogoutBind(wxId);
@@ -617,9 +609,9 @@ public class AuthServiceImpl implements AuthService {
      */
     private String getFormSubmitUrl(LoginType loginType) {
         if (loginType == LoginType.SMS) {
-            return A4tLoginSMSFormActionURL;
+            return A4tLoginSMSRedirectURL;
         } else {
-            return A4tLoginPASSWORDFormActionURL;
+            return A4tLoginPASSWORDRedirectURL;
         }
     }
 
