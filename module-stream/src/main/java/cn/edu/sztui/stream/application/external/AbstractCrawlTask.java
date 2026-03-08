@@ -63,7 +63,7 @@ public abstract class AbstractCrawlTask {
         if (!StringUtils.hasText(openId)) return false;
         if (!authSessionCacheUtil.hasSession(openId)) return false;
         if (!authSessionCacheUtil.isSchoolLoggedIn(openId)) return false;
-        return !authSessionCacheUtil.isCookiePossiblyExpired(openId);
+        return true;
     }
 
     protected String findValidSourceFromOnlineUsers() {

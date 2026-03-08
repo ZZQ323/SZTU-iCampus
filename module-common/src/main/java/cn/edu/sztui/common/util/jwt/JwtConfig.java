@@ -30,7 +30,7 @@ public class JwtConfig {
 
     private static final Logger log = LoggerFactory.getLogger(JwtConfig.class);
     private String secret;
-    private Long expire;          // 默认过期时间（秒），建议 14400（4小时）
+    private Long expire;          // 14400
     private String tokenPrefix;   // "Bearer "
     private String header;        // "Authorization"
     private SecretKey secretKey;

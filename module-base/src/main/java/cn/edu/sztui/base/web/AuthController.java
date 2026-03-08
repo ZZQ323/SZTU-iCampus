@@ -152,9 +152,9 @@ public class AuthController {
      */
     @Operation(summary = "登出学校系统")
     @PostMapping("/v1/logout")
-    public Result logout(@RequestBody LoginRequestCommand cmd) {
+    public Result logout() {
         // FIXME 这里加个cmd何意味？
-        LoginResultsVo result = authService.logout(cmd);
+        LoginResultsVo result = authService.logout();
         return Result.ok(result);
     }
 }

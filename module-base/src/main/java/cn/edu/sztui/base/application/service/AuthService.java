@@ -104,9 +104,7 @@ public interface AuthService {
 
     /**
      * 登出学校系统
-     *
-     * @param cmd 登出参数
      * @return LoginResultsVo
      */
-    LoginResultsVo logout(LoginRequestCommand cmd);
+    LoginResultsVo logout();
 }

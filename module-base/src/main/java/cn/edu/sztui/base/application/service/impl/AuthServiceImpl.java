@@ -14,6 +14,7 @@ import cn.edu.sztui.base.infrastructure.util.praser.UserInfoPraser;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
+import cn.edu.sztui.common.util.checker.SchoolSessionChecker;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
@@ -32,7 +33,15 @@ import java.util.stream.Collectors;
 import static cn.edu.sztui.base.domain.model.login.SchoolAPIs.*;
 
 /**
- * 认证服务 V2 实现（基于 SmartHttpClient，无浏览器）
+ * 认证服务实现（精简版）
+ * <p>
+ * 核心改动：
+ * <ul>
+ *   <li>使用 {@link SchoolSessionChecker} 统一检测会话状态</li>
+ *   <li>删除状态缓存逻辑，每次 getStatus 都实时检查</li>
+ *   <li>删除 Cookie 过期预测逻辑</li>
+ *   <li>logout 时保存新 Cookie 而非清空</li>
+ * </ul>
  */
 @Slf4j
 @Service
@@ -53,37 +62,25 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     // ==================== 状态查询 ====================
 
+    /**
+     * 获取登录状态（实时检查，无缓存）
+     * <p>
+     * 每次调用都会访问学校网关，通过重定向结果判断登录状态。
+     * 同时起到 Cookie 保活的作用。
+     */
     @Override
     public LoginStatusVo getStatus() {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
         log.info("用户 {} 查询登录状态", wxId);
 
-        // 1. 优先从缓存读取状态
-        LoginStatusVo cachedStatus = authSessionCacheUtil.getCachedStatus(wxId);
-        if (cachedStatus != null) {
-            log.info("命中状态缓存: openId={}, logined={}", wxId, cachedStatus.isLogined());
-            return cachedStatus;
-        }
-
-        // 2. 检查 Cookie 是否可能过期
-        if (authSessionCacheUtil.isCookiePossiblyExpired(wxId)) {
-            log.info("Cookie 可能已过期，清除旧 Cookie: openId={}", wxId);
-            authSessionCacheUtil.clearSessionCookies(wxId);
-        }
-
-        // 3. 缓存未命中，获取真实状态
+        // 直接调用 doRefreshCookies，不做缓存
         LoginResultsVo result = doRefreshCookies(wxId, authSessionCacheUtil.getSession(wxId));
 
-        // 4. 转换并缓存
-        LoginStatusVo status = LoginStatusVo.from(result);
-        status.setCookieExpiringSoon(authSessionCacheUtil.isCookieExpiringSoon(wxId));
-        authSessionCacheUtil.cacheStatus(wxId, status);
-
-        return status;
+        // 转换为 LoginStatusVo
+        return LoginStatusVo.from(result);
     }
 
     @Override
@@ -105,34 +102,35 @@ public class AuthServiceImpl implements AuthService {
 
     // ==================== 会话管理 ====================
 
+    /**
+     * 初始化会话（强制重建 Cookie）
+     * <p>
+     * 先删除旧的 ProxySession，再重新获取 Cookie。
+     */
     @Override
     public LoginResultsVo initSession() {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
 
-        log.info("用户 {} 初始化会话（SmartHttpClient V2）", wxId);
+        log.info("用户 {} 初始化会话（强制重建）", wxId);
 
-        // 清除旧缓存，强制重新获取
-        authSessionCacheUtil.invalidateStatusCache(wxId);
-        authSessionCacheUtil.clearSessionCookies(wxId);
+        // ⭐ 强制删除旧的 ProxySession
+        authSessionCacheUtil.deleteSession(wxId);
 
-        // 执行刷新
-        LoginResultsVo result = doRefreshCookies(wxId, null);
-
-        // 更新状态缓存
-        LoginStatusVo status = LoginStatusVo.from(result);
-        authSessionCacheUtil.cacheStatus(wxId, status);
-
-        return result;
+        // 用空 session 重新获取 Cookie
+        return doRefreshCookies(wxId, null);
     }
 
+    /**
+     * 刷新会话（仅刷新已有会话）
+     */
     @Override
     public LoginResultsVo refreshSession() {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
         log.info("用户 {} 刷新会话", wxId);
 
-        // 1. 检查是否有会话
+        // 检查是否有会话
         ProxySession session = authSessionCacheUtil.getSession(wxId);
         if (session == null) {
             throw new BusinessException(
@@ -142,23 +140,17 @@ public class AuthServiceImpl implements AuthService {
             );
         }
 
-        // 2. 执行刷新
+        // 执行刷新
         LoginResultsVo result = doRefreshCookies(wxId, session);
 
-        // 3. 检查刷新结果
+        // 检查刷新结果：如果未登录，抛出 403
         if (!result.isLogined()) {
-            authSessionCacheUtil.invalidateStatusCache(wxId);
-            authSessionCacheUtil.clearSessionCookies(wxId);
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
-                    "会话已过期，请重新登录",
-                    ResultCodeEnum.UNAUTHORIZED.getCode()
+                    "学校会话已过期",
+                    ResultCodeEnum.FORBIDDEN.getCode()  // 403
             );
         }
-
-        // 4. 更新状态缓存
-        LoginStatusVo status = LoginStatusVo.from(result);
-        authSessionCacheUtil.cacheStatus(wxId, status);
 
         return result;
     }
@@ -171,6 +163,11 @@ public class AuthServiceImpl implements AuthService {
 
     // ==================== 核心：Cookie 刷新逻辑 ====================
 
+    /**
+     * 刷新 Cookie 并检测登录状态
+     * <p>
+     * 使用 {@link SchoolSessionChecker} 统一判断登录状态。
+     */
     private LoginResultsVo doRefreshCookies(String wxId, ProxySession session) {
         LoginResultsVo ret = new LoginResultsVo();
         ret.setLogined(false);
@@ -186,16 +183,17 @@ public class AuthServiceImpl implements AuthService {
 
             String finalUrl = response.getFinalUrl();
             log.info("最终 URL: {}, 重定向次数: {}", finalUrl, response.getRedirectCount());
-            
+
             // 打印重定向链，用于调试
             if (log.isDebugEnabled()) {
                 log.debug("重定向链: {}", response.getRedirectChain());
             }
 
             log.info("🍪 doRefreshCookies 请求后有 {} 个 Cookie", smartSession.getCookies().size());
+            log.info("📍 SchoolSessionChecker 状态: {}", SchoolSessionChecker.getStatusDescription(response));
 
-            // 根据最终 URL 判断登录状态
-            if (finalUrl.contains(acdemAdminSysGatewayStartURL) || finalUrl.contains("/bmportal/index.portal")) {
+            // ⭐ 使用 SchoolSessionChecker 统一判断
+            if (SchoolSessionChecker.isLoggedIn(response)) {
                 // 已登录
                 ret.setLogined(true);
                 UserContext.getContext().setLoginTime(System.currentTimeMillis());
@@ -210,38 +208,30 @@ public class AuthServiceImpl implements AuthService {
                         ret.getRealName()
                 ));
 
-            } else if (finalUrl.contains(gatewayFirstURL) || finalUrl.contains("/idp/authcenter/ActionAuthChain")) {
-                // 未登录，需要 SMS
-                ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
-
-            } else if (finalUrl.contains(gatewaySecondURL)) {
-                // 未登录，支持 SMS + PASSWORD
-                List<LoginType> typeLists = new ArrayList<>();
-                typeLists.add(LoginType.SMS);
-                typeLists.add(LoginType.PASSWORD);
-                ret.setLoginTypes(typeLists);
+            } else if (SchoolSessionChecker.isRedirectedToLogin(response)) {
+                // 未登录，检测支持的登录方式
+                List<String> typeStrings = SchoolSessionChecker.detectLoginTypes(response);
+                List<LoginType> loginTypes = typeStrings.stream()
+                        .map(LoginType::valueOf)
+                        .collect(Collectors.toList());
+                ret.setLoginTypes(loginTypes);
+                log.info("检测到登录方式: {}", typeStrings);
 
             } else {
                 // 未知状态，尝试从响应体判断
                 String body = response.getBody();
                 if (body != null) {
-                    if (body.contains("j_username") || body.contains("登录") || body.contains("login")) {
-                        // 包含登录表单，未登录状态
-                        ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
-                        log.info("根据页面内容判断为未登录状态");
-                    } else if (body.contains("bmportal") || body.contains("userInfo") || body.contains("个人中心")) {
-                        // 包含门户内容，已登录状态
+                    if (body.contains("bmportal") || body.contains("userInfo") || body.contains("个人中心")) {
                         ret.setLogined(true);
                         UserInfoPraser.extractByRegex(ret, body);
                         log.info("根据页面内容判断为已登录状态");
                     } else {
-                        // 默认为未登录
                         ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
+                        log.info("根据页面内容判断为未登录状态，默认 SMS");
                     }
                 } else {
                     ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
                 }
-
                 log.warn("未知的最终页面 URL: {}", finalUrl);
             }
 
@@ -288,35 +278,25 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("📱 获取短信验证码: openId={}, userId={}", wxId, usrId);
 
-        // ⭐ 关键修复：从 WebVPN 入口开始，建立完整的会话链路
-        // 而不是直接访问认证系统
         try (SmartSession smartSession = smartHttpClient.newSession()) {
 
             log.info("🍪 getSms 开始时有 0 个 Cookie（新会话）");
 
-            // ⭐ 第一步：访问 WebVPN 入口，建立完整的会话链路
-            // 使用 thdportal_login URL 跳过 /por/ 页面的 JS 重定向
+            // 第一步：访问 WebVPN 入口，建立完整的会话链路
             String redirectUri = "https://home-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/bmportal";
-            String thdLoginUrl = "https://webvpn.sztu.edu.cn/public/thdportal_login?redirect_uri=" + 
+            String thdLoginUrl = "https://webvpn.sztu.edu.cn/public/thdportal_login?redirect_uri=" +
                     java.net.URLEncoder.encode(redirectUri, java.nio.charset.StandardCharsets.UTF_8);
-            
+
             log.info("📍 第一步：访问 WebVPN 入口建立会话链路...");
-            log.debug("📍 URL: {}", thdLoginUrl);
-            
+
             SmartResponse loginPageRes = smartHttpClient.get(thdLoginUrl, smartSession);
-            
+
             log.info("📍 登录页面最终 URL: {}", loginPageRes.getFinalUrl());
             log.info("🍪 收集到 {} 个 Cookie", smartSession.getCookies().size());
-            for (SmartCookie c : smartSession.getCookies()) {
-                log.debug("  🍪 {}={} (domain={})", 
-                        c.getName(), 
-                        c.getValue().length() > 10 ? c.getValue().substring(0, 10) + "..." : c.getValue(),
-                        c.getDomain());
-            }
 
-            // ⭐ 第二步：发送短信验证码请求
+            // 第二步：发送短信验证码请求
             log.info("📍 第二步：发送短信验证码请求...");
-            
+
             Map<String, String> formData = new HashMap<>();
             formData.put("j_username", CharacterConverter.toSBC(usrId));
 
@@ -331,24 +311,33 @@ public class AuthServiceImpl implements AuthService {
                     headers
             );
 
-            log.info("📱 短信请求响应: status={}", response.getStatusCode());
-            
-            // 检查响应
-            String body = response.getBody();
-            if (body != null && body.contains("错误") && body.contains("问题")) {
-                log.error("❌ 短信请求返回错误页面");
+            log.info("📱 短信接口响应: status={}, body={}",
+                    response.getStatusCode(),
+                    response.getBody() != null ? response.getBody().substring(0, Math.min(200, response.getBody().length())) : "null");
+
+            // 验证响应
+            if (!response.isSuccess()) {
                 throw new BusinessException(
                         SysReturnCode.BASE_PROXY.getCode(),
-                        "获取短信验证码失败，请重试",
+                        "发送短信验证码失败，服务器返回错误",
                         ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
                 );
             }
 
-            log.info("🍪 getSms 请求后有 {} 个 Cookie", smartSession.getCookies().size());
+            // 检查响应内容
+            String body = response.getBody();
+            if (body == null || body.isEmpty()) {
+                throw new BusinessException(
+                        SysReturnCode.BASE_PROXY.getCode(),
+                        "发送短信验证码失败，服务器无响应",
+                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+                );
+            }
 
-            // 保存 Cookies
+            // 保存会话 Cookie（供后续登录使用）
             saveSessionCookies(wxId, smartSession);
-            log.info("💾 已保存 {} 个 Cookie 到缓存", smartSession.getCookies().size());
+
+            log.info("📱 短信验证码请求成功");
 
         } catch (BusinessException e) {
             throw e;
@@ -367,157 +356,82 @@ public class AuthServiceImpl implements AuthService {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
 
-        LoginResultsVo ret = new LoginResultsVo();
+        log.info("🔐 用户 {} 登录学校系统: userId={}, loginType={}",
+                wxId, cmd.getUserId(), cmd.getLoginType());
 
-        // 检查 ProxySession
-        ProxySession cachedSession = authSessionCacheUtil.getSession(wxId);
-        if (cachedSession == null || cachedSession.getCookiesJson() == null 
-                || cachedSession.getCookiesJson().isEmpty() 
-                || cachedSession.getCookiesJson().equals("[]")) {
-            log.error("❌ ProxySession 为空或无 Cookie! openId={}", wxId);
-            throw new BusinessException(
-                    SysReturnCode.BASE_PROXY.getCode(),
-                    "会话不存在，请先获取短信验证码",
-                    ResultCodeEnum.BAD_REQUEST.getCode()
-            );
-        }
-        
-        log.info("📦 ProxySession.cookiesJson 长度: {}", cachedSession.getCookiesJson().length());
+        try (SmartSession smartSession = createSmartSession(authSessionCacheUtil.getSession(wxId))) {
 
-        try (SmartSession smartSession = createSmartSession(cachedSession)) {
-
-            List<SmartCookie> loadedCookies = smartSession.getCookies();
-            log.info("🍪 SmartSession 中加载了 {} 个 Cookie", loadedCookies.size());
-            for (SmartCookie c : loadedCookies) {
-                log.debug("  🍪 {}={} (domain={}, path={})", 
-                        c.getName(), 
-                        c.getValue().length() > 20 ? c.getValue().substring(0, 20) + "..." : c.getValue(),
-                        c.getDomain(), 
-                        c.getPath());
-            }
-
-            // ⭐ 关键修复：不再访问登录页面，直接发送 AJAX 验证请求
-            // 因为再次访问登录页面可能会重置服务器端的验证码状态
-            String refererUrl = (cmd.getLoginType() == LoginType.SMS) ? gatewayFirstURL : gatewaySecondURL;
-
-            // ============ 第一步：AJAX 验证 ============
+            // 第一步：AJAX 验证
             Map<String, String> verifyFormData = buildAjaxVerifyFormData(cmd);
             Map<String, String> verifyHeaders = new HashMap<>();
-            
+            String refererUrl = (cmd.getLoginType() == LoginType.SMS) ? gatewayFirstURL : gatewaySecondURL;
             verifyHeaders.put("Referer", refererUrl);
             verifyHeaders.put("Origin", URLPraser.extractOrigin(gatewayLoginSubmitURL));
             verifyHeaders.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             verifyHeaders.put("Accept", "*/*");
             verifyHeaders.put("X-Requested-With", "XMLHttpRequest");
+            verifyHeaders.put("Origin", URLPraser.extractOrigin(gatewayLoginSubmitURL));
 
-            log.info("📤 发送 AJAX 验证请求: url={}", gatewayLoginSubmitURL + "?sf_request_type=ajax");
-            log.debug("📤 表单数据: {}", verifyFormData);
+            String ajaxUrl = gatewayLoginSubmitURL + "?sf_request_type=ajax";
+            SmartResponse ajaxResponse = smartHttpClient.postAjax(ajaxUrl, verifyFormData, smartSession, verifyHeaders);
+
+            log.info("🔐 AJAX 验证响应: {}", ajaxResponse.getBody());
+
+            // 第二步：表单提交
+            String submitUrl = getFormSubmitUrl(cmd.getLoginType());
+            Map<String, String> formData = buildFormSubmitData(cmd);
 
             SmartResponse ajaxRes = smartHttpClient.postAjax(
-                    gatewayLoginSubmitURL + "?sf_request_type=ajax",
-                    verifyFormData,
+                    submitUrl + "?sf_request_type=ajax",
+                    formData,
                     smartSession,
                     verifyHeaders
             );
 
-            String ajaxBody = ajaxRes.getBody();
-            log.info("📥 AJAX 响应: status={}, bodyLength={}", 
-                    ajaxRes.getStatusCode(), ajaxBody != null ? ajaxBody.length() : 0);
-            
-            if (ajaxBody != null) {
-                if (ajaxBody.length() < 500) {
-                    log.debug("📥 响应内容: {}", ajaxBody);
-                } else {
-                    log.debug("📥 响应前500字符: {}", ajaxBody.substring(0, 500));
-                }
-            }
+            log.info("🔐 表单提交后最终 URL: {}", ajaxRes.getFinalUrl());
 
-            // 检查响应是否为 HTML（被重定向或会话错误）
-            if (ajaxBody == null || ajaxBody.trim().startsWith("<")) {
-                log.error("❌ AJAX 请求返回了 HTML 而非 JSON");
-                log.error("❌ 当前 session 中有 {} 个 Cookie:", smartSession.getCookies().size());
-                for (SmartCookie c : smartSession.getCookies()) {
-                    log.error("  ❌ {}={} (domain={})", c.getName(), 
-                            c.getValue().length() > 10 ? c.getValue().substring(0, 10) + "..." : c.getValue(),
-                            c.getDomain());
-                }
-                
-                throw new BusinessException(
-                        SysReturnCode.BASE_PROXY.getCode(),
-                        "登录会话已失效，请重新获取短信验证码",
-                        ResultCodeEnum.UNAUTHORIZED.getCode()
+            // 第三步：检查登录结果
+            LoginResultsVo result = new LoginResultsVo();
+
+            if (SchoolSessionChecker.isLoggedIn(ajaxRes)) {
+                result.setLogined(true);
+                UserInfoPraser.extractByRegex(result, ajaxRes.getBody());
+
+                // 绑定用户
+                authSessionCacheUtil.sessionLoginBind(
+                        wxId,
+                        result.getUserId() != null ? result.getUserId() : cmd.getUserId(),
+                        convertToPlaywrightCookies(smartSession.getCookies())
                 );
+
+                // 发布登录事件
+                eventPublisher.publishEvent(new UserLoginEvent(
+                        this, wxId,
+                        result.getUserId(),
+                        result.getRealName()
+                ));
+
+                log.info("🔐 登录成功: userId={}, realName={}", result.getUserId(), result.getRealName());
+
+            } else {
+                result.setLogined(false);
+                List<String> typeStrings = SchoolSessionChecker.detectLoginTypes(ajaxRes);
+                result.setLoginTypes(typeStrings.stream()
+                        .map(LoginType::valueOf)
+                        .collect(Collectors.toList()));
+
+                // 保存 Cookie（即使登录失败也保存，下次可能成功）
+                saveSessionCookies(wxId, smartSession);
+
+                log.warn("🔐 登录失败，最终 URL: {}", ajaxRes.getFinalUrl());
             }
 
-            JsonNode json = objectMapper.readTree(ajaxBody);
-            boolean loginFailed = json.path("loginFailed").asBoolean(true)
-                    || ajaxBody.contains("当前界面遇到了一些问题");
-
-            if (loginFailed) {
-                String errorMsg = json.path("message").asText(json.path("msg").asText("验证失败"));
-                log.error("❌ 登录验证失败: {}", errorMsg);
-                throw new BusinessException(
-                        SysReturnCode.BASE_PROXY.getCode(),
-                        "登录验证失败: " + errorMsg,
-                        ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
-                );
-            }
-            
-            log.info("✅ AJAX 验证成功");
-
-            // ============ 第二步：表单提交 ============
-            String formSubmitUrl = getFormSubmitUrl(cmd.getLoginType());
-            Map<String, String> loginFormData = buildFormSubmitData(cmd);
-            
-            Map<String, String> formHeaders = new HashMap<>();
-            formHeaders.put("Referer", refererUrl);
-            formHeaders.put("Origin", URLPraser.extractOrigin(gatewayLoginSubmitURL));
-            
-            log.info("📤 提交登录表单: url={}", formSubmitUrl);
-            
-            SmartResponse formRes = smartHttpClient.post(formSubmitUrl, loginFormData, smartSession);
-
-            log.info("📥 表单提交后最终 URL: {}", formRes.getFinalUrl());
-
-            // ============ 第三步：访问最终页面获取用户信息 ============
-            SmartResponse finalRes = smartHttpClient.get(gatewayStartURL, smartSession);
-
-            if (finalRes.getFinalUrl().contains(acdemAdminSysGatewayStartURL)
-                    || finalRes.getFinalUrl().contains("/bmportal/index.portal")) {
-                UserInfoPraser.extractByRegex(ret, finalRes.getBody());
-                log.info("✅ 从最终页面解析到用户信息: userId={}, realName={}",
-                        ret.getUserId(), ret.getRealName());
-            }
-
-            // 也尝试从表单响应中解析
-            UserInfoPraser.extractByRegex(ret, formRes.getBody());
-            log.info("解析到用户信息: userId={}, realName={}", ret.getUserId(), ret.getRealName());
-
-            // ============ 第四步：保存 Cookies ============
-            authSessionCacheUtil.sessionLoginBind(wxId, cmd.getUserId(),
-                    convertToPlaywrightCookies(smartSession.getCookies()));
-
-            // ============ 第五步：使状态缓存失效 ============
-            authSessionCacheUtil.invalidateStatusCache(wxId);
-
-            // ============ 第六步：发布登录成功事件 ============
-            announcementCacheUtil.setActiveSourceOpenId(wxId);
-            eventPublisher.publishEvent(new UserLoginEvent(
-                    this, wxId,
-                    ret.getUserId(),
-                    ret.getRealName()
-            ));
-
-            log.info("✅ 登录成功，已发布用户登录事件: openId={}", wxId);
-
-            ret.setWxId(wxId);
-            ret.setLogined(true);
-            return ret;
+            return result;
 
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("❌ 登录失败: {}", e.getMessage(), e);
+            log.error("登录失败: {}", e.getMessage(), e);
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
                     "登录失败: " + e.getMessage(),
@@ -526,73 +440,65 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * 登出学校系统
+     * <p>
+     * ⭐ 关键改动：保存登出后的新 Cookie，而非清空
+     */
     @Override
-    public LoginResultsVo logout(LoginRequestCommand cmd) {
+    public LoginResultsVo logout() {
         TokenMessage tokenMessage = UserContext.getContext();
         String wxId = tokenMessage.getOpenId();
 
+        log.info("🚪 用户 {} 登出学校系统", wxId);
+
         try (SmartSession smartSession = createSmartSession(authSessionCacheUtil.getSession(wxId))) {
 
-            // 访问登出 URL
-            smartHttpClient.get(logoutSubmitURL, smartSession);
+            // 访问登出 URL，跟随重定向
+            SmartResponse response = smartHttpClient.get(logoutSubmitURL, smartSession);
 
-            // 清除会话
-            authSessionCacheUtil.sessionLogoutBind(wxId);
-            authSessionCacheUtil.invalidateStatusCache(wxId);
+            log.info("🚪 登出后最终 URL: {}", response.getFinalUrl());
+            log.info("🍪 登出后有 {} 个 Cookie", smartSession.getCookies().size());
 
+            // ⭐ 保存登出后的新 Cookie（用于下次登录可选择密码方式）
+            List<com.microsoft.playwright.options.Cookie> newCookies =
+                    convertToPlaywrightCookies(smartSession.getCookies());
+            authSessionCacheUtil.sessionLogoutBind(wxId, newCookies);
+
+            // 构建返回结果
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);
+
+            // 检测登出后支持的登录方式
+            List<String> typeStrings = SchoolSessionChecker.detectLoginTypes(response);
+            ret.setLoginTypes(typeStrings.stream()
+                    .map(LoginType::valueOf)
+                    .collect(Collectors.toList()));
+
+            log.info("🚪 登出成功，可用登录方式: {}", typeStrings);
+
             return ret;
 
         } catch (Exception e) {
             log.error("登出失败: {}", e.getMessage());
-            // 即使失败也清除本地会话
+            // 即使失败也更新本地状态
             authSessionCacheUtil.sessionLogoutBind(wxId);
-            authSessionCacheUtil.invalidateStatusCache(wxId);
 
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);
+            ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
             return ret;
         }
     }
 
-    // ==================== 表单构建方法（⭐关键修复） ====================
+    // ==================== 表单构建方法 ====================
 
-    /**
-     * 构建 AJAX 验证表单数据
-     * 
-     * 参考 UsernameSmsImpl.loginVerification() 和 UsernamePasswordImpl.loginVerification()
-     */
     private Map<String, String> buildAjaxVerifyFormData(LoginRequestCommand cmd) {
-        Map<String, String> formData = new HashMap<>();
-        formData.put("j_username", cmd.getUserId());  // 不需要 toSBC 转换
-        formData.put("j_checkcode", "验证码");        // 固定值
-        formData.put("op", "login");                  // ⭐ 必须字段
-        
-        if (cmd.getLoginType() == LoginType.SMS) {
-            // SMS 登录：使用 sms_checkcode（不是 j_checkcode！）
-            formData.put("sms_checkcode", cmd.getSmsCode());
-            formData.put("spAuthChainCode", spAuthChainCodeSMS);  // ⭐ 必须字段
-        } else if (cmd.getLoginType() == LoginType.PASSWORD) {
-            // 密码登录
-            formData.put("j_password", cmd.getPassword());
-            formData.put("spAuthChainCode", spAuthChainCodePASSWORD);  // ⭐ 必须字段
-        }
-        
-        return formData;
-    }
-
-    /**
-     * 构建表单提交数据
-     * 
-     * 参考 UsernameSmsImpl.loginRedirect() 和 UsernamePasswordImpl.loginRedirect()
-     */
-    private Map<String, String> buildFormSubmitData(LoginRequestCommand cmd) {
         Map<String, String> formData = new HashMap<>();
         formData.put("j_username", cmd.getUserId());
         formData.put("j_checkcode", "验证码");
         formData.put("op", "login");
-        
+
         if (cmd.getLoginType() == LoginType.SMS) {
             formData.put("sms_checkcode", cmd.getSmsCode());
             formData.put("spAuthChainCode", spAuthChainCodeSMS);
@@ -600,13 +506,27 @@ public class AuthServiceImpl implements AuthService {
             formData.put("j_password", cmd.getPassword());
             formData.put("spAuthChainCode", spAuthChainCodePASSWORD);
         }
-        
+
         return formData;
     }
 
-    /**
-     * 根据登录类型获取表单提交 URL
-     */
+    private Map<String, String> buildFormSubmitData(LoginRequestCommand cmd) {
+        Map<String, String> formData = new HashMap<>();
+        formData.put("j_username", cmd.getUserId());
+        formData.put("j_checkcode", "验证码");
+        formData.put("op", "login");
+
+        if (cmd.getLoginType() == LoginType.SMS) {
+            formData.put("sms_checkcode", cmd.getSmsCode());
+            formData.put("spAuthChainCode", spAuthChainCodeSMS);
+        } else if (cmd.getLoginType() == LoginType.PASSWORD) {
+            formData.put("j_password", cmd.getPassword());
+            formData.put("spAuthChainCode", spAuthChainCodePASSWORD);
+        }
+
+        return formData;
+    }
+
     private String getFormSubmitUrl(LoginType loginType) {
         if (loginType == LoginType.SMS) {
             return A4tLoginSMSRedirectURL;
@@ -617,9 +537,6 @@ public class AuthServiceImpl implements AuthService {
 
     // ==================== 辅助方法 ====================
 
-    /**
-     * 从 ProxySession 创建 SmartSession
-     */
     private SmartSession createSmartSession(ProxySession proxySession) {
         if (proxySession == null || proxySession.getCookiesJson() == null
                 || proxySession.getCookiesJson().isEmpty()) {
@@ -630,15 +547,6 @@ public class AuthServiceImpl implements AuthService {
         try {
             List<SmartCookie> cookies = parseCookiesFromJson(proxySession.getCookiesJson());
             log.info("从缓存加载了 {} 个 Cookie", cookies.size());
-            
-            // 打印 Cookie 详情用于调试
-            if (log.isDebugEnabled()) {
-                for (SmartCookie c : cookies) {
-                    log.debug("  Cookie: name={}, domain={}, path={}", 
-                            c.getName(), c.getDomain(), c.getPath());
-                }
-            }
-            
             return smartHttpClient.newSession(cookies);
         } catch (Exception e) {
             log.warn("解析 Cookie JSON 失败: {}", e.getMessage());
@@ -646,15 +554,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    /**
-     * 从 JSON 字符串解析 Cookies
-     * 
-     * JSON 格式（与 Playwright Cookie 兼容）:
-     * [
-     *   {"name": "xxx", "value": "yyy", "domain": "zzz", "path": "/", ...},
-     *   ...
-     * ]
-     */
     private List<SmartCookie> parseCookiesFromJson(String cookiesJson) throws Exception {
         JsonNode arrayNode = objectMapper.readTree(cookiesJson);
 
@@ -669,25 +568,21 @@ public class AuthServiceImpl implements AuthService {
             String value = node.path("value").asText(null);
             String domain = node.path("domain").asText(null);
             String path = node.path("path").asText("/");
-            
-            // 如果 domain 为空，尝试从其他字段推断
+
             if (domain == null || domain.isEmpty()) {
-                // 尝试从 url 字段提取
                 String url = node.path("url").asText(null);
                 if (url != null && !url.isEmpty()) {
                     try {
                         domain = new java.net.URI(url).getHost();
-                        log.debug("从 url 字段推断 domain: {} -> {}", url, domain);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
             }
-            
-            // 如果还是没有 domain，设置默认值
+
             if (domain == null || domain.isEmpty()) {
-                domain = "webvpn.sztu.edu.cn";  // 默认根域名
-                log.debug("Cookie {} 无 domain，使用默认值: {}", name, domain);
+                domain = "webvpn.sztu.edu.cn";
             }
-            
+
             SmartCookie cookie = SmartCookie.builder()
                     .name(name)
                     .value(value)
@@ -705,37 +600,17 @@ public class AuthServiceImpl implements AuthService {
         return cookies;
     }
 
-    /**
-     * 保存 SmartSession 的 Cookies 到缓存
-     */
     private void saveSessionCookies(String wxId, SmartSession smartSession) {
         List<SmartCookie> smartCookies = smartSession.getCookies();
         log.info("💾 saveSessionCookies: 准备保存 {} 个 SmartCookie", smartCookies.size());
-        
-        // 调试：打印每个 SmartCookie
-        for (SmartCookie sc : smartCookies) {
-            log.debug("  💾 SmartCookie: name={}, domain={}, value={}...", 
-                    sc.getName(), sc.getDomain(), 
-                    sc.getValue().length() > 10 ? sc.getValue().substring(0, 10) : sc.getValue());
-        }
-        
+
         List<com.microsoft.playwright.options.Cookie> playwrightCookies =
                 convertToPlaywrightCookies(smartCookies);
-        
-        log.info("💾 转换为 {} 个 Playwright Cookie", playwrightCookies.size());
-        
-        // 调试：打印每个 Playwright Cookie
-        for (com.microsoft.playwright.options.Cookie pc : playwrightCookies) {
-            log.debug("  💾 Playwright Cookie: name={}, domain={}", pc.name, pc.domain);
-        }
-        
+
         authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, playwrightCookies);
-        log.info("💾 已调用 saveOrUpdateSessionCookie");
+        log.info("💾 已保存 Cookie");
     }
 
-    /**
-     * 将 SmartCookie 转换为 Playwright Cookie
-     */
     private List<com.microsoft.playwright.options.Cookie> convertToPlaywrightCookies(List<SmartCookie> smartCookies) {
         return smartCookies.stream()
                 .map(SmartCookie::toPlaywright)

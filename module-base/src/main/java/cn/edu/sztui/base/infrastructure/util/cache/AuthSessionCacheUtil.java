@@ -1,6 +1,5 @@
 package cn.edu.sztui.base.infrastructure.util.cache;
 
-import cn.edu.sztui.base.application.vo.LoginStatusVo;
 import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.cache.dto.TokenMeta;
@@ -19,46 +18,44 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * 会话缓存工具（重构版）
+ * 会话缓存工具（精简版）
  * <p>
  * 存储结构（适配 CacheUtil 的 Hash API）：
  * <ul>
  *   <li>{@code icampus:token-meta}      → Hash，field = openId，value = TokenMeta JSON</li>
  *   <li>{@code icampus:proxy-session}   → Hash，field = openId，value = ProxySession JSON</li>
- *   <li>{@code icampus:login-status}    → Hash，field = openId，value = LoginStatusVo JSON（短TTL缓存）</li>
  * </ul>
  * <p>
- * <b>新增功能</b>：
+ * 设计原则：
  * <ul>
- *   <li>登录状态缓存（30秒TTL，减少 Playwright 调用）</li>
- *   <li>Cookie 过期检查（保守策略，可配置）</li>
+ *   <li>Cookie 跟随 Token 生命周期，Token 过期时一并清除</li>
+ *   <li>不做 Cookie 过期预测，由学校重定向自然触发 403</li>
+ *   <li>不做状态缓存，每次 getStatus 都实时检查</li>
  * </ul>
  */
 @Slf4j
 @Component
 public class AuthSessionCacheUtil {
 
-    /** TokenMeta 的 Hash key */
+    /**
+     * TokenMeta 的 Hash key
+     */
     private static final String TOKEN_META_KEY = "icampus:token-meta";
-    /** ProxySession 的 Hash key */
+
+    /**
+     * ProxySession 的 Hash key
+     */
     private static final String PROXY_SESSION_KEY = "icampus:proxy-session";
-    /** LoginStatus 缓存的 Hash key */
-    private static final String LOGIN_STATUS_KEY = "icampus:login-status";
 
-    /** 滑动窗口阈值：24 小时（毫秒） */
-    public static final long SLIDING_WINDOW_MS = 24 * 60 * 60 * 1000L;
+    /**
+     * 滑动窗口阈值：3 天（毫秒）—— 3天内活跃可续签 Token
+     */
+    public static final long SLIDING_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L;
 
-    /** 清理阈值：25 小时（毫秒），比滑动窗口多 1h 缓冲 */
-    public static final long CLEANUP_THRESHOLD_MS = 25 * 60 * 60 * 1000L;
-
-    /** 状态缓存有效期：30 秒（毫秒） */
-    public static final long STATUS_CACHE_TTL_MS = 30 * 1000L;
-
-    /** Cookie 保守过期时间：一天—— 超过此时间未刷新则视为可能过期 */
-    public static final long COOKIE_CONSERVATIVE_EXPIRE_MS = 24 * 60 * 60 * 1000L;
-
-    /** Cookie 即将过期预警：30 分钟（毫秒） */
-    public static final long COOKIE_EXPIRING_SOON_MS = 23 * 60 * 1000L;
+    /**
+     * 清理阈值：3 天 + 1 小时（毫秒）—— 超过此时间的会话会被清理
+     */
+    public static final long CLEANUP_THRESHOLD_MS = (3 * 24 + 1) * 60 * 60 * 1000L;
 
     @Resource
     private CacheUtil cacheUtil;
@@ -94,7 +91,7 @@ public class AuthSessionCacheUtil {
     }
 
     /**
-     * 判断是否在滑动窗口内（< 24h），允许刷新 token
+     * 判断是否在滑动窗口内（< 3天），允许刷新 token
      */
     public boolean isRefreshable(String openId) {
         TokenMeta meta = getTokenMeta(openId);
@@ -143,6 +140,14 @@ public class AuthSessionCacheUtil {
     }
 
     /**
+     * 删除代理会话（用于 initSession 强制重建）
+     */
+    public void deleteSession(String openId) {
+        cacheUtil.hdel(PROXY_SESSION_KEY, openId);
+        log.info("删除代理会话: openId={}", openId);
+    }
+
+    /**
      * 获取所有代理会话（供定时任务批量操作用）
      */
     public Map<String, ProxySession> getAllSessions() {
@@ -183,10 +188,15 @@ public class AuthSessionCacheUtil {
     public boolean sessionLoginBind(String openId, String userId, List<Cookie> newCookies) {
         ProxySession session = getSession(openId);
         if (session == null) {
-            throw new BusinessException(SysReturnCode.BASE_PROXY.getCode(),"无法获取代理会话，请先初始化",ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode());
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "无法获取代理会话，请先初始化",
+                    ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+            );
         }
-        if (!session.getUserIds().contains(userId))
+        if (!session.getUserIds().contains(userId)) {
             session.getUserIds().add(userId);
+        }
         session.setCookiesJson(CookieConverter.toCookieStrings(newCookies));
         session.setLastUpdateTime(System.currentTimeMillis());
         session.setSchoolLoggedIn(true);
@@ -196,7 +206,7 @@ public class AuthSessionCacheUtil {
     }
 
     /**
-     * 登出
+     * 登出绑定（保留 Cookie，只更新状态）
      */
     public void sessionLogoutBind(String openId) {
         ProxySession session = getSession(openId);
@@ -208,103 +218,31 @@ public class AuthSessionCacheUtil {
     }
 
     /**
+     * 登出绑定（更新 Cookie 和状态）
+     * <p>
+     * 用于登出时保存学校返回的新 Cookie
+     */
+    public void sessionLogoutBind(String openId, List<Cookie> newCookies) {
+        ProxySession session = getSession(openId);
+        if (session == null) return;
+
+        // 更新 Cookie
+        if (!CollectionUtils.isEmpty(newCookies)) {
+            session.setCookiesJson(CookieConverter.toCookieStrings(newCookies));
+        }
+
+        session.setLastUpdateTime(System.currentTimeMillis());
+        session.setSchoolLoggedIn(false);
+        saveSession(openId, session);
+        log.info("openId={} 已登出学校后端（已更新Cookie）", openId);
+    }
+
+    /**
      * 判断是否已登录学校后端
      */
     public boolean isSchoolLoggedIn(String openId) {
         ProxySession session = getSession(openId);
         return session != null && session.isSchoolLoggedIn();
-    }
-
-    // ==================== 状态缓存（新增） ====================
-
-    /**
-     * 获取缓存的登录状态
-     *
-     * @return LoginStatusVo 或 null（缓存不存在或已过期）
-     */
-    public LoginStatusVo getCachedStatus(String openId) {
-        if (!StringUtils.hasText(openId)) return null;
-        Object obj = cacheUtil.hget(LOGIN_STATUS_KEY, openId);
-        if (obj == null) return null;
-
-        LoginStatusVo status = JSON.parseObject(obj.toString(), LoginStatusVo.class);
-
-        // 检查缓存是否过期（应用层 TTL）
-        if (status.getStatusTime() == null) return null;
-        long elapsed = System.currentTimeMillis() - status.getStatusTime();
-        if (elapsed > STATUS_CACHE_TTL_MS) {
-            // 缓存过期，删除并返回 null
-            cacheUtil.hdel(LOGIN_STATUS_KEY, openId);
-            return null;
-        }
-        return status;
-    }
-
-    /**
-     * 缓存登录状态
-     */
-    public void cacheStatus(String openId, LoginStatusVo status) {
-        if (!StringUtils.hasText(openId) || status == null) return;
-        status.setStatusTime(System.currentTimeMillis());
-        cacheUtil.hset(LOGIN_STATUS_KEY, openId, JSON.toJSONString(status));
-        log.debug("缓存登录状态: openId={}, logined={}", openId, status.isLogined());
-    }
-
-    /**
-     * 使状态缓存失效
-     */
-    public void invalidateStatusCache(String openId) {
-        cacheUtil.hdel(LOGIN_STATUS_KEY, openId);
-        log.debug("状态缓存已失效: openId={}", openId);
-    }
-
-    // ==================== Cookie 过期检查（新增） ====================
-
-    /**
-     * 检查 Cookie 是否可能已过期（保守策略）
-     * <p>
-     * 由于学校返回的 Cookie 过期时间不确定，采用保守策略：
-     * 如果 lastUpdateTime 超过 COOKIE_CONSERVATIVE_EXPIRE_MS，则认为可能过期
-     *
-     * @return true 表示 Cookie 可能已过期，建议重新初始化
-     */
-    public boolean isCookiePossiblyExpired(String openId) {
-        ProxySession session = getSession(openId);
-        if (session == null) return true;
-        if ( Objects.isNull(session.getLastUpdateTime()) ) return true;
-
-        long elapsed = System.currentTimeMillis() - session.getLastUpdateTime();
-        return elapsed > COOKIE_CONSERVATIVE_EXPIRE_MS;
-    }
-
-    /**
-     * 检查 Cookie 是否即将过期（用于提前刷新提醒）
-     *
-     * @return true 表示 Cookie 即将过期（距离保守过期时间不足 30 分钟）
-     */
-    public boolean isCookieExpiringSoon(String openId) {
-        ProxySession session = getSession(openId);
-        if (session == null) return true;
-        if ( Objects.isNull(session.getLastUpdateTime()) ) return true;
-
-        long elapsed = System.currentTimeMillis() - session.getLastUpdateTime();
-        long remaining = COOKIE_CONSERVATIVE_EXPIRE_MS - elapsed;
-        return remaining < COOKIE_EXPIRING_SOON_MS;
-    }
-
-    /**
-     * 清除会话的 Cookie（保留其他信息）
-     * <p>
-     * 用于 Cookie 过期后强制重新初始化
-     */
-    public void clearSessionCookies(String openId) {
-        ProxySession session = getSession(openId);
-        if (session == null) return;
-        session.setCookiesJson("");
-        session.setSchoolLoggedIn(false);
-        session.setLastUpdateTime(System.currentTimeMillis());
-        saveSession(openId, session);
-        log.info("已清除 openId={} 的 Cookie", openId);
     }
 
     // ==================== 清理 ====================
@@ -315,14 +253,15 @@ public class AuthSessionCacheUtil {
     public void clearUser(String openId) {
         cacheUtil.hdel(TOKEN_META_KEY, openId);
         cacheUtil.hdel(PROXY_SESSION_KEY, openId);
-        cacheUtil.hdel(LOGIN_STATUS_KEY, openId);
         log.info("清理用户缓存: openId={}", openId);
     }
 
     /**
      * 清理过期会话（由定时任务调用）
      * <p>
-     * 遍历所有 TokenMeta，删除 lastAccessTime > 25h 的条目及其关联的 ProxySession。
+     * 遍历所有 TokenMeta，删除 lastAccessTime > 3天+1小时 的条目及其关联的 ProxySession。
+     * <p>
+     * ⭐ 关键：Token 过期时同时清除 Cookie，保证两者生命周期一致
      *
      * @return 清理的条目数
      */
@@ -337,7 +276,7 @@ public class AuthSessionCacheUtil {
             long elapsed = now - meta.getLastAccessTime();
 
             if (elapsed > CLEANUP_THRESHOLD_MS) {
-                clearUser(openId);
+                clearUser(openId);  // 同时删除 TokenMeta 和 ProxySession
                 cleaned++;
                 log.info("清理过期会话: openId={}, 已不活跃 {}h",
                         openId, elapsed / (1000 * 60 * 60));
