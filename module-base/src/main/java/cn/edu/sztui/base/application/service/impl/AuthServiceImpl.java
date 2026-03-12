@@ -458,7 +458,7 @@ public class AuthServiceImpl implements AuthService {
 
             Map<String, String> formHeaders = new HashMap<>();
             formHeaders.put("Referer", refererUrl);
-            formHeaders.put("Origin", URLPraser.extractOrigin(gatewayLoginSubmitURL));
+            formHeaders.put("Origin", URLPraser.extractOrigin(formSubmitUrl));
 
             log.info("📤 提交登录表单: url={}", formSubmitUrl);
 
@@ -466,7 +466,7 @@ public class AuthServiceImpl implements AuthService {
             log.info("📥 表单提交后最终 URL: {}", formRes.getFinalUrl());
 
             // ============ 第三步：访问最终页面获取用户信息 ============
-            SmartResponse finalRes = smartHttpClient.get(gatewayStartURL, smartSession);
+            SmartResponse finalRes = smartHttpClient.get(internalNetStartURL, smartSession);
 
             if (finalRes.getFinalUrl().contains(internalNetStartURL)
                     || finalRes.getFinalUrl().contains("/bmportal/index.portal")) {

@@ -261,8 +261,7 @@ public class AuthSessionCacheUtil {
      * <p>
      * 遍历所有 TokenMeta，删除 lastAccessTime > 3天+1小时 的条目及其关联的 ProxySession。
      * <p>
-     * ⭐ 关键：Token 过期时同时清除 Cookie，保证两者生命周期一致
-     *
+     * 关键：Token 过期时同时清除 Cookie，保证两者生命周期一致
      * @return 清理的条目数
      */
     public int cleanupStaleEntries() {
