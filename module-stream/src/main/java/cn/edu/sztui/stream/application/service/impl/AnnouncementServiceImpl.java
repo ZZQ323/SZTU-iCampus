@@ -99,7 +99,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
         // 获取元数据以确定分类
         AnnouncementMetaVo meta = announcementCacheUtil.getMeta(id);
-        String categoryCode = meta != null ? meta.getCategory() : null;
+        String categoryCode = meta != null ? meta.getCategoryCode() : null;
 
         // 获取数据源配置
         SourceConfig sourceConfig = getSourceConfig(categoryCode);

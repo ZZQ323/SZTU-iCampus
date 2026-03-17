@@ -1,0 +1,111 @@
+package cn.edu.sztui.stream.application.service;
+
+import cn.edu.sztui.stream.infrastructure.persistence.entity.ContentParserResult;
+import cn.edu.sztui.stream.infrastructure.persistence.entity.ListParserResult;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 统一信息流服务接口
+ * <p>
+ * 支持多频道（channel）的信息获取
+ */
+public interface InfoService {
+
+    // ==================== 频道与分类 ====================
+
+    /**
+     * 获取频道列表（带未读数）
+     */
+    List<ChannelInfo> getChannelsWithUnread();
+
+    /**
+     * 获取指定频道的分类代码映射
+     */
+    Map<String, String> getCategoryCodeMap(String channelId);
+
+    // ==================== 内容列表 ====================
+
+    /**
+     * 获取信息列表
+     *
+     * @param channelId    频道ID
+     * @param categoryCode 分类代码（可选）
+     * @param page         页码
+     * @param pageSize     每页数量
+     * @return 列表结果
+     */
+    InfoListResult getList(String channelId, String categoryCode, int page, int pageSize);
+
+    /**
+     * 搜索信息
+     *
+     * @param keyword   关键词
+     * @param channelId 频道ID（可选，为空则搜索全部）
+     * @param limit     最大返回数量
+     * @return 搜索结果
+     */
+    List<ListParserResult.InfoItemMeta> search(String keyword, String channelId, int limit);
+
+    // ==================== 内容详情 ====================
+
+    /**
+     * 获取详情
+     *
+     * @param channelId    频道ID
+     * @param id           内容ID
+     * @param categoryCode 分类代码（可选）
+     * @return 详情内容
+     */
+    ContentParserResult getDetail(String channelId, String id, String categoryCode);
+
+    // ==================== 未读管理 ====================
+
+    /**
+     * 获取各频道未读计数
+     */
+    Map<String, Long> getUnreadCounts();
+
+    /**
+     * 标记频道已读
+     *
+     * @param channelId 频道ID
+     * @param latestId  已读到的最新ID
+     */
+    void markChannelRead(String channelId, String latestId);
+
+    // ==================== DTO ====================
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class ChannelInfo {
+        private String id;
+        private String name;
+        private String icon;
+        private Long unreadCount;
+        private List<CategoryInfo> categories;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class CategoryInfo {
+        private String code;
+        private String name;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class InfoListResult {
+        private List<ListParserResult.InfoItemMeta> list;
+        private String latestId;
+        private Long total;
+        private Boolean hasMore;
+    }
+}

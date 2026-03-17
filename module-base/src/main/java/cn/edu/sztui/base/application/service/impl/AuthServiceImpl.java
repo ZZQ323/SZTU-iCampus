@@ -1,10 +1,10 @@
 package cn.edu.sztui.base.application.service.impl;
 
 import cn.edu.sztui.base.application.dto.command.LoginRequestCommand;
-import cn.edu.sztui.base.application.external.UserLoginEvent;
 import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.application.vo.LoginStatusVo;
+import cn.edu.sztui.base.domain.event.UserLoginEvent;
 import cn.edu.sztui.base.domain.model.login.LoginType;
 import cn.edu.sztui.base.infrastructure.persistence.convertor.CharacterConverter;
 import cn.edu.sztui.base.infrastructure.persistence.parser.URLPraser;
