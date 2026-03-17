@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.convertor;
+package cn.edu.sztui.base.infrastructure.persistence.convertor;
 
 public class CharacterConverter {
 

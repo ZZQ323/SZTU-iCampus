@@ -1,6 +1,5 @@
 package cn.edu.sztui.common.cache.dto;
 
-import com.microsoft.playwright.options.SameSiteAttribute;
 import lombok.Data;
 
 @Data
@@ -17,5 +16,5 @@ public class CookieDTO {
     private boolean httpOnly;
     // 	true 时，该 Cookie 仅在 HTTPS 加密连接下传输（HTTP 连接不发送），防止数据被窃听；false 时 HTTP/HTTPS 都可传输
     private boolean secure;
-    private SameSiteAttribute sameSiteAttribute;
+    // private SameSiteAttribute sameSiteAttribute;
 }

@@ -1,7 +1,6 @@
 package cn.edu.sztui.common.util.smarthttp;
 
 import cn.edu.sztui.common.cache.dto.CookieDTO;
-import com.microsoft.playwright.options.Cookie;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,32 +53,6 @@ public class SmartCookieConverter {
         if (cookies == null) return List.of();
         return cookies.stream()
                 .map(SmartCookieConverter::toDTO)
-                .collect(Collectors.toList());
-    }
-    
-    // ==================== SmartCookie <-> Playwright Cookie ====================
-    
-    public static SmartCookie fromPlaywright(Cookie pw) {
-        if (pw == null) return null;
-        return SmartCookie.fromPlaywright(pw);
-    }
-    
-    public static Cookie toPlaywright(SmartCookie cookie) {
-        if (cookie == null) return null;
-        return cookie.toPlaywright();
-    }
-    
-    public static List<SmartCookie> fromPlaywrightList(List<Cookie> pwCookies) {
-        if (pwCookies == null) return List.of();
-        return pwCookies.stream()
-                .map(SmartCookieConverter::fromPlaywright)
-                .collect(Collectors.toList());
-    }
-    
-    public static List<Cookie> toPlaywrightList(List<SmartCookie> cookies) {
-        if (cookies == null) return List.of();
-        return cookies.stream()
-                .map(SmartCookieConverter::toPlaywright)
                 .collect(Collectors.toList());
     }
 }

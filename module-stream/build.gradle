@@ -10,9 +10,6 @@ dependencies {
     // Redis 核心依赖（包含 Stream 相关类）
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // Playwright（浏览器自动化）
-    implementation 'com.microsoft.playwright:playwright:1.43.0'
-
     //  依赖公共包
     implementation project(':module-base')
     implementation project(':module-common')

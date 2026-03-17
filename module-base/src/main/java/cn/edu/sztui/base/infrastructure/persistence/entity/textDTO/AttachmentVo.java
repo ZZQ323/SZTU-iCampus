@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.application.vo;
+package cn.edu.sztui.base.infrastructure.persistence.entity.textDTO;
 
 import lombok.Data;
 

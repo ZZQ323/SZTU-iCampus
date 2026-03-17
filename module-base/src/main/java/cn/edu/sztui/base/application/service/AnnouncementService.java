@@ -1,8 +1,8 @@
 package cn.edu.sztui.base.application.service;
 
-import cn.edu.sztui.base.application.vo.AnnouncementContentVo;
-import cn.edu.sztui.base.application.vo.AnnouncementListVo;
-import cn.edu.sztui.base.application.vo.AnnouncementMetaVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementContentVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementListVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
 import java.util.List;
 
 /**

@@ -1,14 +1,17 @@
 package cn.edu.sztui.stream.application.external.announcement;
 
-import cn.edu.sztui.base.application.vo.AnnouncementContentVo;
-import cn.edu.sztui.base.application.vo.AnnouncementMetaVo;
-import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementContentVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
+import cn.edu.sztui.base.infrastructure.persistence.convertor.CookieConverter;
 import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementContentParser;
-import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementListParser;
+import cn.edu.sztui.base.infrastructure.persistence.praser.announcement.AnnouncementContentParser;
+import cn.edu.sztui.base.infrastructure.persistence.praser.announcement.AnnouncementListParser;
 import cn.edu.sztui.common.cache.dto.ProxySession;
-import cn.edu.sztui.common.util.smarthttp.*;
+import cn.edu.sztui.common.util.smarthttp.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.SmartHttpClient;
+import cn.edu.sztui.common.util.smarthttp.SmartResponse;
+import cn.edu.sztui.common.util.smarthttp.SmartSession;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

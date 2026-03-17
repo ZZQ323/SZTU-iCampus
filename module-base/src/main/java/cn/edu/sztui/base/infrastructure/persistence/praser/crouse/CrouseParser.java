@@ -1,7 +1,7 @@
-package cn.edu.sztui.base.infrastructure.util.praser;
+package cn.edu.sztui.base.infrastructure.persistence.praser.crouse;
 
-import cn.edu.sztui.base.application.vo.CourseTableVo;
-import cn.edu.sztui.base.application.vo.CourseTableVo.CourseInfo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.tableDTO.CourseTableVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.tableDTO.CourseTableVo.CourseInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

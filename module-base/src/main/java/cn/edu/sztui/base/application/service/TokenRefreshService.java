@@ -77,13 +77,13 @@ public class TokenRefreshService
 
         // 2. 检查滑动窗口
         if (!authSessionCacheUtil.isRefreshable(openId)) {
-            throw new IllegalStateException("会话已过期（超过24小时未活跃），请重新登录");
+            throw new IllegalStateException("会话已过期（超过24小时未活跃），请刷新会话");
         }
 
         // 3. 获取旧的 TokenMeta
         TokenMeta meta = authSessionCacheUtil.getTokenMeta(openId);
         if (meta == null) {
-            throw new IllegalStateException("Redis 中无 TokenMeta 数据，请重新登录");
+            throw new IllegalStateException("Redis 中无 TokenMeta 数据，请刷新会话");
         }
 
         // 4. 更新 sessionKey 和 unionId（如果有新的）

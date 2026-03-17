@@ -1,7 +1,7 @@
-package cn.edu.sztui.base.infrastructure.util.praser;
+package cn.edu.sztui.base.infrastructure.persistence.praser.announcement;
 
-import cn.edu.sztui.base.application.vo.AnnouncementContentVo;
-import cn.edu.sztui.base.application.vo.AttachmentVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementContentVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AttachmentVo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

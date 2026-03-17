@@ -1,14 +1,13 @@
 package cn.edu.sztui.base.infrastructure.util.cache;
 
-import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.cache.dto.TokenMeta;
 import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
+import cn.edu.sztui.common.util.smarthttp.SmartCookie;
 import com.alibaba.fastjson2.JSON;
-import com.microsoft.playwright.options.Cookie;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -162,8 +161,10 @@ public class AuthSessionCacheUtil {
 
     /**
      * 保存或更新 cookies
+     * <p>
+     * ⭐ 直接接收 SmartCookie，不再依赖 Playwright
      */
-    public boolean saveOrUpdateSessionCookie(String openId, List<Cookie> cookies) {
+    public boolean saveOrUpdateSessionCookie(String openId, List<SmartCookie> cookies) {
         if (!StringUtils.hasText(openId) || CollectionUtils.isEmpty(cookies)) {
             return false;
         }
@@ -175,7 +176,8 @@ public class AuthSessionCacheUtil {
             session.setUserIds(new ArrayList<>());
             session.setSchoolLoggedIn(false);
         }
-        session.setCookiesJson(CookieConverter.toCookieStrings(cookies));
+        // ⭐ 直接序列化 SmartCookie 为 JSON
+        session.setCookiesJson(JSON.toJSONString(cookies));
         session.setLastUpdateTime(System.currentTimeMillis());
         saveSession(openId, session);
         log.info("保存代理会话 cookie: openId={}", openId);
@@ -184,8 +186,10 @@ public class AuthSessionCacheUtil {
 
     /**
      * 登录绑定
+     * <p>
+     * ⭐ 直接接收 SmartCookie
      */
-    public boolean sessionLoginBind(String openId, String userId, List<Cookie> newCookies) {
+    public boolean sessionLoginBind(String openId, String userId, List<SmartCookie> newCookies) {
         ProxySession session = getSession(openId);
         if (session == null) {
             throw new BusinessException(
@@ -197,7 +201,8 @@ public class AuthSessionCacheUtil {
         if (!session.getUserIds().contains(userId)) {
             session.getUserIds().add(userId);
         }
-        session.setCookiesJson(CookieConverter.toCookieStrings(newCookies));
+        // ⭐ 直接序列化 SmartCookie 为 JSON
+        session.setCookiesJson(JSON.toJSONString(newCookies));
         session.setLastUpdateTime(System.currentTimeMillis());
         session.setSchoolLoggedIn(true);
         saveSession(openId, session);
@@ -222,13 +227,13 @@ public class AuthSessionCacheUtil {
      * <p>
      * 用于登出时保存学校返回的新 Cookie
      */
-    public void sessionLogoutBind(String openId, List<Cookie> newCookies) {
+    public void sessionLogoutBind(String openId, List<SmartCookie> newCookies) {
         ProxySession session = getSession(openId);
         if (session == null) return;
 
         // 更新 Cookie
         if (!CollectionUtils.isEmpty(newCookies)) {
-            session.setCookiesJson(CookieConverter.toCookieStrings(newCookies));
+            session.setCookiesJson(JSON.toJSONString(newCookies));
         }
 
         session.setLastUpdateTime(System.currentTimeMillis());
@@ -262,6 +267,7 @@ public class AuthSessionCacheUtil {
      * 遍历所有 TokenMeta，删除 lastAccessTime > 3天+1小时 的条目及其关联的 ProxySession。
      * <p>
      * 关键：Token 过期时同时清除 Cookie，保证两者生命周期一致
+     *
      * @return 清理的条目数
      */
     public int cleanupStaleEntries() {

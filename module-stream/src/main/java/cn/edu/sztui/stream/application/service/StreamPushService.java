@@ -1,6 +1,6 @@
 package cn.edu.sztui.stream.application.service;
 
-import cn.edu.sztui.base.application.vo.CourseTableVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.tableDTO.CourseTableVo;
 import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
 import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
 import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;

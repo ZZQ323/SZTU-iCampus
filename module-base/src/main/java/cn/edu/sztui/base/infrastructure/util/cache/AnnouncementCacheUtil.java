@@ -1,7 +1,7 @@
 package cn.edu.sztui.base.infrastructure.util.cache;
 
-import cn.edu.sztui.base.application.vo.AnnouncementContentVo;
-import cn.edu.sztui.base.application.vo.AnnouncementMetaVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementContentVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
 import cn.edu.sztui.common.cache.redis.RedisKeyGenerator;
 import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.common.cache.util.service.CacheService;

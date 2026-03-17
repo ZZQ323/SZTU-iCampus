@@ -1,7 +1,7 @@
 package cn.edu.sztui.stream.application.external.announcement;
 
 import cn.edu.sztui.base.application.service.AnnouncementService;
-import cn.edu.sztui.base.application.vo.AnnouncementMetaVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
 import cn.edu.sztui.stream.application.external.AbstractCrawlTask;
 import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
 import cn.edu.sztui.stream.infrastructure.stream.StreamPublisher;

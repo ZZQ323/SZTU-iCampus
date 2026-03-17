@@ -6,7 +6,9 @@ import cn.binarywang.wx.miniapp.util.WxMaConfigHolder;
 import cn.edu.sztui.base.application.dto.command.WXLoginDTO;
 import cn.edu.sztui.base.application.service.TokenRefreshService;
 import cn.edu.sztui.base.application.vo.TokenAuthVo;
+import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.common.util.auth.UserContext;
+import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
@@ -20,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -41,6 +44,8 @@ public class WxAuthController {
     private JwtConfig jwtConfig;
     @Autowired
     private TokenRefreshService tokenRefreshService;
+    @Resource
+    private AuthSessionCacheUtil authSessionCacheUtil;
 
     /**
      * 检验 token 是否有效
@@ -146,5 +151,35 @@ public class WxAuthController {
                     ResultCodeEnum.UNAUTHORIZED.getCode()
             );
         }
+    }
+
+    /**
+     * 重置会话（清除 Redis 中的 TokenMeta 和 ProxySession）
+     * <p>
+     * 使用场景：
+     * - 登录会话失效，无法恢复
+     * - 用户需要完全重置状态
+     * <p>
+     * 此接口需要 token（用于获取 openId），调用后会清除该 openId 的所有缓存
+     */
+    @PostMapping("/v1/reset-session")
+    public Result resetSession() {
+        TokenMessage tokenMessage = UserContext.getContext();
+        if (tokenMessage == null || tokenMessage.getOpenId() == null) {
+            throw new BusinessException(
+                    SysReturnCode.WECHAT_PROXY.getCode(),
+                    "无效的 token",
+                    ResultCodeEnum.UNAUTHORIZED.getCode()
+            );
+        }
+
+        String openId = tokenMessage.getOpenId();
+
+        // 清除该用户的所有 Redis 缓存（TokenMeta + ProxySession）
+        authSessionCacheUtil.clearUser(openId);
+
+        log.info("用户 {} 主动重置会话", openId);
+
+        return Result.ok(Map.of("success", true, "message", "会话已重置，请重新初始化"));
     }
 }

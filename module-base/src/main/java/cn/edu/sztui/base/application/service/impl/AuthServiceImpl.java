@@ -6,11 +6,11 @@ import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.application.vo.LoginStatusVo;
 import cn.edu.sztui.base.domain.model.login.LoginType;
-import cn.edu.sztui.base.infrastructure.convertor.CharacterConverter;
+import cn.edu.sztui.base.infrastructure.persistence.convertor.CharacterConverter;
 import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.base.infrastructure.util.praser.URLPraser;
-import cn.edu.sztui.base.infrastructure.util.praser.UserInfoPraser;
+import cn.edu.sztui.base.infrastructure.persistence.praser.url.URLPraser;
+import cn.edu.sztui.base.infrastructure.persistence.praser.url.UserInfoPraser;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
@@ -27,7 +27,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.edu.sztui.base.domain.model.login.SchoolAPIs.*;
 
@@ -137,7 +136,7 @@ public class AuthServiceImpl implements AuthService {
         if (!result.isLogined()) {
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
-                    "会话已过期，请重新登录",
+                    "会话已过期，请刷新会话",
                     ResultCodeEnum.UNAUTHORIZED.getCode()
             );
         }
@@ -149,118 +148,6 @@ public class AuthServiceImpl implements AuthService {
     @Deprecated
     public LoginResultsVo refresh() {
         return initSession();
-    }
-
-    // ==================== 核心：Cookie 刷新逻辑（完全不变） ====================
-
-    private LoginResultsVo doRefreshCookies(String wxId, ProxySession session) {
-        LoginResultsVo ret = new LoginResultsVo();
-        ret.setLogined(false);
-
-        log.info("🔄 doRefreshCookies: openId={}, hasSession={}", wxId, session != null);
-
-        try (SmartSession smartSession = createSmartSession(session)) {
-
-            log.info("🍪 doRefreshCookies 开始时有 {} 个 Cookie", smartSession.getCookies().size());
-
-            // 访问网关起始页，自动跟随所有重定向
-            SmartResponse response = smartHttpClient.get(gatewayStartURL, smartSession);
-
-            String finalUrl = response.getFinalUrl();
-            log.info("最终 URL: {}, 重定向次数: {}", finalUrl, response.getRedirectCount());
-
-            // 打印重定向链，用于调试
-            if (log.isDebugEnabled()) {
-                log.debug("重定向链: {}", response.getRedirectChain());
-            }
-
-            log.info("🍪 doRefreshCookies 请求后有 {} 个 Cookie", smartSession.getCookies().size());
-
-            // 根据最终 URL 判断登录状态
-            if (finalUrl.contains(internalNetStartURL) || finalUrl.contains("/bmportal/index.portal")) {
-                // 已登录
-                ret.setLogined(true);
-                UserContext.getContext().setLoginTime(System.currentTimeMillis());
-
-                // 解析用户信息
-                UserInfoPraser.extractByRegex(ret, response.getBody());
-
-                // 发布登录成功事件
-                eventPublisher.publishEvent(new UserLoginEvent(
-                        this, wxId,
-                        ret.getUserId(),
-                        ret.getRealName()
-                ));
-
-            } else if (finalUrl.contains(gatewayFirstURL) || finalUrl.contains("/idp/authcenter/ActionAuthChain")) {
-                // 未登录，检测支持的登录方式
-                List<LoginType> detectedTypes = detectLoginTypesFromBody(response.getBody());
-                ret.setLoginTypes(detectedTypes);
-                log.info("检测到登录方式（gatewayFirst）: {}", detectedTypes);
-
-            } else if (finalUrl.contains(gatewaySecondURL)) {
-                // 未登录，检测支持的登录方式
-                List<LoginType> detectedTypes = detectLoginTypesFromBody(response.getBody());
-                ret.setLoginTypes(detectedTypes);
-                log.info("检测到登录方式（gatewaySecond）: {}", detectedTypes);
-
-            } else {
-                // 未知状态，尝试从响应体判断
-                String body = response.getBody();
-                if (body != null) {
-                    if (body.contains("j_username") || body.contains("登录") || body.contains("login")) {
-                        // 包含登录表单，未登录状态 - 检测支持的登录方式
-                        List<LoginType> detectedTypes = detectLoginTypesFromBody(body);
-                        ret.setLoginTypes(detectedTypes);
-                        log.info("根据页面内容判断为未登录状态，检测到登录方式: {}", detectedTypes);
-                    } else if (body.contains("bmportal") || body.contains("userInfo") || body.contains("个人中心")) {
-                        // 包含门户内容，已登录状态
-                        ret.setLogined(true);
-                        UserInfoPraser.extractByRegex(ret, body);
-                        log.info("根据页面内容判断为已登录状态");
-                    } else {
-                        // 默认为未登录，只支持 SMS
-                        ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
-                        log.info("无法根据页面内容判断，默认SMS");
-                    }
-                } else {
-                    ret.setLoginTypes(Collections.singletonList(LoginType.SMS));
-                }
-                log.warn("未知的最终页面 URL: {}", finalUrl);
-            }
-
-            log.info("解析到用户信息: userId={}, realName={}, logined={}",
-                    ret.getUserId(), ret.getRealName(), ret.isLogined());
-
-            // 保存 Cookies
-            saveSessionCookies(wxId, smartSession);
-
-            return ret;
-
-        } catch (SmartHttpException e) {
-            log.error("SmartHttp 请求失败: {}", e.getMessage());
-            if (e.isRetryable()) {
-                throw new BusinessException(
-                        SysReturnCode.BASE_PROXY.getCode(),
-                        "学校服务器响应超时，请稍后重试",
-                        ResultCodeEnum.GATEWAY_TIMEOUT.getCode()
-                );
-            }
-            throw new BusinessException(
-                    SysReturnCode.BASE_PROXY.getCode(),
-                    "会话刷新失败: " + e.getMessage(),
-                    ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
-            );
-        } catch (BusinessException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("会话刷新出现错误: {}", e.getMessage(), e);
-            throw new BusinessException(
-                    SysReturnCode.BASE_PROXY.getCode(),
-                    "会话刷新出现错误: " + e.getMessage(),
-                    ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
-            );
-        }
     }
 
     // ==================== 登录/登出（完全不变） ====================
@@ -431,7 +318,7 @@ public class AuthServiceImpl implements AuthService {
 
                 throw new BusinessException(
                         SysReturnCode.BASE_PROXY.getCode(),
-                        "登录会话已失效，请重新获取短信验证码",
+                        "登录会话已失效，请回到主页面，并更新会话",
                         ResultCodeEnum.UNAUTHORIZED.getCode()
                 );
             }
@@ -480,8 +367,7 @@ public class AuthServiceImpl implements AuthService {
             log.info("解析到用户信息: userId={}, realName={}", ret.getUserId(), ret.getRealName());
 
             // ============ 第四步：保存 Cookies ============
-            authSessionCacheUtil.sessionLoginBind(wxId, cmd.getUserId(),
-                    convertToPlaywrightCookies(smartSession.getCookies()));
+            authSessionCacheUtil.sessionLoginBind(wxId, cmd.getUserId(),smartSession.getCookies());
 
             // ⭐ 第五步已删除：不再调用 invalidateStatusCache
 
@@ -495,7 +381,7 @@ public class AuthServiceImpl implements AuthService {
 
             log.info("✅ 登录成功，已发布用户登录事件: openId={}", wxId);
 
-            ret.setWxId(wxId);
+            // ret.setWxId(wxId);
             ret.setLogined(true);
             return ret;
 
@@ -598,13 +484,207 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+
+    // ==================== 核心：Cookie 刷新逻辑 ====================
+
+    private LoginResultsVo doRefreshCookies(String wxId, ProxySession session) {
+        LoginResultsVo ret = new LoginResultsVo();
+        ret.setLogined(false);
+
+        log.info("🔄 doRefreshCookies: openId={}, hasSession={}", wxId, session != null);
+
+        try (SmartSession smartSession = createSmartSession(session)) {
+
+            log.info("🍪 doRefreshCookies 开始时有 {} 个 Cookie", smartSession.getCookies().size());
+
+            // 访问网关起始页，自动跟随所有重定向
+            SmartResponse response = smartHttpClient.get(gatewayStartURL, smartSession);
+
+            String finalUrl = response.getFinalUrl();
+            String body = response.getBody();
+            log.info("最终 URL: {}, 重定向次数: {}", finalUrl, response.getRedirectCount());
+
+            // 打印重定向链，用于调试
+            if (log.isDebugEnabled()) {
+                log.debug("重定向链: {}", response.getRedirectChain());
+            }
+
+            log.info("🍪 doRefreshCookies 请求后有 {} 个 Cookie", smartSession.getCookies().size());
+
+            // ⭐ 首先检测是否是错误页面（必须在其他判断之前）
+            if (isErrorPage(body)) {
+                log.warn("⚠️ 检测到错误页面，清空 Cookie 并要求重新登录");
+
+                // 清空该用户的所有缓存
+                authSessionCacheUtil.deleteSession(wxId);
+
+                // 设置需要重新登录
+                ret.setLogined(false);
+                ret.setLoginTypes(Arrays.asList(LoginType.SMS, LoginType.PASSWORD));
+                ret.setSessionInvalid(true);  // ⭐ 标记会话无效
+
+                log.info("错误页面处理完成: logined=false, sessionInvalid=true");
+                return ret;
+            }
+
+            // 根据最终 URL 判断登录状态
+            if (finalUrl.contains(internalNetStartURL) || finalUrl.contains("/bmportal/index.portal")) {
+                // 已登录
+                ret.setLogined(true);
+                UserContext.getContext().setLoginTime(System.currentTimeMillis());
+
+                // 解析用户信息
+                UserInfoPraser.extractByRegex(ret, body);
+
+                // 发布登录成功事件
+                eventPublisher.publishEvent(new UserLoginEvent(
+                        this, wxId,
+                        ret.getUserId(),
+                        ret.getRealName()
+                ));
+
+            } else if (finalUrl.contains(gatewayFirstURL) || finalUrl.contains("/idp/authcenter/ActionAuthChain")) {
+                // 未登录，检测支持的登录方式
+                List<LoginType> detectedTypes = detectLoginTypesFromBody(body);
+                ret.setLoginTypes(detectedTypes);
+                log.info("检测到登录方式（gatewayFirst）: {}", detectedTypes);
+
+            } else if (finalUrl.contains(gatewaySecondURL)) {
+                // 未登录，检测支持的登录方式
+                List<LoginType> detectedTypes = detectLoginTypesFromBody(body);
+                ret.setLoginTypes(detectedTypes);
+                log.info("检测到登录方式（gatewaySecond）: {}", detectedTypes);
+
+            } else {
+                // 未知状态，尝试从响应体判断
+                if (body != null) {
+                    // ⭐ 检查是否是真正的登录表单页面（而不是错误页面）
+                    if (isRealLoginPage(body)) {
+                        // 包含登录表单，未登录状态 - 检测支持的登录方式
+                        List<LoginType> detectedTypes = detectLoginTypesFromBody(body);
+                        ret.setLoginTypes(detectedTypes);
+                        log.info("根据页面内容判断为未登录状态，检测到登录方式: {}", detectedTypes);
+                    } else {
+                        // 未知页面，但不是登录页
+                        log.warn("未知的页面内容，设置默认登录方式");
+                        ret.setLoginTypes(Arrays.asList(LoginType.SMS));
+                    }
+                }
+
+                log.warn("未知的最终页面 URL: {}", finalUrl);
+            }
+
+            // 保存刷新后的 Cookies（仅当非错误页面时）
+            if (!ret.isSessionInvalid()) {
+                saveSessionCookies(wxId, smartSession);
+            }
+
+            log.info("解析到用户信息: userId={}, realName={}, logined={}",
+                    ret.getUserId(), ret.getRealName(), ret.isLogined());
+
+            return ret;
+
+        } catch (Exception e) {
+            log.error("刷新 Cookie 失败: {}", e.getMessage(), e);
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "刷新 Cookie 失败: " + e.getMessage(),
+                    ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+            );
+        }
+    }
+
+    // ==================== ⭐ 新增：错误页面检测 ====================
+
     /**
-     * 从页面 HTML 检测支持的登录方式
+     * 检测是否是错误页面
      *
-     * 解析逻辑（基于学校登录页面 HTML 结构）：
-     * 1. 检查 passwordLayer 是否显示（通过内联样式或 CSS 判断）
-     * 2. 检查 j_password 输入框是否存在
-     * 3. 检查 SMS 相关元素
+     * 错误页面特征：
+     * - 标题包含 "错误信息"
+     * - 包含 "当前界面遇到了一些问题"
+     * - 包含 "请关闭浏览器页面重试"
+     * - 包含 "请清理浏览器缓存"
+     * - 包含 "请升级浏览器版本"
+     * - 包含 "联系运维人员"
+     *
+     * @param body 页面 HTML
+     * @return true 表示是错误页面
+     */
+    private boolean isErrorPage(String body) {
+        if (body == null || body.isEmpty()) {
+            return false;
+        }
+
+        // 检测错误页面的关键特征
+        boolean hasErrorTitle = body.contains("<title>错误信息</title>");
+        boolean hasErrorMessage = body.contains("当前界面遇到了一些问题");
+        boolean hasRetryHint = body.contains("请关闭浏览器页面重试")
+                || body.contains("请清理浏览器缓存")
+                || body.contains("请升级浏览器版本");
+        boolean hasContactHint = body.contains("联系运维人员");
+
+        // 任意两个特征匹配即认为是错误页面
+        int matchCount = 0;
+        if (hasErrorTitle) matchCount++;
+        if (hasErrorMessage) matchCount++;
+        if (hasRetryHint) matchCount++;
+        if (hasContactHint) matchCount++;
+
+        if (matchCount >= 2) {
+            log.info("检测到错误页面特征: title={}, message={}, retry={}, contact={}",
+                    hasErrorTitle, hasErrorMessage, hasRetryHint, hasContactHint);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 检测是否是真正的登录页面（而不是错误页面）
+     *
+     * 真正的登录页面需要同时满足：
+     * 1. 包含登录表单元素（j_username, j_password 等）
+     * 2. 不是错误页面
+     *
+     * @param body 页面 HTML
+     * @return true 表示是真正的登录页面
+     */
+    private boolean isRealLoginPage(String body) {
+        if (body == null || body.isEmpty()) {
+            return false;
+        }
+
+        // 首先排除错误页面
+        if (isErrorPage(body)) {
+            log.info("页面是错误页面，不是登录页面");
+            return false;
+        }
+
+        // 检查是否包含登录表单的关键元素
+        boolean hasUsernameField = body.contains("j_username") || body.contains("name=\"username\"");
+        boolean hasPasswordField = body.contains("j_password") || body.contains("type=\"password\"");
+        boolean hasLoginForm = body.contains("action=\"") &&
+                (body.contains("login") || body.contains("BAMUsername"));
+        boolean hasSmsField = body.contains("sms_checkcode") || body.contains("验证码");
+
+        // 必须有用户名输入框，且至少有密码框或短信验证码
+        boolean isLoginPage = hasUsernameField && (hasPasswordField || hasSmsField || hasLoginForm);
+
+        log.debug("登录页面检测: username={}, password={}, form={}, sms={}, result={}",
+                hasUsernameField, hasPasswordField, hasLoginForm, hasSmsField, isLoginPage);
+
+        return isLoginPage;
+    }
+
+    // ==================== 登录方式检测 ====================
+
+    /**
+     * 从登录页面 HTML 中检测支持的登录方式
+     *
+     * 检测策略（优先级从高到低）：
+     * 1. Tab 按钮：tabA1/tab1 = 密码，tabA4/tab4 = SMS
+     * 2. 输入框：j_password = 密码，sms_checkcode = SMS
+     * 3. 表单 action：BAMUsernamePassword = 密码，BAMUsernameOTP = SMS
      * 4. 默认至少支持 SMS
      *
      * @param body 登录页面 HTML
@@ -614,85 +694,108 @@ public class AuthServiceImpl implements AuthService {
         List<LoginType> types = new ArrayList<>();
 
         if (body == null || body.isEmpty()) {
-            // 默认返回 SMS
             types.add(LoginType.SMS);
             return types;
         }
 
-        // ========== 1. 检测是否支持密码登录 ==========
-        boolean hasPasswordLogin = false;
+        // ⭐ 再次检查是否是错误页面（双重保险）
+        if (isErrorPage(body)) {
+            log.warn("detectLoginTypesFromBody: 检测到错误页面，返回默认登录方式");
+            types.add(LoginType.SMS);
+            types.add(LoginType.PASSWORD);
+            return types;
+        }
 
-        // 方式一：检查 j_password 输入框是否存在且可见
-        // 页面结构：<input id="j_password" class="inputLogin" type="password" name="j_password" ...>
-        if (body.contains("j_password") && body.contains("type=\"password\"")) {
-            // 检查是否被隐藏（通过内联样式）
-            // 查找 j_password 相关的元素是否有 display:none
-            int passwordIndex = body.indexOf("j_password");
-            if (passwordIndex > 0) {
-                // 检查前后 200 字符内是否有 display:none
-                int start = Math.max(0, passwordIndex - 200);
-                int end = Math.min(body.length(), passwordIndex + 200);
-                String context = body.substring(start, end);
+        // ========== 1. 优先检测 Tab 按钮（最可靠） ==========
+        // 页面结构：
+        // <a id="tabA1" ...><li><span class="tab tab1" title="用户名密码认证"></span></li></a>
+        // <a id="tabA4" ...><li><span class="tab tab4" title="用户名短信认证"></span></li></a>
 
-                // 如果没有 display:none，说明密码登录可见
-                if (!context.contains("display:none") && !context.contains("display: none")) {
-                    hasPasswordLogin = true;
-                    log.debug("检测到 j_password 输入框可见");
-                }
+        boolean hasPasswordTab = body.contains("tabA1") || body.contains("用户名密码认证");
+        boolean hasSmsTab = body.contains("tabA4") || body.contains("用户名短信认证");
+
+        // ⭐ 注意：tab1 可能在错误页面中也存在，所以需要更严格的检查
+        // 只有同时包含 tab1 和登录表单元素才认为支持密码登录
+        if (!hasPasswordTab && body.contains("tab1")) {
+            // 额外检查是否真的有密码输入框
+            if (body.contains("j_password") || body.contains("type=\"password\"")) {
+                hasPasswordTab = true;
+                log.info("检测到 tab1 + 密码输入框 - 支持密码登录");
             }
         }
 
-        // 方式二：检查 passwordLayer 元素
-        // 页面结构：<div class="passwordLayer">密码</div>
-        // 如果 passwordLayer 的 CSS 是 display:block，则支持密码登录
-        if (body.contains("passwordLayer")) {
-            // 检查 <style> 标签中的 CSS
-            // 查找 .passwordLayer { display: block; ... }
-            if (body.contains(".passwordLayer") && body.contains("display:block")
-                    || body.contains(".passwordLayer") && body.contains("display: block")) {
+        if (hasPasswordTab) {
+            log.info("检测到 tabA1/用户名密码认证 - 支持密码登录");
+        }
+        if (hasSmsTab) {
+            log.info("检测到 tabA4/用户名短信认证 - 支持短信登录");
+        }
+
+        // ========== 2. 补充检测：密码登录 ==========
+        boolean hasPasswordLogin = hasPasswordTab;
+
+        if (!hasPasswordLogin) {
+            // 方式一：检查 j_password 输入框是否存在且可见
+            if (body.contains("j_password") && body.contains("type=\"password\"")) {
+                int passwordIndex = body.indexOf("j_password");
+                if (passwordIndex > 0) {
+                    int start = Math.max(0, passwordIndex - 200);
+                    int end = Math.min(body.length(), passwordIndex + 200);
+                    String context = body.substring(start, end);
+                    if (!context.contains("display:none") && !context.contains("display: none")) {
+                        hasPasswordLogin = true;
+                        log.info("检测到 j_password 输入框可见");
+                    }
+                }
+            }
+
+            // 方式二：检查 passwordLayer 元素
+            if (body.contains("passwordLayer")) {
+                if ((body.contains(".passwordLayer") && body.contains("display:block"))
+                        || (body.contains(".passwordLayer") && body.contains("display: block"))) {
+                    hasPasswordLogin = true;
+                    log.info("检测到 passwordLayer CSS display:block");
+                }
+                if (body.contains("entityId=home") || body.contains("gatewaySecond")
+                        || body.contains("BAMUsernamePassword")) {
+                    if (!body.contains("passwordLayer") || !body.contains("style=\"display:none\"")) {
+                        hasPasswordLogin = true;
+                        log.info("检测到第二关页面，支持密码登录");
+                    }
+                }
+            }
+
+            // 方式三：直接检查表单 action URL
+            if (body.contains("BAMUsernamePassword")) {
                 hasPasswordLogin = true;
-                log.debug("检测到 passwordLayer CSS display:block");
-            }
-
-            // 检查内联样式：如果 passwordLayer 元素没有 style="display:none"
-            // 且页面是第二关（gatewaySecond / entityId=home），默认认为密码登录可用
-            if (body.contains("entityId=home") || body.contains("gatewaySecond")
-                    || body.contains("BAMUsernamePassword")) {
-                // 这是第二关页面，通常支持密码登录
-                if (!body.contains("passwordLayer") || !body.contains("style=\"display:none\"")) {
-                    hasPasswordLogin = true;
-                    log.debug("检测到第二关页面，支持密码登录");
-                }
+                log.info("检测到 BAMUsernamePassword 表单");
             }
         }
 
-        // 方式三：直接检查表单 action URL
-        // A4tLoginPASSWORDFormActionURL = "...BAMUsernamePassword..."
-        if (body.contains("BAMUsernamePassword")) {
-            hasPasswordLogin = true;
-            log.debug("检测到 BAMUsernamePassword 表单");
+        // ========== 3. 补充检测：SMS 登录 ==========
+        boolean hasSmsLogin = hasSmsTab;
+
+        if (!hasSmsLogin) {
+            if (body.contains("sms_checkcode")
+                    || body.contains("短信验证")
+                    || body.contains("验证码登录")
+                    || body.contains("BAMUsernameOTP")
+                    || body.contains("entityId=webvpn")) {
+                hasSmsLogin = true;
+            }
+
+            // ⭐ 如果有用户名输入框但没检测到其他登录方式，默认支持 SMS
+            if (!hasSmsLogin && body.contains("j_username")) {
+                hasSmsLogin = true;
+                log.info("检测到 j_username，默认支持短信登录");
+            }
         }
 
-        // ========== 2. 检测是否支持 SMS 登录 ==========
-        boolean hasSmsLogin = false;
-
-        // SMS 登录始终可用（基础登录方式）
-        // 检查 SMS 相关元素作为确认
-        if (body.contains("sms_checkcode")
-                || body.contains("短信验证")
-                || body.contains("验证码登录")
-                || body.contains("j_username")
-                || body.contains("BAMUsernameOTP")
-                || body.contains("entityId=webvpn")) {
-            hasSmsLogin = true;
-        }
-
-        // ========== 3. 添加检测到的登录方式 ==========
-        // SMS 作为默认登录方式
-        if (hasSmsLogin || !hasPasswordLogin) {
+        // ========== 4. 添加检测到的登录方式 ==========
+        // SMS 优先
+        if (hasSmsLogin) {
             types.add(LoginType.SMS);
         }
-
         if (hasPasswordLogin) {
             types.add(LoginType.PASSWORD);
         }
@@ -702,7 +805,8 @@ public class AuthServiceImpl implements AuthService {
             types.add(LoginType.SMS);
         }
 
-        log.info("检测登录方式 - body长度: {}, 结果: {}", body.length(), types);
+        log.info("检测登录方式 - body长度: {}, hasPasswordTab: {}, hasSmsTab: {}, 结果: {}",
+                body.length(), hasPasswordTab, hasSmsTab, types);
 
         return types;
     }
@@ -799,6 +903,8 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * 保存 SmartSession 的 Cookies 到缓存
+     *
+     * ⭐ 直接使用 SmartCookie JSON 序列化，不再依赖 Playwright
      */
     private void saveSessionCookies(String wxId, SmartSession smartSession) {
         List<SmartCookie> smartCookies = smartSession.getCookies();
@@ -811,26 +917,8 @@ public class AuthServiceImpl implements AuthService {
                     sc.getValue().length() > 10 ? sc.getValue().substring(0, 10) : sc.getValue());
         }
 
-        List<com.microsoft.playwright.options.Cookie> playwrightCookies =
-                convertToPlaywrightCookies(smartCookies);
-
-        log.info("💾 转换为 {} 个 Playwright Cookie", playwrightCookies.size());
-
-        // 调试：打印每个 Playwright Cookie
-        for (com.microsoft.playwright.options.Cookie pc : playwrightCookies) {
-            log.debug("  💾 Playwright Cookie: name={}, domain={}", pc.name, pc.domain);
-        }
-
-        authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, playwrightCookies);
+        // ⭐ 直接保存 SmartCookie，不再转换为 Playwright Cookie
+        authSessionCacheUtil.saveOrUpdateSessionCookie(wxId, smartCookies);
         log.info("💾 已调用 saveOrUpdateSessionCookie");
-    }
-
-    /**
-     * 将 SmartCookie 转换为 Playwright Cookie
-     */
-    private List<com.microsoft.playwright.options.Cookie> convertToPlaywrightCookies(List<SmartCookie> smartCookies) {
-        return smartCookies.stream()
-                .map(SmartCookie::toPlaywright)
-                .collect(Collectors.toList());
     }
 }

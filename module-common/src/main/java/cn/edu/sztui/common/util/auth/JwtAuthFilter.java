@@ -81,7 +81,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (!result.isValid()) {
                 if (result.isExpired()) {
-                    writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "登录已过期，请重新登录");
+                    writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "会话已过期，请刷新会话");
                 } else {
                     writeErrorResponse(response, HttpStatus.FORBIDDEN, result.getMessage());
                 }

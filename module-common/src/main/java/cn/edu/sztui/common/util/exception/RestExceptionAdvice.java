@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import java.nio.file.AccessDeniedException;
 
@@ -32,6 +33,27 @@ public class RestExceptionAdvice {
     private String active;
     public static final String REST_EXCEPTION = "rest_exception";
     public static final String PRD = "prd";
+
+    // ============ SSE 超时异常处理（静默） ============
+
+    /**
+     * ⭐ 处理 SSE 异步请求超时
+     *
+     * SSE 连接超时是正常行为，不需要返回错误响应。
+     * 因为 SSE 连接已经关闭，无法写入响应，尝试写入会抛出 HttpMediaTypeNotAcceptableException。
+     *
+     * 这里只记录 DEBUG 日志，不做任何响应处理。
+     */
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public void handleAsyncRequestTimeoutException(
+            AsyncRequestTimeoutException ex,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        // SSE 超时是正常行为，静默处理
+        // 只记录 DEBUG 级别日志，不打印 ERROR
+        log.debug("SSE 连接超时（正常行为）: {}", request.getRequestURI());
+        // 不做任何响应处理，因为连接已经关闭
+    }
 
     // ============ 修改所有方法，不要设置状态码为200 ============
 
@@ -122,26 +144,32 @@ public class RestExceptionAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)  // 401
     public Result handleExpiredJwtException(ExpiredJwtException ex, HttpServletRequest request) {
         log.warn("JWT过期: URL={}", request.getRequestURI());
-        return Result.error(HttpStatus.UNAUTHORIZED.value(), "登录已过期，请重新登录");
+        return Result.error(HttpStatus.UNAUTHORIZED.value(), "会话已过期，请刷新会话");
     }
 
     @ExceptionHandler({io.jsonwebtoken.JwtException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)  // 403
     public Result handleJwtException(JwtException ex, HttpServletRequest request) {
         log.warn("JWT验证失败: URL={}, Message={}", request.getRequestURI(), ex.getMessage());
-        return Result.error(HttpStatus.FORBIDDEN.value(), "令牌无效或已损坏");
+        return Result.error(HttpStatus.FORBIDDEN.value(), "会话无效或已损坏");
     }
 
     @ExceptionHandler({org.springframework.security.access.AccessDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)  // 403
     public Result handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
         log.warn("访问被拒绝: URL={}", request.getRequestURI());
-        return Result.error(HttpStatus.FORBIDDEN.value(), "无权访问此资源");
+        return Result.error(HttpStatus.FORBIDDEN.value(), "会话无权访问此资源");
     }
 
     @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 使用注解设置HTTP状态码
     public Result unknownException(Exception ex,HttpServletResponse response,HttpServletRequest request) {
+        // ⭐ 忽略 SSE 相关的异常（已经在专门的 handler 处理）
+        if (ex instanceof AsyncRequestTimeoutException) {
+            log.debug("SSE 超时异常（已处理）: {}", request.getRequestURI());
+            return null;  // 返回 null，Spring 会忽略
+        }
+
         if (this.active.equals("prd")) {
             log.error(LogMark.format("rest_exception", "UnknownException request url：{}，request method：{},Message:{}"),
                     new Object[]{request.getRequestURI(), request.getMethod(), ex});

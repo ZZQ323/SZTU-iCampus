@@ -64,37 +64,5 @@ public class SmartCookie {
     public String toHeaderValue() {
         return name + "=" + value;
     }
-    
-    /**
-     * 从 Playwright Cookie 格式转换
-     */
-    public static SmartCookie fromPlaywright(com.microsoft.playwright.options.Cookie pw) {
-        return SmartCookie.builder()
-                .name(pw.name)
-                .value(pw.value)
-                .domain(pw.domain)
-                .path(pw.path)
-                .expires(pw.expires != null && pw.expires > 0 
-                        ? Instant.ofEpochSecond(pw.expires.longValue()) 
-                        : null)
-                .httpOnly(pw.httpOnly != null && pw.httpOnly)
-                .secure(pw.secure != null && pw.secure)
-                .sameSite(pw.sameSite != null ? pw.sameSite.name() : null)
-                .build();
-    }
-    
-    /**
-     * 转换为 Playwright Cookie 格式
-     */
-    public com.microsoft.playwright.options.Cookie toPlaywright() {
-        com.microsoft.playwright.options.Cookie pw = new com.microsoft.playwright.options.Cookie(name, value);
-        pw.setDomain(domain);
-        pw.setPath(path != null ? path : "/");
-        if (expires != null) {
-            pw.setExpires((double) expires.getEpochSecond());
-        }
-        pw.setHttpOnly(httpOnly);
-        pw.setSecure(secure);
-        return pw;
-    }
+
 }

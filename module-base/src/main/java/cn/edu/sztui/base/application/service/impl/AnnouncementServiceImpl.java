@@ -1,14 +1,14 @@
 package cn.edu.sztui.base.application.service.impl;
 
 import cn.edu.sztui.base.application.service.AnnouncementService;
-import cn.edu.sztui.base.application.vo.AnnouncementContentVo;
-import cn.edu.sztui.base.application.vo.AnnouncementListVo;
-import cn.edu.sztui.base.application.vo.AnnouncementMetaVo;
-import cn.edu.sztui.base.infrastructure.convertor.CookieConverter;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementContentVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementListVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
+import cn.edu.sztui.base.infrastructure.persistence.convertor.CookieConverter;
 import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementContentParser;
-import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementListParser;
+import cn.edu.sztui.base.infrastructure.persistence.praser.announcement.AnnouncementContentParser;
+import cn.edu.sztui.base.infrastructure.persistence.praser.announcement.AnnouncementListParser;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;

@@ -1,11 +1,11 @@
 package cn.edu.sztui.base.web;
 
 import cn.edu.sztui.base.application.service.AnnouncementService;
-import cn.edu.sztui.base.application.vo.AnnouncementContentVo;
-import cn.edu.sztui.base.application.vo.AnnouncementListVo;
-import cn.edu.sztui.base.application.vo.AnnouncementMetaVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementContentVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementListVo;
+import cn.edu.sztui.base.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
 import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
-import cn.edu.sztui.base.infrastructure.util.praser.AnnouncementListParser;
+import cn.edu.sztui.base.infrastructure.persistence.praser.announcement.AnnouncementListParser;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.result.Result;
 import io.swagger.v3.oas.annotations.Operation;

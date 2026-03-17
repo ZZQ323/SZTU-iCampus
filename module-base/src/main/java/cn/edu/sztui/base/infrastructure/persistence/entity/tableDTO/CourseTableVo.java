@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.application.vo;
+package cn.edu.sztui.base.infrastructure.persistence.entity.tableDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

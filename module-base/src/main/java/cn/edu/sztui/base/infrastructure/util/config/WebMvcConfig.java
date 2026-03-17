@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.config;
+package cn.edu.sztui.base.infrastructure.util.config;
 
 import cn.edu.sztui.base.application.service.AccessTouchInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
