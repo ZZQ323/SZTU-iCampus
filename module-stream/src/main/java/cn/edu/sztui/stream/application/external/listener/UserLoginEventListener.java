@@ -1,6 +1,6 @@
 package cn.edu.sztui.stream.application.external.listener;
 
-import cn.edu.sztui.base.infrastructure.event.UserLoginEvent;
+import cn.edu.sztui.base.application.external.UserLoginEvent;
 import cn.edu.sztui.stream.application.external.announcement.AnnouncementInitTask;
 import cn.edu.sztui.stream.infrastructure.util.cache.AnnouncementCacheUtil;
 import jakarta.annotation.Resource;

@@ -111,8 +111,8 @@ public class AnnouncementCacheUtil {
         String timelineKey = generateKey(TIMELINE_KEY);
         redisTemplate.opsForZSet().add(timelineKey, meta.getId(), Double.parseDouble(meta.getId()));
 
-        if (StringUtils.hasText(meta.getCategory())) {
-            String categoryKey = generateKey(CATEGORY_KEY_PREFIX + meta.getCategory());
+        if (StringUtils.hasText(meta.getCategoryCode())) {
+            String categoryKey = generateKey(CATEGORY_KEY_PREFIX + meta.getCategoryCode());
             redisTemplate.opsForZSet().add(categoryKey, meta.getId(), Double.parseDouble(meta.getId()));
         }
 
