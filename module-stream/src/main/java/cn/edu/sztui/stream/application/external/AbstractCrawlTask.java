@@ -1,26 +1,27 @@
 package cn.edu.sztui.stream.application.external;
 
-import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.common.cache.dto.ProxySession;
+import cn.edu.sztui.stream.infrastructure.util.cache.AnnouncementCacheUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-
-import jakarta.annotation.Resource;
 
 import java.util.Map;
 
 /**
  * 抽象爬取任务基类
+ * 
+ * 文件位置：module-stream/src/main/java/cn/edu/sztui/stream/application/external/AbstractCrawlTask.java
  */
 @Slf4j
 public abstract class AbstractCrawlTask {
 
     @Resource
-    protected AnnouncementCacheUtil announcementCacheUtil;
+    protected AuthSessionCacheUtil authSessionCacheUtil;
 
     @Resource
-    protected AuthSessionCacheUtil authSessionCacheUtil;
+    protected AnnouncementCacheUtil announcementCacheUtil;
 
     protected void execute() {
         String sourceOpenId = getAvailableCookieSource();

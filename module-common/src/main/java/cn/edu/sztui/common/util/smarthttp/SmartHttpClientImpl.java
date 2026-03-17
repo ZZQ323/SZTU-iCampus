@@ -22,7 +22,7 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * 文件位置：module-common/src/main/java/cn/edu/sztui/common/util/smarthttp/SmartHttpClientImpl.java
  */
 @Slf4j
-@Component
+@Service
 public class SmartHttpClientImpl implements SmartHttpClient {
     
     private CloseableHttpClient httpClient;

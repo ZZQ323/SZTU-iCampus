@@ -1,0 +1,49 @@
+# 频道配置
+# 每个频道可以包含多个数据源
+
+channels:
+  # 校园公告频道
+  - id: announcement
+    name: 校园公告
+    description: 学校公文通公告信息
+    icon: notice
+    sort: 1
+    enabled: true
+    sources:
+      - gwt-jiaowu
+      - gwt-keyan
+      - gwt-xingzheng
+      - gwt-xuegong
+      - gwt-xiaoyuan
+
+  # 图书馆频道（预留）
+  - id: library
+    name: 图书馆
+    description: 图书馆新书推荐、讲座、通知
+    icon: book
+    sort: 2
+    enabled: false
+    sources:
+      - lib-news
+      - lib-notice
+
+  # 招聘信息频道（预留）
+  - id: job
+    name: 招聘信息
+    description: 校园招聘、实习信息
+    icon: briefcase
+    sort: 3
+    enabled: false
+    sources:
+      - job-campus
+      - job-intern
+
+  # 学术讲座频道（预留）
+  - id: lecture
+    name: 学术讲座
+    description: 学术报告、讲座预告
+    icon: microphone
+    sort: 4
+    enabled: false
+    sources:
+      - lecture-academic

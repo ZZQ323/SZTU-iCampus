@@ -1,10 +1,9 @@
 package cn.edu.sztui.stream.application.service;
 
-import cn.edu.sztui.base.infrastructure.persistence.entity.tableDTO.CourseTableVo;
-import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
-import cn.edu.sztui.stream.infrastructure.sse.dto.SseMessage;
-import cn.edu.sztui.stream.infrastructure.stream.StreamKeys;
-import cn.edu.sztui.stream.infrastructure.stream.StreamPublisher;
+import cn.edu.sztui.stream.infrastructure.util.sse.SseEmitterManager;
+import cn.edu.sztui.stream.infrastructure.util.sse.dto.SseMessage;
+import cn.edu.sztui.stream.infrastructure.util.stream.StreamKeys;
+import cn.edu.sztui.stream.infrastructure.util.stream.StreamPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,8 @@ import java.util.Map;
  * 流式推送服务
  * 
  * 封装消息推送逻辑，供其他业务服务调用
+ * 
+ * 文件位置：module-stream/src/main/java/cn/edu/sztui/stream/application/service/StreamPushService.java
  */
 @Slf4j
 @Service
@@ -35,8 +36,8 @@ public class StreamPushService {
      * @param wxOpenId 用户微信OpenId
      * @param schedule 课表数据
      */
-    public void pushScheduleToUser(String wxOpenId, CourseTableVo schedule) {
-        SseMessage<CourseTableVo> message = SseMessage.dataTo(
+    public void pushScheduleToUser(String wxOpenId, Object schedule) {
+        SseMessage<Object> message = SseMessage.dataTo(
                 StreamKeys.TYPE_SCHEDULE_DATA,
                 schedule,
                 wxOpenId
@@ -51,8 +52,8 @@ public class StreamPushService {
      * 注意: 通常不需要广播课表，因为每个用户的课表不同
      * 这个方法主要用于测试或特殊场景
      */
-    public void broadcastSchedule(CourseTableVo schedule) {
-        SseMessage<CourseTableVo> message = SseMessage.data(
+    public void broadcastSchedule(Object schedule) {
+        SseMessage<Object> message = SseMessage.data(
                 StreamKeys.TYPE_SCHEDULE_DATA,
                 schedule
         );
@@ -127,6 +128,15 @@ public class StreamPushService {
         streamPublisher.publishAnnouncement(message);
     }
     
+    /**
+     * 广播新公告通知
+     * 
+     * @param data 新公告数据（包含 ids, count, metas, latestId）
+     */
+    public void broadcastNewAnnouncements(Object data) {
+        streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
+    }
+    
     // ==================== 日历/活动推送 ====================
     
     /**
@@ -134,7 +144,7 @@ public class StreamPushService {
      */
     public void broadcastCalendarEvent(Object event) {
         SseMessage<Object> message = SseMessage.data(
-                "CALENDAR_EVENT",
+                StreamKeys.TYPE_CALENDAR_DATA,
                 event
         );
         streamPublisher.publishCalendar(message);
@@ -161,5 +171,19 @@ public class StreamPushService {
      */
     public boolean isUserSubscribedToSchedule(String wxOpenId) {
         return sseEmitterManager.isSubscribed("schedule", wxOpenId);
+    }
+    
+    /**
+     * 获取公告订阅者数量
+     */
+    public int getAnnouncementSubscriberCount() {
+        return sseEmitterManager.getConnectionCount("announcement");
+    }
+    
+    /**
+     * 获取总连接数
+     */
+    public int getTotalConnectionCount() {
+        return sseEmitterManager.getTotalConnectionCount();
     }
 }

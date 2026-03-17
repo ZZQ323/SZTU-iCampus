@@ -7,17 +7,19 @@ import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.application.vo.LoginStatusVo;
 import cn.edu.sztui.base.domain.model.login.LoginType;
 import cn.edu.sztui.base.infrastructure.persistence.convertor.CharacterConverter;
-import cn.edu.sztui.base.infrastructure.util.cache.AnnouncementCacheUtil;
+import cn.edu.sztui.base.infrastructure.persistence.parser.URLPraser;
+import cn.edu.sztui.base.infrastructure.persistence.parser.UserInfoPraser;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.base.infrastructure.persistence.praser.url.URLPraser;
-import cn.edu.sztui.base.infrastructure.persistence.praser.url.UserInfoPraser;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
-import cn.edu.sztui.common.util.smarthttp.*;
+import cn.edu.sztui.common.util.smarthttp.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.SmartHttpClient;
+import cn.edu.sztui.common.util.smarthttp.SmartResponse;
+import cn.edu.sztui.common.util.smarthttp.SmartSession;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
@@ -51,9 +53,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Resource
     private ApplicationEventPublisher eventPublisher;
-
-    @Resource
-    private AnnouncementCacheUtil announcementCacheUtil;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -372,7 +371,7 @@ public class AuthServiceImpl implements AuthService {
             // ⭐ 第五步已删除：不再调用 invalidateStatusCache
 
             // ============ 第六步：发布登录成功事件 ============
-            announcementCacheUtil.setActiveSourceOpenId(wxId);
+            // announcementCacheUtil.setActiveSourceOpenId(wxId);
             eventPublisher.publishEvent(new UserLoginEvent(
                     this, wxId,
                     ret.getUserId(),

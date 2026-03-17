@@ -1,0 +1,137 @@
+# 数据源配置
+# 每个数据源对应一个可爬取的网站/页面
+
+sources:
+  # ==================== 公文通数据源 ====================
+
+  # 教务公告
+  - id: gwt-jiaowu
+    name: 教务公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: https://gwt.sztu.edu.cn
+    listUrlTemplate: https://gwt.sztu.edu.cn/info/1018/list{page}.htm
+    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1018/{id}.htm
+    category: "1018"
+    categoryName: 教务
+    requiresAuth: true
+    crawlIntervalMinutes: 10
+    crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  # 科研公告
+  - id: gwt-keyan
+    name: 科研公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: https://gwt.sztu.edu.cn
+    listUrlTemplate: https://gwt.sztu.edu.cn/info/1019/list{page}.htm
+    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1019/{id}.htm
+    category: "1019"
+    categoryName: 科研
+    requiresAuth: true
+    crawlIntervalMinutes: 10
+    crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  # 行政公告
+  - id: gwt-xingzheng
+    name: 行政公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: https://gwt.sztu.edu.cn
+    listUrlTemplate: https://gwt.sztu.edu.cn/info/1020/list{page}.htm
+    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1020/{id}.htm
+    category: "1020"
+    categoryName: 行政
+    requiresAuth: true
+    crawlIntervalMinutes: 10
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  # 学工公告
+  - id: gwt-xuegong
+    name: 学工公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: https://gwt.sztu.edu.cn
+    listUrlTemplate: https://gwt.sztu.edu.cn/info/1021/list{page}.htm
+    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1021/{id}.htm
+    category: "1021"
+    categoryName: 学工
+    requiresAuth: true
+    crawlIntervalMinutes: 10
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  # 校园公告
+  - id: gwt-xiaoyuan
+    name: 校园公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: https://gwt.sztu.edu.cn
+    listUrlTemplate: https://gwt.sztu.edu.cn/info/1022/list{page}.htm
+    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1022/{id}.htm
+    category: "1022"
+    categoryName: 校园
+    requiresAuth: true
+    crawlIntervalMinutes: 10
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  # ==================== 图书馆数据源（预留） ====================
+
+  - id: lib-news
+    name: 图书馆新闻
+    channelId: library
+    parserType: sztu-library
+    baseUrl: https://lib.sztu.edu.cn
+    listUrlTemplate: https://lib.sztu.edu.cn/news/list{page}.htm
+    detailUrlTemplate: https://lib.sztu.edu.cn/news/{id}.htm
+    requiresAuth: false
+    crawlIntervalMinutes: 30
+    enabled: false
+    sort: 1
+
+  - id: lib-notice
+    name: 图书馆通知
+    channelId: library
+    parserType: sztu-library
+    baseUrl: https://lib.sztu.edu.cn
+    listUrlTemplate: https://lib.sztu.edu.cn/notice/list{page}.htm
+    detailUrlTemplate: https://lib.sztu.edu.cn/notice/{id}.htm
+    requiresAuth: false
+    crawlIntervalMinutes: 30
+    enabled: false
+    sort: 2
+
+  # ==================== 招聘数据源（预留） ====================
+
+  - id: job-campus
+    name: 校园招聘
+    channelId: job
+    parserType: sztu-job
+    baseUrl: https://job.sztu.edu.cn
+    listUrlTemplate: https://job.sztu.edu.cn/campus/list{page}.htm
+    detailUrlTemplate: https://job.sztu.edu.cn/campus/{id}.htm
+    requiresAuth: true
+    crawlIntervalMinutes: 60
+    enabled: false
+    sort: 1
+
+  - id: job-intern
+    name: 实习信息
+    channelId: job
+    parserType: sztu-job
+    baseUrl: https://job.sztu.edu.cn
+    listUrlTemplate: https://job.sztu.edu.cn/intern/list{page}.htm
+    detailUrlTemplate: https://job.sztu.edu.cn/intern/{id}.htm
+    requiresAuth: true
+    crawlIntervalMinutes: 60
+    enabled: false
+    sort: 2

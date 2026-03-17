@@ -1,8 +1,8 @@
 package cn.edu.sztui.stream.application.external.schedule;
 
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.stream.infrastructure.sse.SseEmitterManager;
-import cn.edu.sztui.stream.infrastructure.stream.StreamPublisher;
+import cn.edu.sztui.stream.infrastructure.util.sse.SseEmitterManager;
+import cn.edu.sztui.stream.infrastructure.util.stream.StreamPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -13,8 +13,8 @@ import java.util.Set;
 
 /**
  * 定时推送任务
- * <p>
- * 【更新】使用 getCrouseTableByOpenId 实现真正的课表推送
+ * 
+ * 文件位置：module-stream/src/main/java/cn/edu/sztui/stream/application/external/schedule/SchedulePushTask.java
  */
 @Slf4j
 @Component
@@ -26,14 +26,13 @@ public class SchedulePushTask {
     
     @Resource
     private StreamPublisher streamPublisher;
-
     
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
     
     /**
      * 每天早上 7:00 推送当日课表
-     * <p>
+     * 
      * cron: 秒 分 时 日 月 周
      */
     @Scheduled(cron = "0 0 7 * * ?")
@@ -71,53 +70,11 @@ public class SchedulePushTask {
         int errorCount = 0;
         
         for (String wxOpenId : subscribers) {
-//            try {
-//                // 1. 检查是否已登录学校系统
-//                if (!authSessionCacheUtil.isSchoolLoggedIn(wxOpenId)) {
-//                    log.debug("用户 {} 未登录学校系统", wxOpenId);
-//                    SseMessage<Void> authMsg = SseMessage.authRequired(wxOpenId, "请先登录学校系统");
-//                    streamPublisher.publishSchedule(authMsg);
-//                    authFailCount++;
-//                    continue;
-//                }
-//
-//                // 2. 检查 Cookie 是否可能过期
-//                if (authSessionCacheUtil.isCookiePossiblyExpired(wxOpenId)) {
-//                    log.debug("用户 {} Cookie 可能已过期", wxOpenId);
-//                    SseMessage<Void> expiredMsg = SseMessage.authRequired(wxOpenId, "会话已过期，请重新登录");
-//                    streamPublisher.publishSchedule(expiredMsg);
-//                    cookieExpiredCount++;
-//                    continue;
-//                }
-//
-//                // 3. 使用 getCrouseTableByOpenId 获取课表
-//                // CourseTableVo schedule = academicService.getCrouseTableByOpenId(
-//                //         wxOpenId,
-//                //         new CrouseTableQuery()
-//                // );
-//
-//                // 4. 推送课表数据
-//                SseMessage<CourseTableVo> dataMsg = SseMessage.dataTo(
-//                        StreamKeys.TYPE_SCHEDULE_DATA,
-//                        schedule,
-//                        wxOpenId
-//                );
-//                streamPublisher.publishSchedule(dataMsg);
-//
-//                successCount++;
-//                log.debug("成功推送课表给用户 {}", wxOpenId);
-//
-//            } catch (Exception e) {
-//                log.error("推送课表给用户 {} 失败: {}", wxOpenId, e.getMessage());
-//                errorCount++;
-//
-//                // 推送错误提示给用户
-//                try {
-//                    SseMessage<Void> errorMsg = SseMessage.authRequired(wxOpenId, "获取课表失败，请稍后重试");
-//                    sseEmitterManager.sendToUser("schedule", wxOpenId, errorMsg);
-//                } catch (Exception ignored) {
-//                }
-//            }
+            // TODO: 实现课表推送逻辑
+            // 1. 检查是否已登录学校系统
+            // 2. 检查 Cookie 是否可能过期
+            // 3. 获取课表数据
+            // 4. 推送课表数据
         }
         
         log.info("课表推送完成 - 成功: {}, 未登录: {}, Cookie过期: {}, 错误: {}", 
@@ -156,14 +113,5 @@ public class SchedulePushTask {
         if (before != after) {
             log.info("连接清理完成 - 清理前: {}, 清理后: {}", before, after);
         }
-    }
-    
-    /**
-     * 每 10 分钟检测公告更新
-     */
-    @Scheduled(fixedRate = 10 * 60 * 1000)
-    public void checkAnnouncementUpdates() {
-        // TODO: 实现公告更新检测逻辑
-        log.debug("公告更新检测...");
     }
 }
