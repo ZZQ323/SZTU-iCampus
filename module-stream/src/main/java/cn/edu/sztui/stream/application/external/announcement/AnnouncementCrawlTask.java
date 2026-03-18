@@ -1,7 +1,6 @@
 package cn.edu.sztui.stream.application.external.announcement;
 
 import cn.edu.sztui.stream.application.external.AbstractCrawlTask;
-import cn.edu.sztui.stream.application.service.AnnouncementService;
 import cn.edu.sztui.stream.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
 import cn.edu.sztui.stream.infrastructure.util.stream.StreamKeys;
 import cn.edu.sztui.stream.infrastructure.util.stream.StreamPublisher;
@@ -9,7 +8,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

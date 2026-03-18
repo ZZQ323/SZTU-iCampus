@@ -2,7 +2,6 @@ package cn.edu.sztui.stream.application.external.announcement;
 
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.common.cache.dto.ProxySession;
-import cn.edu.sztui.stream.application.service.AnnouncementService;
 import cn.edu.sztui.stream.infrastructure.persistence.entity.textDTO.AnnouncementMetaVo;
 import cn.edu.sztui.stream.infrastructure.util.cache.AnnouncementCacheUtil;
 import jakarta.annotation.Resource;

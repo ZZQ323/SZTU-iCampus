@@ -1,7 +1,7 @@
 package cn.edu.sztui.stream.application.external.schedule;
 
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.stream.infrastructure.util.sse.SseEmitterManager;
+import cn.edu.sztui.stream.infrastructure.websocket.registry.WsSessionRegistry;
 import cn.edu.sztui.stream.infrastructure.util.stream.StreamPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -12,106 +12,56 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 /**
- * 定时推送任务
- * 
- * 文件位置：module-stream/src/main/java/cn/edu/sztui/stream/application/external/schedule/SchedulePushTask.java
+ * 定时推送任务（WebSocket 版）
+ * <p>
+ * 改造点：
+ * <ul>
+ *   <li>SseEmitterManager → WsSessionRegistry（获取订阅者列表）</li>
+ *   <li>删除心跳任务（WebSocket 有原生 ping/pong）</li>
+ *   <li>删除连接清理任务（WsSessionRegistry 在断开时自动清理）</li>
+ * </ul>
+ * <p>
+ * 文件位置：module-stream/.../application/external/schedule/SchedulePushTask.java
  */
 @Slf4j
 @Component
 @EnableScheduling
 public class SchedulePushTask {
-    
+
     @Resource
-    private SseEmitterManager sseEmitterManager;
-    
+    private WsSessionRegistry wsSessionRegistry;
+
     @Resource
     private StreamPublisher streamPublisher;
-    
+
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
-    
+
     /**
      * 每天早上 7:00 推送当日课表
-     * 
-     * cron: 秒 分 时 日 月 周
      */
     @Scheduled(cron = "0 0 7 * * ?")
     public void pushDailySchedule() {
         log.info("======== 开始每日课表推送任务 ========");
         doPushScheduleToSubscribers();
     }
-    
-    /**
-     * 每 15 分钟推送一次（可选，用于测试）
-     * 生产环境可以注释掉
-     */
-    // @Scheduled(cron = "0 */15 * * * ?")
-    public void pushSchedulePeriodically() {
-        log.info("======== 定时课表推送 ========");
-        doPushScheduleToSubscribers();
-    }
-    
-    /**
-     * 向所有订阅者推送课表
-     */
+
     private void doPushScheduleToSubscribers() {
-        Set<String> subscribers = sseEmitterManager.getSubscribers("schedule");
-        
+        Set<String> subscribers = wsSessionRegistry.getSubscribers("schedule");
+
         if (subscribers.isEmpty()) {
             log.info("无活跃订阅者，跳过推送");
             return;
         }
-        
+
         log.info("当前活跃订阅者数量: {}", subscribers.size());
-        
-        int successCount = 0;
-        int authFailCount = 0;
-        int cookieExpiredCount = 0;
-        int errorCount = 0;
-        
-        for (String wxOpenId : subscribers) {
-            // TODO: 实现课表推送逻辑
-            // 1. 检查是否已登录学校系统
-            // 2. 检查 Cookie 是否可能过期
-            // 3. 获取课表数据
-            // 4. 推送课表数据
-        }
-        
-        log.info("课表推送完成 - 成功: {}, 未登录: {}, Cookie过期: {}, 错误: {}", 
-                successCount, authFailCount, cookieExpiredCount, errorCount);
+
+        // TODO: 实现课表推送逻辑
+        // 1. 检查是否已登录学校系统
+        // 2. 获取课表数据
+        // 3. 通过 StreamPublisher 发布到 Redis Stream → StreamConsumer → WebSocket 推送
     }
-    
-    /**
-     * 每 5 分钟发送心跳，保持连接活跃
-     */
-    @Scheduled(fixedRate = 5 * 60 * 1000)
-    public void sendHeartbeat() {
-        int totalConnections = sseEmitterManager.getTotalConnectionCount();
-        
-        if (totalConnections > 0) {
-            log.debug("发送心跳 - 当前连接数: {}", totalConnections);
-            
-            sseEmitterManager.sendHeartbeat("schedule");
-            sseEmitterManager.sendHeartbeat("announcement");
-            sseEmitterManager.sendHeartbeat("calendar");
-        }
-    }
-    
-    /**
-     * 每小时检测并清理过期连接
-     */
-    @Scheduled(fixedRate = 60 * 60 * 1000)
-    public void cleanupConnections() {
-        int before = sseEmitterManager.getTotalConnectionCount();
-        
-        sseEmitterManager.sendHeartbeat("schedule");
-        sseEmitterManager.sendHeartbeat("announcement");
-        sseEmitterManager.sendHeartbeat("calendar");
-        
-        int after = sseEmitterManager.getTotalConnectionCount();
-        
-        if (before != after) {
-            log.info("连接清理完成 - 清理前: {}, 清理后: {}", before, after);
-        }
-    }
+
+    // 注意：原来的 sendHeartbeat() 和 cleanupConnections() 已删除
+    // WebSocket 有原生 ping/pong 保活机制，不需要应用层心跳
 }
