@@ -1,7 +1,7 @@
 package cn.edu.sztui.stream.application.service;
 
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ContentParserResult;
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ListParserResult;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -103,7 +103,7 @@ public interface InfoService {
     @NoArgsConstructor
     @AllArgsConstructor
     class InfoListResult {
-        private List<ListParserResult.InfoItemMeta> list;
+        private List<ListParserResult.InfoItemMeta> items;
         private String latestId;
         private Long total;
         private Boolean hasMore;

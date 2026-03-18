@@ -2,9 +2,11 @@ package cn.edu.sztui.stream.web;
 
 import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.result.Result;
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ContentParserResult;
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ListParserResult;
+import cn.edu.sztui.stream.application.service.InfoService;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult;
+import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,7 +41,7 @@ public class InfoController {
     private CrawlerConfigLoader configLoader;
 
     @Resource
-    private InfoCacheUtil cacheUtil;
+    private InfoCacheUtil infoCacheUtil;
 
     // ==================== 分类目录 ====================
 
@@ -188,7 +190,7 @@ public class InfoController {
             @Parameter(description = "频道ID")
             @RequestParam(defaultValue = "announcement") String channelId) {
 
-        String latestId = cacheUtil.getLatestId(channelId);
+        String latestId = infoCacheUtil.getLatestId(channelId);
         Map<String, String> result = new HashMap<>();
         result.put("channelId", channelId);
         result.put("latestId", latestId != null ? latestId : "0");
@@ -232,7 +234,7 @@ public class InfoController {
         status.put("sourceCount", configLoader.getSources().size());
 
         // 缓存统计
-        status.put("cacheStats", cacheUtil.getCacheStats());
+        status.put("cacheStats", infoCacheUtil.getCacheStats());
 
         return Result.ok(status);
     }

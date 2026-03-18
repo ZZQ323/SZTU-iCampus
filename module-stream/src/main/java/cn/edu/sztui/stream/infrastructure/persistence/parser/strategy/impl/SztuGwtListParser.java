@@ -29,13 +29,19 @@ import java.util.regex.Pattern;
 @Component
 public class SztuGwtListParser implements ParserStrategy {
 
-    /** 解析器类型标识 */
+    /**
+     * 解析器类型标识
+     */
     public static final String TYPE = "sztu-gwt";
 
-    /** 公文通基础URL */
+    /**
+     * 公文通基础URL
+     */
     private static final String BASE_URL = "https://gwt.sztu.edu.cn";
 
-    /** 分类代码 -> 分类名称映射 */
+    /**
+     * 分类代码 -> 分类名称映射
+     */
     private static final Map<String, String> CATEGORY_MAP = new HashMap<>();
 
     static {
@@ -67,11 +73,9 @@ public class SztuGwtListParser implements ParserStrategy {
 
             // 解析列表项
             List<InfoItemMeta> items = new ArrayList<>();
-            Elements listItems = doc.select("ul.list1 li, ul.newsList li, .newslist li");
-
+            Elements listItems = doc.select("ul.news-ul > li.clearfix");
             if (listItems.isEmpty()) {
-                // 尝试其他选择器
-                listItems = doc.select("div.list li, table.list tr");
+                listItems = doc.select("ul.news-list > li.clearfix");
             }
 
             for (Element item : listItems) {
@@ -122,65 +126,49 @@ public class SztuGwtListParser implements ParserStrategy {
      */
     private InfoItemMeta parseListItem(Element item, SourceConfig sourceConfig) {
         try {
-            // 解析链接
-            Element link = item.selectFirst("a");
-            if (link == null) {
-                return null;
-            }
+            // 1. 标题和ID（width04）
+            Element titleLink = item.selectFirst(".width04 a");
+            if (titleLink == null) return null;
 
-            String href = link.attr("href");
-            String title = link.text().trim();
-
-            if (!StringUtils.hasText(href) || !StringUtils.hasText(title)) {
-                return null;
-            }
-
-            // 提取 ID
+            String title = titleLink.text().trim();
+            String href = titleLink.attr("href");
             String id = extractIdFromUrl(href);
-            if (id == null) {
-                return null;
+            if (id == null) return null;
+
+            // 2. 类别（width02）
+            String category = sourceConfig.getCategory();
+            String categoryName = sourceConfig.getCategoryName();
+            Element catElem = item.selectFirst(".width02 a");
+            if (catElem != null) {
+                categoryName = catElem.text().trim();
             }
 
-            // 解析日期
-            String publishDate = null;
-            Element dateElem = item.selectFirst("span.time, span.date, .time, .date");
-            if (dateElem != null) {
-                publishDate = dateElem.text().trim();
-            } else {
-                // 尝试从文本中提取日期
-                publishDate = extractDateFromText(item.text());
-            }
-
-            // 解析部门
+            // 3. 发文单位（width03）
             String department = null;
-            Element deptElem = item.selectFirst("span.dept, span.source, .dept, .source");
+            Element deptElem = item.selectFirst(".width03 a");
             if (deptElem != null) {
                 department = deptElem.text().trim();
             }
 
-            // 构建完整URL
-            String fullUrl = href;
-            if (!href.startsWith("http")) {
-                if (href.startsWith("/")) {
-                    fullUrl = BASE_URL + href;
-                } else {
-                    fullUrl = BASE_URL + "/" + href;
-                }
+            // 4. 日期（width06）
+            String publishDate = null;
+            Element dateElem = item.selectFirst(".width06");
+            if (dateElem != null) {
+                publishDate = dateElem.text().trim();
             }
 
             return InfoItemMeta.builder()
                     .id(id)
-                    .url(fullUrl)
+                    .url(href)
                     .title(title)
-                    .category(sourceConfig.getCategory())
-                    .categoryName(CATEGORY_MAP.getOrDefault(sourceConfig.getCategory(), sourceConfig.getCategoryName()))
+                    .category(category)
+                    .categoryName(categoryName)
                     .department(department)
                     .publishDate(publishDate)
                     .source(sourceConfig.getName())
                     .channelId(sourceConfig.getChannelId())
                     .crawledAt(System.currentTimeMillis())
                     .build();
-
         } catch (Exception e) {
             log.warn("解析列表项失败", e);
             return null;

@@ -94,7 +94,7 @@ public class UnifiedWsHandler extends TextWebSocketHandler {
 
     private void sendConnectedMessage(WebSocketSession session, String openId, String topics) {
         try {
-            WsMessage<Object> msg = WsMessage.system(StreamKeys.TYPE_CONNECTED,
+            WsMessage<?> msg = WsMessage.system(StreamKeys.TYPE_CONNECTED,
                     "连接成功，已订阅: " + topics);
             String json = objectMapper.writeValueAsString(msg);
             session.sendMessage(new TextMessage(json));

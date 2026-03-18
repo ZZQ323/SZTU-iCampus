@@ -1,10 +1,10 @@
 package cn.edu.sztui.stream.infrastructure.util.cache;
 
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ContentParserResult;
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ListParserResult;
 import cn.edu.sztui.common.cache.redis.RedisKeyGenerator;
 import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.common.cache.util.service.CacheService;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -97,11 +97,6 @@ public class InfoCacheUtil {
         log.info("已清除频道 {} 的 Cookie 来源", channelId);
     }
 
-    public void updateLastCrawlTime(String channelId) {
-        String key = getSystemKey(channelId);
-        cacheUtil.hset(key, "lastCrawlTime", String.valueOf(System.currentTimeMillis()));
-    }
-
     // ==================== 元数据操作 ====================
 
     public void saveMeta(String channelId, ListParserResult.InfoItemMeta meta) {
@@ -111,8 +106,8 @@ public class InfoCacheUtil {
         String timelineKey = generateKey(KEY_PREFIX + channelId + TIMELINE_SUFFIX);
         redisTemplate.opsForZSet().add(timelineKey, meta.getId(), Double.parseDouble(meta.getId()));
 
-        if (StringUtils.hasText(meta.getCategoryCode())) {
-            String categoryKey = generateKey(KEY_PREFIX + channelId + CATEGORY_PREFIX + meta.getCategoryCode());
+        if (StringUtils.hasText(meta.getCategory())) {
+            String categoryKey = generateKey(KEY_PREFIX + channelId + CATEGORY_PREFIX + meta.getCategory());
             redisTemplate.opsForZSet().add(categoryKey, meta.getId(), Double.parseDouble(meta.getId()));
         }
 
@@ -350,5 +345,72 @@ public class InfoCacheUtil {
 
     private String generateKey(String key) {
         return redisKeyGenerator.generate("cache:" + key);
+    }
+    // ==================== 数据源级别状态（按 sourceId） ====================
+
+    /**
+     * 某数据源是否已完成初始化
+     */
+    public boolean isSourceInitialized(String sourceId) {
+        String key = generateKey("info:source:" + sourceId + ":system");
+        Object val = cacheUtil.hget(key, "initialized");
+        return "true".equals(String.valueOf(val));
+    }
+
+    /**
+     * 标记数据源已初始化
+     */
+    public void markSourceInitialized(String sourceId) {
+        String key = generateKey("info:source:" + sourceId + ":system");
+        cacheUtil.hset(key, "initialized", "true");
+        log.info("数据源已标记初始化: {}", sourceId);
+    }
+
+    /**
+     * 更新数据源最后爬取时间（按 sourceId，非 channelId）
+     */
+    public void updateLastCrawlTime(String sourceId) {
+        String key = generateKey("info:source:" + sourceId + ":system");
+        cacheUtil.hset(key, "lastCrawlTime", String.valueOf(System.currentTimeMillis()));
+    }
+
+    /**
+     * 获取数据源最后爬取时间
+     */
+    public Long getLastCrawlTime(String sourceId) {
+        String key = generateKey("info:source:" + sourceId + ":system");
+        Object val = cacheUtil.hget(key, "lastCrawlTime");
+        return val != null ? Long.parseLong(val.toString()) : null;
+    }
+
+    // ==================== 全局 Cookie 来源（不分频道） ====================
+
+    private static final String GLOBAL_SYSTEM_KEY = "info:global:system";
+
+    /**
+     * 获取全局活跃 Cookie 来源 openId
+     * （CookieSourceManager 调用，不区分频道）
+     */
+    public String getActiveSourceOpenId() {
+        String key = generateKey(GLOBAL_SYSTEM_KEY);
+        Object val = cacheUtil.hget(key, "activeSourceOpenId");
+        return val != null && StringUtils.hasText(val.toString()) ? val.toString() : null;
+    }
+
+    /**
+     * 设置全局活跃 Cookie 来源 openId
+     */
+    public void setActiveSourceOpenId(String openId) {
+        String key = generateKey(GLOBAL_SYSTEM_KEY);
+        cacheUtil.hset(key, "activeSourceOpenId", openId != null ? openId : "");
+    }
+
+    /**
+     * 清除全局活跃 Cookie 来源
+     */
+    public void clearActiveSource() {
+        String key = generateKey(GLOBAL_SYSTEM_KEY);
+        cacheUtil.hset(key, "activeSourceOpenId", "");
+        log.debug("已清除全局 Cookie 来源");
     }
 }

@@ -2,16 +2,15 @@
 # 每个数据源对应一个可爬取的网站/页面
 
 sources:
-  # ==================== 公文通数据源 ====================
+  # ==================== 公文通数据源（WebVPN） ====================
 
-  # 教务公告
   - id: gwt-jiaowu
     name: 教务公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://gwt.sztu.edu.cn
-    listUrlTemplate: https://gwt.sztu.edu.cn/info/1018/list{page}.htm
-    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1018/{id}.htm
+    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
+    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1018&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1018/{id}.htm
     category: "1018"
     categoryName: 教务
     requiresAuth: true
@@ -20,14 +19,13 @@ sources:
     enabled: true
     sort: 1
 
-  # 科研公告
   - id: gwt-keyan
     name: 科研公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://gwt.sztu.edu.cn
-    listUrlTemplate: https://gwt.sztu.edu.cn/info/1019/list{page}.htm
-    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1019/{id}.htm
+    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
+    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1019&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1019/{id}.htm
     category: "1019"
     categoryName: 科研
     requiresAuth: true
@@ -36,14 +34,13 @@ sources:
     enabled: true
     sort: 2
 
-  # 行政公告
   - id: gwt-xingzheng
     name: 行政公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://gwt.sztu.edu.cn
-    listUrlTemplate: https://gwt.sztu.edu.cn/info/1020/list{page}.htm
-    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1020/{id}.htm
+    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
+    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1020/{id}.htm
     category: "1020"
     categoryName: 行政
     requiresAuth: true
@@ -52,14 +49,13 @@ sources:
     enabled: true
     sort: 3
 
-  # 学工公告
   - id: gwt-xuegong
     name: 学工公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://gwt.sztu.edu.cn
-    listUrlTemplate: https://gwt.sztu.edu.cn/info/1021/list{page}.htm
-    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1021/{id}.htm
+    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
+    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1021/{id}.htm
     category: "1021"
     categoryName: 学工
     requiresAuth: true
@@ -68,14 +64,13 @@ sources:
     enabled: true
     sort: 4
 
-  # 校园公告
   - id: gwt-xiaoyuan
     name: 校园公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://gwt.sztu.edu.cn
-    listUrlTemplate: https://gwt.sztu.edu.cn/info/1022/list{page}.htm
-    detailUrlTemplate: https://gwt.sztu.edu.cn/info/1022/{id}.htm
+    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
+    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1022&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1022/{id}.htm
     category: "1022"
     categoryName: 校园
     requiresAuth: true

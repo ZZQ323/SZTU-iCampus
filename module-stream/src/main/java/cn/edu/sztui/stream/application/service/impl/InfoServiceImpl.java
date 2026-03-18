@@ -3,12 +3,13 @@ package cn.edu.sztui.stream.application.service.impl;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
+import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
 import cn.edu.sztui.stream.application.service.InfoService;
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ContentParserResult;
-import cn.edu.sztui.stream.infrastructure.persistence.entity.ListParserResult;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ParserFactory;
@@ -108,7 +109,7 @@ public class InfoServiceImpl implements InfoService {
         }
 
         InfoListResult result = new InfoListResult();
-        result.setList(list);
+        result.setItems(list);
         result.setLatestId(infoCacheUtil.getLatestId(channelId));
         result.setTotal(total != null ? total : 0L);
         result.setHasMore(list.size() == pageSize);
@@ -151,7 +152,7 @@ public class InfoServiceImpl implements InfoService {
         if (!StringUtils.hasText(categoryCode)) {
             ListParserResult.InfoItemMeta meta = infoCacheUtil.getMeta(channelId, id);
             if (meta != null) {
-                categoryCode = meta.getCategoryCode();
+                categoryCode = meta.getCategory();
             }
         }
 
@@ -189,7 +190,7 @@ public class InfoServiceImpl implements InfoService {
         }
 
         try {
-            SmartSession smartSession = smartHttpClient.newSession(session.getSessionCookies());
+            SmartSession smartSession = smartHttpClient.newSession(SmartCookieConverter.jsonToSmartCookies(session.getCookiesJson()));
 
             // 构建详情 URL
             String url = buildDetailUrl(source, id, categoryCode);
@@ -202,8 +203,8 @@ public class InfoServiceImpl implements InfoService {
             }
 
             // 获取解析器
-            ParserStrategy<ContentParserResult> parser = parserFactory.getContentParser(source.getParserType());
-            ContentParserResult content = parser.parse(response.getBody());
+            ParserStrategy parser = parserFactory.getContentParser(source.getParserType());
+            ContentParserResult content = parser.parseContent(response.getBody(), source, id);
 
             if (content != null) {
                 content.setId(id);

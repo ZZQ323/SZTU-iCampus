@@ -112,12 +112,12 @@ public class AnnouncementListParser {
             String href = categoryElem.attr("href");
             Matcher matcher = CATEGORY_FROM_TREEID_PATTERN.matcher(href);
             if (matcher.find()) {
-                meta.setCategory(matcher.group(1));
+                meta.setCategoryCode(matcher.group(1));
             } else {
                 // 反向查找
                 for (Map.Entry<String, String> entry : CATEGORY_MAP.entrySet()) {
                     if (entry.getValue().equals(categoryName)) {
-                        meta.setCategory(entry.getKey());
+                        meta.setCategoryCode(entry.getKey());
                         break;
                     }
                 }
@@ -144,11 +144,11 @@ public class AnnouncementListParser {
             }
 
             // 如果类别未获取到，从 href 中提取
-            if (meta.getCategory() == null || meta.getCategory().isEmpty()) {
+            if (meta.getCategoryCode() == null || meta.getCategoryCode().isEmpty()) {
                 Matcher catMatcher = CATEGORY_FROM_HREF_PATTERN.matcher(href);
                 if (catMatcher.find()) {
                     String categoryCode = catMatcher.group(1);
-                    meta.setCategory(categoryCode);
+                    meta.setCategoryCode(categoryCode);
                     meta.setCategoryName(CATEGORY_MAP.getOrDefault(categoryCode, "未知"));
                 }
             }

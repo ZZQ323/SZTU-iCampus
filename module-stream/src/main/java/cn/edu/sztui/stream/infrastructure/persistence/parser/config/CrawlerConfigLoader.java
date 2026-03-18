@@ -10,6 +10,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.LoaderOptions;
 
 import jakarta.annotation.PostConstruct;
+
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,19 +24,27 @@ import java.util.stream.Collectors;
 @Component
 public class CrawlerConfigLoader {
 
-    /** 频道配置 Map: channelId -> ChannelConfig */
+    /**
+     * 频道配置 Map: channelId -> ChannelConfig
+     */
     @Getter
     private Map<String, ChannelConfig> channelMap = new HashMap<>();
 
-    /** 数据源配置 Map: sourceId -> SourceConfig */
+    /**
+     * 数据源配置 Map: sourceId -> SourceConfig
+     */
     @Getter
     private Map<String, SourceConfig> sourceMap = new HashMap<>();
 
-    /** 按频道分组的数据源 Map: channelId -> List<SourceConfig> */
+    /**
+     * 按频道分组的数据源 Map: channelId -> List<SourceConfig>
+     */
     @Getter
     private Map<String, List<SourceConfig>> sourcesByChannel = new HashMap<>();
 
-    /** 按解析器类型分组的数据源 Map: parserType -> List<SourceConfig> */
+    /**
+     * 按解析器类型分组的数据源 Map: parserType -> List<SourceConfig>
+     */
     @Getter
     private Map<String, List<SourceConfig>> sourcesByParser = new HashMap<>();
 
@@ -182,5 +191,65 @@ public class CrawlerConfigLoader {
         sourcesByChannel.clear();
         sourcesByParser.clear();
         init();
+    }
+
+    /**
+     * 别名：findChannelById → getChannel
+     */
+    public ChannelConfig findChannelById(String channelId) {
+        return getChannel(channelId);
+    }
+
+    /**
+     * 别名：findSourceById → getSource
+     */
+    public SourceConfig findSourceById(String sourceId) {
+        return getSource(sourceId);
+    }
+
+    /**
+     * 别名：getChannels → getEnabledChannels（InfoController/InfoServiceImpl 调用）
+     */
+    public List<ChannelConfig> getChannels() {
+        return getEnabledChannels();
+    }
+
+    /**
+     * 别名：getSources → getEnabledSources（InfoController 调用）
+     */
+    public List<SourceConfig> getSources() {
+        return getEnabledSources();
+    }
+
+    /**
+     * 获取分类树（InfoController 调用）
+     */
+    public Map<String, Object> getCategoryTree() {
+        Map<String, Object> tree = new HashMap<>();
+        List<Map<String, Object>> channelList = new ArrayList<>();
+
+        for (ChannelConfig channel : getEnabledChannels()) {
+            Map<String, Object> chMap = new HashMap<>();
+            chMap.put("id", channel.getId());
+            chMap.put("name", channel.getName());
+            chMap.put("icon", channel.getIcon());
+
+            // 收集该频道下所有源的分类
+            List<Map<String, String>> categories = new ArrayList<>();
+            List<SourceConfig> sources = getSourcesByChannel(channel.getId());
+            for (SourceConfig source : sources) {
+                if (source.getCategory() != null && source.getCategoryName() != null) {
+                    Map<String, String> cat = new HashMap<>();
+                    cat.put("code", source.getCategory());
+                    cat.put("name", source.getCategoryName());
+                    categories.add(cat);
+                }
+            }
+            chMap.put("categories", categories);
+            channelList.add(chMap);
+        }
+
+        tree.put("channels", channelList);
+        return tree;
     }
 }
