@@ -1,4 +1,9 @@
-package cn.edu.sztui.common.util.smarthttp;
+package cn.edu.sztui.common.util.smarthttp.service;
+
+import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.SmartHttpException;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartRequest;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 
 import java.util.List;
 import java.util.Map;

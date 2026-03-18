@@ -1,6 +1,6 @@
 package cn.edu.sztui.base.infrastructure.persistence.convertor;
 
-import cn.edu.sztui.common.util.smarthttp.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 

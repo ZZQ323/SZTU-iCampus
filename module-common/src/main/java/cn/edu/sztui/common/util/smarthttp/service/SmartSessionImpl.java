@@ -1,5 +1,6 @@
-package cn.edu.sztui.common.util.smarthttp;
+package cn.edu.sztui.common.util.smarthttp.service;
 
+import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;

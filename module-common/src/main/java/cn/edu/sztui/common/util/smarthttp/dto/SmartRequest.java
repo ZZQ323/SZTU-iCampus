@@ -1,4 +1,4 @@
-package cn.edu.sztui.common.util.smarthttp;
+package cn.edu.sztui.common.util.smarthttp.dto;
 
 import lombok.Builder;
 import lombok.Data;

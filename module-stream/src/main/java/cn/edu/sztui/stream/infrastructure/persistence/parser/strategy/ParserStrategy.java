@@ -1,6 +1,6 @@
 package cn.edu.sztui.stream.infrastructure.persistence.parser.strategy;
 
-import cn.edu.sztui.common.util.smarthttp.SmartSession;
+import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig.SourceConfig;
 
 /**

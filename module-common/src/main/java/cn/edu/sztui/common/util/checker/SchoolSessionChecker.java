@@ -1,6 +1,6 @@
 package cn.edu.sztui.common.util.checker;
 
-import cn.edu.sztui.common.util.smarthttp.SmartResponse;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;

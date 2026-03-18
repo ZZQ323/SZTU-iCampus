@@ -1,6 +1,7 @@
 package cn.edu.sztui.common.util.smarthttp;
 
 import cn.edu.sztui.common.cache.dto.CookieDTO;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 
 import java.util.List;
 import java.util.stream.Collectors;

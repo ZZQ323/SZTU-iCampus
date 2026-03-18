@@ -6,7 +6,7 @@ import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
-import cn.edu.sztui.common.util.smarthttp.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

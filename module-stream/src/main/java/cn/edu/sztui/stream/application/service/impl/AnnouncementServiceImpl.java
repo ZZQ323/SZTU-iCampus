@@ -2,10 +2,10 @@ package cn.edu.sztui.stream.application.service.impl;
 
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.common.cache.dto.ProxySession;
-import cn.edu.sztui.common.util.smarthttp.SmartCookie;
-import cn.edu.sztui.common.util.smarthttp.SmartHttpClient;
-import cn.edu.sztui.common.util.smarthttp.SmartResponse;
-import cn.edu.sztui.common.util.smarthttp.SmartSession;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
+import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
 import cn.edu.sztui.stream.application.service.AnnouncementService;
 import cn.edu.sztui.stream.infrastructure.persistence.entity.textDTO.AnnouncementContentVo;
 import cn.edu.sztui.stream.infrastructure.persistence.entity.textDTO.AnnouncementListVo;
