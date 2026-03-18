@@ -106,8 +106,8 @@ public class InfoCacheUtil {
         String timelineKey = generateKey(KEY_PREFIX + channelId + TIMELINE_SUFFIX);
         redisTemplate.opsForZSet().add(timelineKey, meta.getId(), Double.parseDouble(meta.getId()));
 
-        if (StringUtils.hasText(meta.getCategory())) {
-            String categoryKey = generateKey(KEY_PREFIX + channelId + CATEGORY_PREFIX + meta.getCategory());
+        if (StringUtils.hasText(meta.getCategoryCode())) {
+            String categoryKey = generateKey(KEY_PREFIX + channelId + CATEGORY_PREFIX + meta.getCategoryCode());
             redisTemplate.opsForZSet().add(categoryKey, meta.getId(), Double.parseDouble(meta.getId()));
         }
 

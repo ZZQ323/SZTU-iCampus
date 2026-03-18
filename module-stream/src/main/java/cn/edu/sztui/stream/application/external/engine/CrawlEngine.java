@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
  * 通用爬取引擎
  * <p>
  * 所有数据源走同一套管线：读配置 → 构建URL → HTTP → 解析 → 缓存 → 推送
+ * <p>
+ * ⭐ 修复：initSource 中 totalPages null 防御
  */
 @Slf4j
 @Service
@@ -50,9 +52,6 @@ public class CrawlEngine {
     @Resource
     private StreamPublisher streamPublisher;
 
-    /**
-     * 初始化用并发线程池（JDK17 兼容）
-     */
     private final ExecutorService initExecutor = Executors.newFixedThreadPool(10);
 
     // ==================== 增量爬取 ====================
@@ -72,7 +71,6 @@ public class CrawlEngine {
                 return CrawlResult.fail(sourceId, "HTTP 请求失败: " + response.getStatusCode());
             }
 
-            // ★ 传 sourceConfig + page 给解析器
             ListParserResult result = parserFactory.parseList(
                     source.getParserType(), response.getBody(), source, 1);
 
@@ -144,13 +142,15 @@ public class CrawlEngine {
                 return;
             }
 
-            // ★ 传 sourceConfig + page
             ListParserResult firstResult = parserFactory.parseList(
                     source.getParserType(), firstResponse.getBody(), source, 1);
 
-            int totalPage = firstResult != null ? firstResult.getTotalPages() : 0;
+            // ⭐ 修复：null-safe 获取 totalPages，默认为 1
+            int totalPage = (firstResult != null && firstResult.getTotalPages() != null)
+                    ? firstResult.getTotalPages() : 1;
             if (totalPage <= 0) totalPage = 1;
 
+            // crawlPageCount 控制初始化最多爬几页（sources.yml 配置）
             int maxPages = source.getPageCount() > 0 ? source.getPageCount() : totalPage;
             int pagesToCrawl = Math.min(totalPage, maxPages);
             log.info("数据源 {} 总页数: {}, 将爬取: {} 页", sourceId, totalPage, pagesToCrawl);
@@ -172,7 +172,13 @@ public class CrawlEngine {
             infoCacheUtil.saveMetaBatch(channelId, allItems);
 
             String latestId = allItems.stream()
-                    .map(m -> Long.parseLong(m.getId()))
+                    .map(m -> {
+                        try {
+                            return Long.parseLong(m.getId());
+                        } catch (NumberFormatException e) {
+                            return 0L;
+                        }
+                    })
                     .max(Long::compareTo)
                     .map(String::valueOf)
                     .orElse("0");
@@ -203,7 +209,6 @@ public class CrawlEngine {
                 return null;
             }
 
-            // ★ 传 sourceConfig + itemId
             ContentParserResult content = parserFactory.parseContent(
                     source.getParserType(), response.getBody(), source, id);
             if (content != null) {
@@ -240,7 +245,7 @@ public class CrawlEngine {
         return template
                 .replace("{id}", id)
                 .replace("{category}", categoryCode != null ? categoryCode :
-                        (source.getCategory() != null ? source.getCategory() : ""));
+                        (source.getCategoryCode() != null ? source.getCategoryCode() : ""));
     }
 
     private List<ListParserResult.InfoItemMeta> filterNewItems(
@@ -275,7 +280,6 @@ public class CrawlEngine {
                     String url = buildListUrl(source, p);
                     SmartResponse resp = smartHttpClient.get(url, session);
                     if (resp.isSuccess()) {
-                        // ★ 传 sourceConfig + page
                         ListParserResult result = parserFactory.parseList(
                                 source.getParserType(), resp.getBody(), source, p);
                         if (result != null && result.getItems() != null) {

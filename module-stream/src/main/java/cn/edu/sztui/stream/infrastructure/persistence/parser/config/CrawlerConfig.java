@@ -107,12 +107,25 @@ public class CrawlerConfig {
         /**
          * 分类代码（如公文通的 1018/1019 等）
          */
-        private String category;
+        private String categoryCode;
 
         /**
          * 分类名称
          */
         private String categoryName;
+
+        /**
+         * 返回分类映射（兼容 InfoServiceImpl）
+         * <p>
+         * 因为每个 SourceConfig 只有一个 category + categoryName，
+         * 所以返回单条目的 Map。
+         */
+        public Map<String, String> getCategories() {
+            if (categoryCode != null && categoryName != null) {
+                return Map.of(categoryCode, categoryName);
+            }
+            return Map.of();
+        }
 
         /**
          * 是否需要登录态
@@ -174,18 +187,7 @@ public class CrawlerConfig {
             return crawlPageCount != null ? crawlPageCount : 1;
         }
 
-        /**
-         * 返回分类映射（兼容 InfoServiceImpl）
-         * <p>
-         * 因为每个 SourceConfig 只有一个 category + categoryName，
-         * 所以返回单条目的 Map。
-         */
-        public Map<String, String> getCategories() {
-            if (category != null && categoryName != null) {
-                return Map.of(category, categoryName);
-            }
-            return Map.of();
-        }
+
 
         /**
          * 获取详情页 URL 模板（别名）

@@ -11,7 +11,7 @@ sources:
     baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
     listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1018&a1020514p={page}&a1020514c=20
     detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1018/{id}.htm
-    category: "1018"
+    categoryCode: "1018"
     categoryName: 教务
     requiresAuth: true
     crawlIntervalMinutes: 10
@@ -26,7 +26,7 @@ sources:
     baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
     listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1019&a1020514p={page}&a1020514c=20
     detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1019/{id}.htm
-    category: "1019"
+    categoryCode: "1019"
     categoryName: 科研
     requiresAuth: true
     crawlIntervalMinutes: 10
@@ -41,7 +41,7 @@ sources:
     baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
     listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p={page}&a1020514c=20
     detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1020/{id}.htm
-    category: "1020"
+    categoryCode: "1020"
     categoryName: 行政
     requiresAuth: true
     crawlIntervalMinutes: 10
@@ -56,7 +56,7 @@ sources:
     baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
     listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p={page}&a1020514c=20
     detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1021/{id}.htm
-    category: "1021"
+    categoryCode: "1021"
     categoryName: 学工
     requiresAuth: true
     crawlIntervalMinutes: 10
@@ -71,7 +71,7 @@ sources:
     baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
     listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1022&a1020514p={page}&a1020514c=20
     detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1022/{id}.htm
-    category: "1022"
+    categoryCode: "1022"
     categoryName: 校园
     requiresAuth: true
     crawlIntervalMinutes: 10

@@ -23,27 +23,16 @@ import java.util.regex.Pattern;
 /**
  * 深圳技术大学公文通 - 列表解析器
  * <p>
- * 解析 https://gwt.sztu.edu.cn/info/{category}/list{page}.htm 页面
+ * ⭐ 修复：categoryCode 从文章 URL 中提取（info/1020/50838.htm → 1020），
+ *    不再依赖 sourceConfig.getCategoryCode()（在"全部"页面该值不对应具体文章分类）
  */
 @Slf4j
 @Component
 public class SztuGwtListParser implements ParserStrategy {
 
-    /**
-     * 解析器类型标识
-     */
     public static final String TYPE = "sztu-gwt";
 
-    /**
-     * 公文通基础URL
-     */
-    private static final String BASE_URL = "https://gwt.sztu.edu.cn";
-
-    /**
-     * 分类代码 -> 分类名称映射
-     */
     private static final Map<String, String> CATEGORY_MAP = new HashMap<>();
-
     static {
         CATEGORY_MAP.put("1018", "教务");
         CATEGORY_MAP.put("1019", "科研");
@@ -52,31 +41,32 @@ public class SztuGwtListParser implements ParserStrategy {
         CATEGORY_MAP.put("1022", "校园");
     }
 
+    /** 从 URL info/1020/50838.htm 提取 ID */
+    private static final Pattern ID_FROM_URL = Pattern.compile("/(\\d+)\\.htm");
+
+    /** ⭐ 从 URL info/1020/50838.htm 提取 categoryCode */
+    private static final Pattern CATEGORY_FROM_URL = Pattern.compile("info/(\\d+)/\\d+\\.htm");
+
+    /** 从分页链接提取 totalpage */
+    private static final Pattern TOTALPAGE_PARAM = Pattern.compile("totalpage=(\\d+)");
+
+    /** 从文本提取总条数 */
+    private static final Pattern TOTAL_COUNT = Pattern.compile("共(\\d+)条");
+
     @Override
-    public String getType() {
-        return TYPE;
-    }
+    public String getType() { return TYPE; }
 
     @Override
     public ListParserResult parseList(String html, SourceConfig sourceConfig, int page) {
-        if (!StringUtils.hasText(html)) {
-            return ListParserResult.fail("HTML 内容为空");
-        }
+        if (!StringUtils.hasText(html)) return ListParserResult.fail("HTML 内容为空");
 
         try {
             Document doc = Jsoup.parse(html);
+            if (isErrorPage(doc)) return ListParserResult.fail("访问被拒绝或需要登录");
 
-            // 检查是否是错误页面或登录页面
-            if (isErrorPage(doc)) {
-                return ListParserResult.fail("访问被拒绝或需要登录");
-            }
-
-            // 解析列表项
             List<InfoItemMeta> items = new ArrayList<>();
             Elements listItems = doc.select("ul.news-ul > li.clearfix");
-            if (listItems.isEmpty()) {
-                listItems = doc.select("ul.news-list > li.clearfix");
-            }
+            if (listItems.isEmpty()) listItems = doc.select("ul.news-list > li.clearfix");
 
             for (Element item : listItems) {
                 InfoItemMeta meta = parseListItem(item, sourceConfig);
@@ -85,7 +75,6 @@ public class SztuGwtListParser implements ParserStrategy {
                 }
             }
 
-            // 解析总页数
             Integer totalPages = parseTotalPages(doc);
 
             log.debug("解析列表成功 - 数据源: {}, 页码: {}, 条目数: {}, 总页数: {}",
@@ -108,60 +97,63 @@ public class SztuGwtListParser implements ParserStrategy {
 
     @Override
     public ContentParserResult parseContent(String html, SourceConfig sourceConfig, String itemId) {
-        // 列表解析器不实现详情解析
         return ContentParserResult.fail("请使用 SztuGwtContentParser 解析详情");
     }
 
     @Override
     public String buildListUrl(SourceConfig sourceConfig, int page) {
-        String category = sourceConfig.getCategory();
-        if (page == 1) {
-            return BASE_URL + "/info/" + category + "/list.htm";
-        }
-        return BASE_URL + "/info/" + category + "/list" + page + ".htm";
+        String cat = sourceConfig.getCategoryCode();
+        if (page == 1) return sourceConfig.getBaseUrl() + "/info/" + cat + "/list.htm";
+        return sourceConfig.getBaseUrl() + "/info/" + cat + "/list" + page + ".htm";
     }
 
-    /**
-     * 解析单个列表项
-     */
+    // ==================== 列表项解析 ====================
+
     private InfoItemMeta parseListItem(Element item, SourceConfig sourceConfig) {
         try {
-            // 1. 标题和ID（width04）
+            // 1. 标题和链接（width04）
             Element titleLink = item.selectFirst(".width04 a");
             if (titleLink == null) return null;
 
             String title = titleLink.text().trim();
-            String href = titleLink.attr("href");
+            String href = titleLink.attr("href");   // 例：info/1020/50838.htm
             String id = extractIdFromUrl(href);
             if (id == null) return null;
 
-            // 2. 类别（width02）
-            String category = sourceConfig.getCategory();
-            String categoryName = sourceConfig.getCategoryName();
+            // ⭐ 2. categoryCode：从文章 URL 提取（最可靠）
+            //    info/1020/50838.htm → "1020"
+            String categoryCode = extractCategoryFromUrl(href);
+
+            // 3. categoryName：从 .width02 提取，或从 CATEGORY_MAP 查
+            String categoryName = null;
             Element catElem = item.selectFirst(".width02 a");
             if (catElem != null) {
                 categoryName = catElem.text().trim();
+                // 如果 URL 没提取到 categoryCode，从 .width02 的 href 补充
+                if (categoryCode == null) {
+                    Matcher m = Pattern.compile("wbtreeid=(\\d+)").matcher(catElem.attr("href"));
+                    if (m.find()) categoryCode = m.group(1);
+                }
             }
+            // 还是 null，用 sourceConfig 的兜底
+            if (categoryCode == null) categoryCode = sourceConfig.getCategoryCode();
+            if (categoryName == null) categoryName = CATEGORY_MAP.getOrDefault(categoryCode, sourceConfig.getCategoryName());
 
-            // 3. 发文单位（width03）
+            // 4. 发文单位（width03）
             String department = null;
             Element deptElem = item.selectFirst(".width03 a");
-            if (deptElem != null) {
-                department = deptElem.text().trim();
-            }
+            if (deptElem != null) department = deptElem.text().trim();
 
-            // 4. 日期（width06）
+            // 5. 日期（width06）
             String publishDate = null;
             Element dateElem = item.selectFirst(".width06");
-            if (dateElem != null) {
-                publishDate = dateElem.text().trim();
-            }
+            if (dateElem != null) publishDate = dateElem.text().trim();
 
             return InfoItemMeta.builder()
                     .id(id)
                     .url(href)
                     .title(title)
-                    .category(category)
+                    .categoryCode(categoryCode)     // ⭐ 从 URL 提取，不再是 null
                     .categoryName(categoryName)
                     .department(department)
                     .publishDate(publishDate)
@@ -175,104 +167,73 @@ public class SztuGwtListParser implements ParserStrategy {
         }
     }
 
-    /**
-     * 从 URL 中提取 ID
-     */
+    // ==================== URL 提取 ====================
+
     private String extractIdFromUrl(String url) {
-        // 匹配 /info/1018/50731.htm 或 50731.htm
-        Pattern pattern = Pattern.compile("/(\\d+)\\.htm");
-        Matcher matcher = pattern.matcher(url);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
+        Matcher m = ID_FROM_URL.matcher(url);
+        return m.find() ? m.group(1) : null;
     }
 
     /**
-     * 从文本中提取日期
+     * ⭐ 从文章 URL 中提取 categoryCode
+     * <p>
+     * info/1020/50838.htm → "1020"
+     * info/1019/50855.htm → "1019"
      */
-    private String extractDateFromText(String text) {
-        // 匹配 yyyy-MM-dd 或 yyyy/MM/dd 或 yyyy.MM.dd
-        Pattern pattern = Pattern.compile("(\\d{4}[-/.]\\d{1,2}[-/.]\\d{1,2})");
-        Matcher matcher = pattern.matcher(text);
-        if (matcher.find()) {
-            return matcher.group(1).replace("/", "-").replace(".", "-");
-        }
-        return null;
+    private String extractCategoryFromUrl(String url) {
+        if (url == null) return null;
+        Matcher m = CATEGORY_FROM_URL.matcher(url);
+        return m.find() ? m.group(1) : null;
     }
 
-    /**
-     * 解析总页数
-     */
+    // ==================== 分页解析 ====================
+
     private Integer parseTotalPages(Document doc) {
-        // 方法1: 从分页信息文本中提取
-        Element pageInfo = doc.selectFirst(".page-info, .pagination-info, span.pageinfo");
-        if (pageInfo != null) {
-            Pattern pattern = Pattern.compile("共\\s*(\\d+)\\s*页");
-            Matcher matcher = pattern.matcher(pageInfo.text());
-            if (matcher.find()) {
-                return Integer.parseInt(matcher.group(1));
-            }
+        // 方法1：.p_pages 链接中的 totalpage=N
+        for (Element link : doc.select(".p_pages a")) {
+            Matcher m = TOTALPAGE_PARAM.matcher(link.attr("href"));
+            if (m.find()) return Integer.parseInt(m.group(1));
         }
-
-        // 方法2: 从分页链接中提取最大页码
-        Elements pageLinks = doc.select(".pagination a, .page a, .pagelist a");
-        int maxPage = 1;
-        for (Element link : pageLinks) {
-            String href = link.attr("href");
-            Pattern pattern = Pattern.compile("list(\\d+)\\.htm");
-            Matcher matcher = pattern.matcher(href);
-            if (matcher.find()) {
-                int pageNum = Integer.parseInt(matcher.group(1));
-                maxPage = Math.max(maxPage, pageNum);
-            }
+        // 方法1b：任何含 totalpage= 的链接
+        for (Element link : doc.select("a[href*=totalpage]")) {
+            Matcher m = TOTALPAGE_PARAM.matcher(link.attr("href"));
+            if (m.find()) return Integer.parseInt(m.group(1));
         }
-
-        // 方法3: 从 JavaScript 变量中提取
-        Elements scripts = doc.select("script");
-        for (Element script : scripts) {
-            String scriptText = script.html();
-            Pattern pattern = Pattern.compile("totalPage[\\s]*[=:][\\s]*(\\d+)");
-            Matcher matcher = pattern.matcher(scriptText);
-            if (matcher.find()) {
-                return Integer.parseInt(matcher.group(1));
-            }
+        // 方法2：.p_t 中的 "共N条"
+        for (Element elem : doc.select(".p_t")) {
+            Matcher m = TOTAL_COUNT.matcher(elem.text());
+            if (m.find()) return (Integer.parseInt(m.group(1)) + 19) / 20;
         }
-
-        return maxPage > 1 ? maxPage : null;
+        // 方法3：PAGENUM 参数最大值
+        int max = 0;
+        for (Element link : doc.select("a[href*=PAGENUM]")) {
+            Matcher m = Pattern.compile("PAGENUM=(\\d+)").matcher(link.attr("href"));
+            if (m.find()) max = Math.max(max, Integer.parseInt(m.group(1)));
+        }
+        if (max > 1) return max;
+        // 方法4：list{N}.htm
+        for (Element link : doc.select("a[href*=list]")) {
+            Matcher m = Pattern.compile("list(\\d+)\\.htm").matcher(link.attr("href"));
+            if (m.find()) max = Math.max(max, Integer.parseInt(m.group(1)));
+        }
+        if (max > 1) return max;
+        // 方法5：JS 变量
+        for (Element script : doc.select("script")) {
+            Matcher m = Pattern.compile("totalPage[\\s]*[=:][\\s]*(\\d+)").matcher(script.html());
+            if (m.find()) return Integer.parseInt(m.group(1));
+        }
+        return null;
     }
 
-    /**
-     * 检查是否是错误页面
-     */
+    // ==================== 错误检测 ====================
+
     private boolean isErrorPage(Document doc) {
-        String title = doc.title().toLowerCase();
-        String bodyText = doc.body() != null ? doc.body().text().toLowerCase() : "";
-
-        // 检查常见的错误页面特征
-        if (title.contains("error") || title.contains("错误") ||
-                title.contains("404") || title.contains("403")) {
-            return true;
-        }
-
-        // 检查登录页面特征
-        if (title.contains("登录") || title.contains("login") ||
-                bodyText.contains("请登录") || bodyText.contains("please login")) {
-            return true;
-        }
-
-        // 检查 CAS 认证页面
-        if (bodyText.contains("cas") && bodyText.contains("ticket")) {
-            return true;
-        }
-
-        return false;
+        String t = doc.title().toLowerCase();
+        String b = doc.body() != null ? doc.body().text().toLowerCase() : "";
+        return t.contains("error") || t.contains("错误") || t.contains("404") || t.contains("403")
+                || t.contains("登录") || t.contains("login") || b.contains("请登录")
+                || (b.contains("cas") && b.contains("ticket"));
     }
 
-    /**
-     * 获取分类映射
-     */
-    public static Map<String, String> getCategoryMap() {
-        return new HashMap<>(CATEGORY_MAP);
-    }
+    public static Map<String, String> getCategoryMap() { return new HashMap<>(CATEGORY_MAP); }
 }

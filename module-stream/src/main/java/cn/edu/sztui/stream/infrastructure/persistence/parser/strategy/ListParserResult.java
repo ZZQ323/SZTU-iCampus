@@ -63,7 +63,7 @@ public class ListParserResult {
         private String title;
 
         /** 分类代码 */
-        private String category;
+        private String categoryCode;
 
         /** 分类名称 */
         private String categoryName;

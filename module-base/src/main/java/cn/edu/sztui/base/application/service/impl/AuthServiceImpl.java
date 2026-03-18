@@ -249,7 +249,7 @@ public class AuthServiceImpl implements AuthService {
             log.error("❌ ProxySession 为空或无 Cookie! openId={}", wxId);
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
-                    "会话不存在，请先获取短信验证码",
+                    "会话不存在，请先获取token",
                     ResultCodeEnum.BAD_REQUEST.getCode()
             );
         }
@@ -519,7 +519,7 @@ public class AuthServiceImpl implements AuthService {
 
                 // 设置需要重新登录
                 ret.setLogined(false);
-                ret.setLoginTypes(Arrays.asList(LoginType.SMS, LoginType.PASSWORD));
+                // ret.setLoginTypes(Arrays.asList(LoginType.SMS, LoginType.PASSWORD));
                 ret.setSessionInvalid(true);  // ⭐ 标记会话无效
 
                 log.info("错误页面处理完成: logined=false, sessionInvalid=true");

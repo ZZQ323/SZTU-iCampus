@@ -143,6 +143,7 @@ public class InfoController {
     public Result getDetail(
             @Parameter(description = "频道ID", required = true)
             @PathVariable String channelId,
+
             @Parameter(description = "内容ID", required = true)
             @PathVariable String id,
             @Parameter(description = "分类代码")

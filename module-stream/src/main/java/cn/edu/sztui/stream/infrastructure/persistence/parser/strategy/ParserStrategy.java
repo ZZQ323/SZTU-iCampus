@@ -53,7 +53,7 @@ public interface ParserStrategy {
         }
         return template
                 .replace("{page}", String.valueOf(page))
-                .replace("{category}", sourceConfig.getCategory() != null ? sourceConfig.getCategory() : "");
+                .replace("{category}", sourceConfig.getCategoryCode() != null ? sourceConfig.getCategoryCode() : "");
     }
 
     /**
@@ -72,7 +72,7 @@ public interface ParserStrategy {
         if (template != null) {
             return template
                     .replace("{id}", itemId)
-                    .replace("{category}", sourceConfig.getCategory() != null ? sourceConfig.getCategory() : "");
+                    .replace("{category}", sourceConfig.getCategoryCode() != null ? sourceConfig.getCategoryCode() : "");
         }
         // 如果没有模板，尝试拼接
         String baseUrl = sourceConfig.getBaseUrl();

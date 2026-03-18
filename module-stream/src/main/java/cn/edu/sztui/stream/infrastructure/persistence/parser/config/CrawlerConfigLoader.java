@@ -238,9 +238,9 @@ public class CrawlerConfigLoader {
             List<Map<String, String>> categories = new ArrayList<>();
             List<SourceConfig> sources = getSourcesByChannel(channel.getId());
             for (SourceConfig source : sources) {
-                if (source.getCategory() != null && source.getCategoryName() != null) {
+                if (source.getCategoryCode() != null && source.getCategoryName() != null) {
                     Map<String, String> cat = new HashMap<>();
-                    cat.put("code", source.getCategory());
+                    cat.put("code", source.getCategoryCode());
                     cat.put("name", source.getCategoryName());
                     categories.add(cat);
                 }
