@@ -26,7 +26,12 @@ import java.util.stream.Collectors;
 /**
  * 通用爬取引擎
  * <p>
- * ⭐ 本次改动：buildListUrl() 增加 listUrl 支持（CMS 页面用固定 URL + 路径分页）
+ * ⭐ 本次改动：两阶段初始化
+ * 阶段 1（同步）：爬第 1 页，立即存 Redis + 标记 initialized → 用户 0 等待
+ * 阶段 2（异步）：后台爬剩余页，逐批追加到 Redis → 无感补全历史数据
+ * <p>
+ * 爬取上限：默认最多 10 页（约 200 条），避免对学校服务器造成压力。
+ * 可通过 sources.yml 的 crawlPageCount 覆盖。
  */
 @Slf4j
 @Service
@@ -50,7 +55,20 @@ public class CrawlEngine {
     @Resource
     private StreamPublisher streamPublisher;
 
-    private final ExecutorService initExecutor = Executors.newFixedThreadPool(10);
+    /**
+     * 后台初始化线程池（阶段 2 用）
+     */
+    private final ExecutorService initExecutor = Executors.newFixedThreadPool(30);
+
+    /**
+     * 多页并发爬取线程池
+     */
+    private final ExecutorService pageExecutor = Executors.newFixedThreadPool(10);
+
+    /**
+     * 默认最大爬取页数（无 crawlPageCount 配置时的上限）
+     */
+    // private static final int DEFAULT_MAX_PAGES = 10;
 
     // ==================== 增量爬取 ====================
 
@@ -87,12 +105,7 @@ public class CrawlEngine {
 
             infoCacheUtil.saveMetaBatch(channelId, newItems);
 
-            String newLatestId = newItems.stream()
-                    .map(ListParserResult.InfoItemMeta::getId)
-                    .map(Long::parseLong)
-                    .max(Long::compareTo)
-                    .map(String::valueOf)
-                    .orElse(cachedLatestId);
+            String newLatestId = computeLatestId(newItems, cachedLatestId);
             infoCacheUtil.setLatestId(channelId, newLatestId);
             infoCacheUtil.updateLastCrawlTime(sourceId);
 
@@ -111,7 +124,7 @@ public class CrawlEngine {
         }
     }
 
-    // ==================== 全量初始化 ====================
+    // ==================== ⭐ 两阶段初始化 ====================
 
     public void initSource(String sourceId, String openId) {
         CrawlerConfig.SourceConfig source = configLoader.getSource(sourceId);
@@ -123,7 +136,7 @@ public class CrawlEngine {
         String channelId = source.getChannelId();
 
         if (infoCacheUtil.isSourceInitialized(sourceId)) {
-            log.info("数据源已初始化，跳过: {}", sourceId);
+            log.debug("数据源已初始化，跳过: {}", sourceId);
             return;
         }
 
@@ -132,6 +145,8 @@ public class CrawlEngine {
 
         try {
             SmartSession session = resolveSession(source);
+
+            // ==================== 阶段 1：同步爬第 1 页 ====================
 
             String firstPageUrl = buildListUrl(source, 1);
             SmartResponse firstResponse = smartHttpClient.get(firstPageUrl, session);
@@ -143,46 +158,69 @@ public class CrawlEngine {
             ListParserResult firstResult = parserFactory.parseList(
                     source.getParserType(), firstResponse.getBody(), source, 1);
 
-            int totalPage = (firstResult != null && firstResult.getTotalPages() != null)
-                    ? firstResult.getTotalPages() : 1;
-            if (totalPage <= 0) totalPage = 1;
-
-            int maxPages = source.getPageCount() > 0 ? source.getPageCount() : totalPage;
-            int pagesToCrawl = Math.min(totalPage, maxPages);
-            log.info("数据源 {} 总页数: {}, 将爬取: {} 页", sourceId, totalPage, pagesToCrawl);
-
-            List<ListParserResult.InfoItemMeta> allItems = new ArrayList<>();
-            if (firstResult != null && firstResult.getItems() != null) {
-                allItems.addAll(firstResult.getItems());
-            }
-
-            if (pagesToCrawl > 1) {
-                allItems.addAll(crawlPages(source, session, 2, pagesToCrawl));
-            }
-
-            if (allItems.isEmpty()) {
+            if (firstResult == null || firstResult.getItems() == null || firstResult.getItems().isEmpty()) {
                 log.warn("初始化无结果: {}", sourceId);
+                // 即使无结果也标记已初始化，避免反复重试
+                infoCacheUtil.markSourceInitialized(sourceId);
                 return;
             }
 
-            infoCacheUtil.saveMetaBatch(channelId, allItems);
+            // 保存第 1 页数据
+            List<ListParserResult.InfoItemMeta> firstPageItems = firstResult.getItems();
+            infoCacheUtil.saveMetaBatch(channelId, firstPageItems);
 
-            String latestId = allItems.stream()
-                    .map(m -> {
-                        try {
-                            return Long.parseLong(m.getId());
-                        } catch (NumberFormatException e) {
-                            return 0L;
-                        }
-                    })
-                    .max(Long::compareTo)
-                    .map(String::valueOf)
-                    .orElse("0");
+            String latestId = computeLatestId(firstPageItems, "0");
             infoCacheUtil.setLatestId(channelId, latestId);
+
+            // ⭐ 立即标记为 initialized → 用户马上能看到第 1 页数据
             infoCacheUtil.markSourceInitialized(sourceId);
 
-            long duration = (System.currentTimeMillis() - startTime) / 1000;
-            log.info("======== 初始化完成: {} - {} 条, 耗时 {}s ========", sourceId, allItems.size(), duration);
+            long phase1Ms = System.currentTimeMillis() - startTime;
+            log.info("阶段1完成: {} - {} 条, {}ms（用户可见）", sourceId, firstPageItems.size(), phase1Ms);
+
+            // ==================== 阶段 2：异步爬剩余页 ====================
+
+            int totalPagetmp = (firstResult.getTotalPages() != null) ? firstResult.getTotalPages() : 1;
+            if (totalPagetmp <= 0) totalPagetmp = 1;
+            final int totalPage = totalPagetmp;
+            // 计算要爬的总页数
+            int maxPages = resolveMaxPages(source, totalPage);
+
+            if (maxPages > 1) {
+                final int pagesToCrawl = maxPages;
+                final String finalLatestId = latestId;
+
+                initExecutor.submit(() -> {
+                    try {
+                        log.info("阶段2开始: {} - 后台爬取第 2~{} 页（共 {} 页可用）",
+                                sourceId, pagesToCrawl, totalPage);
+
+                        List<ListParserResult.InfoItemMeta> remaining =
+                                crawlPagesInBatches(source, session, 2, pagesToCrawl);
+
+                        if (!remaining.isEmpty()) {
+                            infoCacheUtil.saveMetaBatch(channelId, remaining);
+
+                            // 更新 latestId（可能有更大的 ID）
+                            String newLatest = computeLatestId(remaining, finalLatestId);
+                            infoCacheUtil.setLatestId(channelId, newLatest);
+
+                            long totalMs = System.currentTimeMillis() - startTime;
+                            log.info("阶段2完成: {} - 追加 {} 条, 总耗时 {}s",
+                                    sourceId, remaining.size(), totalMs / 1000);
+                        } else {
+                            log.info("阶段2完成: {} - 无追加数据", sourceId);
+                        }
+
+                    } catch (Exception e) {
+                        log.warn("阶段2失败（不影响已有数据）: source={}, error={}",
+                                sourceId, e.getMessage());
+                    }
+                });
+            } else {
+                log.info("======== 初始化完成: {} - {} 条, {}ms（单页） ========",
+                        sourceId, firstPageItems.size(), phase1Ms);
+            }
 
         } catch (Exception e) {
             log.error("初始化失败: source={}, error={}", sourceId, e.getMessage(), e);
@@ -230,35 +268,21 @@ public class CrawlEngine {
     /**
      * 构建列表页 URL
      * <p>
-     * ⭐ 支持两种模式：
-     * <p>
-     * 模式 1（listUrl）：CMS 页面的固定 URL + 路径分页
-     * 第1页：https://www.sztu.edu.cn/hljd/xyhd/wyhd.htm（原始 URL）
-     * 第2页：https://www.sztu.edu.cn/hljd/xyhd/wyhd/2.htm
-     * 第3页：https://www.sztu.edu.cn/hljd/xyhd/wyhd/3.htm
-     * （博达 CMS 标准分页格式：去掉 .htm 后缀，加 /{page}.htm）
-     * <p>
-     * 模式 2（listUrlTemplate）：公文通 list.jsp 的模板 URL
-     * https://xxx/list.jsp?wbtreeid=1018&a1020514p={page}&a1020514c=20
+     * 模式 1（listUrl）：CMS 固定 URL + 路径分页
+     * 模式 2（listUrlTemplate）：公文通模板 URL
      */
     private String buildListUrl(CrawlerConfig.SourceConfig source, int page) {
-        // ⭐ 模式 1：固定 URL（CMS 页面）
+        // 模式 1：固定 URL
         String listUrl = source.getListUrl();
         if (StringUtils.hasText(listUrl)) {
-            if (page == 1) {
-                return listUrl;
-            }
-            // 博达 CMS 分页规则：
-            //   wyhd.htm（第1页）→ wyhd/2.htm（第2页）→ wyhd/3.htm（第3页）
-            //   sshd.htm（第1页）→ sshd/8.htm（第2页，降序页码）
-            // 统一处理：去掉 .htm → 加 /{page}.htm
+            if (page == 1) return listUrl;
             if (listUrl.endsWith(".htm")) {
                 return listUrl.substring(0, listUrl.length() - 4) + "/" + page + ".htm";
             }
             return listUrl + "/" + page;
         }
 
-        // 模式 2：模板 URL（公文通 list.jsp）
+        // 模式 2：模板 URL
         String template = source.getListUrlTemplate();
         if (template == null) return null;
         return template
@@ -275,6 +299,85 @@ public class CrawlEngine {
                         (source.getCategoryCode() != null ? source.getCategoryCode() : ""));
     }
 
+    /**
+     * 计算最大爬取页数
+     * <p>
+     * 优先级：crawlPageCount（YAML 配置）> DEFAULT_MAX_PAGES（10）> totalPage
+     */
+    private int resolveMaxPages(CrawlerConfig.SourceConfig source, int totalPage) {
+        Integer configured = source.getCrawlPageCount();
+        if (configured != null && configured > 0) {
+            // YAML 显式配置了页数
+            return Math.min(configured, totalPage);
+        }
+        // 未配置：用默认上限（10 页 ≈ 200 条）
+//        return Math.min(DEFAULT_MAX_PAGES, totalPage);
+        return totalPage;
+    }
+
+    /**
+     * 分批爬取多页（阶段 2 用）
+     * <p>
+     * 每 3 页一批并发，批间间隔 500ms，避免对学校服务器造成压力。
+     */
+    private List<ListParserResult.InfoItemMeta> crawlPagesInBatches(
+            CrawlerConfig.SourceConfig source, SmartSession session, int startPage, int endPage) {
+
+        List<ListParserResult.InfoItemMeta> allItems = new CopyOnWriteArrayList<>();
+        int batchSize = 3; // 每批并发 3 页
+
+        for (int batchStart = startPage; batchStart <= endPage; batchStart += batchSize) {
+            int batchEnd = Math.min(batchStart + batchSize - 1, endPage);
+            List<Future<?>> futures = new ArrayList<>();
+
+            for (int page = batchStart; page <= batchEnd; page++) {
+                final int p = page;
+                futures.add(pageExecutor.submit(() -> {
+                    try {
+                        String url = buildListUrl(source, p);
+                        SmartResponse resp = smartHttpClient.get(url, session);
+                        if (resp.isSuccess()) {
+                            ListParserResult result = parserFactory.parseList(
+                                    source.getParserType(), resp.getBody(), source, p);
+                            if (result != null && result.getItems() != null) {
+                                allItems.addAll(result.getItems());
+                                log.debug("后台爬取第 {} 页: source={}, items={}",
+                                        p, source.getId(), result.getItems().size());
+                            }
+                        } else {
+                            log.warn("后台爬取第 {} 页失败: source={}, status={}",
+                                    p, source.getId(), resp.getStatusCode());
+                        }
+                    } catch (Exception e) {
+                        log.warn("后台爬取第 {} 页异常: source={}, error={}",
+                                p, source.getId(), e.getMessage());
+                    }
+                }));
+            }
+
+            // 等待当前批次完成
+            for (Future<?> f : futures) {
+                try {
+                    f.get(30, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    log.warn("等待爬取结果超时");
+                }
+            }
+
+            // 批间间隔，对学校服务器友好
+            if (batchEnd < endPage) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+
+        return allItems;
+    }
+
     private List<ListParserResult.InfoItemMeta> filterNewItems(
             List<ListParserResult.InfoItemMeta> items, String cachedLatestId) {
 
@@ -282,52 +385,46 @@ public class CrawlEngine {
             return items;
         }
 
-        long threshold = Long.parseLong(cachedLatestId);
+        long threshold;
+        try {
+            threshold = Long.parseLong(cachedLatestId);
+        } catch (NumberFormatException e) {
+            // 非数字 ID（如 wx_xxx），无法比较，返回全部
+            return items;
+        }
+
         return items.stream()
                 .filter(item -> {
                     try {
                         return Long.parseLong(item.getId()) > threshold;
                     } catch (NumberFormatException e) {
-                        return false;
+                        // 非数字 ID 的条目始终视为"新"
+                        return true;
                     }
                 })
                 .collect(Collectors.toList());
     }
 
-    private List<ListParserResult.InfoItemMeta> crawlPages(
-            CrawlerConfig.SourceConfig source, SmartSession session, int startPage, int endPage) {
-
-        List<ListParserResult.InfoItemMeta> allItems = new CopyOnWriteArrayList<>();
-        List<Future<?>> futures = new ArrayList<>();
-
-        for (int page = startPage; page <= endPage; page++) {
-            final int p = page;
-            futures.add(initExecutor.submit(() -> {
-                try {
-                    String url = buildListUrl(source, p);
-                    SmartResponse resp = smartHttpClient.get(url, session);
-                    if (resp.isSuccess()) {
-                        ListParserResult result = parserFactory.parseList(
-                                source.getParserType(), resp.getBody(), source, p);
-                        if (result != null && result.getItems() != null) {
-                            allItems.addAll(result.getItems());
-                        }
-                    }
-                } catch (Exception e) {
-                    log.warn("爬取第 {} 页失败: source={}, error={}", p, source.getId(), e.getMessage());
-                }
-            }));
+    /**
+     * 从条目列表中计算最大 ID
+     */
+    private String computeLatestId(List<ListParserResult.InfoItemMeta> items, String currentLatest) {
+        long max = 0;
+        try {
+            max = Long.parseLong(currentLatest);
+        } catch (NumberFormatException ignored) {
         }
 
-        for (Future<?> f : futures) {
+        for (ListParserResult.InfoItemMeta item : items) {
             try {
-                f.get(30, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                log.warn("等待爬取结果超时");
+                long id = Long.parseLong(item.getId());
+                if (id > max) max = id;
+            } catch (NumberFormatException ignored) {
+                // wx_xxx / ext_xxx 类型的 ID 跳过
             }
         }
 
-        return allItems;
+        return String.valueOf(max);
     }
 
     private void broadcastNewContent(String channelId, List<ListParserResult.InfoItemMeta> newItems, String latestId) {
