@@ -5,41 +5,25 @@ import org.springframework.util.StringUtils;
 /**
  * 文章 URL 解析器
  * <p>
- * 统一处理学校网站三种 URL 形式：
- * <ul>
- *   <li>绝对路径：https://tusports.sztu.edu.cn/info/1015/1914.htm</li>
- *   <li>相对路径：../../info/1040/4091.htm</li>
- *   <li>外链：微信公众号、bysjy.com.cn 等</li>
- * </ul>
+ * ⭐ 更新：放宽外链检测，支持政府/媒体外链（就业网场景）
  */
 public final class ArticleUrlResolver {
 
     private ArticleUrlResolver() {
     }
 
-    /**
-     * 外链前缀标记
-     */
     public static final String EXTERNAL_PREFIX = "EXTERNAL:";
 
     /**
-     * 将 href 解析为完整的绝对 URL
-     *
-     * @param href    原始链接（从 HTML 中提取）
-     * @param baseUrl 当前源的 baseUrl（如 https://jw.sztu.edu.cn）
-     * @return 绝对 URL，外链以 "EXTERNAL:" 前缀标记
+     * 将 href 解析为绝对 URL，外链加 EXTERNAL: 前缀
      */
     public static String resolve(String href, String baseUrl) {
         if (!StringUtils.hasText(href)) return null;
-
         href = href.trim();
 
-        // 1. 已经是绝对路径
+        // 1. 绝对路径
         if (href.startsWith("http://") || href.startsWith("https://")) {
-            if (isExternalLink(href)) {
-                return EXTERNAL_PREFIX + href;
-            }
-            return href;
+            return isExternalLink(href) ? EXTERNAL_PREFIX + href : href;
         }
 
         // 2. 协议相对
@@ -48,7 +32,7 @@ public final class ArticleUrlResolver {
             return isExternalLink(full) ? EXTERNAL_PREFIX + full : full;
         }
 
-        // 3. 相对路径 ../../info/1040/4091.htm → /info/1040/4091.htm
+        // 3. ../xxx → 去掉 ../ 拼 baseUrl
         if (href.startsWith("../")) {
             String cleaned = href;
             while (cleaned.startsWith("../")) {
@@ -57,17 +41,17 @@ public final class ArticleUrlResolver {
             return baseUrl + "/" + cleaned;
         }
 
-        // 4. 绝对路径 /info/xxx
+        // 4. /xxx → baseUrl + /xxx
         if (href.startsWith("/")) {
             return baseUrl + href;
         }
 
-        // 5. 裸相对路径 info/xxx
+        // 5. 裸相对路径
         return baseUrl + "/" + href;
     }
 
     /**
-     * 判断是否为外部链接
+     * 判断是否为外部链接（非 sztu.edu.cn）
      */
     public static boolean isExternalLink(String url) {
         if (url == null) return false;
@@ -75,50 +59,40 @@ public final class ArticleUrlResolver {
         if (url.contains("mp.weixin.qq.com")) return true;
         // 就业平台
         if (url.contains("bysjy.com.cn")) return true;
-        // 非 sztu 域名
+        // 非 sztu 域名 → 外链
         if (!url.contains("sztu.edu.cn")) return true;
         return false;
     }
 
     /**
-     * 从标准 URL 中提取 ID
-     * <p>
-     * 支持格式：/info/{category}/{id}.htm
+     * 从 URL 提取 ID（info/{cat}/{id}.htm → id）
      */
     public static String extractId(String url) {
-        if (url == null) return null;
-        // 去掉外链前缀
-        if (url.startsWith(EXTERNAL_PREFIX)) return null;
-
-        // 匹配 /info/xxxx/1234.htm 或 /1234.htm
+        if (url == null || url.startsWith(EXTERNAL_PREFIX)) return null;
         int lastSlash = url.lastIndexOf('/');
         if (lastSlash < 0) return null;
-
         String filename = url.substring(lastSlash + 1);
         int dotPos = filename.lastIndexOf('.');
-        if (dotPos > 0) {
-            return filename.substring(0, dotPos);
-        }
+        if (dotPos > 0) return filename.substring(0, dotPos);
         return filename;
     }
 
     /**
-     * 从标准 URL 中提取 category
-     * <p>
-     * /info/1018/4567.htm → "1018"
+     * 从 URL 提取 categoryCode（info/{cat}/{id}.htm → cat）
      */
     public static String extractCategory(String url) {
-        if (url == null) return null;
-        if (url.startsWith(EXTERNAL_PREFIX)) return null;
-
+        if (url == null || url.startsWith(EXTERNAL_PREFIX)) return null;
         int infoIdx = url.indexOf("/info/");
-        if (infoIdx < 0) return null;
-
-        String after = url.substring(infoIdx + 6); // 去掉 "/info/"
-        int slash = after.indexOf('/');
-        if (slash > 0) {
-            return after.substring(0, slash);
+        if (infoIdx < 0) {
+            // 也匹配相对路径 info/1020/xxx.htm
+            infoIdx = url.indexOf("info/");
+            if (infoIdx < 0) return null;
+            String after = url.substring(infoIdx + 5);
+            int slash = after.indexOf('/');
+            return slash > 0 ? after.substring(0, slash) : null;
         }
-        return null;
+        String after = url.substring(infoIdx + 6);
+        int slash = after.indexOf('/');
+        return slash > 0 ? after.substring(0, slash) : null;
     }
 }

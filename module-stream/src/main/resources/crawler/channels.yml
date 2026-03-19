@@ -2,7 +2,9 @@
 # 每个频道可以包含多个数据源
 
 channels:
-  # 校园公告频道
+  # ==================== 第一梯队：与学生日常强相关（默认订阅） ====================
+
+  # 校园公告频道（公文通，需要登录）
   - id: announcement
     name: 校园公告
     description: 学校公文通公告信息
@@ -16,34 +18,72 @@ channels:
       - gwt-xuegong
       - gwt-xiaoyuan
 
-  # 图书馆频道（预留）
+  # 教务信息频道（教务部公开站点）
+  - id: academic
+    name: 教务信息
+    description: 教学动态、信息公告、规章制度
+    icon: book
+    sort: 2
+    enabled: true
+    sources:
+      - jw-jdt
+      - jw-xxg
+
+  # 校园生活频道（官网活动）
+  - id: campus-life
+    name: 校园生活
+    description: 文娱活动、体育活动
+    icon: heart
+    sort: 3
+    enabled: true
+    sources:
+      - www-wyhd
+      - www-tyhd
+      # www-jdfg 技大风光暂关（纯图片画廊）
+
+  # 学校新闻频道
+  - id: news
+    name: 学校新闻
+    description: 校园新闻、国际交流、学生境外交流
+    icon: newspaper
+    sort: 4
+    enabled: true
+    sources:
+      - www-xyxw        # ⭐ 新增：校园新闻（1003）
+      - www-gjjl        # 国际交流（1031）
+      - www-xsjwjl      # ⭐ 新增：学生境外交流（1032）
+      # www-mtjj 媒体聚焦暂关（100% 外链）
+
+  # ==================== 第二梯队：按需浏览（预留） ====================
+
+  # 就业信息频道
+  - id: job
+    name: 就业信息
+    description: 就业指导中心通知、工作动态
+    icon: briefcase
+    sort: 10
+    enabled: false
+    sources:
+      - jyzd-tzgg
+      - jyzd-gzdt
+
+  # 招生信息频道
+  - id: admission
+    name: 招生信息
+    description: 招生动态、招生政策
+    icon: user-add
+    sort: 11
+    enabled: false
+    sources:
+      - zs-zsdt
+
+  # 图书馆频道
   - id: library
     name: 图书馆
     description: 图书馆新书推荐、讲座、通知
-    icon: book
-    sort: 2
+    icon: browse
+    sort: 12
     enabled: false
     sources:
       - lib-news
       - lib-notice
-
-  # 招聘信息频道（预留）
-  - id: job
-    name: 招聘信息
-    description: 校园招聘、实习信息
-    icon: briefcase
-    sort: 3
-    enabled: false
-    sources:
-      - job-campus
-      - job-intern
-
-  # 学术讲座频道（预留）
-  - id: lecture
-    name: 学术讲座
-    description: 学术报告、讲座预告
-    icon: microphone
-    sort: 4
-    enabled: false
-    sources:
-      - lecture-academic

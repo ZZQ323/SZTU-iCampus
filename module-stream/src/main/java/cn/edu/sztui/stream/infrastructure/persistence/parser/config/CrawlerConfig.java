@@ -8,104 +8,50 @@ import java.util.Map;
 /**
  * 爬虫配置 POJO
  * <p>
- * 从 YAML 文件加载的配置结构
+ * ⭐ 新增 listUrl 字段：CMS 页面用固定 URL（如 jdt.htm），不用 listUrlTemplate
  */
 public class CrawlerConfig {
 
-    /**
-     * 频道配置
-     * <p>
-     * 对应 channels.yml
-     */
     @Data
     public static class ChannelConfig {
-        /**
-         * 频道ID，如 "announcement", "library", "job"
-         */
         private String id;
-
-        /**
-         * 频道名称，如 "校园公告", "图书馆", "招聘信息"
-         */
         private String name;
-
-        /**
-         * 频道描述
-         */
         private String description;
-
-        /**
-         * 频道图标
-         */
         private String icon;
-
-        /**
-         * 排序权重
-         */
         private Integer sort;
-
-        /**
-         * 是否启用
-         */
         private Boolean enabled;
-
-        /**
-         * 关联的数据源ID列表
-         */
         private List<String> sources;
 
-        /**
-         * 别名：getSourceIds → getSources（InfoServiceImpl 调用）
-         */
         public List<String> getSourceIds() {
             return sources;
         }
     }
 
-    /**
-     * 数据源配置
-     * <p>
-     * 对应 sources.yml
-     */
     @Data
     public static class SourceConfig {
-        /**
-         * 数据源ID，全局唯一，如 "gwt-jiaowu", "gwt-keyan"
-         */
         private String id;
-
-        /**
-         * 数据源名称，如 "教务公告", "科研公告"
-         */
         private String name;
-
-        /**
-         * 所属频道ID
-         */
         private String channelId;
-
-        /**
-         * 解析器类型，对应 ParserStrategy.getType()
-         */
         private String parserType;
-
-        /**
-         * 基础URL
-         */
         private String baseUrl;
 
         /**
-         * 列表页URL模板，支持 {page}, {category} 占位符
+         * 列表页 URL 模板（公文通 list.jsp 用，含 {page} 占位符）
          */
         private String listUrlTemplate;
 
         /**
-         * 详情页URL模板，支持 {id}, {category} 占位符
+         * ⭐ 新增：列表页固定 URL（CMS 页面用，分页靠 list2.htm / list3.htm 后缀）
+         */
+        private String listUrl;
+
+        /**
+         * 详情页 URL 模板
          */
         private String detailUrlTemplate;
 
         /**
-         * 分类代码（如公文通的 1018/1019 等）
+         * 分类代码
          */
         private String categoryCode;
 
@@ -114,42 +60,10 @@ public class CrawlerConfig {
          */
         private String categoryName;
 
-        /**
-         * 返回分类映射（兼容 InfoServiceImpl）
-         * <p>
-         * 因为每个 SourceConfig 只有一个 category + categoryName，
-         * 所以返回单条目的 Map。
-         */
-        public Map<String, String> getCategories() {
-            if (categoryCode != null && categoryName != null) {
-                return Map.of(categoryCode, categoryName);
-            }
-            return Map.of();
-        }
-
-        /**
-         * 是否需要登录态
-         */
         private boolean requiresAuth;
-
-        /**
-         * 爬取间隔（分钟）
-         */
         private Integer crawlIntervalMinutes;
-
-        /**
-         * 每次爬取的页数
-         */
         private Integer crawlPageCount;
-
-        /**
-         * 是否启用
-         */
         private boolean enabled;
-
-        /**
-         * 排序权重
-         */
         private Integer sort;
 
         /**
@@ -159,56 +73,45 @@ public class CrawlerConfig {
 
         // ==================== 便捷方法 ====================
 
-        /**
-         * 是否需要认证
-         */
         public boolean isRequiresAuth() {
             return requiresAuth;
         }
 
-        /**
-         * 是否启用
-         */
         public boolean isEnabled() {
             return enabled;
         }
 
-        /**
-         * 获取爬取间隔（默认10分钟）
-         */
         public int getCrawlInterval() {
             return crawlIntervalMinutes != null ? crawlIntervalMinutes : 10;
         }
 
-        /**
-         * 获取每次爬取页数（默认1页）
-         */
         public int getPageCount() {
             return crawlPageCount != null ? crawlPageCount : 1;
         }
 
-
+        /**
+         * 返回分类映射（兼容 InfoServiceImpl）
+         */
+        public Map<String, String> getCategories() {
+            if (categoryCode != null && categoryName != null) {
+                return Map.of(categoryCode, categoryName);
+            }
+            return Map.of();
+        }
 
         /**
          * 获取详情页 URL 模板（别名）
-         * InfoServiceImpl 调用 getDetailUrl()
          */
         public String getDetailUrl() {
             return detailUrlTemplate;
         }
     }
 
-    /**
-     * 频道列表配置文件根节点
-     */
     @Data
     public static class ChannelsRoot {
         private List<ChannelConfig> channels;
     }
 
-    /**
-     * 数据源列表配置文件根节点
-     */
     @Data
     public static class SourcesRoot {
         private List<SourceConfig> sources;

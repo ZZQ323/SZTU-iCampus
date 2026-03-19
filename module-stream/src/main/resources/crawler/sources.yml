@@ -1,8 +1,12 @@
 # 数据源配置
 # 每个数据源对应一个可爬取的网站/页面
-
+# 调整 crawlPageCount 来调整初始的爬取数值
 sources:
-  # ==================== 公文通数据源（WebVPN） ====================
+  # ========================================================================
+  #  公文通（WebVPN，需要登录）
+  #  parserType: sztu-gwt
+  #  列表格式：list.jsp?wbtreeid=XXXX 表格式
+  # ========================================================================
 
   - id: gwt-jiaowu
     name: 教务公告
@@ -15,7 +19,7 @@ sources:
     categoryName: 教务
     requiresAuth: true
     crawlIntervalMinutes: 10
-    crawlPageCount: 1
+    # crawlPageCount: 1
     enabled: true
     sort: 1
 
@@ -79,54 +83,217 @@ sources:
     enabled: true
     sort: 5
 
-  # ==================== 图书馆数据源（预留） ====================
+  # ========================================================================
+  #  学校官网（www.sztu.edu.cn，公开，不需要登录）
+  #  parserType: sztu-cms（待实现）
+  #  列表格式：卡片式 li[id^=line_] 或 li > a
+  # ========================================================================
+  # ---------- 活力技大 ----------
 
-  - id: lib-news
-    name: 图书馆新闻
-    channelId: library
-    parserType: sztu-library
-    baseUrl: https://lib.sztu.edu.cn
-    listUrlTemplate: https://lib.sztu.edu.cn/news/list{page}.htm
-    detailUrlTemplate: https://lib.sztu.edu.cn/news/{id}.htm
+  - id: www-wyhd
+    name: 文娱活动
+    channelId: campus-life
+    parserType: sztu-cms
+    baseUrl: https://www.sztu.edu.cn
+    listUrl: https://www.sztu.edu.cn/hljd/xyhd/wyhd.htm
+    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1040"
+    categoryName: 文娱活动
     requiresAuth: false
-    crawlIntervalMinutes: 30
-    enabled: false
+    crawlIntervalMinutes: 60
+    # crawlPageCount: 1
+    enabled: true
     sort: 1
 
-  - id: lib-notice
-    name: 图书馆通知
-    channelId: library
-    parserType: sztu-library
-    baseUrl: https://lib.sztu.edu.cn
-    listUrlTemplate: https://lib.sztu.edu.cn/notice/list{page}.htm
-    detailUrlTemplate: https://lib.sztu.edu.cn/notice/{id}.htm
+  - id: www-tyhd
+    name: 体育活动
+    channelId: campus-life
+    parserType: sztu-cms
+    baseUrl: https://www.sztu.edu.cn
+    listUrl: https://www.sztu.edu.cn/hljd/xyhd/tyhd.htm
+    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1041"
+    categoryName: 体育活动
+    # 未来哪天其他catagory不404了，我就去看看
+    # 不设 categoryCode — 本页混合了 1041/1088/1087/1067/1015 五个分类
+    #   且部分文章指向 tusports.sztu.edu.cn（跨域绝对URL）
+    #   SztuCmsListParser 从每篇文章的 href 中提取真实分类
     requiresAuth: false
-    crawlIntervalMinutes: 30
+    crawlIntervalMinutes: 60
+    # crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  - id: www-jdfg
+    name: 技大风光
+    channelId: campus-life
+    parserType: sztu-cms
+    baseUrl: https://www.sztu.edu.cn
+    listUrl: https://www.sztu.edu.cn/hljd/jdfg.htm
+    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1037"
+    categoryName: 技大风光
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    # ⚠️ 纯图片画廊，文章标题 display:none，爬取价值不大，先关闭
+    enabled: false
+    sort: 3
+
+  # ---------- 媒体焦点 ----------
+
+  - id: www-xyxw
+    name: 校园新闻
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: https://www.sztu.edu.cn
+    listUrl: https://www.sztu.edu.cn/jdjd/xyxw.htm
+    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1003"
+    categoryName: 校园新闻
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    # crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: www-mtjj
+    name: 媒体聚焦
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: https://www.sztu.edu.cn
+    listUrl: https://www.sztu.edu.cn/jdjd/mtjj.htm
+    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    # ⚠️ 100% 外部链接（深圳特区报/新华社/南方Plus/科技日报），
+    #    无 info/ 链接，无法爬取详情，仅存元数据+外链 URL。
+    #    前端展示为"外部链接"标签，点击复制链接或 web-view 打开。
     enabled: false
     sort: 2
 
-  # ==================== 招聘数据源（预留） ====================
+  # ---------- 对外交流 ----------
 
-  - id: job-campus
-    name: 校园招聘
+  - id: www-gjjl
+    name: 国际交流
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: https://www.sztu.edu.cn
+    listUrl: https://www.sztu.edu.cn/dwjl/gjjl.htm
+    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1031"
+    categoryName: 国际交流
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: www-xsjwjl
+    name: 学生境外交流
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: https://www.sztu.edu.cn
+    listUrl: https://www.sztu.edu.cn/dwjl/xsjwjl.htm
+    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1032"
+    categoryName: 学生境外交流
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  # ========================================================================
+  #  教务部（jw.sztu.edu.cn，公开）
+  #  parserType: sztu-cms
+  #  列表格式：CMS 标准列表
+  # ========================================================================
+
+  - id: jw-jdt
+    name: 教学动态
+    channelId: academic
+    parserType: sztu-cms
+    baseUrl: https://jw.sztu.edu.cn
+    listUrl: https://jw.sztu.edu.cn/jdt.htm
+    detailUrlTemplate: https://jw.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1005"
+    categoryName: 教学动态
+    requiresAuth: false
+    crawlIntervalMinutes: 30
+    # crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: jw-xxg
+    name: 信息公告
+    channelId: academic
+    parserType: sztu-cms
+    baseUrl: https://jw.sztu.edu.cn
+    listUrl: https://jw.sztu.edu.cn/xxg.htm
+    detailUrlTemplate: https://jw.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1007"
+    categoryName: 信息公告
+    requiresAuth: false
+    crawlIntervalMinutes: 30
+    # crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+
+
+  # ========================================================================
+  #  就业指导中心（jyzd.sztu.edu.cn，公开）
+  #  parserType: sztu-gwt（和公文通用同一种 list.jsp 格式）
+  #  列表格式：list-noPicture.jsp?wbtreeid=XXXX
+  # ========================================================================
+
+  - id: jyzd-tzgg
+    name: 就业通知公告
     channelId: job
-    parserType: sztu-job
-    baseUrl: https://job.sztu.edu.cn
-    listUrlTemplate: https://job.sztu.edu.cn/campus/list{page}.htm
-    detailUrlTemplate: https://job.sztu.edu.cn/campus/{id}.htm
-    requiresAuth: true
+    parserType: sztu-cms
+    baseUrl: https://jyzd.sztu.edu.cn
+    listUrlTemplate: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1002&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: https://jyzd.sztu.edu.cn/info/1002/{id}.htm
+    categoryCode: "1002"
+    categoryName: 就业通知
+    requiresAuth: false
     crawlIntervalMinutes: 60
+    # crawlPageCount: 1
     enabled: false
     sort: 1
 
-  - id: job-intern
-    name: 实习信息
+  - id: jyzd-gzdt
+    name: 就业工作动态
     channelId: job
-    parserType: sztu-job
-    baseUrl: https://job.sztu.edu.cn
-    listUrlTemplate: https://job.sztu.edu.cn/intern/list{page}.htm
-    detailUrlTemplate: https://job.sztu.edu.cn/intern/{id}.htm
-    requiresAuth: true
+    parserType: sztu-cms
+    baseUrl: https://jyzd.sztu.edu.cn
+    listUrlTemplate: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: https://jyzd.sztu.edu.cn/info/1013/{id}.htm
+    categoryCode: "1013"
+    categoryName: 工作动态
+    requiresAuth: false
     crawlIntervalMinutes: 60
+    # crawlPageCount: 1
     enabled: false
     sort: 2
+
+  # ========================================================================
+  #  招生网（zs.sztu.edu.cn，公开）
+  # ========================================================================
+
+  - id: zs-zsdt
+    name: 招生动态
+    channelId: admission
+    parserType: sztu-cms
+    baseUrl: https://zs.sztu.edu.cn
+    listUrl: https://zs.sztu.edu.cn/zsdt.htm
+    detailUrlTemplate: https://zs.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1030"
+    categoryName: 招生动态
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    enabled: false
+    sort: 1

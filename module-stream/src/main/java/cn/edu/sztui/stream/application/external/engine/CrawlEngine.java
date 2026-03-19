@@ -26,9 +26,7 @@ import java.util.stream.Collectors;
 /**
  * 通用爬取引擎
  * <p>
- * 所有数据源走同一套管线：读配置 → 构建URL → HTTP → 解析 → 缓存 → 推送
- * <p>
- * ⭐ 修复：initSource 中 totalPages null 防御
+ * ⭐ 本次改动：buildListUrl() 增加 listUrl 支持（CMS 页面用固定 URL + 路径分页）
  */
 @Slf4j
 @Service
@@ -145,12 +143,10 @@ public class CrawlEngine {
             ListParserResult firstResult = parserFactory.parseList(
                     source.getParserType(), firstResponse.getBody(), source, 1);
 
-            // ⭐ 修复：null-safe 获取 totalPages，默认为 1
             int totalPage = (firstResult != null && firstResult.getTotalPages() != null)
                     ? firstResult.getTotalPages() : 1;
             if (totalPage <= 0) totalPage = 1;
 
-            // crawlPageCount 控制初始化最多爬几页（sources.yml 配置）
             int maxPages = source.getPageCount() > 0 ? source.getPageCount() : totalPage;
             int pagesToCrawl = Math.min(totalPage, maxPages);
             log.info("数据源 {} 总页数: {}, 将爬取: {} 页", sourceId, totalPage, pagesToCrawl);
@@ -231,7 +227,38 @@ public class CrawlEngine {
         return smartHttpClient.newSession();
     }
 
+    /**
+     * 构建列表页 URL
+     * <p>
+     * ⭐ 支持两种模式：
+     * <p>
+     * 模式 1（listUrl）：CMS 页面的固定 URL + 路径分页
+     * 第1页：https://www.sztu.edu.cn/hljd/xyhd/wyhd.htm（原始 URL）
+     * 第2页：https://www.sztu.edu.cn/hljd/xyhd/wyhd/2.htm
+     * 第3页：https://www.sztu.edu.cn/hljd/xyhd/wyhd/3.htm
+     * （博达 CMS 标准分页格式：去掉 .htm 后缀，加 /{page}.htm）
+     * <p>
+     * 模式 2（listUrlTemplate）：公文通 list.jsp 的模板 URL
+     * https://xxx/list.jsp?wbtreeid=1018&a1020514p={page}&a1020514c=20
+     */
     private String buildListUrl(CrawlerConfig.SourceConfig source, int page) {
+        // ⭐ 模式 1：固定 URL（CMS 页面）
+        String listUrl = source.getListUrl();
+        if (StringUtils.hasText(listUrl)) {
+            if (page == 1) {
+                return listUrl;
+            }
+            // 博达 CMS 分页规则：
+            //   wyhd.htm（第1页）→ wyhd/2.htm（第2页）→ wyhd/3.htm（第3页）
+            //   sshd.htm（第1页）→ sshd/8.htm（第2页，降序页码）
+            // 统一处理：去掉 .htm → 加 /{page}.htm
+            if (listUrl.endsWith(".htm")) {
+                return listUrl.substring(0, listUrl.length() - 4) + "/" + page + ".htm";
+            }
+            return listUrl + "/" + page;
+        }
+
+        // 模式 2：模板 URL（公文通 list.jsp）
         String template = source.getListUrlTemplate();
         if (template == null) return null;
         return template
