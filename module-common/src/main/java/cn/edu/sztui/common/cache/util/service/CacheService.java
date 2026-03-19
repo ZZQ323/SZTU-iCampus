@@ -50,6 +50,21 @@ public class CacheService {
         }
     }
 
+    /**
+     * 按模式匹配查找 key
+     * <p>
+     * ⚠️ 生产环境大数据量时应使用 SCAN 替代。
+     * 当前用户量 <1000，KEYS 可接受。
+     */
+    public Set<String> keys(String pattern) {
+        try {
+            return this.redisTemplate.keys(pattern);
+        } catch (Exception e) {
+            log.error(pattern, e);
+            return null;
+        }
+    }
+
     public void del(String... key) {
         if (key != null && key.length > 0) {
             if (key.length == 1) {
@@ -262,7 +277,7 @@ public class CacheService {
 
     public Boolean zSSet(String key, Object value, double score) {
         try {
-            return this.redisTemplate.opsForZSet().add(key, value, (double)2.0F);
+            return this.redisTemplate.opsForZSet().add(key, value, (double) 2.0F);
         } catch (Exception e) {
             log.error(key, e);
             return false;

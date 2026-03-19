@@ -222,6 +222,7 @@ sources:
     categoryName: 教学动态
     requiresAuth: false
     crawlIntervalMinutes: 30
+    paginationReverse: true    # ⭐ 倒序分页（page2=jdt/7.htm, page3=jdt/6.htm...）
     # crawlPageCount: 1
     enabled: true
     sort: 1

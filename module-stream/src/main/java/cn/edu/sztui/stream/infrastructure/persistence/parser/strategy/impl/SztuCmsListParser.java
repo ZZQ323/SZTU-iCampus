@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
  *   <li>E 型 极简式（工程物理学院）：li > a[title] + span.date</li>
  *   <li>F 型 content.jsp（国有资产部）：li > a[href*=content.jsp] > p.bt + p.p1</li>
  *   <li>G 型 就业网（jyzd）：li.item > a.item-link[title] + span.item-time</li>
+ *   <li>H 型 杂志卡片（教务部教学动态 jw）：div.soga11 > p.soga_p > a.soga_a + span.timer1</li>
  * </ul>
  * <p>
  * 外链处理策略：
@@ -156,9 +157,10 @@ public class SztuCmsListParser implements ParserStrategy {
     private List<InfoItemMeta> extractItems(Document doc, SourceConfig sourceConfig, String baseUrl) {
         List<InfoItemMeta> items = new ArrayList<>();
         Set<String> seenIds = new HashSet<>();
-
         // 遍历所有 li 内的 a 链接
-        Elements allAnchors = doc.select("li a[href]");
+        // Elements allAnchors = doc.select("li a[href]");
+        // 遍历所有文章链接（li 内 + H 型 soga11 容器内）
+        Elements allAnchors = doc.select("li a[href], div.soga11 a[href]");
 
         for (Element anchor : allAnchors) {
             String href = anchor.attr("href").trim();
@@ -282,7 +284,7 @@ public class SztuCmsListParser implements ParserStrategy {
         }
 
         // 3. 特定 class 元素
-        for (String sel : new String[]{".bt", ".text span", ".con p", "p.bt"}) {
+        for (String sel : new String[]{".bt", ".text span", ".con p", "p.bt", ".soga_a"}) {
             Element el = anchor.selectFirst(sel);
             if (el != null && StringUtils.hasText(el.text()) && !isDateString(el.text())) {
                 return el.text().trim();
@@ -328,6 +330,17 @@ public class SztuCmsListParser implements ParserStrategy {
                 if (date != null) return date;
             }
             return findDateInText(parentLi.text());
+        }
+
+        // H 型（jw-jdt 等）：日期在 div.soga11 > span.timer1
+        Element parentSoga = anchor.closest("div.soga11");
+        if (parentSoga != null) {
+            Element timer = parentSoga.selectFirst("span.timer1");
+            if (timer != null) {
+                String date = findDateInText(timer.text());
+                if (date != null) return date;
+            }
+            return findDateInText(parentSoga.text());
         }
 
         return null;

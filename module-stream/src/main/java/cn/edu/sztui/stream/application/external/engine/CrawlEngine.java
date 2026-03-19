@@ -71,7 +71,6 @@ public class CrawlEngine {
     // private static final int DEFAULT_MAX_PAGES = 10;
 
     // ==================== 增量爬取 ====================
-
     public CrawlResult crawlIncremental(String sourceId) {
         CrawlerConfig.SourceConfig source = configLoader.getSource(sourceId);
         if (source == null) {
@@ -196,7 +195,7 @@ public class CrawlEngine {
                                 sourceId, pagesToCrawl, totalPage);
 
                         List<ListParserResult.InfoItemMeta> remaining =
-                                crawlPagesInBatches(source, session, 2, pagesToCrawl);
+                                crawlPagesInBatches(source, session, 2, pagesToCrawl, totalPage);
 
                         if (!remaining.isEmpty()) {
                             infoCacheUtil.saveMetaBatch(channelId, remaining);
@@ -267,19 +266,34 @@ public class CrawlEngine {
 
     /**
      * 构建列表页 URL
-     * <p>
-     * 模式 1（listUrl）：CMS 固定 URL + 路径分页
-     * 模式 2（listUrlTemplate）：公文通模板 URL
      */
     private String buildListUrl(CrawlerConfig.SourceConfig source, int page) {
+        return buildListUrl(source, page, -1);
+    }
+
+    /**
+     * 构建列表页 URL（支持倒序分页）
+     *
+     * @param totalPages 总页数（倒序分页时需要，-1 表示未知）
+     */
+    private String buildListUrl(CrawlerConfig.SourceConfig source, int page, int totalPages) {
         // 模式 1：固定 URL
         String listUrl = source.getListUrl();
         if (StringUtils.hasText(listUrl)) {
             if (page == 1) return listUrl;
-            if (listUrl.endsWith(".htm")) {
-                return listUrl.substring(0, listUrl.length() - 4) + "/" + page + ".htm";
+
+            int pathNum = page;
+            // 倒序分页：page N → path (totalPages - N + 1)
+            if (source.isPaginationReverse() && totalPages > 0) {
+                pathNum = totalPages - page + 1;
+                if (pathNum < 1) pathNum = 1;
+                log.debug("倒序分页: page={} → pathNum={} (totalPages={})", page, pathNum, totalPages);
             }
-            return listUrl + "/" + page;
+
+            if (listUrl.endsWith(".htm")) {
+                return listUrl.substring(0, listUrl.length() - 4) + "/" + pathNum + ".htm";
+            }
+            return listUrl + "/" + pathNum;
         }
 
         // 模式 2：模板 URL
@@ -321,7 +335,8 @@ public class CrawlEngine {
      * 每 3 页一批并发，批间间隔 500ms，避免对学校服务器造成压力。
      */
     private List<ListParserResult.InfoItemMeta> crawlPagesInBatches(
-            CrawlerConfig.SourceConfig source, SmartSession session, int startPage, int endPage) {
+            CrawlerConfig.SourceConfig source, SmartSession session,
+            int startPage, int endPage, int totalPages) {
 
         List<ListParserResult.InfoItemMeta> allItems = new CopyOnWriteArrayList<>();
         int batchSize = 3; // 每批并发 3 页
@@ -334,7 +349,7 @@ public class CrawlEngine {
                 final int p = page;
                 futures.add(pageExecutor.submit(() -> {
                     try {
-                        String url = buildListUrl(source, p);
+                        String url = buildListUrl(source, p, totalPages);
                         SmartResponse resp = smartHttpClient.get(url, session);
                         if (resp.isSuccess()) {
                             ListParserResult result = parserFactory.parseList(

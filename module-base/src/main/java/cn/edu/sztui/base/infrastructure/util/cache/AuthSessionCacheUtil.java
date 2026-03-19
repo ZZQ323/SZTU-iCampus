@@ -17,19 +17,21 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * 会话缓存工具（精简版）
+ * 会话缓存工具（独立 Key 版）
  * <p>
- * 存储结构（适配 CacheUtil 的 Hash API）：
+ * ⭐ 改造：Hash → 独立 String Key + TTL
+ * <p>
+ * 存储结构：
  * <ul>
- *   <li>{@code icampus:token-meta}      → Hash，field = openId，value = TokenMeta JSON</li>
- *   <li>{@code icampus:proxy-session}   → Hash，field = openId，value = ProxySession JSON</li>
+ *   <li>{@code icampus:token-meta:{openId}}    → String，value = TokenMeta JSON，TTL = 3天</li>
+ *   <li>{@code icampus:proxy-session:{openId}}  → String，value = ProxySession JSON，TTL = 3天</li>
  * </ul>
  * <p>
- * 设计原则：
+ * 优势：
  * <ul>
- *   <li>Cookie 跟随 Token 生命周期，Token 过期时一并清除</li>
- *   <li>不做 Cookie 过期预测，由学校重定向自然触发 403</li>
- *   <li>不做状态缓存，每次 getStatus 都实时检查</li>
+ *   <li>每个用户独立 TTL，自动过期，不需要定时清理任务</li>
+ *   <li>不存在大 Hash 阻塞（旧方案 1000 用户时 HGETALL 会卡住 Redis）</li>
+ *   <li>touch() 刷新 TTL，实现滑动窗口</li>
  * </ul>
  */
 @Slf4j
@@ -37,24 +39,20 @@ import java.util.*;
 public class AuthSessionCacheUtil {
 
     /**
-     * TokenMeta 的 Hash key
+     * Key 前缀
      */
-    private static final String TOKEN_META_KEY = "icampus:token-meta";
+    private static final String TOKEN_META_PREFIX = "icampus:token-meta:";
+    private static final String PROXY_SESSION_PREFIX = "icampus:proxy-session:";
 
     /**
-     * ProxySession 的 Hash key
+     * TTL：3 天（秒）
      */
-    private static final String PROXY_SESSION_KEY = "icampus:proxy-session";
+    private static final long TTL_SECONDS = 3 * 24 * 60 * 60;
 
     /**
      * 滑动窗口阈值：3 天（毫秒）—— 3天内活跃可续签 Token
      */
     public static final long SLIDING_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L;
-
-    /**
-     * 清理阈值：3 天 + 1 小时（毫秒）—— 超过此时间的会话会被清理
-     */
-    public static final long CLEANUP_THRESHOLD_MS = (3 * 24 + 1) * 60 * 60 * 1000L;
 
     @Resource
     private CacheUtil cacheUtil;
@@ -65,7 +63,7 @@ public class AuthSessionCacheUtil {
      * 创建或更新 TokenMeta
      */
     public void saveTokenMeta(TokenMeta meta) {
-        cacheUtil.hset(TOKEN_META_KEY, meta.getOpenId(), JSON.toJSONString(meta));
+        cacheUtil.set(TOKEN_META_PREFIX + meta.getOpenId(), JSON.toJSONString(meta), TTL_SECONDS);
         log.info("保存 TokenMeta: openId={}", meta.getOpenId());
     }
 
@@ -74,19 +72,20 @@ public class AuthSessionCacheUtil {
      */
     public TokenMeta getTokenMeta(String openId) {
         if (!StringUtils.hasText(openId)) return null;
-        Object obj = cacheUtil.hget(TOKEN_META_KEY, openId);
+        Object obj = cacheUtil.get(TOKEN_META_PREFIX + openId);
         if (obj == null) return null;
         return JSON.parseObject(obj.toString(), TokenMeta.class);
     }
 
     /**
-     * 更新 lastAccessTime（活跃续期）
+     * 更新 lastAccessTime + 刷新 TTL（活跃续期）
      */
     public void touchTokenMeta(String openId) {
         TokenMeta meta = getTokenMeta(openId);
         if (meta == null) return;
         meta.setLastAccessTime(System.currentTimeMillis());
-        cacheUtil.hset(TOKEN_META_KEY, openId, JSON.toJSONString(meta));
+        // ⭐ 保存时自动刷新 TTL
+        saveTokenMeta(meta);
     }
 
     /**
@@ -103,20 +102,7 @@ public class AuthSessionCacheUtil {
      * 删除 TokenMeta
      */
     public void deleteTokenMeta(String openId) {
-        cacheUtil.hdel(TOKEN_META_KEY, openId);
-    }
-
-    /**
-     * 获取所有 TokenMeta（供定时任务清理用）
-     */
-    public Map<String, TokenMeta> getAllTokenMetas() {
-        Map<Object, Object> rawMap = cacheUtil.hmget(TOKEN_META_KEY);
-        if (rawMap == null || rawMap.isEmpty()) return Collections.emptyMap();
-        Map<String, TokenMeta> result = new HashMap<>();
-        rawMap.forEach((key, value) -> {
-            result.put(key.toString(), JSON.parseObject(value.toString(), TokenMeta.class));
-        });
-        return result;
+        cacheUtil.del(TOKEN_META_PREFIX + openId);
     }
 
     // ==================== ProxySession ====================
@@ -126,7 +112,7 @@ public class AuthSessionCacheUtil {
      */
     public ProxySession getSession(String openId) {
         if (!StringUtils.hasText(openId)) return null;
-        Object obj = cacheUtil.hget(PROXY_SESSION_KEY, openId);
+        Object obj = cacheUtil.get(PROXY_SESSION_PREFIX + openId);
         if (obj == null) return null;
         return JSON.parseObject(obj.toString(), ProxySession.class);
     }
@@ -135,34 +121,19 @@ public class AuthSessionCacheUtil {
      * 判断代理会话是否存在
      */
     public boolean hasSession(String openId) {
-        return cacheUtil.hHasKey(PROXY_SESSION_KEY, openId);
+        return cacheUtil.hasKey(PROXY_SESSION_PREFIX + openId);
     }
 
     /**
      * 删除代理会话（用于 initSession 强制重建）
      */
     public void deleteSession(String openId) {
-        cacheUtil.hdel(PROXY_SESSION_KEY, openId);
+        cacheUtil.del(PROXY_SESSION_PREFIX + openId);
         log.info("删除代理会话: openId={}", openId);
     }
 
     /**
-     * 获取所有代理会话（供定时任务批量操作用）
-     */
-    public Map<String, ProxySession> getAllSessions() {
-        Map<Object, Object> rawMap = cacheUtil.hmget(PROXY_SESSION_KEY);
-        if (rawMap == null || rawMap.isEmpty()) return Collections.emptyMap();
-        Map<String, ProxySession> result = new HashMap<>();
-        rawMap.forEach((key, value) -> {
-            result.put(key.toString(), JSON.parseObject(value.toString(), ProxySession.class));
-        });
-        return result;
-    }
-
-    /**
      * 保存或更新 cookies
-     * <p>
-     * ⭐ 直接接收 SmartCookie，不再依赖 Playwright
      */
     public boolean saveOrUpdateSessionCookie(String openId, List<SmartCookie> cookies) {
         if (!StringUtils.hasText(openId) || CollectionUtils.isEmpty(cookies)) {
@@ -176,7 +147,6 @@ public class AuthSessionCacheUtil {
             session.setUserIds(new ArrayList<>());
             session.setSchoolLoggedIn(false);
         }
-        // ⭐ 直接序列化 SmartCookie 为 JSON
         session.setCookiesJson(JSON.toJSONString(cookies));
         session.setLastUpdateTime(System.currentTimeMillis());
         saveSession(openId, session);
@@ -186,8 +156,6 @@ public class AuthSessionCacheUtil {
 
     /**
      * 登录绑定
-     * <p>
-     * ⭐ 直接接收 SmartCookie
      */
     public boolean sessionLoginBind(String openId, String userId, List<SmartCookie> newCookies) {
         ProxySession session = getSession(openId);
@@ -201,7 +169,6 @@ public class AuthSessionCacheUtil {
         if (!session.getUserIds().contains(userId)) {
             session.getUserIds().add(userId);
         }
-        // ⭐ 直接序列化 SmartCookie 为 JSON
         session.setCookiesJson(JSON.toJSONString(newCookies));
         session.setLastUpdateTime(System.currentTimeMillis());
         session.setSchoolLoggedIn(true);
@@ -224,18 +191,13 @@ public class AuthSessionCacheUtil {
 
     /**
      * 登出绑定（更新 Cookie 和状态）
-     * <p>
-     * 用于登出时保存学校返回的新 Cookie
      */
     public void sessionLogoutBind(String openId, List<SmartCookie> newCookies) {
         ProxySession session = getSession(openId);
         if (session == null) return;
-
-        // 更新 Cookie
         if (!CollectionUtils.isEmpty(newCookies)) {
             session.setCookiesJson(JSON.toJSONString(newCookies));
         }
-
         session.setLastUpdateTime(System.currentTimeMillis());
         session.setSchoolLoggedIn(false);
         saveSession(openId, session);
@@ -256,43 +218,86 @@ public class AuthSessionCacheUtil {
      * 清理单个用户的所有缓存
      */
     public void clearUser(String openId) {
-        cacheUtil.hdel(TOKEN_META_KEY, openId);
-        cacheUtil.hdel(PROXY_SESSION_KEY, openId);
+        cacheUtil.del(TOKEN_META_PREFIX + openId);
+        cacheUtil.del(PROXY_SESSION_PREFIX + openId);
         log.info("清理用户缓存: openId={}", openId);
     }
 
     /**
-     * 清理过期会话（由定时任务调用）
+     * ⭐ 获取所有已登录的 ProxySession
      * <p>
-     * 遍历所有 TokenMeta，删除 lastAccessTime > 3天+1小时 的条目及其关联的 ProxySession。
-     * <p>
-     * 关键：Token 过期时同时清除 Cookie，保证两者生命周期一致
-     *
-     * @return 清理的条目数
+     * 用于 CookieSourceManager 获取可用 Cookie。
+     * 使用 KEYS 扫描（用户量 <1000 时可接受，量大后改 SCAN）。
      */
-    public int cleanupStaleEntries() {
-        Map<String, TokenMeta> allMetas = getAllTokenMetas();
-        long now = System.currentTimeMillis();
-        int cleaned = 0;
+    public Map<String, ProxySession> getAllSessions() {
+        Set<String> keys = cacheUtil.keys(PROXY_SESSION_PREFIX + "*");
+        if (keys == null || keys.isEmpty()) return Collections.emptyMap();
 
-        for (Map.Entry<String, TokenMeta> entry : allMetas.entrySet()) {
-            String openId = entry.getKey();
-            TokenMeta meta = entry.getValue();
-            long elapsed = now - meta.getLastAccessTime();
+        Map<String, ProxySession> result = new HashMap<>();
+        for (String fullKey : keys) {
+            // fullKey 经过 RedisKeyGenerator 处理后的完整 key
+            // 需要提取 openId：去掉前缀
+            String openId = extractOpenIdFromKey(fullKey, "proxy-session:");
+            if (openId == null) continue;
 
-            if (elapsed > CLEANUP_THRESHOLD_MS) {
-                clearUser(openId);  // 同时删除 TokenMeta 和 ProxySession
-                cleaned++;
-                log.info("清理过期会话: openId={}, 已不活跃 {}h",
-                        openId, elapsed / (1000 * 60 * 60));
+            ProxySession session = getSession(openId);
+            if (session != null) {
+                result.put(openId, session);
             }
         }
-        return cleaned;
+        return result;
+    }
+
+    /**
+     * ⭐ 获取所有 TokenMeta
+     * <p>
+     * 仅供兼容旧代码。独立 Key + TTL 后不再需要定时清理。
+     */
+    public Map<String, TokenMeta> getAllTokenMetas() {
+        Set<String> keys = cacheUtil.keys(TOKEN_META_PREFIX + "*");
+        if (keys == null || keys.isEmpty()) return Collections.emptyMap();
+
+        Map<String, TokenMeta> result = new HashMap<>();
+        for (String fullKey : keys) {
+            String openId = extractOpenIdFromKey(fullKey, "token-meta:");
+            if (openId == null) continue;
+
+            TokenMeta meta = getTokenMeta(openId);
+            if (meta != null) {
+                result.put(openId, meta);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * ⭐ 定时清理不再必要（Redis TTL 自动过期）
+     * <p>
+     * 保留此方法是为了兼容，但它现在基本是空操作。
+     * 极端情况下（手动 set 无 TTL 的 key）仍可用。
+     */
+    public int cleanupStaleEntries() {
+        // 独立 Key + TTL 后，Redis 自动清理过期数据
+        // 此方法不再需要遍历全量数据
+        log.debug("cleanupStaleEntries: 独立 Key + TTL 模式，Redis 自动过期，无需手动清理");
+        return 0;
     }
 
     // ==================== 内部 ====================
 
     private void saveSession(String openId, ProxySession session) {
-        cacheUtil.hset(PROXY_SESSION_KEY, openId, JSON.toJSONString(session));
+        cacheUtil.set(PROXY_SESSION_PREFIX + openId, JSON.toJSONString(session), TTL_SECONDS);
+    }
+
+    /**
+     * 从完整的 Redis key 中提取 openId
+     * <p>
+     * fullKey 格式（经过 RedisKeyGenerator）：dev:sztu:cache:icampus:token-meta:oXXXXX
+     * 需要提取 oXXXXX 部分
+     */
+    private String extractOpenIdFromKey(String fullKey, String marker) {
+        int idx = fullKey.indexOf(marker);
+        if (idx < 0) return null;
+        return fullKey.substring(idx + marker.length());
     }
 }

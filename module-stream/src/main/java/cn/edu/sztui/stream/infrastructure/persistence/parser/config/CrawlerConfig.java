@@ -62,7 +62,11 @@ public class CrawlerConfig {
 
         private boolean requiresAuth;
         private Integer crawlIntervalMinutes;
+
         private Integer crawlPageCount;
+        /** 分页是否倒序（如 jw-jdt：第2页=jdt/7.htm，第3页=jdt/6.htm...尾页=jdt/1.htm） */
+        private boolean paginationReverse;
+
         private boolean enabled;
         private Integer sort;
 
@@ -87,6 +91,10 @@ public class CrawlerConfig {
 
         public int getPageCount() {
             return crawlPageCount != null ? crawlPageCount : 1;
+        }
+
+        public boolean isPaginationReverse() {
+            return Boolean.TRUE.equals(paginationReverse);
         }
 
         /**
