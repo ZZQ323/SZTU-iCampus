@@ -269,8 +269,7 @@ public class AuthServiceImpl implements AuthService {
                         c.getPath());
             }
 
-            // ⭐ 关键修复：不再访问登录页面，直接发送 AJAX 验证请求
-            // 因为再次访问登录页面可能会重置服务器端的验证码状态
+            // 发送 AJAX 验证请求
             String refererUrl = (cmd.getLoginType() == LoginType.SMS) ? gatewayFirstURL : gatewaySecondURL;
 
             // ============ 第一步：AJAX 验证 ============

@@ -88,7 +88,7 @@ public class SmartHttpClientImpl implements SmartHttpClient {
                 .setSSLSocketFactory(sslSocketFactory)
                 .build();
         
-        // 3. 创建 HttpClient（禁用内置重定向，我们自己处理）
+        // 3. 创建 HttpClient（禁用内置重定向）
         this.httpClient = HttpClients.custom()
                 .setConnectionManager(connManager)
                 .disableRedirectHandling()  // ⭐ 关键：禁用内置重定向
