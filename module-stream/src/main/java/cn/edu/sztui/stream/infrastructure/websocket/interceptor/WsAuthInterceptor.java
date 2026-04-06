@@ -14,16 +14,16 @@ import java.util.Map;
 /**
  * WebSocket 握手鉴权拦截器
  * <p>
- * 握手 URL：ws://host:port/ws?openId=xxx&topics=announcement,schedule
+ * 握手 URL：ws://host:port/ws?userId=xxx&topics=announcement,schedule
  * <p>
- * 从 query param 读取 openId（前端登录后已获取）。
+ * 从 query param 读取 userId（前端登录后已获取）。
  * 不再使用 JWT 验证。
  */
 @Slf4j
 @Component
 public class WsAuthInterceptor implements HandshakeInterceptor {
 
-    public static final String ATTR_OPEN_ID = "ws.openId";
+    public static final String ATTR_USER_ID = "ws.userId";
     public static final String ATTR_TOPICS = "ws.topics";
 
     @Override
@@ -34,10 +34,10 @@ public class WsAuthInterceptor implements HandshakeInterceptor {
             return false;
         }
 
-        // 从 query param 读取 openId
-        String openId = servletRequest.getServletRequest().getParameter("openId");
-        if (!StringUtils.hasText(openId)) {
-            log.warn("WS 握手拒绝: 缺少 openId 参数");
+        // 从 query param 读取 userId
+        String userId = servletRequest.getServletRequest().getParameter("userId");
+        if (!StringUtils.hasText(userId)) {
+            log.warn("WS 握手拒绝: 缺少 userId 参数");
             return false;
         }
 
@@ -47,10 +47,10 @@ public class WsAuthInterceptor implements HandshakeInterceptor {
             topics = "announcement";
         }
 
-        attributes.put(ATTR_OPEN_ID, openId);
+        attributes.put(ATTR_USER_ID, userId);
         attributes.put(ATTR_TOPICS, topics);
 
-        log.info("WS 握手通过: openId={}, topics={}", openId, topics);
+        log.info("WS 握手通过: userId={}, topics={}", userId, topics);
         return true;
     }
 

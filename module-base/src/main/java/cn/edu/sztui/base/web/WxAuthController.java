@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * 会话管理控制器（精简版 —— 去除 JWT token 层）
+ * 会话管理控制器（精简版）
  * <p>
  * 仅保留重置会话功能。
- * Token 相关的 get-token / refresh-token / active 端点已移除。
  */
 @Slf4j
 @RestController
@@ -33,7 +32,7 @@ public class WxAuthController {
     @PostMapping("/v1/reset")
     public Result resetSession() {
         TokenMessage tokenMessage = UserContext.getContext();
-        if (tokenMessage == null || tokenMessage.getOpenId() == null) {
+        if (tokenMessage == null || tokenMessage.getUserId() == null) {
             throw new BusinessException(
                     SysReturnCode.WECHAT_PROXY.getCode(),
                     "未提供身份标识",
@@ -41,9 +40,9 @@ public class WxAuthController {
             );
         }
 
-        String openId = tokenMessage.getOpenId();
-        authSessionCacheUtil.clearUser(openId);
-        log.info("用户 {} 主动重置会话", openId);
+        String userId = tokenMessage.getUserId();
+        authSessionCacheUtil.clearUser(userId);
+        log.info("用户 {} 主动重置会话", userId);
 
         return Result.ok(Map.of("success", true, "message", "会话已重置"));
     }

@@ -101,10 +101,10 @@ public class ProxyController {
             @RequestParam String url,
             HttpServletResponse response) {
 
-        String openId = UserContext.getContext().getOpenId();
+        String userId = UserContext.getContext().getUserId();
         String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
 
-        log.debug("代理图片: openId={}, url={}", openId, decodedUrl);
+        log.debug("代理图片: userId={}, url={}", userId, decodedUrl);
 
         // 安全检查：只允许代理学校域名的资源
         if (!isAllowedDomain(decodedUrl)) {
@@ -114,7 +114,7 @@ public class ProxyController {
         }
 
         try {
-            byte[] data = fetchResource(openId, decodedUrl);
+            byte[] data = fetchResource(userId, decodedUrl);
             if (data == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -155,10 +155,10 @@ public class ProxyController {
             @RequestParam(required = false) String filename,
             HttpServletResponse response) {
 
-        String openId = UserContext.getContext().getOpenId();
+        String userId = UserContext.getContext().getUserId();
         String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
 
-        log.info("代理附件下载: openId={}, url={}, filename={}", openId, decodedUrl, filename);
+        log.info("代理附件下载: userId={}, url={}, filename={}", userId, decodedUrl, filename);
 
         if (!isAllowedDomain(decodedUrl)) {
             log.warn("拒绝代理非学校域名: {}", decodedUrl);
@@ -167,7 +167,7 @@ public class ProxyController {
         }
 
         try {
-            byte[] data = fetchResource(openId, decodedUrl);
+            byte[] data = fetchResource(userId, decodedUrl);
             if (data == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -210,11 +210,11 @@ public class ProxyController {
      * <p>
      * ⭐ 关键：设置 Host 头为目标域名，避免 WebVPN 拒绝
      */
-    private byte[] fetchResource(String openId, String url) {
+    private byte[] fetchResource(String userId, String url) {
         // 1. 获取用户的学校 Cookie
-        ProxySession session = authSessionCacheUtil.getSession(openId);
+        ProxySession session = authSessionCacheUtil.getSession(userId);
         if (session == null || !StringUtils.hasText(session.getCookiesJson())) {
-            log.warn("用户无有效会话: openId={}", openId);
+            log.warn("用户无有效会话: userId={}", userId);
             return null;
         }
 

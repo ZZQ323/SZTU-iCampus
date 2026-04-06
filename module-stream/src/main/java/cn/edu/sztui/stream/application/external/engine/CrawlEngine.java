@@ -125,7 +125,7 @@ public class CrawlEngine {
 
     // ==================== ⭐ 两阶段初始化 ====================
 
-    public void initSource(String sourceId, String openId) {
+    public void initSource(String sourceId, String userId) {
         CrawlerConfig.SourceConfig source = configLoader.getSource(sourceId);
         if (source == null) {
             log.error("初始化失败，未找到数据源: {}", sourceId);

@@ -38,15 +38,15 @@ public class CookieSourceManager {
      * 获取一个可用的 SmartSession（带学校 Cookie）
      */
     public SmartSession getAvailableSession() {
-        String openId = getAvailableOpenId();
-        if (openId == null) {
+        String userId = getAvailableUserId();
+        if (userId == null) {
             throw new NoCookieAvailableException("无可用的 Cookie 来源");
         }
 
-        ProxySession proxy = authSessionCacheUtil.getSession(openId);
+        ProxySession proxy = authSessionCacheUtil.getSession(userId);
         if (proxy == null || !StringUtils.hasText(proxy.getCookiesJson())) {
-            markInvalidAndSwitch(openId);
-            throw new NoCookieAvailableException("Cookie 来源失效: " + openId);
+            markInvalidAndSwitch(userId);
+            throw new NoCookieAvailableException("Cookie 来源失效: " + userId);
         }
 
         // ★ 关键：从 cookiesJson 反序列化为 SmartCookie 列表，再创建 SmartSession
@@ -54,15 +54,15 @@ public class CookieSourceManager {
         return smartHttpClient.newSession(cookies);
     }
 
-    public String getAvailableOpenId() {
-        String active = infoCacheUtil.getActiveSourceOpenId();
+    public String getAvailableUserId() {
+        String active = infoCacheUtil.getActiveSourceUserId();
         if (StringUtils.hasText(active) && isValid(active)) {
             return active;
         }
 
         String found = findValidFromOnlineUsers();
         if (found != null) {
-            infoCacheUtil.setActiveSourceOpenId(found);
+            infoCacheUtil.setActiveSourceUserId(found);
             log.info("切换到新 Cookie 来源: {}", found);
             return found;
         }
@@ -71,23 +71,23 @@ public class CookieSourceManager {
         return null;
     }
 
-    public void markInvalidAndSwitch(String invalidOpenId) {
+    public void markInvalidAndSwitch(String invalidUserId) {
         infoCacheUtil.clearActiveSource();
         String newSource = findValidFromOnlineUsers();
-        if (newSource != null && !newSource.equals(invalidOpenId)) {
-            infoCacheUtil.setActiveSourceOpenId(newSource);
-            log.info("Cookie 来源切换: {} → {}", invalidOpenId, newSource);
+        if (newSource != null && !newSource.equals(invalidUserId)) {
+            infoCacheUtil.setActiveSourceUserId(newSource);
+            log.info("Cookie 来源切换: {} → {}", invalidUserId, newSource);
         }
     }
 
     public boolean hasAvailableCookie() {
-        return getAvailableOpenId() != null;
+        return getAvailableUserId() != null;
     }
 
-    private boolean isValid(String openId) {
-        if (!StringUtils.hasText(openId)) return false;
-        if (!authSessionCacheUtil.hasSession(openId)) return false;
-        return authSessionCacheUtil.isSchoolLoggedIn(openId);
+    private boolean isValid(String userId) {
+        if (!StringUtils.hasText(userId)) return false;
+        if (!authSessionCacheUtil.hasSession(userId)) return false;
+        return authSessionCacheUtil.isSchoolLoggedIn(userId);
     }
 
     private String findValidFromOnlineUsers() {

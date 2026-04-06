@@ -75,14 +75,14 @@ public class WebSocketPushService {
      * 定向推送给指定用户
      *
      * @param topic   主题
-     * @param openId  目标用户
+     * @param userId  目标用户
      * @param message 消息体
      * @return 是否发送成功
      */
-    public boolean pushToUser(String topic, String openId, WsMessage<?> message) {
-        WebSocketSession session = sessionRegistry.getUserSession(openId);
+    public boolean pushToUser(String topic, String userId, WsMessage<?> message) {
+        WebSocketSession session = sessionRegistry.getUserSession(userId);
         if (session == null || !session.isOpen()) {
-            log.debug("用户未连接: openId={}, topic={}", openId, topic);
+            log.debug("用户未连接: userId={}, topic={}", userId, topic);
             return false;
         }
 
@@ -123,8 +123,8 @@ public class WebSocketPushService {
 
             // 如果是定向消息，检查目标用户
             if (message.getTargetUser() != null) {
-                String openId = sessionRegistry.getOpenId(session);
-                if (!message.getTargetUser().equals(openId)) {
+                String userId = sessionRegistry.getUserId(session);
+                if (!message.getTargetUser().equals(userId)) {
                     continue;
                 }
             }

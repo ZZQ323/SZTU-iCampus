@@ -14,11 +14,6 @@ public class  UserContext {
         return CONTEXT_HOLDER.get();
     }
 
-    public static String getOpenid() {
-        TokenMessage ctx = CONTEXT_HOLDER.get();
-        return ctx != null ? ctx.getUnionId() : null;
-    }
-
     public static void clear() {
         CONTEXT_HOLDER.remove();
     }

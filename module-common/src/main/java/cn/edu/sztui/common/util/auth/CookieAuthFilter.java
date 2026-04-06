@@ -21,18 +21,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Cookie 认证过滤器（替代 JwtAuthFilter）
+ * Cookie 认证过滤器
  * <p>
- * 从请求 header 读取 X-Open-Id 和 X-School-Cookies，
+ * 从请求 header 读取 X-School-Cookies（必需）和 X-User-Id（可选），
  * 构建 UserContext 供下游使用。
  * <p>
- * 不做 JWT 签名验证、不做过期判断。
  * Cookie 有效性由学校返回的页面内容判断（在业务层处理）。
  */
 @Component
 public class CookieAuthFilter extends OncePerRequestFilter {
 
-    public static final String HEADER_OPEN_ID = "X-Open-Id";
+    public static final String HEADER_USER_ID = "X-User-Id";
     public static final String HEADER_COOKIES = "X-School-Cookies";
 
     @Autowired
@@ -63,26 +62,24 @@ public class CookieAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // 读取 openId
-            String openId = request.getHeader(HEADER_OPEN_ID);
-            if (!StringUtils.hasText(openId)) {
-                // 也支持从参数获取（WebSocket 握手兼容）
-                openId = request.getParameter("openId");
-            }
-
-            if (!StringUtils.hasText(openId)) {
+            // 读取 cookies（认证的核心）
+            String cookiesJson = request.getHeader(HEADER_COOKIES);
+            if (!StringUtils.hasText(cookiesJson)) {
                 writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "请先登录");
                 return;
             }
 
             // 构建用户上下文
             TokenMessage context = new TokenMessage();
-            context.setOpenId(openId);
+            context.setSchoolCookiesJson(cookiesJson);
 
-            // cookies 是可选的（有些接口只需要身份标识，不需要代理）
-            String cookiesJson = request.getHeader(HEADER_COOKIES);
-            if (StringUtils.hasText(cookiesJson)) {
-                context.setSchoolCookiesJson(cookiesJson);
+            // userId 是可选的（用于缓存/路由，不是认证凭证）
+            String userId = request.getHeader(HEADER_USER_ID);
+            if (!StringUtils.hasText(userId)) {
+                userId = request.getParameter("userId");
+            }
+            if (StringUtils.hasText(userId)) {
+                context.setUserId(userId);
             }
 
             UserContext.setContext(context);

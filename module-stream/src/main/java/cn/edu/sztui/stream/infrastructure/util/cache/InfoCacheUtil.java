@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  *   <li>info:{channelId}:content:{id} - String，详情缓存（TTL=24h）</li>
  *   <li>info:{channelId}:system       - Hash，频道状态</li>
  *   <li>info:{channelId}:hot-access   - ZSET，热点访问记录</li>
- *   <li>info:user:{openId}:read:{channelId} - String，用户已读位置</li>
+ *   <li>info:user:{userId}:read:{channelId} - String，用户已读位置</li>
  * </ul>
  */
 @Slf4j
@@ -76,24 +76,24 @@ public class InfoCacheUtil {
         cacheUtil.hset(key, "initialized", String.valueOf(initialized));
     }
 
-    public String getActiveSourceOpenId(String channelId) {
+    public String getActiveSourceUserId(String channelId) {
         String key = getSystemKey(channelId);
-        Object val = cacheUtil.hget(key, "activeSourceOpenId");
+        Object val = cacheUtil.hget(key, "activeSourceUserId");
         return val != null && StringUtils.hasText(val.toString()) ? val.toString() : null;
     }
 
-    public void setActiveSourceOpenId(String channelId, String openId) {
+    public void setActiveSourceUserId(String channelId, String userId) {
         String key = getSystemKey(channelId);
-        cacheUtil.hset(key, "activeSourceOpenId", openId != null ? openId : "");
+        cacheUtil.hset(key, "activeSourceUserId", userId != null ? userId : "");
     }
 
     public boolean hasActiveSource(String channelId) {
-        return StringUtils.hasText(getActiveSourceOpenId(channelId));
+        return StringUtils.hasText(getActiveSourceUserId(channelId));
     }
 
     public void clearActiveSource(String channelId) {
         String key = getSystemKey(channelId);
-        cacheUtil.hset(key, "activeSourceOpenId", "");
+        cacheUtil.hset(key, "activeSourceUserId", "");
         log.info("已清除频道 {} 的 Cookie 来源", channelId);
     }
 
@@ -267,19 +267,19 @@ public class InfoCacheUtil {
 
     // ==================== 用户已读管理 ====================
 
-    public void setUserReadPosition(String openId, String channelId, String latestId) {
-        String key = generateKey(USER_READ_PREFIX + openId + ":read:" + channelId);
+    public void setUserReadPosition(String userId, String channelId, String latestId) {
+        String key = generateKey(USER_READ_PREFIX + userId + ":read:" + channelId);
         cacheService.set(key, latestId);
     }
 
-    public String getUserReadPosition(String openId, String channelId) {
-        String key = generateKey(USER_READ_PREFIX + openId + ":read:" + channelId);
+    public String getUserReadPosition(String userId, String channelId) {
+        String key = generateKey(USER_READ_PREFIX + userId + ":read:" + channelId);
         Object val = cacheService.get(key);
         return val != null ? val.toString() : "0";
     }
 
-    public long getUnreadCount(String openId, String channelId) {
-        String readPosition = getUserReadPosition(openId, channelId);
+    public long getUnreadCount(String userId, String channelId) {
+        String readPosition = getUserReadPosition(userId, channelId);
         String latestId = getLatestId(channelId);
 
         if (latestId == null || readPosition == null) {
@@ -388,21 +388,21 @@ public class InfoCacheUtil {
     private static final String GLOBAL_SYSTEM_KEY = "info:global:system";
 
     /**
-     * 获取全局活跃 Cookie 来源 openId
+     * 获取全局活跃 Cookie 来源 userId
      * （CookieSourceManager 调用，不区分频道）
      */
-    public String getActiveSourceOpenId() {
+    public String getActiveSourceUserId() {
         String key = generateKey(GLOBAL_SYSTEM_KEY);
-        Object val = cacheUtil.hget(key, "activeSourceOpenId");
+        Object val = cacheUtil.hget(key, "activeSourceUserId");
         return val != null && StringUtils.hasText(val.toString()) ? val.toString() : null;
     }
 
     /**
-     * 设置全局活跃 Cookie 来源 openId
+     * 设置全局活跃 Cookie 来源 userId
      */
-    public void setActiveSourceOpenId(String openId) {
+    public void setActiveSourceUserId(String userId) {
         String key = generateKey(GLOBAL_SYSTEM_KEY);
-        cacheUtil.hset(key, "activeSourceOpenId", openId != null ? openId : "");
+        cacheUtil.hset(key, "activeSourceUserId", userId != null ? userId : "");
     }
 
     /**
@@ -410,7 +410,7 @@ public class InfoCacheUtil {
      */
     public void clearActiveSource() {
         String key = generateKey(GLOBAL_SYSTEM_KEY);
-        cacheUtil.hset(key, "activeSourceOpenId", "");
+        cacheUtil.hset(key, "activeSourceUserId", "");
         log.debug("已清除全局 Cookie 来源");
     }
 }

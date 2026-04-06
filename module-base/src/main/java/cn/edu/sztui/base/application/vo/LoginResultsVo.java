@@ -54,11 +54,6 @@ public class LoginResultsVo {
     private String cookiesJson;
 
     /**
-     * openId（微信用户标识）—— 前端需存储并在后续请求中携带
-     */
-    private String openId;
-
-    /**
      * ⭐ 会话是否无效（需要重新初始化）
      * <p>
      * 当遇到以下情况时为 true：

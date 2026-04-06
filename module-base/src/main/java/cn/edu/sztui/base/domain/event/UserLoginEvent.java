@@ -15,12 +15,7 @@ public class UserLoginEvent extends ApplicationEvent {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 微信 OpenId
-     */
-    private final String openId;
-
-    /**
-     * 学号
+     * 用户 ID
      */
     private final String userId;
 
@@ -34,15 +29,14 @@ public class UserLoginEvent extends ApplicationEvent {
      */
     private final Long loginTime;
 
-    public UserLoginEvent(Object source, String openId, String userId, String realName) {
+    public UserLoginEvent(Object source, String userId, String realName) {
         super(source);
-        this.openId = openId;
         this.userId = userId;
         this.realName = realName;
         this.loginTime = System.currentTimeMillis();
     }
 
-    public UserLoginEvent(Object source, String openId) {
-        this(source, openId, null, null);
+    public UserLoginEvent(Object source, String userId) {
+        this(source, userId, null);
     }
 }
