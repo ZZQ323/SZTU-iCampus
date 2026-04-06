@@ -3,8 +3,6 @@ package cn.edu.sztui.common.util.exception;
 import cn.edu.sztui.common.util.log.LogMark;
 import cn.edu.sztui.common.util.result.Result;
 import cn.hutool.core.util.ObjectUtil;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.dubbo.remoting.RemotingException;
@@ -138,22 +136,6 @@ public class RestExceptionAdvice {
         // response.setStatus(HttpStatus.OK.value());
         return Result.error(900000000, "服务网络异常");
     }
-    // ============ 添加JWT相关异常处理 ============
-
-    @ExceptionHandler({io.jsonwebtoken.ExpiredJwtException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)  // 401
-    public Result handleExpiredJwtException(ExpiredJwtException ex, HttpServletRequest request) {
-        log.warn("JWT过期: URL={}", request.getRequestURI());
-        return Result.error(HttpStatus.UNAUTHORIZED.value(), "会话已过期，请刷新会话");
-    }
-
-    @ExceptionHandler({io.jsonwebtoken.JwtException.class})
-    @ResponseStatus(HttpStatus.FORBIDDEN)  // 403
-    public Result handleJwtException(JwtException ex, HttpServletRequest request) {
-        log.warn("JWT验证失败: URL={}, Message={}", request.getRequestURI(), ex.getMessage());
-        return Result.error(HttpStatus.FORBIDDEN.value(), "会话无效或已损坏");
-    }
-
     @ExceptionHandler({org.springframework.security.access.AccessDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)  // 403
     public Result handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {

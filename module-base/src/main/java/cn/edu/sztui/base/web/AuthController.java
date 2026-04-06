@@ -65,7 +65,7 @@ public class AuthController {
         String userId = body.get("userId");
         String cookiesJson = body.get("cookiesJson");
         if (userId == null || userId.isBlank()) {
-            return Result.fail("学号不能为空");
+            return Result.error("学号不能为空");
         }
         authService.getSms(userId, cookiesJson);
         return Result.ok("success");
