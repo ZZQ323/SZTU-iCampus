@@ -31,11 +31,6 @@ dependencies {
     implementation 'org.apache.commons:commons-pool2:2.12.0'
     implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
 
-    // JWT 依赖（common模块需要提供JWT工具类）
-    api "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-
-    // 如果JwtAuthFilter是Filter，可能还需要Servlet API
+    // CookieAuthFilter 需要 Servlet API
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 }

@@ -1,7 +1,6 @@
 package cn.edu.sztui.base.infrastructure.util.cache;
 
 import cn.edu.sztui.common.cache.dto.ProxySession;
-import cn.edu.sztui.common.cache.dto.TokenMeta;
 import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
@@ -17,93 +16,24 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * 会话缓存工具（独立 Key 版）
- * <p>
- * ⭐ 改造：Hash → 独立 String Key + TTL
+ * 会话缓存工具
  * <p>
  * 存储结构：
  * <ul>
- *   <li>{@code icampus:token-meta:{openId}}    → String，value = TokenMeta JSON，TTL = 3天</li>
  *   <li>{@code icampus:proxy-session:{openId}}  → String，value = ProxySession JSON，TTL = 3天</li>
  * </ul>
  * <p>
- * 优势：
- * <ul>
- *   <li>每个用户独立 TTL，自动过期，不需要定时清理任务</li>
- *   <li>不存在大 Hash 阻塞（旧方案 1000 用户时 HGETALL 会卡住 Redis）</li>
- *   <li>touch() 刷新 TTL，实现滑动窗口</li>
- * </ul>
+ * ProxySession 仅供爬虫引擎（CrawlEngine）使用，前端通过 header 直接传递 cookies。
  */
 @Slf4j
 @Component
 public class AuthSessionCacheUtil {
 
-    /**
-     * Key 前缀
-     */
-    private static final String TOKEN_META_PREFIX = "icampus:token-meta:";
     private static final String PROXY_SESSION_PREFIX = "icampus:proxy-session:";
-
-    /**
-     * TTL：3 天（秒）
-     */
     private static final long TTL_SECONDS = 3 * 24 * 60 * 60;
-
-    /**
-     * 滑动窗口阈值：3 天（毫秒）—— 3天内活跃可续签 Token
-     */
-    public static final long SLIDING_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L;
 
     @Resource
     private CacheUtil cacheUtil;
-
-    // ==================== TokenMeta ====================
-
-    /**
-     * 创建或更新 TokenMeta
-     */
-    public void saveTokenMeta(TokenMeta meta) {
-        cacheUtil.set(TOKEN_META_PREFIX + meta.getOpenId(), JSON.toJSONString(meta), TTL_SECONDS);
-        log.info("保存 TokenMeta: openId={}", meta.getOpenId());
-    }
-
-    /**
-     * 获取 TokenMeta
-     */
-    public TokenMeta getTokenMeta(String openId) {
-        if (!StringUtils.hasText(openId)) return null;
-        Object obj = cacheUtil.get(TOKEN_META_PREFIX + openId);
-        if (obj == null) return null;
-        return JSON.parseObject(obj.toString(), TokenMeta.class);
-    }
-
-    /**
-     * 更新 lastAccessTime + 刷新 TTL（活跃续期）
-     */
-    public void touchTokenMeta(String openId) {
-        TokenMeta meta = getTokenMeta(openId);
-        if (meta == null) return;
-        meta.setLastAccessTime(System.currentTimeMillis());
-        // ⭐ 保存时自动刷新 TTL
-        saveTokenMeta(meta);
-    }
-
-    /**
-     * 判断是否在滑动窗口内（< 3天），允许刷新 token
-     */
-    public boolean isRefreshable(String openId) {
-        TokenMeta meta = getTokenMeta(openId);
-        if (meta == null) return false;
-        long elapsed = System.currentTimeMillis() - meta.getLastAccessTime();
-        return elapsed < SLIDING_WINDOW_MS;
-    }
-
-    /**
-     * 删除 TokenMeta
-     */
-    public void deleteTokenMeta(String openId) {
-        cacheUtil.del(TOKEN_META_PREFIX + openId);
-    }
 
     // ==================== ProxySession ====================
 
@@ -218,7 +148,6 @@ public class AuthSessionCacheUtil {
      * 清理单个用户的所有缓存
      */
     public void clearUser(String openId) {
-        cacheUtil.del(TOKEN_META_PREFIX + openId);
         cacheUtil.del(PROXY_SESSION_PREFIX + openId);
         log.info("清理用户缓存: openId={}", openId);
     }
@@ -248,40 +177,6 @@ public class AuthSessionCacheUtil {
         return result;
     }
 
-    /**
-     * ⭐ 获取所有 TokenMeta
-     * <p>
-     * 仅供兼容旧代码。独立 Key + TTL 后不再需要定时清理。
-     */
-    public Map<String, TokenMeta> getAllTokenMetas() {
-        Set<String> keys = cacheUtil.keys(TOKEN_META_PREFIX + "*");
-        if (keys == null || keys.isEmpty()) return Collections.emptyMap();
-
-        Map<String, TokenMeta> result = new HashMap<>();
-        for (String fullKey : keys) {
-            String openId = extractOpenIdFromKey(fullKey, "token-meta:");
-            if (openId == null) continue;
-
-            TokenMeta meta = getTokenMeta(openId);
-            if (meta != null) {
-                result.put(openId, meta);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * ⭐ 定时清理不再必要（Redis TTL 自动过期）
-     * <p>
-     * 保留此方法是为了兼容，但它现在基本是空操作。
-     * 极端情况下（手动 set 无 TTL 的 key）仍可用。
-     */
-    public int cleanupStaleEntries() {
-        // 独立 Key + TTL 后，Redis 自动清理过期数据
-        // 此方法不再需要遍历全量数据
-        log.debug("cleanupStaleEntries: 独立 Key + TTL 模式，Redis 自动过期，无需手动清理");
-        return 0;
-    }
 
     // ==================== 内部 ====================
 
