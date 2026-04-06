@@ -1,5 +1,8 @@
 package cn.edu.sztui.base.application.service.impl;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import cn.binarywang.wx.miniapp.util.WxMaConfigHolder;
 import cn.edu.sztui.base.application.dto.command.LoginRequestCommand;
 import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
@@ -20,10 +23,13 @@ import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.error.WxErrorException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -54,13 +60,18 @@ public class AuthServiceImpl implements AuthService {
     @Resource
     private ApplicationEventPublisher eventPublisher;
 
+    @Resource
+    private WxMaService wxMaService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     // ==================== 状态查询 ====================
 
     /**
-     * 获取登录状态（精简版 - 不做缓存）
+     * 获取登录状态
+     * <p>
+     * 使用前端 header 传来的 cookies 检测学校登录状态。
      */
     @Override
     public LoginStatusVo getStatus() {
@@ -68,8 +79,11 @@ public class AuthServiceImpl implements AuthService {
         String wxId = tokenMessage.getOpenId();
         log.debug("用户 {} 查询登录状态", wxId);
 
-        // 直接获取真实状态（不做缓存）
-        LoginResultsVo result = doRefreshCookies(wxId, authSessionCacheUtil.getSession(wxId));
+        // 使用前端传来的 cookies 构建 ProxySession
+        ProxySession session = buildSessionFromContext(tokenMessage);
+
+        LoginResultsVo result = doRefreshCookies(wxId, session);
+        result.setOpenId(wxId);
 
         return LoginStatusVo.from(result);
     }
@@ -77,8 +91,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean getSessionStatus() {
         TokenMessage tokenMessage = UserContext.getContext();
-        String wxId = tokenMessage.getOpenId();
-        return authSessionCacheUtil.hasSession(wxId);
+        // 如果前端带了 cookies，那 session 就存在
+        return tokenMessage != null && tokenMessage.getSchoolCookiesJson() != null;
     }
 
     @Override
@@ -94,23 +108,25 @@ public class AuthServiceImpl implements AuthService {
     // ==================== 会话管理 ====================
 
     /**
-     * 初始化会话（精简版）
+     * 初始化会话（公开接口，无需认证）
+     * <p>
+     * 访问学校 gateway，获取预登录 cookies + loginTypes。
+     * 返回明文 cookies 给前端。
      */
     @Override
     public LoginResultsVo initSession() {
-        TokenMessage tokenMessage = UserContext.getContext();
-        String wxId = tokenMessage.getOpenId();
-        log.info("用户 {} 初始化会话（SmartHttpClient V2）", wxId);
+        log.info("初始化会话（公开，无 openId）");
 
-        // ⭐ 强制删除旧 ProxySession（替代原来的 invalidateStatusCache + clearSessionCookies）
-        authSessionCacheUtil.deleteSession(wxId);
+        // 新建空会话，执行刷新
+        LoginResultsVo result = doRefreshCookies(null, null);
 
-        // 执行刷新
-        return doRefreshCookies(wxId, null);
+        return result;
     }
 
     /**
-     * 刷新会话（精简版）
+     * 刷新会话
+     * <p>
+     * 使用前端传来的 cookies 重新访问学校 gateway，获取最新状态。
      */
     @Override
     public LoginResultsVo refreshSession() {
@@ -118,25 +134,16 @@ public class AuthServiceImpl implements AuthService {
         String wxId = tokenMessage.getOpenId();
         log.info("用户 {} 刷新会话", wxId);
 
-        // 1. 检查是否有会话
-        ProxySession session = authSessionCacheUtil.getSession(wxId);
-        if (session == null) {
-            throw new BusinessException(
-                    SysReturnCode.BASE_PROXY.getCode(),
-                    "会话不存在，请先初始化",
-                    ResultCodeEnum.BAD_REQUEST.getCode()
-            );
-        }
+        ProxySession session = buildSessionFromContext(tokenMessage);
 
-        // 2. 执行刷新
         LoginResultsVo result = doRefreshCookies(wxId, session);
+        result.setOpenId(wxId);
 
-        // 3. 检查刷新结果
         if (!result.isLogined()) {
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
-                    "会话已过期，请刷新会话",
-                    ResultCodeEnum.UNAUTHORIZED.getCode()
+                    "会话已过期，请重新登录",
+                    ResultCodeEnum.BAD_REQUEST.getCode()
             );
         }
 
@@ -152,14 +159,10 @@ public class AuthServiceImpl implements AuthService {
     // ==================== 登录/登出（完全不变） ====================
 
     @Override
-    public void getSms(String usrId) {
-        TokenMessage tokenMessage = UserContext.getContext();
-        String wxId = tokenMessage.getOpenId();
+    public void getSms(String usrId, String cookiesJson) {
+        log.info("📱 获取短信验证码: userId={}", usrId);
 
-        log.info("📱 获取短信验证码: openId={}, userId={}", wxId, usrId);
-
-        // ⭐ 关键修复：从 WebVPN 入口开始，建立完整的会话链路
-        // 而不是直接访问认证系统
+        // 使用前端传来的 cookies 或新建会话
         try (SmartSession smartSession = smartHttpClient.newSession()) {
 
             log.info("🍪 getSms 开始时有 0 个 Cookie（新会话）");
@@ -217,10 +220,7 @@ public class AuthServiceImpl implements AuthService {
 
             log.info("🍪 getSms 请求后有 {} 个 Cookie", smartSession.getCookies().size());
 
-            // 保存 Cookies
-            saveSessionCookies(wxId, smartSession);
-
-            log.info("💾 已保存 {} 个 Cookie 到缓存", smartSession.getCookies().size());
+            log.info("📱 短信请求完成，有 {} 个 Cookie", smartSession.getCookies().size());
 
         } catch (BusinessException e) {
             throw e;
@@ -236,27 +236,28 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResultsVo loginFrame(LoginRequestCommand cmd) {
-        TokenMessage tokenMessage = UserContext.getContext();
-        String wxId = tokenMessage.getOpenId();
+        // 从 wxCode 换取 openId（用于内部标识）
+        String wxId = resolveOpenId(cmd.getWxCode());
 
         LoginResultsVo ret = new LoginResultsVo();
 
-        // 检查 ProxySession
-        ProxySession cachedSession = authSessionCacheUtil.getSession(wxId);
-        if (cachedSession == null || cachedSession.getCookiesJson() == null
-                || cachedSession.getCookiesJson().isEmpty()
-                || cachedSession.getCookiesJson().equals("[]")) {
-            log.error("❌ ProxySession 为空或无 Cookie! openId={}", wxId);
+        // 使用前端传来的 cookies
+        String cookiesJson = cmd.getCookiesJson();
+        if (cookiesJson == null || cookiesJson.isEmpty() || cookiesJson.equals("[]")) {
+            log.error("❌ 前端未提供 cookies!");
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
-                    "会话不存在，请先获取token",
+                    "缺少预登录 cookies，请先初始化会话",
                     ResultCodeEnum.BAD_REQUEST.getCode()
             );
         }
 
-        log.info("📦 ProxySession.cookiesJson 长度: {}", cachedSession.getCookiesJson().length());
+        log.info("📦 前端传来 cookiesJson 长度: {}", cookiesJson.length());
 
-        try (SmartSession smartSession = createSmartSession(cachedSession)) {
+        ProxySession tempSession = new ProxySession();
+        tempSession.setCookiesJson(cookiesJson);
+
+        try (SmartSession smartSession = createSmartSession(tempSession)) {
 
             List<SmartCookie> loadedCookies = smartSession.getCookies();
             log.info("🍪 SmartSession 中加载了 {} 个 Cookie", loadedCookies.size());
@@ -364,13 +365,14 @@ public class AuthServiceImpl implements AuthService {
             UserInfoPraser.extractByRegex(ret, formRes.getBody());
             log.info("解析到用户信息: userId={}, realName={}", ret.getUserId(), ret.getRealName());
 
-            // ============ 第四步：保存 Cookies ============
-            authSessionCacheUtil.sessionLoginBind(wxId, cmd.getUserId(),smartSession.getCookies());
+            // ============ 第四步：保存 Cookies 到 Redis（供爬虫引擎使用） ============
+            authSessionCacheUtil.sessionLoginBind(wxId, cmd.getUserId(), smartSession.getCookies());
 
-            // ⭐ 第五步已删除：不再调用 invalidateStatusCache
+            // ============ 第五步：返回 cookies 给前端 ============
+            ret.setCookiesJson(JSON.toJSONString(smartSession.getCookies()));
+            ret.setOpenId(wxId);
 
             // ============ 第六步：发布登录成功事件 ============
-            // announcementCacheUtil.setActiveSourceOpenId(wxId);
             eventPublisher.publishEvent(new UserLoginEvent(
                     this, wxId,
                     ret.getUserId(),
@@ -379,7 +381,6 @@ public class AuthServiceImpl implements AuthService {
 
             log.info("✅ 登录成功，已发布用户登录事件: openId={}", wxId);
 
-            // ret.setWxId(wxId);
             ret.setLogined(true);
             return ret;
 
@@ -483,6 +484,47 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    // ==================== 辅助：身份解析 + 会话构建 ====================
+
+    /**
+     * 从 wxCode 换取 openId
+     */
+    private String resolveOpenId(String wxCode) {
+        if (StringUtils.isBlank(wxCode)) {
+            throw new BusinessException(
+                    SysReturnCode.WECHAT_PROXY.getCode(),
+                    "wxCode 不能为空",
+                    ResultCodeEnum.BAD_REQUEST.getCode()
+            );
+        }
+        try {
+            WxMaJscode2SessionResult session = wxMaService.getUserService().getSessionInfo(wxCode);
+            return session.getOpenid();
+        } catch (WxErrorException e) {
+            log.error("微信 code 换 session 失败: {}", e.getMessage(), e);
+            throw new BusinessException(
+                    SysReturnCode.WECHAT_PROXY.getCode(),
+                    "微信认证失败: " + e.getMessage(),
+                    ResultCodeEnum.BAD_REQUEST.getCode()
+            );
+        } finally {
+            WxMaConfigHolder.remove();
+        }
+    }
+
+    /**
+     * 从 UserContext 中的 schoolCookiesJson 构建 ProxySession
+     */
+    private ProxySession buildSessionFromContext(TokenMessage tokenMessage) {
+        if (tokenMessage == null || tokenMessage.getSchoolCookiesJson() == null) {
+            return null;
+        }
+        ProxySession session = new ProxySession();
+        session.setOpenId(tokenMessage.getOpenId());
+        session.setCookiesJson(tokenMessage.getSchoolCookiesJson());
+        return session;
+    }
+
     // ==================== 核心：Cookie 刷新逻辑 ====================
 
     private LoginResultsVo doRefreshCookies(String wxId, ProxySession session) {
@@ -514,7 +556,9 @@ public class AuthServiceImpl implements AuthService {
                 log.warn("⚠️ 检测到错误页面，清空 Cookie 并要求重新登录");
 
                 // 清空该用户的所有缓存
-                authSessionCacheUtil.deleteSession(wxId);
+                if (wxId != null) {
+                    authSessionCacheUtil.deleteSession(wxId);
+                }
 
                 // 设置需要重新登录
                 ret.setLogined(false);
@@ -529,7 +573,6 @@ public class AuthServiceImpl implements AuthService {
             if (finalUrl.contains(internalNetStartURL) || finalUrl.contains("/bmportal/index.portal")) {
                 // 已登录
                 ret.setLogined(true);
-                UserContext.getContext().setLoginTime(System.currentTimeMillis());
 
                 // 解析用户信息
                 UserInfoPraser.extractByRegex(ret, body);
@@ -572,8 +615,11 @@ public class AuthServiceImpl implements AuthService {
                 log.warn("未知的最终页面 URL: {}", finalUrl);
             }
 
-            // 保存刷新后的 Cookies（仅当非错误页面时）
-            if (!ret.isSessionInvalid()) {
+            // 返回 cookies 给前端
+            ret.setCookiesJson(JSON.toJSONString(smartSession.getCookies()));
+
+            // 保存到 Redis（供爬虫引擎使用，仅当有 openId 且非错误页面时）
+            if (wxId != null && !ret.isSessionInvalid()) {
                 saveSessionCookies(wxId, smartSession);
             }
 

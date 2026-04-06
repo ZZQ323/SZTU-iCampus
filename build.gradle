@@ -13,7 +13,6 @@ ext {
     commonsLang3Version = '3.14.0'
     hutoolVersion = '5.8.23'
     fastjson2Version = '2.0.48'
-    jjwtVersion = '0.11.5'
     xxlJobVersion = '2.4.0'
     httpClientVersion = '4.5.14'
     httpCoreVersion = '4.4.16'
@@ -47,9 +46,6 @@ subprojects {
         resolutionStrategy {
             force "org.apache.httpcomponents:httpclient:${httpClientVersion}"
             force "org.apache.httpcomponents:httpcore:${httpCoreVersion}"
-            force "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-            force "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-            force "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
         }
     }
 

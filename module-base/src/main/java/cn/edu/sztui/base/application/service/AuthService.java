@@ -91,8 +91,9 @@ public interface AuthService {
      * 请求发送短信验证码
      *
      * @param usrId 学号
+     * @param cookiesJson 前端传来的预登录 cookies JSON（可选，若为 null 则新建会话）
      */
-    void getSms(String usrId);
+    void getSms(String usrId, String cookiesJson);
 
     /**
      * 登录学校系统
