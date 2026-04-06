@@ -35,11 +35,11 @@ public class StreamPushService {
 
     // ==================== 课表推送 ====================
 
-    public void pushScheduleToUser(String wxOpenId, Object schedule) {
+    public void pushScheduleToUser(String userId, Object schedule) {
         WsMessage<Object> message = WsMessage.toUser(
-                StreamKeys.TYPE_SCHEDULE_DATA, schedule, wxOpenId);
+                StreamKeys.TYPE_SCHEDULE_DATA, schedule, userId);
         streamPublisher.publishSchedule(message);
-        log.info("已发布课表推送 - user: {}", wxOpenId);
+        log.info("已发布课表推送 - user: {}", userId);
     }
 
     public void broadcastSchedule(Object schedule) {
@@ -49,26 +49,26 @@ public class StreamPushService {
         log.info("已广播课表 - 订阅者数量: {}", wsSessionRegistry.getConnectionCount("schedule"));
     }
 
-    public void pushScheduleRefreshHint(String wxOpenId, String hint) {
+    public void pushScheduleRefreshHint(String userId, String hint) {
         WsMessage<Map<String, String>> message = WsMessage.toUser(
                 StreamKeys.TYPE_SCHEDULE_DATA,
                 Map.of("action", "REFRESH_HINT", "message", hint),
-                wxOpenId);
+                userId);
         streamPublisher.publishSchedule(message);
     }
 
-    public void pushScheduleRefreshHintToUsers(Collection<String> wxOpenIds, String hint) {
-        for (String wxOpenId : wxOpenIds) {
-            pushScheduleRefreshHint(wxOpenId, hint);
+    public void pushScheduleRefreshHintToUsers(Collection<String> userIds, String hint) {
+        for (String userId : userIds) {
+            pushScheduleRefreshHint(userId, hint);
         }
     }
 
-    public void pushAuthRequired(String wxOpenId, String message) {
+    public void pushAuthRequired(String userId, String message) {
         WsMessage<Void> authMsg = WsMessage.toUser(
-                StreamKeys.TYPE_AUTH_REQUIRED, null, wxOpenId);
+                StreamKeys.TYPE_AUTH_REQUIRED, null, userId);
         authMsg.setMessage(message);
         streamPublisher.publishSchedule(authMsg);
-        log.info("已发布认证失效提醒 - user: {}", wxOpenId);
+        log.info("已发布认证失效提醒 - user: {}", userId);
     }
 
     // ==================== 公告推送 ====================
@@ -80,9 +80,9 @@ public class StreamPushService {
         log.info("已广播公告 - 订阅者数量: {}", wsSessionRegistry.getConnectionCount("announcement"));
     }
 
-    public void pushAnnouncementToUser(String wxOpenId, Object announcement) {
+    public void pushAnnouncementToUser(String userId, Object announcement) {
         WsMessage<Object> message = WsMessage.toUser(
-                StreamKeys.TYPE_ANNOUNCEMENT_DATA, announcement, wxOpenId);
+                StreamKeys.TYPE_ANNOUNCEMENT_DATA, announcement, userId);
         streamPublisher.publishAnnouncement(message);
     }
 

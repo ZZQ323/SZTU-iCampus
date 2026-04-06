@@ -49,7 +49,7 @@ public class WsMessage<T> {
     private Long timestamp;
 
     /**
-     * 目标用户 openId，null = 广播
+     * 目标用户 userId，null = 广播
      */
     private String targetUser;
 

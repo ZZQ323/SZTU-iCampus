@@ -16,8 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 存储结构：
  * <ul>
  *   <li>topicSessions: topic → Set&lt;WebSocketSession&gt;</li>
- *   <li>sessionUsers:  sessionId → wxOpenId</li>
- *   <li>userSessions:  wxOpenId → WebSocketSession</li>
+ *   <li>sessionUsers:  sessionId → userId</li>
+ *   <li>userSessions:  userId → WebSocketSession</li>
  * </ul>
  * <p>
  * 文件位置：module-stream/.../infrastructure/websocket/registry/WsSessionRegistry.java
@@ -32,12 +32,12 @@ public class WsSessionRegistry {
     private final ConcurrentHashMap<String, Set<WebSocketSession>> topicSessions = new ConcurrentHashMap<>();
 
     /**
-     * sessionId → wxOpenId
+     * sessionId → userId
      */
     private final ConcurrentHashMap<String, String> sessionUsers = new ConcurrentHashMap<>();
 
     /**
-     * wxOpenId → session（一个用户同时只保留一个连接）
+     * userId → session（一个用户同时只保留一个连接）
      */
     private final ConcurrentHashMap<String, WebSocketSession> userSessions = new ConcurrentHashMap<>();
 
@@ -47,29 +47,29 @@ public class WsSessionRegistry {
      * 注册连接到指定 topic
      *
      * @param topic   订阅主题
-     * @param openId  用户 wxOpenId
+     * @param userId  用户 userId
      * @param session WebSocket 会话
      */
-    public void register(String topic, String openId, WebSocketSession session) {
+    public void register(String topic, String userId, WebSocketSession session) {
         // 如果该用户已有旧连接，先关闭
-        WebSocketSession old = userSessions.get(openId);
+        WebSocketSession old = userSessions.get(userId);
         if (old != null && old.isOpen() && !old.getId().equals(session.getId())) {
             try {
                 old.close();
             } catch (Exception ignored) {
             }
-            log.info("关闭用户旧连接: openId={}, oldSessionId={}", openId, old.getId());
+            log.info("关闭用户旧连接: userId={}, oldSessionId={}", userId, old.getId());
         }
 
         // 注册
         topicSessions
                 .computeIfAbsent(topic, k -> ConcurrentHashMap.newKeySet())
                 .add(session);
-        sessionUsers.put(session.getId(), openId);
-        userSessions.put(openId, session);
+        sessionUsers.put(session.getId(), userId);
+        userSessions.put(userId, session);
 
-        log.info("WS 注册: topic={}, openId={}, sessionId={}, 当前连接数={}",
-                topic, openId, session.getId(), getConnectionCount(topic));
+        log.info("WS 注册: topic={}, userId={}, sessionId={}, 当前连接数={}",
+                topic, userId, session.getId(), getConnectionCount(topic));
     }
 
     /**
@@ -77,17 +77,17 @@ public class WsSessionRegistry {
      */
     public void unregister(WebSocketSession session) {
         String sessionId = session.getId();
-        String openId = sessionUsers.remove(sessionId);
+        String userId = sessionUsers.remove(sessionId);
 
         // 从所有 topic 中移除
         topicSessions.values().forEach(sessions -> sessions.remove(session));
 
         // 从 userSessions 移除（仅当是同一个 session 时）
-        if (openId != null) {
-            userSessions.remove(openId, session);
+        if (userId != null) {
+            userSessions.remove(userId, session);
         }
 
-        log.info("WS 注销: openId={}, sessionId={}", openId, sessionId);
+        log.info("WS 注销: userId={}, sessionId={}", userId, sessionId);
     }
 
     // ==================== 查询 ====================
@@ -102,14 +102,14 @@ public class WsSessionRegistry {
     /**
      * 获取指定用户的 session
      */
-    public WebSocketSession getUserSession(String openId) {
-        return userSessions.get(openId);
+    public WebSocketSession getUserSession(String userId) {
+        return userSessions.get(userId);
     }
 
     /**
-     * 根据 session 获取 openId
+     * 根据 session 获取 userId
      */
-    public String getOpenId(WebSocketSession session) {
+    public String getUserId(WebSocketSession session) {
         return sessionUsers.get(session.getId());
     }
 
@@ -131,20 +131,20 @@ public class WsSessionRegistry {
     }
 
     /**
-     * 获取某 topic 下所有订阅者的 openId
+     * 获取某 topic 下所有订阅者的 userId
      */
     public Set<String> getSubscribers(String topic) {
         Set<WebSocketSession> sessions = topicSessions.get(topic);
         if (sessions == null || sessions.isEmpty()) {
             return Collections.emptySet();
         }
-        Set<String> openIds = ConcurrentHashMap.newKeySet();
+        Set<String> userIds = ConcurrentHashMap.newKeySet();
         for (WebSocketSession s : sessions) {
-            String openId = sessionUsers.get(s.getId());
-            if (openId != null) {
-                openIds.add(openId);
+            String userId = sessionUsers.get(s.getId());
+            if (userId != null) {
+                userIds.add(userId);
             }
         }
-        return openIds;
+        return userIds;
     }
 }

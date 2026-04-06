@@ -54,7 +54,7 @@ public class InfoController {
     @GetMapping("/v1/category-tree")
     @Operation(summary = "获取分类树", description = "获取频道、分类的完整配置")
     public Result getCategoryTree() {
-        log.debug("用户 {} 获取分类树", UserContext.getContext().getOpenId());
+        log.debug("用户 {} 获取分类树", UserContext.getContext().getUserId());
         return Result.ok(configLoader.getCategoryTree());
     }
 
@@ -64,7 +64,7 @@ public class InfoController {
     @GetMapping("/v1/channels")
     @Operation(summary = "获取频道列表")
     public Result getChannels() {
-        log.debug("用户 {} 获取频道列表", UserContext.getContext().getOpenId());
+        log.debug("用户 {} 获取频道列表", UserContext.getContext().getUserId());
         return Result.ok(infoService.getChannelsWithUnread());
     }
 
@@ -76,7 +76,7 @@ public class InfoController {
     public Result getCategories(
             @Parameter(description = "频道ID，默认 announcement")
             @RequestParam(defaultValue = "announcement") String channelId) {
-        log.debug("用户 {} 获取分类列表: channel={}", UserContext.getContext().getOpenId(), channelId);
+        log.debug("用户 {} 获取分类列表: channel={}", UserContext.getContext().getUserId(), channelId);
         return Result.ok(infoService.getCategoryCodeMap(channelId));
     }
 
@@ -103,7 +103,7 @@ public class InfoController {
             @RequestParam(defaultValue = "20") Integer pageSize) {
 
         log.info("用户 {} 获取信息列表: channel={}, category={}, page={}",
-                UserContext.getContext().getOpenId(), channelId, categoryCode, page);
+                UserContext.getContext().getUserId(), channelId, categoryCode, page);
 
         InfoService.InfoListResult result = infoService.getList(channelId, categoryCode, page, pageSize);
         return Result.ok(result);
@@ -123,7 +123,7 @@ public class InfoController {
             @RequestParam(defaultValue = "20") Integer limit) {
 
         log.info("用户 {} 搜索: keyword={}, channel={}",
-                UserContext.getContext().getOpenId(), keyword, channelId);
+                UserContext.getContext().getUserId(), keyword, channelId);
 
         List<ListParserResult.InfoItemMeta> result = infoService.search(keyword, channelId, limit);
         return Result.ok(result);
@@ -150,7 +150,7 @@ public class InfoController {
             @RequestParam(required = false) String categoryCode) {
 
         log.info("用户 {} 获取详情: channel={}, id={}, category={}",
-                UserContext.getContext().getOpenId(), channelId, id, categoryCode);
+                UserContext.getContext().getUserId(), channelId, id, categoryCode);
 
         ContentParserResult result = infoService.getDetail(channelId, id, categoryCode);
         return Result.ok(result);
@@ -178,7 +178,7 @@ public class InfoController {
     @GetMapping("/v1/unread")
     @Operation(summary = "获取未读计数")
     public Result getUnreadCount() {
-        log.debug("用户 {} 获取未读计数", UserContext.getContext().getOpenId());
+        log.debug("用户 {} 获取未读计数", UserContext.getContext().getUserId());
         return Result.ok(infoService.getUnreadCounts());
     }
 
@@ -205,7 +205,7 @@ public class InfoController {
     @Operation(summary = "标记已读")
     public Result markRead(@RequestBody MarkReadRequest request) {
         log.debug("用户 {} 标记已读: channel={}, latestId={}",
-                UserContext.getContext().getOpenId(), request.getChannelId(), request.getLatestId());
+                UserContext.getContext().getUserId(), request.getChannelId(), request.getLatestId());
 
         infoService.markChannelRead(
                 request.getChannelId() != null ? request.getChannelId() : "announcement",

@@ -54,7 +54,7 @@ public class InfoServiceImpl implements InfoService {
 
     @Override
     public List<ChannelInfo> getChannelsWithUnread() {
-        String openId = UserContext.getContext().getOpenId();
+        String userId = UserContext.getContext().getUserId();
         List<CrawlerConfig.ChannelConfig> channels = configLoader.getChannels();
 
         return channels.stream().map(ch -> {
@@ -62,7 +62,7 @@ public class InfoServiceImpl implements InfoService {
             info.setId(ch.getId());
             info.setName(ch.getName());
             info.setIcon(ch.getIcon());
-            info.setUnreadCount(infoCacheUtil.getUnreadCount(openId, ch.getId()));
+            info.setUnreadCount(infoCacheUtil.getUnreadCount(userId, ch.getId()));
 
             List<CategoryInfo> categories = new ArrayList<>();
             if (ch.getSourceIds() != null) {
@@ -185,10 +185,10 @@ public class InfoServiceImpl implements InfoService {
      * 分类代码必须和文章实际分类匹配，否则 404。
      */
     private ContentParserResult crawlDetail(String channelId, String id, String categoryCode) {
-        String openId = UserContext.getContext().getOpenId();
-        ProxySession session = authSessionCacheUtil.getSession(openId);
+        String userId = UserContext.getContext().getUserId();
+        ProxySession session = authSessionCacheUtil.getSession(userId);
         if (session == null) {
-            log.warn("无法获取用户会话: {}", openId);
+            log.warn("无法获取用户会话: {}", userId);
             return ContentParserResult.fail("无法获取用户会话");
         }
 
@@ -288,11 +288,11 @@ public class InfoServiceImpl implements InfoService {
 
     @Override
     public Map<String, Long> getUnreadCounts() {
-        String openId = UserContext.getContext().getOpenId();
+        String userId = UserContext.getContext().getUserId();
         Map<String, Long> counts = new LinkedHashMap<>();
 
         for (CrawlerConfig.ChannelConfig ch : configLoader.getChannels()) {
-            counts.put(ch.getId(), infoCacheUtil.getUnreadCount(openId, ch.getId()));
+            counts.put(ch.getId(), infoCacheUtil.getUnreadCount(userId, ch.getId()));
         }
 
         return counts;
@@ -300,8 +300,8 @@ public class InfoServiceImpl implements InfoService {
 
     @Override
     public void markChannelRead(String channelId, String latestId) {
-        String openId = UserContext.getContext().getOpenId();
-        infoCacheUtil.setUserReadPosition(openId, channelId, latestId);
-        log.debug("标记已读: openId={}, channel={}, latestId={}", openId, channelId, latestId);
+        String userId = UserContext.getContext().getUserId();
+        infoCacheUtil.setUserReadPosition(userId, channelId, latestId);
+        log.debug("标记已读: userId={}, channel={}, latestId={}", userId, channelId, latestId);
     }
 }

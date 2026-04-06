@@ -25,12 +25,12 @@ public class UserLoginEventListener {
     @Async
     @EventListener
     public void onUserLogin(UserLoginEvent event) {
-        log.info("收到用户登录事件: openId={}, userId={}, realName={}",
-                event.getOpenId(), event.getUserId(), event.getRealName());
+        log.info("收到用户登录事件: userId={}, realName={}",
+                event.getUserId(), event.getRealName());
 
         try {
             // 触发所有未初始化数据源的全量爬取
-            sourceInitTask.triggerInit(event.getOpenId());
+            sourceInitTask.triggerInit(event.getUserId());
         } catch (Exception e) {
             log.error("处理登录事件失败: {}", e.getMessage(), e);
         }

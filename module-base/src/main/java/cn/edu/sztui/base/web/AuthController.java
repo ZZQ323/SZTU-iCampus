@@ -24,7 +24,7 @@ import java.util.Map;
  *   <li>POST /auth/v1/login           - 登录学校系统</li>
  * </ul>
  * <p>
- * 需要认证（header 携带 X-Open-Id + X-School-Cookies）：
+ * 需要认证（header 携带 X-School-Cookies，可选 X-User-Id）：
  * <ul>
  *   <li>GET  /auth/v1/status          - 状态查询</li>
  *   <li>POST /auth/v1/session/refresh - 刷新会话</li>
@@ -74,9 +74,9 @@ public class AuthController {
     /**
      * 登录学校系统（公开接口）
      * <p>
-     * 请求体需包含 wxCode（用于换取 openId）和 cookiesJson（预登录 cookies）。
+     * 请求体需包含 cookiesJson（预登录 cookies）。
      */
-    @Operation(summary = "登录学校系统", description = "公开接口，需提供 wxCode + cookiesJson")
+    @Operation(summary = "登录学校系统", description = "公开接口，需提供 cookiesJson")
     @PostMapping("/v1/login")
     public Result login(@RequestBody LoginRequestCommand cmd) {
         LoginResultsVo result = authService.loginFrame(cmd);

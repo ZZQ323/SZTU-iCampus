@@ -40,9 +40,9 @@ public class SourceInitTask {
     /**
      * 触发所有未初始化源的全量爬取
      *
-     * @param openId 登录用户的 openId（用于获取 Cookie）
+     * @param userId 登录用户的 userId（用于获取 Cookie）
      */
-    public void triggerInit(String openId) {
+    public void triggerInit(String userId) {
         if (!initializing.compareAndSet(false, true)) {
             log.info("数据源初始化进行中，跳过重复触发");
             return;
@@ -60,7 +60,7 @@ public class SourceInitTask {
                 }
 
                 try {
-                    crawlEngine.initSource(source.getId(), openId);
+                    crawlEngine.initSource(source.getId(), userId);
                     initCount++;
                 } catch (Exception e) {
                     log.error("初始化源失败: {}, error={}", source.getId(), e.getMessage());

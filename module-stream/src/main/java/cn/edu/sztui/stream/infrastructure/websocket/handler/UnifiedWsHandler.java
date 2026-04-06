@@ -21,7 +21,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
  * <p>
  * 职责：
  * <ul>
- *   <li>连接建立时：从 attributes 读取 openId + topics，注册到 WsSessionRegistry</li>
+ *   <li>连接建立时：从 attributes 读取 userId + topics，注册到 WsSessionRegistry</li>
  *   <li>收到消息时：目前仅处理 HEARTBEAT（前端 ping），后续可扩展</li>
  *   <li>连接关闭时：从 WsSessionRegistry 注销</li>
  * </ul>
@@ -40,10 +40,10 @@ public class UnifiedWsHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        String openId = (String) session.getAttributes().get(WsAuthInterceptor.ATTR_OPEN_ID);
+        String userId = (String) session.getAttributes().get(WsAuthInterceptor.ATTR_USER_ID);
         String topicsStr = (String) session.getAttributes().get(WsAuthInterceptor.ATTR_TOPICS);
 
-        if (openId == null || topicsStr == null) {
+        if (userId == null || topicsStr == null) {
             log.warn("WS 连接缺少鉴权信息，关闭: sessionId={}", session.getId());
             closeQuietly(session);
             return;
@@ -54,12 +54,12 @@ public class UnifiedWsHandler extends TextWebSocketHandler {
         for (String topic : topics) {
             String trimmed = topic.trim();
             if (!trimmed.isEmpty()) {
-                sessionRegistry.register(trimmed, openId, session);
+                sessionRegistry.register(trimmed, userId, session);
             }
         }
 
         // 发送连接成功消息
-        sendConnectedMessage(session, openId, topicsStr);
+        sendConnectedMessage(session, userId, topicsStr);
     }
 
     @Override
@@ -78,28 +78,28 @@ public class UnifiedWsHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String openId = (String) session.getAttributes().get(WsAuthInterceptor.ATTR_OPEN_ID);
+        String userId = (String) session.getAttributes().get(WsAuthInterceptor.ATTR_USER_ID);
         sessionRegistry.unregister(session);
-        log.info("WS 连接关闭: openId={}, status={}", openId, status);
+        log.info("WS 连接关闭: userId={}, status={}", userId, status);
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        String openId = (String) session.getAttributes().get(WsAuthInterceptor.ATTR_OPEN_ID);
-        log.warn("WS 传输错误: openId={}, error={}", openId, exception.getMessage());
+        String userId = (String) session.getAttributes().get(WsAuthInterceptor.ATTR_USER_ID);
+        log.warn("WS 传输错误: userId={}, error={}", userId, exception.getMessage());
         sessionRegistry.unregister(session);
     }
 
     // ==================== 内部方法 ====================
 
-    private void sendConnectedMessage(WebSocketSession session, String openId, String topics) {
+    private void sendConnectedMessage(WebSocketSession session, String userId, String topics) {
         try {
             WsMessage<?> msg = WsMessage.system(StreamKeys.TYPE_CONNECTED,
                     "连接成功，已订阅: " + topics);
             String json = objectMapper.writeValueAsString(msg);
             session.sendMessage(new TextMessage(json));
         } catch (Exception e) {
-            log.warn("发送连接成功消息失败: openId={}", openId);
+            log.warn("发送连接成功消息失败: userId={}", userId);
         }
     }
 
