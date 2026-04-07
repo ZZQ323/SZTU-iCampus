@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * 会话管理控制器（精简版）
+ * 会话管理控制器
  * <p>
- * 仅保留重置会话功能。
+ * 管理 Redis 中的 ProxySession 缓存。
  */
 @Slf4j
 @RestController
 @RequestMapping("/session")
-public class WxAuthController {
+public class SessionController {
 
     @Resource
     private AuthSessionCacheUtil authSessionCacheUtil;
