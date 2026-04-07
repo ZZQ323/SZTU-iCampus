@@ -85,16 +85,15 @@ public class AuthSessionCacheUtil {
     }
 
     /**
-     * 登录绑定
+     * 登录绑定（不存在则创建，一个用户一个 session）
      */
     public boolean sessionLoginBind(String userId, String studentId, List<SmartCookie> newCookies) {
         ProxySession session = getSession(userId);
         if (session == null) {
-            throw new BusinessException(
-                    SysReturnCode.BASE_PROXY.getCode(),
-                    "无法获取代理会话，请先初始化",
-                    ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
-            );
+            session = new ProxySession();
+            session.setUserId(userId);
+            session.setCreateTime(System.currentTimeMillis());
+            session.setUserIds(new ArrayList<>());
         }
         if (!session.getUserIds().contains(studentId)) {
             session.getUserIds().add(studentId);
