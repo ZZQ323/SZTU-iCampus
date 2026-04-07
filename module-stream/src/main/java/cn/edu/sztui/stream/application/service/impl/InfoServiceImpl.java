@@ -1,8 +1,7 @@
 package cn.edu.sztui.stream.application.service.impl;
 
-import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
+import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
@@ -37,9 +36,6 @@ public class InfoServiceImpl implements InfoService {
 
     @Resource
     private InfoCacheUtil infoCacheUtil;
-
-    @Resource
-    private AuthSessionCacheUtil authSessionCacheUtil;
 
     @Resource
     private CrawlerConfigLoader configLoader;
@@ -185,10 +181,10 @@ public class InfoServiceImpl implements InfoService {
      * 分类代码必须和文章实际分类匹配，否则 404。
      */
     private ContentParserResult crawlDetail(String channelId, String id, String categoryCode) {
-        String userId = UserContext.getContext().getUserId();
-        ProxySession session = authSessionCacheUtil.getSession(userId);
-        if (session == null) {
-            log.warn("无法获取用户会话: {}", userId);
+        TokenMessage ctx = UserContext.getContext();
+        String cookiesJson = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
+        if (cookiesJson == null || cookiesJson.isEmpty()) {
+            log.warn("无法获取用户 Cookie");
             return ContentParserResult.fail("无法获取用户会话");
         }
 
@@ -201,7 +197,7 @@ public class InfoServiceImpl implements InfoService {
 
         try {
             SmartSession smartSession = smartHttpClient.newSession(
-                    SmartCookieConverter.jsonToSmartCookies(session.getCookiesJson()));
+                    SmartCookieConverter.jsonToSmartCookies(cookiesJson));
 
             // 构建详情 URL（使用正确 source 的 detailUrlTemplate）
             String url = buildDetailUrl(source, id, categoryCode);

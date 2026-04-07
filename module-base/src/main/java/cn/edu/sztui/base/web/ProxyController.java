@@ -1,8 +1,7 @@
 package cn.edu.sztui.base.web;
 
-import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
-import cn.edu.sztui.common.cache.dto.ProxySession;
 import cn.edu.sztui.common.util.auth.UserContext;
+import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
@@ -41,8 +40,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 3. WebVPN 资源可能检查 Host/Referer 头
  * <p>
  * 流程：
- * 小程序 → /proxy/image?url=xxx （带 JWT Token）
- *       → 后端从 Redis 取学校 Cookie
+ * 小程序 → /proxy/image?url=xxx （带 X-School-Cookies header）
+ *       → 后端从请求 header 获取学校 Cookie
  *       → 后端带 Cookie + Host 头请求学校服务器
  *       → 返回二进制流给小程序
  * <p>
@@ -53,9 +52,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/proxy")
 @Tag(name = "资源代理", description = "代理访问需要学校 Cookie 的图片和附件")
 public class ProxyController {
-
-    @Resource
-    private AuthSessionCacheUtil authSessionCacheUtil;
 
     @Resource
     private SmartHttpClient smartHttpClient;
@@ -101,10 +97,9 @@ public class ProxyController {
             @RequestParam String url,
             HttpServletResponse response) {
 
-        String userId = UserContext.getContext().getUserId();
         String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
 
-        log.debug("代理图片: userId={}, url={}", userId, decodedUrl);
+        log.debug("代理图片: url={}", decodedUrl);
 
         // 安全检查：只允许代理学校域名的资源
         if (!isAllowedDomain(decodedUrl)) {
@@ -114,7 +109,7 @@ public class ProxyController {
         }
 
         try {
-            byte[] data = fetchResource(userId, decodedUrl);
+            byte[] data = fetchResource(decodedUrl);
             if (data == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -155,10 +150,9 @@ public class ProxyController {
             @RequestParam(required = false) String filename,
             HttpServletResponse response) {
 
-        String userId = UserContext.getContext().getUserId();
         String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
 
-        log.info("代理附件下载: userId={}, url={}, filename={}", userId, decodedUrl, filename);
+        log.info("代理附件下载: url={}, filename={}", decodedUrl, filename);
 
         if (!isAllowedDomain(decodedUrl)) {
             log.warn("拒绝代理非学校域名: {}", decodedUrl);
@@ -167,7 +161,7 @@ public class ProxyController {
         }
 
         try {
-            byte[] data = fetchResource(userId, decodedUrl);
+            byte[] data = fetchResource(decodedUrl);
             if (data == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -209,17 +203,20 @@ public class ProxyController {
      * 用用户的学校 Cookie 请求资源，返回二进制数据
      * <p>
      * ⭐ 关键：设置 Host 头为目标域名，避免 WebVPN 拒绝
+     * <p>
+     * Cookies 从请求 header（UserContext）获取，不从 Redis 读取。
      */
-    private byte[] fetchResource(String userId, String url) {
-        // 1. 获取用户的学校 Cookie
-        ProxySession session = authSessionCacheUtil.getSession(userId);
-        if (session == null || !StringUtils.hasText(session.getCookiesJson())) {
-            log.warn("用户无有效会话: userId={}", userId);
+    private byte[] fetchResource(String url) {
+        // 1. 从 UserContext 获取前端通过 header 传来的 Cookie
+        TokenMessage ctx = UserContext.getContext();
+        String cookiesJson = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
+        if (!StringUtils.hasText(cookiesJson)) {
+            log.warn("用户无有效 Cookie");
             return null;
         }
 
         try {
-            List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(session.getCookiesJson());
+            List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
             SmartSession smartSession = smartHttpClient.newSession(cookies);
 
             // 2. 构建 Cookie 字符串
