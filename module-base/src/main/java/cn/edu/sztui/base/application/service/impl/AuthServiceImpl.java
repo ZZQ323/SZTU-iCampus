@@ -409,7 +409,8 @@ public class AuthServiceImpl implements AuthService {
         TokenMessage tokenMessage = UserContext.getContext();
         String userId = tokenMessage.getUserId();
 
-        try (SmartSession smartSession = createSmartSession(authSessionCacheUtil.getSession(userId))) {
+        ProxySession session = buildSessionFromContext(tokenMessage);
+        try (SmartSession smartSession = createSmartSession(session)) {
 
             // 访问登出 URL
             smartHttpClient.get(logoutSubmitURL, smartSession);

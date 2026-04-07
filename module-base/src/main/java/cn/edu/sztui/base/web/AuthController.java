@@ -21,12 +21,17 @@ import java.util.Map;
  * Cookies 通过 header 收发：
  * - 前端通过 X-School-Cookies header 发送 cookies
  * - 后端通过 X-Set-Cookies response header 返回更新后的 cookies
+ * - CookieResponseFilter 统一暴露 Access-Control-Expose-Headers
  * <p>
  * 公开接口（cookie 可选）：
  * <ul>
- *   <li>POST /auth/v1/session/init    - 初始化会话，获取 loginTypes</li>
- *   <li>POST /auth/v1/request/sms     - 请求短信验证码</li>
- *   <li>POST /auth/v1/login           - 登录学校系统</li>
+ *   <li>POST /auth/v1/session/init    - 初始化会话，获取预登录 cookies 和 loginTypes</li>
+ * </ul>
+ * <p>
+ * 登录流程接口（需要 initSession 返回的 cookies）：
+ * <ul>
+ *   <li>POST /auth/v1/request/sms     - 请求短信验证码（需 initSession cookies）</li>
+ *   <li>POST /auth/v1/login           - 登录学校系统（需 requestSms cookies）</li>
  * </ul>
  * <p>
  * 需要认证（header 必须携带 X-School-Cookies）：
@@ -58,7 +63,9 @@ public class AuthController {
         return Result.ok(result);
     }
 
-    @Operation(summary = "请求短信验证码")
+    // ==================== 登录流程接口（需要 initSession 返回的 cookies） ====================
+
+    @Operation(summary = "请求短信验证码", description = "需要 initSession 返回的 cookies")
     @PostMapping("/v1/request/sms")
     public Result requestSms(@RequestBody Map<String, String> body, HttpServletResponse response) {
         String userId = body.get("userId");
@@ -72,7 +79,7 @@ public class AuthController {
         return Result.ok("success");
     }
 
-    @Operation(summary = "登录学校系统", description = "公开接口，cookies 通过 header 传递")
+    @Operation(summary = "登录学校系统", description = "需要 requestSms 返回的 cookies")
     @PostMapping("/v1/login")
     public Result login(@RequestBody LoginRequestCommand cmd, HttpServletResponse response) {
         LoginResultsVo result = authService.loginFrame(cmd);

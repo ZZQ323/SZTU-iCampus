@@ -47,8 +47,6 @@ public class CookieAuthFilter extends OncePerRequestFilter {
      */
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/auth/v1/session/init",
-            "/auth/v1/login",
-            "/auth/v1/request/sms",
             "/notice/list",
             "/calendar/**"
     );
