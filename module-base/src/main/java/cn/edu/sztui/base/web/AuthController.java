@@ -59,7 +59,8 @@ public class AuthController {
     @PostMapping("/v1/session/init")
     public Result initSession(HttpServletResponse response) {
         LoginResultsVo result = authService.initSession();
-        extractCookiesToHeader(response, result);
+        // header + body 双保险：header 给自动拦截器，body 给手动兜底
+        setCookieHeader(response, result);
         return Result.ok(result);
     }
 
@@ -83,7 +84,8 @@ public class AuthController {
     @PostMapping("/v1/login")
     public Result login(@RequestBody LoginRequestCommand cmd, HttpServletResponse response) {
         LoginResultsVo result = authService.loginFrame(cmd);
-        extractCookiesToHeader(response, result);
+        // header + body 双保险
+        setCookieHeader(response, result);
         return Result.ok(result);
     }
 
@@ -122,7 +124,22 @@ public class AuthController {
     // ==================== 工具方法 ====================
 
     /**
-     * 从 LoginResultsVo 中提取 cookiesJson → 写入 response header → 清空 VO 中的字段
+     * 设置 X-Set-Cookies header，保留 body 中的 cookiesJson（header + body 双保险）
+     * <p>
+     * 用于 initSession / login 等需要前端一定能拿到 cookies 的接口。
+     * 小程序 uni.request 可能无法读取自定义响应头（即使有 Access-Control-Expose-Headers），
+     * 所以 body 作为兜底。
+     */
+    private void setCookieHeader(HttpServletResponse response, LoginResultsVo result) {
+        if (result != null && result.getCookiesJson() != null) {
+            response.setHeader(HEADER_SET_COOKIES, result.getCookiesJson());
+        }
+    }
+
+    /**
+     * 设置 X-Set-Cookies header 并清空 body 中的 cookiesJson
+     * <p>
+     * 用于 refresh / logout 等已有 cookies 的接口（不需要 body 兜底）
      */
     private void extractCookiesToHeader(HttpServletResponse response, LoginResultsVo result) {
         if (result != null && result.getCookiesJson() != null) {
