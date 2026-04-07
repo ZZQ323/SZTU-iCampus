@@ -20,7 +20,7 @@ import java.util.List;
  * <p>
  * 错误码约定：
  * <ul>
- *   <li>401 - Token 无效（由 JwtAuthFilter 处理）</li>
+ *   <li>401 - 未认证（由 CookieAuthFilter 处理）</li>
  *   <li>403 - Cookie 无效（由本工具检测，业务层抛出）</li>
  * </ul>
  * <p>

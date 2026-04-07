@@ -5,9 +5,6 @@ plugins {
 }
 
 dependencies {
-    // 微信类
-    implementation("com.github.binarywang:weixin-java-miniapp:4.7.0")
-
     // 业务模块不需要 Spring Boot 插件，只需要基础依赖
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'

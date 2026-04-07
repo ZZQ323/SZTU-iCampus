@@ -15,7 +15,7 @@ plugins {
 
 dependencies {
     implementation 'org.apache.dubbo:dubbo:3.2.0'
-    implementation("com.github.binarywang:weixin-java-miniapp:4.7.0")
+
     implementation 'com.alibaba.fastjson2:fastjson2:2.0.48'
     // 业务模块不需要 Spring Boot 插件，只需要基础依赖
     implementation 'org.springframework:spring-core'
