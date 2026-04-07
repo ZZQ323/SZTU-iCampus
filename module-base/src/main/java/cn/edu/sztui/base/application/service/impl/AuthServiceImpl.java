@@ -152,13 +152,22 @@ public class AuthServiceImpl implements AuthService {
     // ==================== 登录/登出（完全不变） ====================
 
     @Override
-    public void getSms(String usrId, String cookiesJson) {
+    public String getSms(String usrId) {
         log.info("📱 获取短信验证码: userId={}", usrId);
 
-        // 使用前端传来的 cookies 或新建会话
-        try (SmartSession smartSession = smartHttpClient.newSession()) {
+        // 从 UserContext 获取前端通过 header 传来的 cookies（如果有）
+        TokenMessage ctx = UserContext.getContext();
+        String existingCookies = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
 
-            log.info("🍪 getSms 开始时有 0 个 Cookie（新会话）");
+        ProxySession tempSession = new ProxySession();
+        if (existingCookies != null && !existingCookies.isEmpty() && !existingCookies.equals("[]")) {
+            tempSession.setCookiesJson(existingCookies);
+            log.info("🍪 getSms 使用前端传来的 cookies");
+        }
+
+        try (SmartSession smartSession = createSmartSession(tempSession)) {
+
+            log.info("🍪 getSms 开始时有 {} 个 Cookie", smartSession.getCookies().size());
 
             // ⭐ 第一步：访问 WebVPN 入口，建立完整的会话链路
             // 使用 thdportal_login URL 跳过 /por/ 页面的 JS 重定向
@@ -215,6 +224,8 @@ public class AuthServiceImpl implements AuthService {
 
             log.info("📱 短信请求完成，有 {} 个 Cookie", smartSession.getCookies().size());
 
+            return JSON.toJSONString(smartSession.getCookies());
+
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -233,10 +244,17 @@ public class AuthServiceImpl implements AuthService {
 
         LoginResultsVo ret = new LoginResultsVo();
 
-        // 使用前端传来的 cookies
-        String cookiesJson = cmd.getCookiesJson();
+        // 从 UserContext 获取 cookies（CookieAuthFilter 从 header 解析）
+        TokenMessage ctx = UserContext.getContext();
+        String cookiesJson = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
+
+        // fallback: 从请求体读取（兼容旧版前端）
         if (cookiesJson == null || cookiesJson.isEmpty() || cookiesJson.equals("[]")) {
-            log.error("❌ 前端未提供 cookies!");
+            cookiesJson = cmd.getCookiesJson();
+        }
+
+        if (cookiesJson == null || cookiesJson.isEmpty() || cookiesJson.equals("[]")) {
+            log.error("❌ 前端未提供 cookies（header 和 body 均为空）");
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
                     "缺少预登录 cookies，请先初始化会话",
