@@ -23,8 +23,11 @@ import java.util.Map;
 /**
  * Cookie 认证过滤器
  * <p>
- * 从请求 header 读取 X-School-Cookies（必需）和 X-User-Id（可选），
+ * 所有请求都尝试从 header 读取 X-School-Cookies 和 X-User-Id，
  * 构建 UserContext 供下游使用。
+ * <p>
+ * 公开接口：有 cookie 就读，没有不拒绝。
+ * 非公开接口：必须有 cookie，否则 401。
  * <p>
  * Cookie 有效性由学校返回的页面内容判断（在业务层处理）。
  */
@@ -40,7 +43,7 @@ public class CookieAuthFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     /**
-     * 公开接口，无需认证
+     * 公开接口，cookie 可选
      */
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/auth/v1/session/init",
@@ -55,34 +58,30 @@ public class CookieAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String path = request.getServletPath();
+            String cookiesJson = request.getHeader(HEADER_COOKIES);
 
-            // 公开接口直接放行
-            if (isPublicPath(path)) {
-                chain.doFilter(request, response);
-                return;
+            // 所有路径：有 cookie 就读取并设置 UserContext
+            if (StringUtils.hasText(cookiesJson)) {
+                TokenMessage context = new TokenMessage();
+                context.setSchoolCookiesJson(cookiesJson);
+
+                String userId = request.getHeader(HEADER_USER_ID);
+                if (!StringUtils.hasText(userId)) {
+                    userId = request.getParameter("userId");
+                }
+                if (StringUtils.hasText(userId)) {
+                    context.setUserId(userId);
+                }
+
+                UserContext.setContext(context);
             }
 
-            // 读取 cookies（认证的核心）
-            String cookiesJson = request.getHeader(HEADER_COOKIES);
-            if (!StringUtils.hasText(cookiesJson)) {
+            // 非公开路径：必须有 cookies
+            if (!isPublicPath(path) && !StringUtils.hasText(cookiesJson)) {
                 writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "请先登录");
                 return;
             }
 
-            // 构建用户上下文
-            TokenMessage context = new TokenMessage();
-            context.setSchoolCookiesJson(cookiesJson);
-
-            // userId 是可选的（用于缓存/路由，不是认证凭证）
-            String userId = request.getHeader(HEADER_USER_ID);
-            if (!StringUtils.hasText(userId)) {
-                userId = request.getParameter("userId");
-            }
-            if (StringUtils.hasText(userId)) {
-                context.setUserId(userId);
-            }
-
-            UserContext.setContext(context);
             chain.doFilter(request, response);
 
         } finally {
