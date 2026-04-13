@@ -1,8 +1,12 @@
 package cn.edu.sztui.stream.application.external.engine;
 
+import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
+import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
+import cn.edu.sztui.stream.application.service.StreamPushService;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
@@ -55,6 +59,12 @@ public class CrawlEngine {
     @Resource
     private StreamPublisher streamPublisher;
 
+    @Resource
+    private AuthSessionCacheUtil authSessionCacheUtil;
+
+    @Resource
+    private StreamPushService streamPushService;
+
     /**
      * 后台初始化线程池（阶段 2 用）
      */
@@ -78,7 +88,8 @@ public class CrawlEngine {
         }
 
         try {
-            SmartSession session = resolveSession(source);
+            CookieSourceManager.CookieSessionPair pair = resolveSessionPair(source);
+            SmartSession session = pair.getSession();
 
             String listUrl = buildListUrl(source, 1);
             SmartResponse response = smartHttpClient.get(listUrl, session);
@@ -90,6 +101,7 @@ public class CrawlEngine {
                     source.getParserType(), response.getBody(), source, 1);
 
             if (result == null || result.getItems() == null || result.getItems().isEmpty()) {
+                syncCookiesIfChanged(pair);
                 return CrawlResult.empty(sourceId);
             }
 
@@ -99,6 +111,7 @@ public class CrawlEngine {
 
             if (newItems.isEmpty()) {
                 infoCacheUtil.updateLastCrawlTime(sourceId);
+                syncCookiesIfChanged(pair);
                 return CrawlResult.empty(sourceId);
             }
 
@@ -109,6 +122,9 @@ public class CrawlEngine {
             infoCacheUtil.updateLastCrawlTime(sourceId);
 
             broadcastNewContent(channelId, newItems, newLatestId);
+
+            // 爬取完成后检测 cookie 变化
+            syncCookiesIfChanged(pair);
 
             List<String> ids = newItems.stream().map(ListParserResult.InfoItemMeta::getId).toList();
             log.info("增量爬取完成: source={}, 新增 {} 条", sourceId, newItems.size());
@@ -143,7 +159,8 @@ public class CrawlEngine {
         log.info("======== 开始初始化数据源: {} ({}) ========", source.getName(), sourceId);
 
         try {
-            SmartSession session = resolveSession(source);
+            CookieSourceManager.CookieSessionPair pair = resolveSessionPair(source);
+            SmartSession session = pair.getSession();
 
             // ==================== 阶段 1：同步爬第 1 页 ====================
 
@@ -173,6 +190,9 @@ public class CrawlEngine {
 
             // ⭐ 立即标记为 initialized → 用户马上能看到第 1 页数据
             infoCacheUtil.markSourceInitialized(sourceId);
+
+            // 阶段 1 完成后检测 cookie 变化
+            syncCookiesIfChanged(pair);
 
             long phase1Ms = System.currentTimeMillis() - startTime;
             log.info("阶段1完成: {} - {} 条, {}ms（用户可见）", sourceId, firstPageItems.size(), phase1Ms);
@@ -211,6 +231,9 @@ public class CrawlEngine {
                             log.info("阶段2完成: {} - 无追加数据", sourceId);
                         }
 
+                        // 阶段 2 完成后再次检测 cookie 变化
+                        syncCookiesIfChanged(pair);
+
                     } catch (Exception e) {
                         log.warn("阶段2失败（不影响已有数据）: source={}, error={}",
                                 sourceId, e.getMessage());
@@ -233,7 +256,8 @@ public class CrawlEngine {
         if (source == null) return null;
 
         try {
-            SmartSession session = resolveSession(source);
+            CookieSourceManager.CookieSessionPair pair = resolveSessionPair(source);
+            SmartSession session = pair.getSession();
             String detailUrl = buildDetailUrl(source, id, categoryCode);
 
             SmartResponse response = smartHttpClient.get(detailUrl, session);
@@ -247,6 +271,8 @@ public class CrawlEngine {
             if (content != null) {
                 content.setId(id);
             }
+
+            syncCookiesIfChanged(pair);
             return content;
 
         } catch (Exception e) {
@@ -257,11 +283,47 @@ public class CrawlEngine {
 
     // ==================== 内部方法 ====================
 
-    private SmartSession resolveSession(CrawlerConfig.SourceConfig source) {
+    /**
+     * 解析爬取 session
+     * <p>
+     * 返回 CookieSessionPair：需要认证时包含 userId 和原始 cookies 快照，不需要认证时 userId 为 null。
+     */
+    private CookieSourceManager.CookieSessionPair resolveSessionPair(CrawlerConfig.SourceConfig source) {
         if (source.isRequiresAuth()) {
-            return cookieSourceManager.getAvailableSession();
+            return cookieSourceManager.getAvailableSessionWithUser();
         }
-        return smartHttpClient.newSession();
+        return new CookieSourceManager.CookieSessionPair(null, smartHttpClient.newSession(), null);
+    }
+
+    /**
+     * 爬取后检测 cookie 变化，有变化则更新 Redis 并推送给用户
+     */
+    private void syncCookiesIfChanged(CookieSourceManager.CookieSessionPair pair) {
+        if (pair.getUserId() == null || pair.getOriginalCookies() == null) return;
+
+        List<SmartCookie> currentCookies = pair.getSession().getCookies();
+        if (cookiesChanged(pair.getOriginalCookies(), currentCookies)) {
+            String userId = pair.getUserId();
+            authSessionCacheUtil.saveOrUpdateSessionCookie(userId, currentCookies);
+            String newJson = SmartCookieConverter.smartCookiesToJson(currentCookies);
+            streamPushService.pushCookieUpdate(userId, newJson);
+            log.info("爬取过程中 Cookie 变化，已同步: userId={}", userId);
+        }
+    }
+
+    /**
+     * 比较两组 cookies 是否有变化（按 name=value 集合比较）
+     */
+    private boolean cookiesChanged(List<SmartCookie> original, List<SmartCookie> current) {
+        if (original.size() != current.size()) return true;
+        var originalSet = new java.util.HashSet<String>();
+        for (SmartCookie c : original) {
+            originalSet.add(c.getName() + "=" + c.getValue());
+        }
+        for (SmartCookie c : current) {
+            if (!originalSet.contains(c.getName() + "=" + c.getValue())) return true;
+        }
+        return false;
     }
 
     /**

@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,9 @@ public class CookieAuthFilter extends OncePerRequestFilter {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     /**
@@ -72,6 +76,11 @@ public class CookieAuthFilter extends OncePerRequestFilter {
                 }
 
                 UserContext.setContext(context);
+
+                // 异步刷新 Redis cookie 池（供爬虫引擎使用）
+                if (StringUtils.hasText(userId)) {
+                    eventPublisher.publishEvent(new CookieAccessEvent(this, userId, cookiesJson));
+                }
             }
 
             // 非公开路径：必须有 cookies

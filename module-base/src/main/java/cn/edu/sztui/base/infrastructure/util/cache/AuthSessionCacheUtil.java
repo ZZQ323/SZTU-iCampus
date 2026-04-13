@@ -5,6 +5,7 @@ import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
+import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
@@ -139,6 +140,28 @@ public class AuthSessionCacheUtil {
     public boolean isSchoolLoggedIn(String userId) {
         ProxySession session = getSession(userId);
         return session != null && session.isSchoolLoggedIn();
+    }
+
+    // ==================== Cookie 池刷新（供 CookieAccessEvent 使用） ====================
+
+    /**
+     * 按需刷新 Cookie 池
+     * <p>
+     * 5 分钟内不重复更新同一用户，避免每次请求都写 Redis。
+     * 由 CookieAccessEventListener 异步调用。
+     */
+    private static final long REFRESH_THROTTLE_MS = 5 * 60 * 1000;
+
+    public void refreshIfNeeded(String userId, String cookiesJson) {
+        if (!StringUtils.hasText(userId) || !StringUtils.hasText(cookiesJson)) return;
+        ProxySession session = getSession(userId);
+        if (session != null) {
+            long elapsed = System.currentTimeMillis() - session.getLastUpdateTime();
+            if (elapsed < REFRESH_THROTTLE_MS) return;
+        }
+        List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
+        saveOrUpdateSessionCookie(userId, cookies);
+        log.info("刷新用户 {} 的 Cookie 池（来自用户请求）", userId);
     }
 
     // ==================== 清理 ====================
