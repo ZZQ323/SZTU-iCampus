@@ -155,19 +155,12 @@ public class AuthServiceImpl implements AuthService {
     public String getSms(String usrId) {
         log.info("📱 获取短信验证码: userId={}", usrId);
 
-        // 从 UserContext 获取前端通过 header 传来的 cookies（如果有）
-        TokenMessage ctx = UserContext.getContext();
-        String existingCookies = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
+        // ⭐ 始终创建空 session，不继承前端的旧 cookie
+        // 首次成功登录：0 cookie → 正确落地 ActionAuthChain?entityId=webvpn
+        // 失败案例：旧 cookie → 错误落地 idp/AuthnEngine（IDP 路由被干扰）
+        try (SmartSession smartSession = smartHttpClient.newSession()) {
 
-        ProxySession tempSession = new ProxySession();
-        if (existingCookies != null && !existingCookies.isEmpty() && !existingCookies.equals("[]")) {
-            tempSession.setCookiesJson(existingCookies);
-            log.info("🍪 getSms 使用前端传来的 cookies");
-        }
-
-        try (SmartSession smartSession = createSmartSession(tempSession)) {
-
-            log.info("🍪 getSms 开始时有 {} 个 Cookie", smartSession.getCookies().size());
+            log.info("🍪 getSms 使用全新空 session");
 
             // ⭐ 第一步：访问 WebVPN 入口，建立完整的会话链路
             // 使用 thdportal_login URL 跳过 /por/ 页面的 JS 重定向
@@ -579,8 +572,13 @@ public class AuthServiceImpl implements AuthService {
                 log.info("检测到登录方式（gatewaySecond）: {}", detectedTypes);
 
             } else {
-                // 未知状态，尝试从响应体判断
-                if (body != null) {
+                // ⭐ 检测 WebVPN 门户页面 = session 已过期
+                if (finalUrl.contains("/por/") || finalUrl.contains("webvpn.sztu.edu.cn/por")) {
+                    log.warn("检测到 WebVPN 门户页面，会话已过期: {}", finalUrl);
+                    ret.setSessionInvalid(true);
+                    ret.setLoginTypes(Arrays.asList(LoginType.SMS, LoginType.PASSWORD));
+                } else if (body != null) {
+                    // 未知状态，尝试从响应体判断
                     // ⭐ 检查是否是真正的登录表单页面（而不是错误页面）
                     if (isRealLoginPage(body)) {
                         // 包含登录表单，未登录状态 - 检测支持的登录方式
