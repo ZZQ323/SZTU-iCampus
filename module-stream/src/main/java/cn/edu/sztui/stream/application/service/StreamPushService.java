@@ -8,9 +8,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 流式推送服务（WebSocket 版）
@@ -88,6 +86,17 @@ public class StreamPushService {
 
     public void broadcastNewAnnouncements(Object data) {
         streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
+    }
+
+    // ==================== Cookie 更新推送 ====================
+
+    public void pushCookieUpdate(String userId, String cookiesJson) {
+        WsMessage<Map<String, String>> message = WsMessage.toUser(
+                StreamKeys.TYPE_COOKIE_UPDATE,
+                Map.of("cookiesJson", cookiesJson),
+                userId);
+        streamPublisher.publishSchedule(message);
+        log.info("已推送 Cookie 更新 - user: {}", userId);
     }
 
     // ==================== 日历/活动推送 ====================
