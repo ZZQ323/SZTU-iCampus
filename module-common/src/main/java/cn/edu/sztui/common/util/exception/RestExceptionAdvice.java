@@ -35,7 +35,7 @@ public class RestExceptionAdvice {
     // ============ SSE 超时异常处理（静默） ============
 
     /**
-     * ⭐ 处理 SSE 异步请求超时
+     * 处理 SSE 异步请求超时
      *
      * SSE 连接超时是正常行为，不需要返回错误响应。
      * 因为 SSE 连接已经关闭，无法写入响应，尝试写入会抛出 HttpMediaTypeNotAcceptableException。
