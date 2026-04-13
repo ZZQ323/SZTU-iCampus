@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.Comparator;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -103,12 +104,13 @@ public class InfoCacheUtil {
         String metaKey = getMetaKey(channelId);
         cacheUtil.hset(metaKey, meta.getId(), JSON.toJSONString(meta));
 
+        double score = idToScore(meta.getId());
         String timelineKey = generateKey(KEY_PREFIX + channelId + TIMELINE_SUFFIX);
-        redisTemplate.opsForZSet().add(timelineKey, meta.getId(), Double.parseDouble(meta.getId()));
+        redisTemplate.opsForZSet().add(timelineKey, meta.getId(), score);
 
         if (StringUtils.hasText(meta.getCategoryCode())) {
             String categoryKey = generateKey(KEY_PREFIX + channelId + CATEGORY_PREFIX + meta.getCategoryCode());
-            redisTemplate.opsForZSet().add(categoryKey, meta.getId(), Double.parseDouble(meta.getId()));
+            redisTemplate.opsForZSet().add(categoryKey, meta.getId(), score);
         }
 
         log.debug("保存元数据: channel={}, id={}, title={}", channelId, meta.getId(), meta.getTitle());
@@ -185,7 +187,7 @@ public class InfoCacheUtil {
             return Collections.emptyList();
         }
 
-        double minScore = Double.parseDouble(lastId) + 1;
+        double minScore = idToScore(lastId) + 1;
         String key = generateKey(KEY_PREFIX + channelId + TIMELINE_SUFFIX);
         Set<Object> ids = redisTemplate.opsForZSet().rangeByScore(key, minScore, Double.MAX_VALUE);
 
@@ -196,7 +198,7 @@ public class InfoCacheUtil {
         return ids.stream()
                 .map(id -> getMeta(channelId, id.toString()))
                 .filter(Objects::nonNull)
-                .sorted((a, b) -> Long.compare(Long.parseLong(b.getId()), Long.parseLong(a.getId())))
+                .sorted(INFO_COMPARATOR)
                 .collect(Collectors.toList());
     }
 
@@ -309,7 +311,7 @@ public class InfoCacheUtil {
         return allMetas.values().stream()
                 .map(v -> JSON.parseObject(v.toString(), ListParserResult.InfoItemMeta.class))
                 .filter(m -> m.getTitle() != null && m.getTitle().toLowerCase().contains(lowerKeyword))
-                .sorted((a, b) -> Long.compare(Long.parseLong(b.getId()), Long.parseLong(a.getId())))
+                .sorted(INFO_COMPARATOR)
                 .limit(limit)
                 .collect(Collectors.toList());
     }
@@ -345,6 +347,42 @@ public class InfoCacheUtil {
 
     private String generateKey(String key) {
         return redisKeyGenerator.generate("cache:" + key);
+    }
+
+    /**
+     * 将 ID 转换为 ZSET score
+     * <p>
+     * 数字 ID：直接作为 score（保持原有排序）。
+     * 非数字 ID（wx_xxx、ext_xxx）：用 hashCode 的绝对值，加负偏移避免与数字 ID 碰撞。
+     * 非数字 ID 之间的相对顺序不重要（无法从 ID 推断时间），但不会与数字 ID 混淆。
+     */
+    private static double idToScore(String id) {
+        try {
+            return Double.parseDouble(id);
+        } catch (NumberFormatException e) {
+            // 非数字 ID：用负值区间，避免与正数 ID 碰撞
+            return -Math.abs((double) id.hashCode());
+        }
+    }
+
+    /**
+     * 安全的 ID 降序比较器（数字 ID 排前面，非数字 ID 排后面）
+     */
+    private static final Comparator<ListParserResult.InfoItemMeta> INFO_COMPARATOR = (a, b) -> {
+        Long aNum = parseIdSafe(a.getId());
+        Long bNum = parseIdSafe(b.getId());
+        if (aNum != null && bNum != null) return Long.compare(bNum, aNum);
+        if (aNum != null) return -1; // 数字排前
+        if (bNum != null) return 1;
+        return b.getId().compareTo(a.getId()); // 都是非数字，字典序降序
+    };
+
+    private static Long parseIdSafe(String id) {
+        try {
+            return Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
     // ==================== 数据源级别状态（按 sourceId） ====================
 
