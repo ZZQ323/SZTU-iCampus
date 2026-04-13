@@ -6,31 +6,20 @@ import cn.edu.sztui.base.application.vo.LoginResultsVo;
 
 /**
  * 教务系统服务接口
+ * <p>
+ * 从 UserContext 获取 userId 和 school cookies。
  */
 public interface AcademicService {
-    
+
     /**
      * 初始化教务系统会话
      * <p>
-     * 从 UserContext 获取 wxOpenId
+     * 通过重定向链获取教务系统 cookie，返回更新后的 cookies。
      */
     LoginResultsVo init();
-    
+
     /**
      * 获取课程表
-     * <p>
-     * 从 UserContext 获取 wxOpenId
      */
     CourseTableVo getCrouseTable(CrouseTableQuery query);
-    
-    /**
-     * 【新增】获取课程表（直接传入 wxOpenId）
-     * <p>
-     * 用于异步场景（SSE 推送、定时任务等），无法使用 UserContext 的情况
-     *
-     * @param wxOpenId 微信 OpenId
-     * @param query    查询参数
-     * @return 课表数据
-     */
-    CourseTableVo getCrouseTableByOpenId(String wxOpenId, CrouseTableQuery query);
 }
