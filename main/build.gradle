@@ -1,10 +1,14 @@
+// BaseMain
 plugins {
     id 'org.springframework.boot'
-    id 'io.spring.dependency-management'
 }
 
 dependencies {
-    implementation project(':module-base')
+    // 启动模块需要 web starter
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // 依赖你的其他子模块（按需启用）
     implementation project(':module-common')
+    implementation project(':module-base')
     implementation project(':module-stream')
 }
