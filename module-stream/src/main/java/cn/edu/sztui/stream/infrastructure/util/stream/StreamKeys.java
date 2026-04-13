@@ -61,6 +61,10 @@ public final class StreamKeys {
     /** 日历更新通知 */
     public static final String TYPE_CALENDAR_UPDATE = "CALENDAR_UPDATE";
 
+    // Cookie 相关
+    /** Cookie 更新推送（爬虫检测到 cookie 变化时推送给对应用户） */
+    public static final String TYPE_COOKIE_UPDATE = "COOKIE_UPDATE";
+
     // 通用/系统
     /** 需要重新登录 */
     public static final String TYPE_AUTH_REQUIRED = "AUTH_REQUIRED";

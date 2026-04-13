@@ -8,10 +8,13 @@ import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
 import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +41,13 @@ public class CookieSourceManager {
      * 获取一个可用的 SmartSession（带学校 Cookie）
      */
     public SmartSession getAvailableSession() {
+        return getAvailableSessionWithUser().getSession();
+    }
+
+    /**
+     * 获取可用的 SmartSession 及其所属 userId（供 CrawlEngine 检测 cookie 变化用）
+     */
+    public CookieSessionPair getAvailableSessionWithUser() {
         String userId = getAvailableUserId();
         if (userId == null) {
             throw new NoCookieAvailableException("无可用的 Cookie 来源");
@@ -49,9 +59,12 @@ public class CookieSourceManager {
             throw new NoCookieAvailableException("Cookie 来源失效: " + userId);
         }
 
-        // ★ 关键：从 cookiesJson 反序列化为 SmartCookie 列表，再创建 SmartSession
+        // 从 cookiesJson 反序列化为 SmartCookie 列表，再创建 SmartSession
         List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(proxy.getCookiesJson());
-        return smartHttpClient.newSession(cookies);
+        // 保存原始 cookies 快照，用于爬取后比对变化
+        List<SmartCookie> originalSnapshot = new ArrayList<>(cookies);
+        SmartSession session = smartHttpClient.newSession(cookies);
+        return new CookieSessionPair(userId, session, originalSnapshot);
     }
 
     public String getAvailableUserId() {
@@ -100,6 +113,17 @@ public class CookieSourceManager {
             }
         }
         return null;
+    }
+
+    /**
+     * 携带 userId 和原始 cookies 快照的 session 包装
+     */
+    @Getter
+    @AllArgsConstructor
+    public static class CookieSessionPair {
+        private final String userId;
+        private final SmartSession session;
+        private final List<SmartCookie> originalCookies;
     }
 
     public static class NoCookieAvailableException extends RuntimeException {
