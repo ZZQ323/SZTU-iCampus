@@ -199,6 +199,20 @@ public class InfoController {
     }
 
     /**
+     * 批量获取所有频道的最新 ID（前端 init 时一次拉取）
+     */
+    @GetMapping("/v1/latest-all")
+    @Operation(summary = "批量获取所有频道最新ID")
+    public Result getLatestAll() {
+        Map<String, String> result = new HashMap<>();
+        for (var channel : configLoader.getEnabledChannels()) {
+            String latestId = infoCacheUtil.getLatestId(channel.getId());
+            result.put(channel.getId(), latestId != null ? latestId : "0");
+        }
+        return Result.ok(result);
+    }
+
+    /**
      * 标记已读
      */
     @PostMapping("/v1/mark-read")
