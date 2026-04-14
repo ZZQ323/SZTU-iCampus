@@ -1,12 +1,12 @@
 # 频道配置
 # 每个频道可以包含多个数据源
-# sourceOrg: fixed=默认频道(始终显示), department=职能部门, support=教辅科研, league=群团招就, college=学院
+# sourceOrg: fixed=固定频道(始终显示), official=学校官网, department=职能部门, support=教辅科研, league=群团招就, college=学院
 
 channels:
-  # ==================== 默认频道（始终显示，不可退订） ====================
+  # ==================== 固定频道（始终显示，不可退订） ====================
 
   - id: announcement
-    name: 校园公告
+    name: 公文通
     description: 学校公文通公告信息
     icon: notice
     sourceOrg: fixed
@@ -19,12 +19,14 @@ channels:
       - gwt-xuegong
       - gwt-xiaoyuan
 
+  # ==================== 学校官网（可订阅） ====================
+
   - id: academic
     name: 教务信息
-    description: 教学动态、信息公告
+    description: 教务部教学动态、信息公告
     icon: book
-    sourceOrg: fixed
-    sort: 2
+    sourceOrg: official
+    sort: 10
     enabled: true
     sources:
       - jw-jdt
@@ -32,10 +34,10 @@ channels:
 
   - id: campus-life
     name: 校园生活
-    description: 文娱活动、体育活动
+    description: 官网文娱活动、体育活动
     icon: heart
-    sourceOrg: fixed
-    sort: 3
+    sourceOrg: official
+    sort: 11
     enabled: true
     sources:
       - www-wyhd
@@ -45,8 +47,8 @@ channels:
     name: 学校新闻
     description: 校园新闻、科研动态、国际交流
     icon: newspaper
-    sourceOrg: fixed
-    sort: 4
+    sourceOrg: official
+    sort: 12
     enabled: true
     sources:
       - www-xyxw
