@@ -405,6 +405,14 @@ public class InfoCacheUtil {
     }
 
     /**
+     * 清除数据源的初始化标记（用于启动时强制重新初始化）
+     */
+    public void clearSourceInitialized(String sourceId) {
+        String key = generateKey("info:source:" + sourceId + ":system");
+        cacheUtil.hdel(key, "initialized");
+    }
+
+    /**
      * 更新数据源最后爬取时间（按 sourceId，非 channelId）
      */
     public void updateLastCrawlTime(String sourceId) {
