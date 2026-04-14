@@ -3,6 +3,7 @@ package cn.edu.sztui.stream.application.external.engine;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
+import cn.edu.sztui.common.util.smarthttp.dto.SmartRequest;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
@@ -92,7 +93,7 @@ public class CrawlEngine {
             SmartSession session = pair.getSession();
 
             String listUrl = buildListUrl(source, 1);
-            SmartResponse response = smartHttpClient.get(listUrl, session);
+            SmartResponse response = fetchPage(listUrl, session, source.isRequiresAuth());
             if (!response.isSuccess()) {
                 return CrawlResult.fail(sourceId, "HTTP 请求失败: " + response.getStatusCode());
             }
@@ -165,7 +166,7 @@ public class CrawlEngine {
             // ==================== 阶段 1：同步爬第 1 页 ====================
 
             String firstPageUrl = buildListUrl(source, 1);
-            SmartResponse firstResponse = smartHttpClient.get(firstPageUrl, session);
+            SmartResponse firstResponse = fetchPage(firstPageUrl, session, source.isRequiresAuth());
             if (!firstResponse.isSuccess()) {
                 log.error("获取首页失败: source={}, status={}", sourceId, firstResponse.getStatusCode());
                 return;
@@ -260,7 +261,7 @@ public class CrawlEngine {
             SmartSession session = pair.getSession();
             String detailUrl = buildDetailUrl(source, id, categoryCode);
 
-            SmartResponse response = smartHttpClient.get(detailUrl, session);
+            SmartResponse response = fetchPage(detailUrl, session, source.isRequiresAuth());
             if (!response.isSuccess()) {
                 log.error("爬取详情失败: source={}, id={}, status={}", sourceId, id, response.getStatusCode());
                 return null;
@@ -412,7 +413,7 @@ public class CrawlEngine {
                 futures.add(pageExecutor.submit(() -> {
                     try {
                         String url = buildListUrl(source, p, totalPages);
-                        SmartResponse resp = smartHttpClient.get(url, session);
+                        SmartResponse resp = fetchPage(url, session, source.isRequiresAuth());
                         if (resp.isSuccess()) {
                             ListParserResult result = parserFactory.parseList(
                                     source.getParserType(), resp.getBody(), source, p);
@@ -514,5 +515,21 @@ public class CrawlEngine {
             data.put("latestTitle", newItems.get(0).getTitle());
         }
         streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
+    }
+
+    /**
+     * 获取页面内容。
+     * <p>
+     * 公开源（requiresAuth=false）不跟随重定向，因为学院 CMS 页面直接返回 200 HTML，
+     * 跟随重定向会被 JS/Meta redirect 引导到不存在的移动端页面（page.html/wap/index.jsp）。
+     * 需要登录的源（公文通等）需要跟随 WebVPN 重定向链。
+     */
+    private SmartResponse fetchPage(String url, SmartSession session, boolean requiresAuth) {
+        if (requiresAuth) {
+            return smartHttpClient.get(url, session);
+        } else {
+            SmartRequest request = SmartRequest.get(url);
+            return smartHttpClient.executeNoRedirect(request, session);
+        }
     }
 }

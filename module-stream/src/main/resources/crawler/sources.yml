@@ -145,7 +145,7 @@ sources:
     crawlIntervalMinutes: 120
     # crawlPageCount: 1
     # ⚠️ 纯图片画廊，文章标题 display:none，爬取价值不大，先关闭
-    enabled: false
+    enabled: true
     sort: 3
 
   # ---------- 媒体焦点 ----------
@@ -179,7 +179,7 @@ sources:
     # ⚠️ 100% 外部链接（深圳特区报/新华社/南方Plus/科技日报），
     #    无 info/ 链接，无法爬取详情，仅存元数据+外链 URL。
     #    前端展示为"外部链接"标签，点击复制链接或 web-view 打开。
-    enabled: false
+    enabled: true
     sort: 2
 
   # ---------- 对外交流 ----------
@@ -276,7 +276,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     # crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: jyzd-gzdt
@@ -292,7 +292,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     # crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   # ========================================================================
@@ -333,7 +333,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 5
 
   - id: www-kxyj
@@ -349,7 +349,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 6
 
   # ---------- 学生工作部 ----------
@@ -366,7 +366,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: sao-xwxx
@@ -382,7 +382,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   # ---------- 科研部 ----------
@@ -399,7 +399,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: kyb-xwdt
@@ -415,7 +415,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   # ---------- 国际合作部 ----------
@@ -432,7 +432,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: intl-jwjl
@@ -448,7 +448,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   # ---------- 校团委 ----------
@@ -465,7 +465,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: xtw-txfc
@@ -481,7 +481,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   # ========================================================================
@@ -500,7 +500,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: fxcs-xw
@@ -516,7 +516,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: cmnf-tzgg
@@ -532,7 +532,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: cmnf-zxdt
@@ -548,7 +548,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: ime-tzgg
@@ -564,7 +564,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: ime-xwdt
@@ -580,7 +580,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   # ========================================================================
@@ -600,7 +600,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: gra-tzgg
@@ -616,7 +616,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: sgim-xyxw
@@ -632,7 +632,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: sgim-tzgg
@@ -648,7 +648,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: ai-yxxw
@@ -664,7 +664,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: ai-tzgg
@@ -680,7 +680,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: nmne-xydt
@@ -696,7 +696,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: nmne-tzgg
@@ -712,7 +712,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: utl-xydt
@@ -728,7 +728,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: utl-tzgg
@@ -744,7 +744,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: hsee-xydt
@@ -792,7 +792,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: cep-tzgg
@@ -808,7 +808,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: design-yxxw
@@ -824,7 +824,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: design-tzgg
@@ -840,7 +840,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: bs-xwdt
@@ -888,7 +888,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: sfl-tzgg
@@ -904,7 +904,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: icoc-xyxw
@@ -920,7 +920,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: icoc-tzgg
@@ -936,7 +936,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: cop-xyxw
@@ -952,7 +952,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: cop-tzgg
@@ -968,7 +968,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: future-xwzx
@@ -984,7 +984,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: future-tzgg
@@ -1000,7 +1000,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: music-ywgz
@@ -1016,7 +1016,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   # ========================================================================
@@ -1036,7 +1036,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: cwb-xxgk
@@ -1052,7 +1052,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: cwb-gzdt
@@ -1068,7 +1068,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 3
 
   - id: sbc-tzgg
@@ -1084,7 +1084,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 4
 
   - id: sbc-gzdt
@@ -1100,7 +1100,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 5
 
   - id: aqbw-tzgg
@@ -1116,7 +1116,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 6
 
   - id: aqbw-gzdt
@@ -1132,7 +1132,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 7
 
   - id: zzb-tzgg
@@ -1148,7 +1148,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 8
 
   - id: zzb-gzdt
@@ -1164,7 +1164,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 9
 
   - id: jjjc-jjyw
@@ -1180,7 +1180,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 10
 
   - id: jjjc-gzdt
@@ -1196,7 +1196,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 11
 
   - id: sjs-gzdt
@@ -1212,7 +1212,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 12
 
   - id: sjs-sjgg
@@ -1228,7 +1228,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 13
 
   - id: hq-tzgg
@@ -1244,7 +1244,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 14
 
   - id: hq-dtyw
@@ -1260,7 +1260,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 15
 
   - id: it-xwgg
@@ -1276,7 +1276,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 16
 
   - id: dds-xwtz
@@ -1292,5 +1292,5 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 17
