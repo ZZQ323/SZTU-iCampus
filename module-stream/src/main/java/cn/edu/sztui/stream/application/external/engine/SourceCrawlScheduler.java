@@ -72,7 +72,10 @@ public class SourceCrawlScheduler {
 
             try {
                 CrawlResult result = crawlEngine.crawlIncremental(source.getId());
-                if (result.isSuccess() && result.getNewCount() > 0) {
+                if (result.isAuthError()) {
+                    cookieSourceManager.markInvalidAndSwitch(result.getCookieUserId());
+                    log.warn("定时爬取 Cookie 失效: source={}, userId={}", source.getId(), result.getCookieUserId());
+                } else if (result.isSuccess() && result.getNewCount() > 0) {
                     log.info("定时爬取: {} → {} 条新内容", source.getId(), result.getNewCount());
                 }
                 crawledCount++;

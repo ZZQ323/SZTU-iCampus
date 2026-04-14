@@ -95,7 +95,13 @@ public class CrawlEngine {
             String listUrl = buildListUrl(source, 1);
             SmartResponse response = fetchPage(listUrl, session, source.isRequiresAuth());
             if (!response.isSuccess()) {
-                return CrawlResult.fail(sourceId, "HTTP 请求失败: " + response.getStatusCode());
+                int status = response.getStatusCode();
+                // 认证失败检测：401/403 或重定向到登录页
+                if (source.isRequiresAuth() && (status == 401 || status == 403)) {
+                    return CrawlResult.authFail(sourceId, pair.getUserId(),
+                            "Cookie 认证失败: HTTP " + status);
+                }
+                return CrawlResult.fail(sourceId, "HTTP 请求失败: " + status);
             }
 
             ListParserResult result = parserFactory.parseList(

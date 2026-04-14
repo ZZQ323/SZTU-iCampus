@@ -7,6 +7,7 @@ import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
+import cn.edu.sztui.stream.infrastructure.websocket.registry.WsSessionRegistry;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,6 +37,9 @@ public class CookieSourceManager {
 
     @Resource
     private InfoCacheUtil infoCacheUtil;
+
+    @Resource
+    private WsSessionRegistry wsSessionRegistry;
 
     /**
      * 获取一个可用的 SmartSession（带学校 Cookie）
@@ -67,16 +71,31 @@ public class CookieSourceManager {
         return new CookieSessionPair(userId, session, originalSnapshot);
     }
 
+    /**
+     * 获取可用的 Cookie 来源用户。
+     * 优先级：当前活跃用户（在线+有效）→ 在线用户 → Redis 所有 session
+     */
     public String getAvailableUserId() {
+        // 1. 当前活跃用户如果在线且有效，直接复用
         String active = infoCacheUtil.getActiveSourceUserId();
-        if (StringUtils.hasText(active) && isValid(active)) {
+        if (StringUtils.hasText(active) && wsSessionRegistry.isOnline(active) && isValid(active)) {
             return active;
         }
 
-        String found = findValidFromOnlineUsers();
+        // 2. 优先从 WS 在线用户中找
+        for (String onlineUser : wsSessionRegistry.getOnlineUserIds()) {
+            if (isValid(onlineUser)) {
+                infoCacheUtil.setActiveSourceUserId(onlineUser);
+                log.info("切换到在线用户 Cookie: {}", onlineUser);
+                return onlineUser;
+            }
+        }
+
+        // 3. 退而求其次：Redis 中所有 session（可能已离线但 cookie 还没过期）
+        String found = findValidFromAllSessions();
         if (found != null) {
             infoCacheUtil.setActiveSourceUserId(found);
-            log.info("切换到新 Cookie 来源: {}", found);
+            log.info("切换到离线用户 Cookie（无在线用户可用）: {}", found);
             return found;
         }
 
@@ -85,10 +104,11 @@ public class CookieSourceManager {
     }
 
     public void markInvalidAndSwitch(String invalidUserId) {
+        log.warn("Cookie 来源失效: {}", invalidUserId);
         infoCacheUtil.clearActiveSource();
-        String newSource = findValidFromOnlineUsers();
+        // 尝试切换到其他可用用户
+        String newSource = getAvailableUserId();
         if (newSource != null && !newSource.equals(invalidUserId)) {
-            infoCacheUtil.setActiveSourceUserId(newSource);
             log.info("Cookie 来源切换: {} → {}", invalidUserId, newSource);
         }
     }
@@ -103,7 +123,10 @@ public class CookieSourceManager {
         return authSessionCacheUtil.isSchoolLoggedIn(userId);
     }
 
-    private String findValidFromOnlineUsers() {
+    /**
+     * 从 Redis 所有 ProxySession 中找一个有效的（不限是否在线）
+     */
+    private String findValidFromAllSessions() {
         Map<String, ProxySession> allSessions = authSessionCacheUtil.getAllSessions();
         if (allSessions == null || allSessions.isEmpty()) return null;
 

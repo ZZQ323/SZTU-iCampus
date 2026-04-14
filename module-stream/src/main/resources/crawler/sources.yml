@@ -19,7 +19,7 @@ sources:
     categoryName: 教务
     contentType: notice
     requiresAuth: true
-    crawlIntervalMinutes: 10
+    crawlIntervalMinutes: 1
     # crawlPageCount: 1
     enabled: true
     sort: 1
@@ -35,7 +35,7 @@ sources:
     categoryName: 科研
     contentType: notice
     requiresAuth: true
-    crawlIntervalMinutes: 10
+    crawlIntervalMinutes: 1
     crawlPageCount: 1
     enabled: true
     sort: 2
@@ -51,7 +51,7 @@ sources:
     categoryName: 行政
     contentType: notice
     requiresAuth: true
-    crawlIntervalMinutes: 10
+    crawlIntervalMinutes: 1
     crawlPageCount: 1
     enabled: true
     sort: 3
@@ -67,7 +67,7 @@ sources:
     categoryName: 学工
     contentType: notice
     requiresAuth: true
-    crawlIntervalMinutes: 10
+    crawlIntervalMinutes: 1
     crawlPageCount: 1
     enabled: true
     sort: 4
@@ -83,7 +83,7 @@ sources:
     categoryName: 校园
     contentType: notice
     requiresAuth: true
-    crawlIntervalMinutes: 10
+    crawlIntervalMinutes: 1
     crawlPageCount: 1
     enabled: true
     sort: 5
