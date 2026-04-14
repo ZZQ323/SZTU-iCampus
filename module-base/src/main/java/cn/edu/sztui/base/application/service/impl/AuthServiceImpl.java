@@ -513,8 +513,23 @@ public class AuthServiceImpl implements AuthService {
 
             log.info("🍪 doRefreshCookies 开始时有 {} 个 Cookie", smartSession.getCookies().size());
 
-            // 访问网关起始页，自动跟随所有重定向
-            SmartResponse response = smartHttpClient.get(gatewayStartURL, smartSession);
+            // ⭐ 根据是否有 Cookie 选择入口 URL：
+            //   有 Cookie → gatewayStartURL（正常刷新路径）
+            //   无 Cookie → thdportal_login（绕过 /por/ 页面的 JS 重定向）
+            // /por/ 页面依赖浏览器 JS 执行重定向，SmartHttpClient 处理不了，
+            // 会导致 0 Cookie 被收集。thdportal_login 是服务器端重定向，可以正常工作。
+            String entryUrl;
+            if (smartSession.getCookies().isEmpty()) {
+                String redirectUri = "https://home-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/bmportal";
+                entryUrl = "https://webvpn.sztu.edu.cn/public/thdportal_login?redirect_uri=" +
+                        java.net.URLEncoder.encode(redirectUri, java.nio.charset.StandardCharsets.UTF_8);
+                log.info("无 Cookie，使用 thdportal_login 入口绕过 /por/ 页面");
+            } else {
+                entryUrl = gatewayStartURL;
+            }
+
+            // 访问入口页，自动跟随所有重定向
+            SmartResponse response = smartHttpClient.get(entryUrl, smartSession);
 
             String finalUrl = response.getFinalUrl();
             String body = response.getBody();
