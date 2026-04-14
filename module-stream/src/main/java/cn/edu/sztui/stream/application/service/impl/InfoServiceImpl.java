@@ -59,21 +59,29 @@ public class InfoServiceImpl implements InfoService {
             info.setName(ch.getName());
             info.setDescription(ch.getDescription());
             info.setIcon(ch.getIcon());
-            info.setTier(ch.getTier() != null ? ch.getTier() : 1);
+            info.setSourceOrg(ch.getSourceOrg() != null ? ch.getSourceOrg() : "fixed");
             info.setSort(ch.getSort());
             info.setUnreadCount(infoCacheUtil.getUnreadCount(userId, ch.getId()));
 
             List<CategoryInfo> categories = new ArrayList<>();
+            List<String> contentTypes = new ArrayList<>();
             if (ch.getSourceIds() != null) {
                 for (String sourceId : ch.getSourceIds()) {
                     CrawlerConfig.SourceConfig source = configLoader.findSourceById(sourceId);
-                    if (source != null && source.getCategories() != null) {
-                        source.getCategories().forEach((code, name) -> {
-                            categories.add(new CategoryInfo(code, name));
-                        });
+                    if (source != null) {
+                        // 收集 contentType（去重）
+                        if (source.getContentType() != null && !contentTypes.contains(source.getContentType())) {
+                            contentTypes.add(source.getContentType());
+                        }
+                        if (source.getCategories() != null) {
+                            source.getCategories().forEach((code, name) -> {
+                                categories.add(new CategoryInfo(code, name));
+                            });
+                        }
                     }
                 }
             }
+            info.setContentTypes(contentTypes);
             info.setCategories(categories);
             return info;
         }).collect(Collectors.toList());

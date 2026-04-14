@@ -18,8 +18,8 @@ public class CrawlerConfig {
         private String name;
         private String description;
         private String icon;
-        /** 梯队：1=默认订阅（始终显示），2=用户订阅（选择后显示），3=低频可选 */
-        private Integer tier;
+        /** 来源组织分类：fixed/department/support/league/college */
+        private String sourceOrg;
         private Integer sort;
         private Boolean enabled;
         private List<String> sources;
@@ -61,6 +61,9 @@ public class CrawlerConfig {
          * 分类名称
          */
         private String categoryName;
+
+        /** 内容类型：notice/news/academic/employment/campus/party */
+        private String contentType;
 
         private boolean requiresAuth;
         private Integer crawlIntervalMinutes;
