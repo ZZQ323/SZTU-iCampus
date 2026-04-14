@@ -86,7 +86,11 @@ public interface InfoService {
     class ChannelInfo {
         private String id;
         private String name;
+        private String description;
         private String icon;
+        /** 梯队：1=默认订阅，2=用户订阅，3=低频可选 */
+        private Integer tier;
+        private Integer sort;
         private Long unreadCount;
         private List<CategoryInfo> categories;
     }

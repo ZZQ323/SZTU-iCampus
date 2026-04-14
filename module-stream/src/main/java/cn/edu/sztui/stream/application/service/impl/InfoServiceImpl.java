@@ -57,7 +57,10 @@ public class InfoServiceImpl implements InfoService {
             ChannelInfo info = new ChannelInfo();
             info.setId(ch.getId());
             info.setName(ch.getName());
+            info.setDescription(ch.getDescription());
             info.setIcon(ch.getIcon());
+            info.setTier(ch.getTier() != null ? ch.getTier() : 1);
+            info.setSort(ch.getSort());
             info.setUnreadCount(infoCacheUtil.getUnreadCount(userId, ch.getId()));
 
             List<CategoryInfo> categories = new ArrayList<>();
