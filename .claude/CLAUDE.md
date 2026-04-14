@@ -48,7 +48,10 @@
 后端不做 cookie 过期预测，不缓存登录状态。所有状态查询都是真实访问学校 gateway 并解析返回页面。
 
 ### 6. refresh 优先于 init
-大多数"会话过期"场景只需要调 `/auth/v1/session/refresh`（像浏览器按 F5），不需要 `/auth/v1/session/init`（清缓存重来）。
+大多数"会话过期"场景只需要调 `/auth/v1/session/refresh`（像浏览器按 F5），不需要 `/auth/v1/session/init`（清缓存重来）。有 cookie 就 refresh，没 cookie 才 init。是否登录只有学校后端说了算，胶水层说不算。
+
+### 7. 所有返回 cookies 的接口都要设 X-Set-Cookies header
+`/auth/v1/status` 内部调了 `doRefreshCookies()` 拿到了新鲜 cookies，必须通过 `X-Set-Cookies` response header 返回给前端。否则前端 cookies 不会被刷新，导致后续请求用过期 cookies。
 
 ## API 端点
 

@@ -64,6 +64,14 @@ public class LoginStatusVo {
     private boolean sessionInvalid;
 
     /**
+     * 学校 cookies（用于 X-Set-Cookies response header）
+     * <p>
+     * 控制器会将此字段提取到 response header 后清空，
+     * 不会出现在 JSON body 中。
+     */
+    private String cookiesJson;
+
+    /**
      * 从 LoginResultsVo 转换
      */
     public static LoginStatusVo from(LoginResultsVo result) {
@@ -75,6 +83,7 @@ public class LoginStatusVo {
         vo.setSchoolName(result.getSchoolName());
         vo.setAvatarURL(result.getAvatarURL());
         vo.setSessionInvalid(result.isSessionInvalid());
+        vo.setCookiesJson(result.getCookiesJson());
 
         // 转换 LoginType 枚举为字符串
         if (result.getLoginTypes() != null) {
