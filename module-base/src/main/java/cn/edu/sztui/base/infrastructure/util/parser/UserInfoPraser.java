@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.persistence.parser;
+package cn.edu.sztui.base.infrastructure.util.parser;
 
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package cn.edu.sztui.base.infrastructure.persistence.parser;
+package cn.edu.sztui.base.infrastructure.util.parser;
 
 public class URLPraser {
 
