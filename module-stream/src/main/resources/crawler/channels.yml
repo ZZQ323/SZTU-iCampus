@@ -1,15 +1,15 @@
 # 频道配置
 # 每个频道可以包含多个数据源
-# tier: 1=默认订阅（始终显示）, 2=用户订阅（选择后显示）, 3=低频可选
+# sourceOrg: fixed=默认频道(始终显示), department=职能部门, support=教辅科研, league=群团招就, college=学院
 
 channels:
-  # ==================== 第一梯队：与学生日常强相关（默认订阅） ====================
+  # ==================== 默认频道（始终显示，不可退订） ====================
 
   - id: announcement
     name: 校园公告
     description: 学校公文通公告信息
     icon: notice
-    tier: 1
+    sourceOrg: fixed
     sort: 1
     enabled: true
     sources:
@@ -23,7 +23,7 @@ channels:
     name: 教务信息
     description: 教学动态、信息公告
     icon: book
-    tier: 1
+    sourceOrg: fixed
     sort: 2
     enabled: true
     sources:
@@ -34,7 +34,7 @@ channels:
     name: 校园生活
     description: 文娱活动、体育活动
     icon: heart
-    tier: 1
+    sourceOrg: fixed
     sort: 3
     enabled: true
     sources:
@@ -45,7 +45,7 @@ channels:
     name: 学校新闻
     description: 校园新闻、科研动态、国际交流
     icon: newspaper
-    tier: 1
+    sourceOrg: fixed
     sort: 4
     enabled: true
     sources:
@@ -55,13 +55,13 @@ channels:
       - www-xqhz
       - www-kxyj
 
-  # ==================== 第二梯队：高频部门（用户订阅） ====================
+  # ==================== 职能部门（用户订阅） ====================
 
   - id: dept-sao
     name: 学生工作部
     description: 学生工作部通知公告、新闻信息
     icon: user
-    tier: 2
+    sourceOrg: department
     sort: 20
     enabled: true
     sources:
@@ -72,7 +72,7 @@ channels:
     name: 科研部
     description: 科研与校企合作部通知、新闻动态
     icon: explore
-    tier: 2
+    sourceOrg: department
     sort: 21
     enabled: true
     sources:
@@ -83,7 +83,7 @@ channels:
     name: 国际合作部
     description: 国际合作与交流部焦点新闻、交流动态
     icon: earth
-    tier: 2
+    sourceOrg: department
     sort: 22
     enabled: true
     sources:
@@ -94,232 +94,19 @@ channels:
     name: 校团委
     description: 校团委通知公告、团学风采
     icon: flag
-    tier: 2
+    sourceOrg: department
     sort: 23
     enabled: true
     sources:
       - xtw-tzgg
       - xtw-txfc
 
-  - id: job
-    name: 就业信息
-    description: 就业指导中心通知、工作动态
-    icon: briefcase
-    tier: 2
-    sort: 24
-    enabled: true
-    sources:
-      - jyzd-tzgg
-      - jyzd-gzdt
-
-  - id: admission
-    name: 招生信息
-    description: 招生动态
-    icon: user-add
-    tier: 2
-    sort: 25
-    enabled: true
-    sources:
-      - zs-zsdt
-
-  # ==================== 第二梯队：科研/教辅单位（用户订阅） ====================
-
-  - id: lab-fxcs
-    name: 分析测试中心
-    description: 分析测试中心通知公告、新闻
-    icon: precision-monitor
-    tier: 2
-    sort: 30
-    enabled: true
-    sources:
-      - fxcs-tzgg
-      - fxcs-xw
-
-  - id: lab-cmnf
-    name: 半导体微纳中心
-    description: 半导体微纳加工中心通知、动态
-    icon: cpu
-    tier: 2
-    sort: 31
-    enabled: true
-    sources:
-      - cmnf-tzgg
-      - cmnf-zxdt
-
-  - id: lab-ime
-    name: 医工交叉研究院
-    description: 医工交叉创新研究院通知、新闻
-    icon: hospital
-    tier: 2
-    sort: 32
-    enabled: true
-    sources:
-      - ime-tzgg
-      - ime-xwdt
-
-  # ==================== 第二梯队：学院（用户订阅） ====================
-
-  - id: college-gra
-    name: 研究生院
-    description: 研究生院新闻、通知公告
-    icon: mortarboard
-    tier: 2
-    sort: 40
-    enabled: true
-    sources:
-      - gra-xwdt
-      - gra-tzgg
-
-  - id: college-sgim
-    name: 中德智能制造学院
-    description: 中德智能制造学院新闻、通知
-    icon: setting
-    tier: 2
-    sort: 41
-    enabled: true
-    sources:
-      - sgim-xyxw
-      - sgim-tzgg
-
-  - id: college-ai
-    name: 人工智能学院
-    description: 人工智能学院新闻、通知
-    icon: cpu
-    tier: 2
-    sort: 42
-    enabled: true
-    sources:
-      - ai-yxxw
-      - ai-tzgg
-
-  - id: college-nmne
-    name: 新材料与新能源学院
-    description: 新材料与新能源学院动态、通知
-    icon: flashlight
-    tier: 2
-    sort: 43
-    enabled: true
-    sources:
-      - nmne-xydt
-      - nmne-tzgg
-
-  - id: college-utl
-    name: 城市交通与物流学院
-    description: 城市交通与物流学院动态、通知
-    icon: car
-    tier: 2
-    sort: 44
-    enabled: true
-    sources:
-      - utl-xydt
-      - utl-tzgg
-
-  - id: college-hsee
-    name: 健康与环境工程学院
-    description: 健康与环境工程学院动态、通知
-    icon: leaf
-    tier: 2
-    sort: 45
-    enabled: true
-    sources:
-      - hsee-xydt
-      - hsee-tzgg
-
-  - id: college-cep
-    name: 工程物理学院
-    description: 工程物理学院新闻、通知
-    icon: tower
-    tier: 2
-    sort: 46
-    enabled: true
-    sources:
-      - cep-xwdt
-      - cep-tzgg
-
-  - id: college-design
-    name: 创意设计学院
-    description: 创意设计学院新闻、通知
-    icon: palette
-    tier: 2
-    sort: 47
-    enabled: true
-    sources:
-      - design-yxxw
-      - design-tzgg
-
-  - id: college-bs
-    name: 商学院
-    description: 商学院/技术经理人学院新闻、通知
-    icon: chart-bar
-    tier: 2
-    sort: 48
-    enabled: true
-    sources:
-      - bs-xwdt
-      - bs-tzgg
-
-  - id: college-sfl
-    name: 外国语学院
-    description: 外国语学院新闻、通知
-    icon: translate
-    tier: 2
-    sort: 49
-    enabled: true
-    sources:
-      - sfl-xyxw
-      - sfl-tzgg
-
-  - id: college-icoc
-    name: 集成电路与光电芯片学院
-    description: 集成电路与光电芯片学院新闻、通知
-    icon: cpu
-    tier: 2
-    sort: 50
-    enabled: true
-    sources:
-      - icoc-xyxw
-      - icoc-tzgg
-
-  - id: college-cop
-    name: 药学院
-    description: 药学院/口腔学院新闻、通知
-    icon: medicine
-    tier: 2
-    sort: 51
-    enabled: true
-    sources:
-      - cop-xyxw
-      - cop-tzgg
-
-  - id: college-future
-    name: 未来技术学院
-    description: 未来技术学院新闻、通知
-    icon: rocket
-    tier: 2
-    sort: 52
-    enabled: true
-    sources:
-      - future-xwzx
-      - future-tzgg
-
-  - id: college-music
-    name: 音乐学院
-    description: 音乐学院院务工作
-    icon: sound
-    tier: 2
-    sort: 53
-    enabled: true
-    sources:
-      - music-ywgz
-
-  # ==================== 第三梯队：低频职能部门（合并频道） ====================
-
   - id: department
-    name: 职能部门
+    name: 职能部门汇总
     description: 各职能部门通知公告汇总
     icon: city
-    tier: 3
-    sort: 90
+    sourceOrg: department
+    sort: 29
     enabled: true
     sources:
       - hr-tzgg
@@ -339,3 +126,216 @@ channels:
       - hq-dtyw
       - it-xwgg
       - dds-xwtz
+
+  # ==================== 教辅科研（用户订阅） ====================
+
+  - id: lab-fxcs
+    name: 分析测试中心
+    description: 分析测试中心通知公告、新闻
+    icon: precision-monitor
+    sourceOrg: support
+    sort: 30
+    enabled: true
+    sources:
+      - fxcs-tzgg
+      - fxcs-xw
+
+  - id: lab-cmnf
+    name: 半导体微纳中心
+    description: 半导体微纳加工中心通知、动态
+    icon: cpu
+    sourceOrg: support
+    sort: 31
+    enabled: true
+    sources:
+      - cmnf-tzgg
+      - cmnf-zxdt
+
+  - id: lab-ime
+    name: 医工交叉研究院
+    description: 医工交叉创新研究院通知、新闻
+    icon: hospital
+    sourceOrg: support
+    sort: 32
+    enabled: true
+    sources:
+      - ime-tzgg
+      - ime-xwdt
+
+  # ==================== 群团招就（用户订阅） ====================
+
+  - id: job
+    name: 就业信息
+    description: 就业指导中心通知、工作动态
+    icon: briefcase
+    sourceOrg: league
+    sort: 35
+    enabled: true
+    sources:
+      - jyzd-tzgg
+      - jyzd-gzdt
+
+  - id: admission
+    name: 招生信息
+    description: 招生动态
+    icon: user-add
+    sourceOrg: league
+    sort: 36
+    enabled: true
+    sources:
+      - zs-zsdt
+
+  # ==================== 学院（用户订阅） ====================
+
+  - id: college-gra
+    name: 研究生院
+    description: 研究生院新闻、通知公告
+    icon: mortarboard
+    sourceOrg: college
+    sort: 40
+    enabled: true
+    sources:
+      - gra-xwdt
+      - gra-tzgg
+
+  - id: college-sgim
+    name: 中德智能制造学院
+    description: 中德智能制造学院新闻、通知
+    icon: setting
+    sourceOrg: college
+    sort: 41
+    enabled: true
+    sources:
+      - sgim-xyxw
+      - sgim-tzgg
+
+  - id: college-ai
+    name: 人工智能学院
+    description: 人工智能学院新闻、通知
+    icon: cpu
+    sourceOrg: college
+    sort: 42
+    enabled: true
+    sources:
+      - ai-yxxw
+      - ai-tzgg
+
+  - id: college-nmne
+    name: 新材料与新能源学院
+    description: 新材料与新能源学院动态、通知
+    icon: flashlight
+    sourceOrg: college
+    sort: 43
+    enabled: true
+    sources:
+      - nmne-xydt
+      - nmne-tzgg
+
+  - id: college-utl
+    name: 城市交通与物流学院
+    description: 城市交通与物流学院动态、通知
+    icon: car
+    sourceOrg: college
+    sort: 44
+    enabled: true
+    sources:
+      - utl-xydt
+      - utl-tzgg
+
+  - id: college-hsee
+    name: 健康与环境工程学院
+    description: 健康与环境工程学院动态、通知
+    icon: leaf
+    sourceOrg: college
+    sort: 45
+    enabled: true
+    sources:
+      - hsee-xydt
+      - hsee-tzgg
+
+  - id: college-cep
+    name: 工程物理学院
+    description: 工程物理学院新闻、通知
+    icon: tower
+    sourceOrg: college
+    sort: 46
+    enabled: true
+    sources:
+      - cep-xwdt
+      - cep-tzgg
+
+  - id: college-design
+    name: 创意设计学院
+    description: 创意设计学院新闻、通知
+    icon: palette
+    sourceOrg: college
+    sort: 47
+    enabled: true
+    sources:
+      - design-yxxw
+      - design-tzgg
+
+  - id: college-bs
+    name: 商学院
+    description: 商学院/技术经理人学院新闻、通知
+    icon: chart-bar
+    sourceOrg: college
+    sort: 48
+    enabled: true
+    sources:
+      - bs-xwdt
+      - bs-tzgg
+
+  - id: college-sfl
+    name: 外国语学院
+    description: 外国语学院新闻、通知
+    icon: translate
+    sourceOrg: college
+    sort: 49
+    enabled: true
+    sources:
+      - sfl-xyxw
+      - sfl-tzgg
+
+  - id: college-icoc
+    name: 集成电路与光电芯片学院
+    description: 集成电路与光电芯片学院新闻、通知
+    icon: cpu
+    sourceOrg: college
+    sort: 50
+    enabled: true
+    sources:
+      - icoc-xyxw
+      - icoc-tzgg
+
+  - id: college-cop
+    name: 药学院
+    description: 药学院/口腔学院新闻、通知
+    icon: medicine
+    sourceOrg: college
+    sort: 51
+    enabled: true
+    sources:
+      - cop-xyxw
+      - cop-tzgg
+
+  - id: college-future
+    name: 未来技术学院
+    description: 未来技术学院新闻、通知
+    icon: rocket
+    sourceOrg: college
+    sort: 52
+    enabled: true
+    sources:
+      - future-xwzx
+      - future-tzgg
+
+  - id: college-music
+    name: 音乐学院
+    description: 音乐学院院务工作
+    icon: sound
+    sourceOrg: college
+    sort: 53
+    enabled: true
+    sources:
+      - music-ywgz

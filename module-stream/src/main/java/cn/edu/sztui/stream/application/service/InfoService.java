@@ -88,8 +88,10 @@ public interface InfoService {
         private String name;
         private String description;
         private String icon;
-        /** 梯队：1=默认订阅，2=用户订阅，3=低频可选 */
-        private Integer tier;
+        /** 来源组织分类：fixed/department/support/league/college */
+        private String sourceOrg;
+        /** 该频道包含的内容类型（从源自动推导） */
+        private List<String> contentTypes;
         private Integer sort;
         private Long unreadCount;
         private List<CategoryInfo> categories;
