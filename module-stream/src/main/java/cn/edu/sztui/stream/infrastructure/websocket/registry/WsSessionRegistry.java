@@ -147,4 +147,28 @@ public class WsSessionRegistry {
         }
         return userIds;
     }
+
+    // ==================== 活跃用户感知 ====================
+
+    /**
+     * 获取所有在线用户 ID（有活跃 WS 连接的用户）
+     */
+    public Set<String> getOnlineUserIds() {
+        return new java.util.HashSet<>(userSessions.keySet());
+    }
+
+    /**
+     * 在线用户数
+     */
+    public int getOnlineUserCount() {
+        return userSessions.size();
+    }
+
+    /**
+     * 指定用户是否在线（有活跃 WS 连接）
+     */
+    public boolean isOnline(String userId) {
+        WebSocketSession session = userSessions.get(userId);
+        return session != null && session.isOpen();
+    }
 }
