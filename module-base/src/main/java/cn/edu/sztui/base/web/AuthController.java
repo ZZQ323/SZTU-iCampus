@@ -93,8 +93,13 @@ public class AuthController {
 
     @Operation(summary = "获取登录状态")
     @GetMapping("/v1/status")
-    public Result getStatus() {
+    public Result getStatus(HttpServletResponse response) {
         LoginStatusVo status = authService.getStatus();
+        // ⭐ 将 doRefreshCookies 拿到的新鲜 cookies 通过 header 返回给前端
+        if (status.getCookiesJson() != null) {
+            response.setHeader(HEADER_SET_COOKIES, status.getCookiesJson());
+            status.setCookiesJson(null);  // header 已设，body 不需要
+        }
         return Result.ok(status);
     }
 
