@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<title>深圳技术大学</title>
+	<meta name="keywords" content="" />
+	<meta name="description" content="VR云游校园" />
+	<meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="IE=edge" http-equiv="x-ua-compatible">
+	<link href="https://image.brandpano.com/public/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://image.brandpano.com/public/plugins/v4/favicon.ico" type="image/x-icon" rel="shortcut icon">
+	<style>
+		@-ms-viewport{width: device-width;}
+		@media only screen and (min-device-width: 800px){html{overflow:hidden;}}
+		html {height:100%;}
+		body {height:100%;overflow:hidden;margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;font-size:16px;background-color:#ffffff;-ms-touch-action: none; -ms-content-zooming: none;}
+		a{text-decoration:none;}
+		#pano{position:fixed;left:0;top:0;width:100%;height:100%;}
+		#pano-startImg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:15;background-repeat:no-repeat;background-position:center;background-color:#000000;display:block;background-size:contain}
+		#loading{position:absolute;height:56px;width:150px;top:0;left:0;right:0;bottom:0;margin:auto;padding-left:60px;line-height:56px;font-size:14px;color:#fff;background:url('https://image.brandpano.com/public/images/loading.gif') rgba(0,0,0,0.7) no-repeat 10px center;z-index:12;border-radius:8px;}
+		
+	</style>
+	
+	<script type="text/javascript">
+		var apiUrl = {baseUrl: "https://wxopen.brandpano.com", webUrl: "https://v2.brandpano.com", userUrl: "https://v2user.brandpano.com", ossUrl: "https://image.brandpano.com"};
+		var panoInfo;
+		
+				panoInfo = {"id":1885,"guid":"TFp2HDUU","title":"深圳技术大学","description":"VR云游校园","cover":"/file/pano_media/dc432be0723fc8f.jpg","view":135974,"setting":{"copyright":{"enable":1,"info":"深圳技术大学","link":"http://"},"music":{"enable":1,"url":"/file/pano_media/da8103d9d0b8b37.mp3"},"planet":{"enable":1},"logo":{"enable":1,"url":"/file/pano_media/654bf61fd0200ae.png","link":"http://"},"autorotate":{"enable":1},"removeUpLogo":{"enable":1},"vr":{"enable":1}},"province":"440000","city":"440300","county":"440310","lng":0,"lat":0,"edition":0,"skinJs":"/file/pano_skin_js_min/20230602000121201.js","skinXml":"/file/pano_skin_xml_min/20240530000001101.xml"};
+				
+		
+	</script>
+</head>
+<body>
+	<div id="pano"></div>
+		<div id="loading">全景品牌馆...</div>
+		<script src="https://image.brandpano.com/public/lib/jquery.min.js"></script>
+	<script src="https://image.brandpano.com/public/plugins/bootstrap/js/bootstrap.min.js"></script>
+	<script src="https://image.brandpano.com/public/lib/brandpano.lib.js"></script>
+	<script>
+		if(apiUrl && apiUrl.ossUrl && panoInfo && panoInfo.skinJs){
+			brandpano.addScriptByLink(apiUrl.ossUrl + panoInfo.skinJs);
+		}
+	</script>
+	<script>
+		var _hmt = _hmt || [];
+		(function() {
+			var hm = document.createElement("script");
+			hm.src = "https://hm.baidu.com/hm.js?311ecc763cc937fa4253e8ee1f53a3bb";
+			var s = document.getElementsByTagName("script")[0]; 
+			s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+</body>
+</html>

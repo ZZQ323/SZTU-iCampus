@@ -352,9 +352,9 @@ sources:
     enabled: true
     sort: 6
 
-  # ---------- 学生工作部 ----------
+  # ---------- 党委学生工作部 ----------
   - id: sao-tzgg
-    name: 学工部通知公告
+    name: 党委学工部通知公告
     channelId: dept-sao
     parserType: sztu-cms
     baseUrl: https://sao.sztu.edu.cn
@@ -370,7 +370,7 @@ sources:
     sort: 1
 
   - id: sao-xwxx
-    name: 学工部新闻信息
+    name: 党委学工部新闻信息
     channelId: dept-sao
     parserType: sztu-cms
     baseUrl: https://sao.sztu.edu.cn

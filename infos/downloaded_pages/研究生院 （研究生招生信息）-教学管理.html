@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link rel="stylesheet" href="index.css">
+	<script type='text/javascript' src="jquery.min.js"></script>
+</head>
+
+<body>
+	<div id="notIeSupportBrowser" class="not-ie-support-browser browser-btn-hide">
+		<div class="ie-not-support">
+			<img src="images/browerTips/IE.png" width="1000"/>
+           <a href="javascript:void(0);" class="brower-ie-still-visit stillVisitPage"></a>
+			<span class="btn-win">
+				<a href="install/Chrome_50.0.2661.102_Setup.exe" class="dw-btn fl btnHideFlag dw-btn-left" data-i18n="downloadChromeBrowser">
+					<span></span>
+				</a>
+			</span>
+			<span class="btn-win">
+				<a href="install/360cse_8.7.0.306.exe" class="dw-btn exp-dw-btn fr btnHideFlag dw-btn-right" data-i18n="download360SpeedBrowser">
+					<span></span>
+				</a>
+			</span>
+			<span class="btn-xp browser-btn-hide">
+				<a href="install/49.0.2623.112_chrome_installer.exe" class="dw-btn fl btnHideFlag dw-btn-left" data-i18n="downloadChromeBrowser">
+					<span></span>
+				</a>
+			</span>
+			<span class="btn-xp browser-btn-hide">
+				<a href="install/360cse_8.5.0.142.exe" class="dw-btn exp-dw-btn fr btnHideFlag dw-btn-right" data-i18n="download360SpeedBrowser">
+					<span></span>
+				</a>
+			</span>
+
+		</div>
+
+	</div>
+	<div class="not-support-browser" id="norSupportBrowser">
+		<div class="browser-pic-show ">
+			<span class="browser-pic-group browser-pic-group-margin-left">
+				<img src="images/browerTips/Group.png"/>
+				<span class="browser-title" data-i18n="doesNotSupportBrowser">不兼容当前版本浏览器</span>
+			</span>
+			<div class="browser-pic-bitmap browser-btn-hide">
+				<span class="browser-pic-arrow">
+					<img src="images/browerTips/arrow.png"/>
+				</span>
+				<span class="browser-pic-mode ">
+					<img src="images/browerTips/Bitmap.png" width="150" height="160"/>
+					<span class="browser-title" data-i18n="doesNotSupportBrowser">请使用浏览器极速模式访问</span>
+				</span>
+			</div>
+		</div>
+		<span class="brower-go browser-btn-hide">
+			<a href="javascript:void(0);" id="animateBtn">我使用的是360浏览器（点击这里）</a>
+		</span>
+		<div class="download-browser" id="downloadBrowser">
+			<a  href="install/Chrome_50.0.2661.102_Setup.exe" class="dw-btn fl btnHideFlag btn-win" data-i18n="downloadChromeBrowser" style="margin-left: 22px;">
+				<img src="images/browerTips/chrome.png" width="26" height="26" style="margin-top: -3px;margin-left: -1px;"/>
+				<span style="padding-left: 4px;">推荐使用新版Chrome浏览器</span>
+			</a>
+			<a href="install/360cse_8.7.0.306.exe" class="dw-btn exp-dw-btn fr btnHideFlag btn-win" data-i18n="download360SpeedBrowser" style="margin-right: 19px;">
+				<img src="images/browerTips/360.png" width="26" height="26" style="margin-top: -3px;"/>
+				<span>推荐使用新版360极速浏览器</span>
+			</a>
+
+			<a href="install/49.0.2623.112_chrome_installer.exe" class="dw-btn fl btnHideFlag btn-xp browser-btn-hide" data-i18n="downloadChromeBrowser" style="margin-left: 22px;">
+				<img src="images/browerTips/chrome.png" width="26" height="26" style="margin-top: -3px;margin-left: -1px;"/>
+				<span style="padding-left: 4px;">推荐使用新版Chrome浏览器</span>
+			</a>
+			<a href="install/360cse_8.5.0.142.exe" class="dw-btn exp-dw-btn fr btnHideFlag btn-xp browser-btn-hide" data-i18n="download360SpeedBrowser" style="margin-right: 19px;">
+				<img src="images/browerTips/360.png" width="26" height="26" style="margin-top: -3px;"/>
+				<span>推荐使用新版360极速浏览器</span>
+			</a>
+		</div>
+		<div class="brower-still-visit">
+			使用不兼容的浏览器可能会出现乱码、页面加载错误、无法访问等问题，您是否<a herf="javascript:void(0);" class="visit stillVisitPage">仍要访问</a>
+		</div>
+		<div class="browser-desc-title">
+			<div class="browser-title-1">
+				网上办事大厅只兼容使用
+				<span class="text-bold">Chrome内核(版本50以上)</span>
+				和
+				<span class="text-bold">IE9及以上内核</span>
+				的浏览器
+			</div>
+			<div class="browser-title-2">
+				您电脑的操作系统为：
+				<img src="images/browerTips/xp.png" width="14" height="14" class="browser-pic-center"/>
+				<span class="browser-title-size">Windows</span>
+				&nbsp;&nbsp;&nbsp;&nbsp;您当前使用的浏览器为：
+				<img src="images/browerTips/ie9.png" class="browser-pic-center" width="14" height="14"/>
+				<span class="browser-title-size">Internet Explorer 8</span>
+			</div>
+			<div class="browser-title-3">
+				<span>*360浏览器极速模式使用Chrome内核，兼容模式使用IE内核</span>
+			</div>
+		</div>
+		<div class="browser-list-btn browser-btn-hide">
+			<img src="images/browerTips/browser-note.png"  />
+			<a href="javascript:void(0);">点击查看浏览器兼容列表</a>
+		</div>
+
+		<div class="brower-list-box browserListBox">
+		<!-- 	<div class="browser-list-line"></div> -->
+			<div class="browser-list-data" >
+				<iframe src="browser_list.html" frameborder=0 width=1000 height=450 marginheight=0 marginwidth=0 scrolling=no ></iframe>
+			</div>
+		</div>
+	</div>
+
+	<div  class="not-support-browser not-support-edge-browser browser-btn-hide" id="norSupportEdgeBrowser">
+		<div class="browser-pic-edge">
+					<span class="browser-pic-group">
+						<img src="images/browerTips/edge-left.png" width="302" height="168"/>
+						 <span class="edge-left-enlarge">
+								<img src="images/browerTips/edge-left-enlarge.png" width="132" height="132"/> 
+						 </span>
+						<span class="browser-title">请点击浏览器右上角"设置及更多"</span>
+					</span>
+					<div class="browser-pic-bitmap">
+						<span class="browser-pic-arrow">
+							<img src="images/browerTips/edge-arrow.png"/>
+						</span>
+						<span class="browser-pic-mode ">
+							<img src="images/browerTips/edge-right.png" width="302" height="168"/>
+							<span class="edge-right-enlarge">
+									<img src="images/browerTips/edge-right-enlarge.png" width="132" height="132"/> 
+							 </span>
+							<span class="browser-title">选择“使用 Internet Explorer 打开”</span>
+						</span>
+					</div>
+		</div>
+
+    <div class="browser-pic-edge-tip">
+		<h2>抱歉，网上办事大厅暂不支持 Edge 浏览器，我们将努力进行优化</h2>
+	</div>
+	<div class="brower-still-visit">
+		使用不兼容的浏览器可能会出现乱码、页面加载错误、无法访问等问题，您是否<a herf="javascript:void(0);" class="visit stillVisitPage">仍要访问</a>
+	</div>
+
+   <div class="browser-desc-title">
+			 
+	<div class="browser-title-2">
+			您电脑的操作系统为：
+			<img src="images/browerTips/xp.png" width="14" height="14" class="browser-pic-center"/>
+			<span class="browser-title-size">Windows</span>
+			&nbsp;&nbsp;&nbsp;&nbsp;您当前使用的浏览器为：
+			<img src="images/browerTips/ie9.png" class="browser-pic-center" width="14" height="14"/>
+			<span class="browser-title-size">Internet Explorer 8</span>
+	</div>
+		<div class="browser-title-3">
+			<span>* 因为Edge和IE浏览器使用不同的技术，网上办事大厅无法同时兼容Edge浏览器和IE 9 内核浏览器。由于使用IE 9 内核的用户数量较多，故暂不支持Edge进行访问。请使用IE浏览器访问网上办事大厅，给您带来的不便敬请谅解。</span>
+		</div>
+	</div>
+	<div class="browser-list-btn browser-btn-hide">
+		<img src="images/browerTips/browser-note.png"  />
+		<a href="javascript:void(0);">点击查看浏览器兼容列表</a>
+	</div>
+
+	<div class="brower-list-box browserListBox">
+	<!-- 	<div class="browser-list-line"></div> -->
+		<div class="browser-list-data" >
+			<iframe src="browser_list.html" frameborder=0 width=1000 height=450 marginheight=0 marginwidth=0 scrolling=no ></iframe>
+		</div>
+	</div>
+	</div>
+
+</body>
+</html>
+
+<script type="text/javascript">
+
+  
+$(function(){
+ //判断浏览器的内核及操作系统
+  
+    BrowserType();
+	$('.browser-list-btn').on('click',function(){
+		if($(this).hasClass('openFlag')){
+			  $('.browserListBox').addClass('browser-btn-hide');
+		$(this).removeClass('openFlag').find('a').text('点击查看浏览器兼容列表');
+			
+	}else{
+       $('.browserListBox').removeClass('browser-btn-hide');
+		$(this).addClass('openFlag').find('a').text('点击收起浏览器兼容列表');
+	}
+		
+	});
+
+	$('#animateBtn').on('click',function(){
+		 $(".browser-pic-group").animate({"margin-left":"-41px"},function(){
+		 	 $(".browser-pic-bitmap").fadeIn(2000).removeClass('browser-btn-hide');
+		 });
+		 $(this).addClass('browser-btn-visibility');
+	});
+
+	//仍要访问
+	$('.stillVisitPage').on('click',function(){
+		 window.location.href = "../index.html?browser=no";
+	});
+	
+
+
+	 //判断当前浏览类型  
+  function BrowserType()  
+  {  
+	  var browserFlag='';
+	  var IeVersion = '';
+	  var browserVersion='';
+      var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串  
+      var isOpera = userAgent.indexOf("Opera") > -1; //判断是否Opera浏览器  
+      var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera; //判断是否IE浏览器  
+      var isEdge = userAgent.indexOf("Edge") > 0;
+      var isFF = userAgent.indexOf("Firefox") > -1; //判断是否Firefox浏览器  
+      var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1; //判断是否Safari浏览器  
+      var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Edge") == -1; //判断Chrome浏览器  
+      var isUcBrowser = userAgent.indexOf("UBrowser") > -1; // 判断UC浏览器
+	  var IeNoSupportFlag = true;
+	  var browserTypeFlag="";
+	  var flag = true;
+	  var support_flag = false;
+	  var OsObject = window.navigator.userAgent;
+  
+      if (isIE)   
+      {  
+
+           var reIE = new RegExp("MSIE (\\d+\\.\\d+);");  
+           reIE.test(userAgent);  
+           var fIEVersion = parseFloat(RegExp["$1"]);  
+
+		   if(fIEVersion == 5)  
+           {  IeVersion="IE5";
+		   IeNoSupportFlag = false;
+		   }
+           else if(fIEVersion == 6)  
+           {  IeVersion="IE6";
+		   IeNoSupportFlag = false;
+		   }
+		   else if(fIEVersion == 7)  
+           {  IeVersion="IE7";
+		   IeNoSupportFlag = false;
+		   }  
+           else if(fIEVersion == 8)  
+           {  IeVersion="IE8";
+		   IeNoSupportFlag = false;
+		   }  
+           else if(fIEVersion == 9)  
+           {  IeVersion="IE9";}  
+           else if(fIEVersion == 10)  
+           {  IeVersion="IE10";}  
+           else if(fIEVersion == 11)  
+           {  IeVersion="IE11";}  
+           else  
+           {  IeVersion="0"}//IE版本过低 
+      //  browserVersion = IeVersion;
+        browserTypeFlag = IeVersion;
+       } 
+           
+       if (isFF) {  
+       	browserTypeFlag= "Firefox";
+       }  
+       if (isOpera) {
+       	browserTypeFlag= "Opera";
+       }  
+       if (isSafari) {
+       	browserTypeFlag= "Safari";
+       		flag =false;
+       }  
+       if (isChrome) {
+       	browserTypeFlag= "Chrome";
+       	flag = false;
+       }  
+       if (isEdge) {
+       	browserTypeFlag= "Edge";
+       	var version_b = getBroswer().version;
+        //  if(parseInt(version_b) < 16){
+    
+         //   flag = false;
+         // }
+       }  
+       if(isUcBrowser){
+       	browserTypeFlag= "UC浏览器";
+       }
+       if(!(isFF ||isOpera||isSafari||isChrome||isEdge||isUcBrowser)){
+       		browserTypeFlag= "未知浏览器";
+       }
+
+	    if (!!window.ActiveXObject || "ActiveXObject" in window) {
+
+		        if (OsObject.indexOf("MSIE") > 0) {
+		            var version = OsObject.match(/MSIE \d+/i);
+		            var versionNum = version[0].match(/\d+/i);
+		            if (parseInt(versionNum) >= 9) {
+		                flag = false;
+		            }
+		        } else if (OsObject.toLowerCase().indexOf("trident") > -1 && OsObject.indexOf("rv") > -1) {
+		            flag = false;
+		        }
+	    }
+	    if(!flag){
+	    	support_flag = filterNavigatorNoSupport(OsObject);
+	    }
+	 if(!flag && !support_flag){
+	 	//浏览器支持，跳转到平台的url.
+	 	goIndex();
+	 	return;
+	 }
+
+    var osFg  = getOs();
+    //更新页面信息
+    setPageNewData(osFg,browserTypeFlag);
+
+	if(!IeNoSupportFlag){
+    $('#notIeSupportBrowser').removeClass('browser-btn-hide');
+    $('#norSupportBrowser').addClass('browser-btn-hide');
+		
+	}
+   }
+
+   function goIndex(){
+	    var newUrl = '';
+	    var host = window.location.host;
+	    var pathname = window.location.pathname;
+	    var updateurl = pathname.split('/');
+	    var newupdateurl = '';
+	    for (var i = 0; i < updateurl.length; i++) {
+	    	debugger;
+            if ((updateurl[i].indexOf('portal'))> -1){
+               newupdateurl +="";
+            }else if((updateurl[i].indexOf('browerTips.html')) > -1){
+                newupdateurl += '/' + 'index.html';
+            }else if($.trim(updateurl[i])!=''){
+               newupdateurl += '/' + updateurl[i];
+            }
+	         
+	    }
+	    newUrl = host + newupdateurl;
+	    window.location.href = window.location.protocol + '//' + newUrl;
+            
+   }
+
+     /**
+         * 过滤非主流浏览器
+         * @param OsObject
+         * @returns {boolean}
+         */
+    function filterNavigatorNoSupport(OsObject) {
+        //搜狗 MetaSr  遨游 Maxthon QQ QQBrowser  猎豹 LBBROWSER  百度 BIDUBrowser  淘宝 TaoBrowser UC  UBrowser
+        if (OsObject.indexOf("MetaSr") > 0 || OsObject.indexOf("UBrowser") > 0 || OsObject.indexOf("Maxthon") > 0 || OsObject.indexOf("QQBrowser") > 0 || OsObject.indexOf("LBBROWSER") > 0 || OsObject.indexOf("BIDUBrowser") > 0 || OsObject.indexOf("TaoBrowser") > 0) {
+            return true;
+        }
+        return false;
+    }
+ 
+	/**
+	 * 获取操作系统的信息
+	 */
+	function getOs(){
+	   var os = navigator.platform;
+       var userAgent = navigator.userAgent;
+       var osFlag='';
+
+       var isWinXp = userAgent.indexOf("Windows NT 5.0") > -1 || userAgent.indexOf("Windows 2000") > -1 || userAgent.indexOf("Windows NT 5.1") > -1 || userAgent.indexOf("Windows XP") > -1 || userAgent.indexOf("Windows NT 5.2") > -1 || userAgent.indexOf("Windows 2003") > -1;
+        
+        if(os.indexOf("Win") > -1){
+            if(isWinXp){
+                osFlag =  "Windows XP";
+            }else if(userAgent.indexOf("Windows NT 10.0") > -1 || userAgent.indexOf("Windows NT 10") > -1 || userAgent.indexOf("Windows 10") > -1){
+                osFlag =  "Windows 10";
+            }else if(userAgent.indexOf("Windows NT 6.1") > -1 || userAgent.indexOf("Windows 7") > -1){
+               osFlag =  "Windows 7";
+            }else if(userAgent.indexOf("Windows 8") > -1){
+                osFlag =  "Windows 8/8.1";
+            }else if(userAgent.indexOf("Windows NT 8.1") > -1){
+                osFlag =  "Windows 8/8.1";
+            }else{
+                osFlag =  "Other";
+            }
+        }else if(os.indexOf("Mac") > -1){
+            osFlag=  "Mac OS";
+        }else{
+           osFlag=  "Other";
+        }
+        return osFlag;
+	}
+
+	function setPageNewData(osFg,browserTypeFlag){
+		var osFg =osFg;//当前使用的操作系统
+		var browserTypeFlag;
+		var osPicurl = getOsPicName(osFg); //获取操作系统的图标地址
+	    var browserPicUrl = getBrowserPicName(browserTypeFlag);
+            
+		var osHtm= '您电脑的操作系统为：<img src="images/browerTips/'+osPicurl+'" width="14" height="14" class="browser-pic-center"/> <span'+
+		 'class="browser-title-size">'+osFg+'</span>&nbsp;&nbsp;&nbsp;&nbsp;您当前使用的浏览器为：'+
+         '<img src="images/browerTips/'+browserPicUrl+'" class="browser-pic-center" width="14" height="14"/>'+
+         ' <span class="browser-title-size">'+browserTypeFlag+'</span>';
+         $('.browser-title-2').html(osHtm);
+
+         if(browserTypeFlag !='IE8'){
+         	$('.browser-list-btn').removeClass('browser-btn-hide');
+         	$('.brower-go').removeClass('browser-btn-hide');
+         	$('.browserListBox').addClass('browser-btn-hide');
+         }
+
+		 if(browserTypeFlag =='Edge'){
+			 $('#norSupportBrowser').addClass('browser-btn-hide');
+			 $('#norSupportEdgeBrowser').removeClass('browser-btn-hide');
+			 var version_b = 'Microsoft Edge' +getBroswer().version;
+			 $('.browser-title-size').text(version_b);
+
+		 }
+
+         if(osFg == 'Windows XP'){
+         	//下载chrome 49浏览器 及360 8.5
+         	$('.btn-xp').removeClass('browser-btn-hide');
+            $('.btn-win').addClass('browser-btn-hide');
+         }else {
+         	$('.btn-xp').addClass('browser-btn-hide');
+            $('.btn-win').removeClass('browser-btn-hide');
+         }
+	}
+
+	function getOsPicName(osFg){
+		var picurl='';
+		 if(osFg.indexOf('Windows XP')>-1){
+           picurl = 'xp.png';
+		 }else if(osFg.indexOf('Windows 7')>-1){
+		 	 picurl = 'w7.png';
+		 }else if(osFg.indexOf('Windows 8/8.1')>-1){
+		 	 picurl = 'w8.png';
+		 }else if(osFg.indexOf('Windows 10')>-1){
+		 	 picurl = 'w10.png';
+		 }else if(osFg.indexOf('Mac')>-1){
+		 	 picurl = 'os.png';
+		 }else{
+		 	  picurl = 'xp.png';
+		 }  
+
+		 return picurl;
+	}
+
+
+	function getBrowserPicName(browserTypeFlag){
+		var picurl='';
+		 if(browserTypeFlag.indexOf('IE')>-1){
+           picurl = 'ie9.png';
+		 }else if(browserTypeFlag.indexOf('Safari')>-1){
+		 	 picurl = 'safari.png';
+		 }else if(browserTypeFlag.indexOf('Chrome')>-1){
+		 	 picurl = 'chrome.png';
+		 }else if(browserTypeFlag.indexOf('Edge')>-1){
+		 	 picurl = 'edge.png';
+		 }else{
+		 	  picurl = 'browser.png';
+		 }  
+		 return picurl;
+	}
+
+	function getBroswer(){
+	    var Sys = {};
+	    var ua = navigator.userAgent.toLowerCase();
+	    var s;
+	    (s = ua.match(/edge\/([\d.]+)/)) ? Sys.edge = s[1] :
+	    (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? Sys.ie = s[1] :
+	    (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+	    (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+	    (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+	    (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+	    (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+
+	    if (Sys.edge) return { broswer : "Edge", version : Sys.edge };
+	    if (Sys.ie) return { broswer : "IE", version : Sys.ie };
+	    if (Sys.firefox) return { broswer : "Firefox", version : Sys.firefox };
+	    if (Sys.chrome) return { broswer : "Chrome", version : Sys.chrome };
+	    if (Sys.opera) return { broswer : "Opera", version : Sys.opera };
+	    if (Sys.safari) return { broswer : "Safari", version : Sys.safari };
+	    
+	    return { broswer : "", version : "0" };
+}		
+});
+	
+
+</script>
