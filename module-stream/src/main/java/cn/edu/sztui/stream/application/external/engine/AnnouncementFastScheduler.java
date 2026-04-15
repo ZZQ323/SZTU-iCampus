@@ -3,6 +3,7 @@ package cn.edu.sztui.stream.application.external.engine;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,6 +35,11 @@ public class AnnouncementFastScheduler {
     @Resource
     private CookieSourceManager cookieSourceManager;
 
+    @PostConstruct
+    public void init() {
+        log.info("AnnouncementFastScheduler 已初始化（10s tick）");
+    }
+
     /**
      * 每 10 秒检查公文通是否需要爬取
      * <p>
@@ -42,9 +48,13 @@ public class AnnouncementFastScheduler {
     @Scheduled(fixedRate = 10000, initialDelay = 30000)
     public void tickAnnouncement() {
         // 无可用 Cookie → 跳过（公文通需要登录）
-        if (!cookieSourceManager.hasAvailableCookie()) {
+        boolean hasCookie = cookieSourceManager.hasAvailableCookie();
+        if (!hasCookie) {
+            log.debug("公文通快速轮询: 无可用 Cookie，跳过");
             return;
         }
+
+        log.info("公文通快速轮询: 开始检查（有 Cookie）");
 
         List<CrawlerConfig.SourceConfig> gwtSources = configLoader.getEnabledSources().stream()
                 .filter(s -> "announcement".equals(s.getChannelId()))
