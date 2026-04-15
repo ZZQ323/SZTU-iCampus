@@ -122,6 +122,7 @@ public class CrawlEngine {
                 return CrawlResult.empty(sourceId);
             }
 
+            enrichItemsWithSourceMeta(newItems, source);
             infoCacheUtil.saveMetaBatch(channelId, newItems);
 
             String newLatestId = computeLatestId(newItems, cachedLatestId);
@@ -190,6 +191,7 @@ public class CrawlEngine {
 
             // 保存第 1 页数据
             List<ListParserResult.InfoItemMeta> firstPageItems = firstResult.getItems();
+            enrichItemsWithSourceMeta(firstPageItems, source);
             infoCacheUtil.saveMetaBatch(channelId, firstPageItems);
 
             String latestId = computeLatestId(firstPageItems, "0");
@@ -225,6 +227,7 @@ public class CrawlEngine {
                                 crawlPagesInBatches(source, session, 2, pagesToCrawl, totalPage);
 
                         if (!remaining.isEmpty()) {
+                            enrichItemsWithSourceMeta(remaining, source);
                             infoCacheUtil.saveMetaBatch(channelId, remaining);
 
                             // 更新 latestId（可能有更大的 ID）
@@ -521,6 +524,24 @@ public class CrawlEngine {
             data.put("latestTitle", newItems.get(0).getTitle());
         }
         streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
+    }
+
+    /**
+     * 为每条 item 打上数据源的元数据标签（sourceId, contentType, subContentType, sourceOrg, sourceOrgName）。
+     * 在保存到 Redis 之前调用。
+     */
+    private void enrichItemsWithSourceMeta(List<ListParserResult.InfoItemMeta> items, CrawlerConfig.SourceConfig source) {
+        CrawlerConfig.ChannelConfig channel = configLoader.findChannelById(source.getChannelId());
+        String sourceOrgName = channel != null ? channel.getName() : source.getName();
+        String sourceOrg = channel != null ? channel.getSourceOrg() : "unknown";
+
+        for (ListParserResult.InfoItemMeta item : items) {
+            item.setSourceId(source.getId());
+            item.setContentType(source.getContentType());
+            item.setSubContentType(source.getSubContentType());
+            item.setSourceOrg(sourceOrg);
+            item.setSourceOrgName(sourceOrgName);
+        }
     }
 
     /**

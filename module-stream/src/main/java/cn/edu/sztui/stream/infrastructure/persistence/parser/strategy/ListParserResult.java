@@ -86,6 +86,21 @@ public class ListParserResult {
         /** 频道ID */
         private String channelId;
 
+        /** 数据源ID（如 kyb-tzgg） */
+        private String sourceId;
+
+        /** 内容大类（notice/news） */
+        private String contentType;
+
+        /** 内容细分类（general-news/party/cooperation/academic/student/general-notice/admission/employment） */
+        private String subContentType;
+
+        /** 来源组织分类（fixed/official/department/support/league/college） */
+        private String sourceOrg;
+
+        /** 来源组织名称（如 "科研部"、"中德智能制造学院"） */
+        private String sourceOrgName;
+
         /** 爬取时间戳 */
         private Long crawledAt;
 

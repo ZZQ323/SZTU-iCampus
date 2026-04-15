@@ -65,6 +65,9 @@ public class CrawlerConfig {
         /** 内容类型：notice/news/academic/employment/campus/party */
         private String contentType;
 
+        /** 内容细分类：general-news/party/cooperation/academic/student/general-notice/admission/employment */
+        private String subContentType;
+
         private boolean requiresAuth;
         private Integer crawlIntervalMinutes;
 
