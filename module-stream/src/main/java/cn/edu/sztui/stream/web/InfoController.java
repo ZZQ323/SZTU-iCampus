@@ -83,6 +83,35 @@ public class InfoController {
     // ==================== 内容列表 ====================
 
     /**
+     * 全局 Feed 查询（跨频道聚合）
+     * <p>
+     * 支持按信息来源、内容类型、细分类三维筛选。
+     * 公文通请继续使用 /info/v1/list?channelId=announcement
+     */
+    @GetMapping("/v1/feed")
+    @Operation(summary = "全局Feed查询（三维筛选）")
+    public Result getFeed(
+            @Parameter(description = "来源分类（official/department/support/league/college）")
+            @RequestParam(required = false) String sourceOrg,
+            @Parameter(description = "具体频道ID")
+            @RequestParam(required = false) String channelId,
+            @Parameter(description = "内容大类（news/notice）")
+            @RequestParam(required = false) String contentType,
+            @Parameter(description = "内容细分类（general-news/party/cooperation/academic/student/general-notice/admission/employment）")
+            @RequestParam(required = false) String subContentType,
+            @Parameter(description = "页码")
+            @RequestParam(defaultValue = "1") Integer page,
+            @Parameter(description = "每页数量")
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        log.info("用户 {} 获取 Feed: sourceOrg={}, channel={}, type={}, subType={}, page={}",
+                UserContext.getContext().getUserId(), sourceOrg, channelId, contentType, subContentType, page);
+
+        InfoService.InfoListResult result = infoService.getFeed(sourceOrg, channelId, contentType, subContentType, page, pageSize);
+        return Result.ok(result);
+    }
+
+    /**
      * 获取信息列表（统一入口）
      *
      * @param channelId    频道 ID（必填，默认 announcement）

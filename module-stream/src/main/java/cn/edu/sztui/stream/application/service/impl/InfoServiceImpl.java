@@ -129,6 +129,19 @@ public class InfoServiceImpl implements InfoService {
     }
 
     @Override
+    public InfoListResult getFeed(String sourceOrg, String channelId, String contentType, String subContentType, int page, int pageSize) {
+        List<ListParserResult.InfoItemMeta> list = infoCacheUtil.getFeedList(
+                sourceOrg, channelId, contentType, subContentType, page, pageSize);
+        long total = infoCacheUtil.getFeedCount(sourceOrg, channelId, contentType, subContentType);
+
+        InfoListResult result = new InfoListResult();
+        result.setItems(list);
+        result.setTotal(total);
+        result.setHasMore(list.size() == pageSize);
+        return result;
+    }
+
+    @Override
     public List<ListParserResult.InfoItemMeta> search(String keyword, String channelId, int limit) {
         if (StringUtils.hasText(channelId)) {
             return infoCacheUtil.searchByTitle(channelId, keyword, limit);

@@ -42,6 +42,11 @@ public interface InfoService {
     InfoListResult getList(String channelId, String categoryCode, int page, int pageSize);
 
     /**
+     * 全局 Feed 查询（跨频道聚合，支持多维筛选）
+     */
+    InfoListResult getFeed(String sourceOrg, String channelId, String contentType, String subContentType, int page, int pageSize);
+
+    /**
      * 搜索信息
      *
      * @param keyword   关键词
