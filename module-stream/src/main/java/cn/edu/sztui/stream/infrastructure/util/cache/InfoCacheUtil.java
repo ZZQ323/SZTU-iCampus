@@ -47,6 +47,8 @@ public class InfoCacheUtil {
     private static final String SYSTEM_SUFFIX = ":system";
     private static final String HOT_ACCESS_SUFFIX = ":hot-access";
     private static final String USER_READ_PREFIX = "info:user:";
+    private static final String FEED_TIMELINE = "feed:timeline";
+    private static final String FEED_META_PREFIX = "feed:meta:";
 
     private static final long CONTENT_TTL_SECONDS = 24 * 60 * 60;
     private static final int MAX_CACHED_DETAILS = 50;
@@ -101,8 +103,11 @@ public class InfoCacheUtil {
     // ==================== 元数据操作 ====================
 
     public void saveMeta(String channelId, ListParserResult.InfoItemMeta meta) {
+        String metaJson = JSON.toJSONString(meta);
+
+        // 1. 写入频道维度（保持原有逻辑）
         String metaKey = getMetaKey(channelId);
-        cacheUtil.hset(metaKey, meta.getId(), JSON.toJSONString(meta));
+        cacheUtil.hset(metaKey, meta.getId(), metaJson);
 
         double score = idToScore(meta.getId());
         String timelineKey = generateKey(KEY_PREFIX + channelId + TIMELINE_SUFFIX);
@@ -112,6 +117,13 @@ public class InfoCacheUtil {
             String categoryKey = generateKey(KEY_PREFIX + channelId + CATEGORY_PREFIX + meta.getCategoryCode());
             redisTemplate.opsForZSet().add(categoryKey, meta.getId(), score);
         }
+
+        // 2. 写入全局 feed（用 channelId:id 作为唯一键，避免跨频道 id 冲突）
+        String feedItemKey = channelId + ":" + meta.getId();
+        String feedTimelineKey = generateKey(FEED_TIMELINE);
+        String feedMetaKey = generateKey(FEED_META_PREFIX + feedItemKey);
+        redisTemplate.opsForZSet().add(feedTimelineKey, feedItemKey, score);
+        cacheService.set(feedMetaKey, metaJson);
 
         log.debug("保存元数据: channel={}, id={}, title={}", channelId, meta.getId(), meta.getTitle());
     }
@@ -146,7 +158,70 @@ public class InfoCacheUtil {
         cacheService.set(key, id);
     }
 
-    // ==================== 列表查询 ====================
+    // ==================== 全局 Feed 查询 ====================
+
+    /**
+     * 从全局 feed 读取并过滤。
+     * 先读取较多条目（overFetch），Java 内存过滤后截取分页。
+     * 适合几千条量级的全局 timeline。
+     */
+    public List<ListParserResult.InfoItemMeta> getFeedList(
+            String sourceOrg, String channelId, String contentType, String subContentType,
+            int page, int pageSize) {
+
+        String feedTimelineKey = generateKey(FEED_TIMELINE);
+
+        // 读取全局 timeline 的全部 item key（最多 5000 条）
+        Set<Object> allKeys = redisTemplate.opsForZSet().reverseRange(feedTimelineKey, 0, 4999);
+        if (allKeys == null || allKeys.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 读取每条 item 的元数据并过滤
+        List<ListParserResult.InfoItemMeta> filtered = new ArrayList<>();
+        for (Object keyObj : allKeys) {
+            String feedItemKey = keyObj.toString();
+            String feedMetaKey = generateKey(FEED_META_PREFIX + feedItemKey);
+            Object val = cacheService.get(feedMetaKey);
+            if (val == null) continue;
+
+            ListParserResult.InfoItemMeta item = JSON.parseObject(val.toString(), ListParserResult.InfoItemMeta.class);
+            if (item == null) continue;
+
+            // 按条件过滤
+            if (StringUtils.hasText(sourceOrg) && !sourceOrg.equals(item.getSourceOrg())) continue;
+            if (StringUtils.hasText(channelId) && !channelId.equals(item.getChannelId())) continue;
+            if (StringUtils.hasText(contentType) && !contentType.equals(item.getContentType())) continue;
+            if (StringUtils.hasText(subContentType) && !subContentType.equals(item.getSubContentType())) continue;
+
+            filtered.add(item);
+        }
+
+        // 分页
+        int start = (page - 1) * pageSize;
+        if (start >= filtered.size()) {
+            return Collections.emptyList();
+        }
+        int end = Math.min(start + pageSize, filtered.size());
+        return filtered.subList(start, end);
+    }
+
+    /**
+     * 获取全局 feed 的总条目数（过滤后）
+     */
+    public long getFeedCount(String sourceOrg, String channelId, String contentType, String subContentType) {
+        // 简化实现：无过滤时直接返回 timeline 大小
+        if (!StringUtils.hasText(sourceOrg) && !StringUtils.hasText(channelId)
+                && !StringUtils.hasText(contentType) && !StringUtils.hasText(subContentType)) {
+            String feedTimelineKey = generateKey(FEED_TIMELINE);
+            Long size = redisTemplate.opsForZSet().zCard(feedTimelineKey);
+            return size != null ? size : 0;
+        }
+        // 有过滤时需要全量扫描（量不大，可接受）
+        return getFeedList(sourceOrg, channelId, contentType, subContentType, 1, 5000).size();
+    }
+
+    // ==================== 频道列表查询 ====================
 
     public List<ListParserResult.InfoItemMeta> getList(String channelId, int page, int pageSize) {
         long start = (long) (page - 1) * pageSize;

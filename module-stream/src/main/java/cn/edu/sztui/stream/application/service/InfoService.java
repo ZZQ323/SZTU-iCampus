@@ -42,6 +42,11 @@ public interface InfoService {
     InfoListResult getList(String channelId, String categoryCode, int page, int pageSize);
 
     /**
+     * 全局 Feed 查询（跨频道聚合，支持多维筛选）
+     */
+    InfoListResult getFeed(String sourceOrg, String channelId, String contentType, String subContentType, int page, int pageSize);
+
+    /**
      * 搜索信息
      *
      * @param keyword   关键词
@@ -88,13 +93,25 @@ public interface InfoService {
         private String name;
         private String description;
         private String icon;
-        /** 来源组织分类：fixed/department/support/league/college */
+        /** 来源组织分类：fixed/official/department/support/league/college */
         private String sourceOrg;
         /** 该频道包含的内容类型（从源自动推导） */
         private List<String> contentTypes;
         private Integer sort;
         private Long unreadCount;
         private List<CategoryInfo> categories;
+        /** 该频道下的数据源列表（前端订阅管理用） */
+        private List<SourceInfo> sources;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class SourceInfo {
+        private String id;
+        private String name;
+        private String contentType;
+        private String subContentType;
     }
 
     @Data
