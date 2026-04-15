@@ -65,6 +65,7 @@ public class InfoServiceImpl implements InfoService {
 
             List<CategoryInfo> categories = new ArrayList<>();
             List<String> contentTypes = new ArrayList<>();
+            List<SourceInfo> sourceInfos = new ArrayList<>();
             if (ch.getSourceIds() != null) {
                 for (String sourceId : ch.getSourceIds()) {
                     CrawlerConfig.SourceConfig source = configLoader.findSourceById(sourceId);
@@ -78,11 +79,17 @@ public class InfoServiceImpl implements InfoService {
                                 categories.add(new CategoryInfo(code, name));
                             });
                         }
+                        // 收集 source 信息（前端订阅管理用）
+                        sourceInfos.add(new SourceInfo(
+                                source.getId(), source.getName(),
+                                source.getContentType(), source.getSubContentType()
+                        ));
                     }
                 }
             }
             info.setContentTypes(contentTypes);
             info.setCategories(categories);
+            info.setSources(sourceInfos);
             return info;
         }).collect(Collectors.toList());
     }
