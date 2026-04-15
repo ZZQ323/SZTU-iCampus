@@ -157,10 +157,17 @@ public class SztuCmsListParser implements ParserStrategy {
     private List<InfoItemMeta> extractItems(Document doc, SourceConfig sourceConfig, String baseUrl) {
         List<InfoItemMeta> items = new ArrayList<>();
         Set<String> seenIds = new HashSet<>();
-        // 遍历所有 li 内的 a 链接
-        // Elements allAnchors = doc.select("li a[href]");
-        // 遍历所有文章链接（li 内 + H 型 soga11 容器内）
-        Elements allAnchors = doc.select("li a[href], div.soga11 a[href]");
+        // 匹配所有可能包含文章链接的容器：
+        // 1. li a[href] — 标准 CMS 列表
+        // 2. div.soga11 a[href] — H型布局
+        // 3. div.item a[href] — 中德学院等图片卡片布局
+        // 4. div.havePictureList_list > a[href] — 人工智能学院等图片列表布局
+        // 5. tr a[href] — 学工部等 TABLE 布局（老版 CMS）
+        Elements allAnchors = doc.select(
+                "li a[href], div.soga11 a[href], div.item a[href], " +
+                "div.havePictureList_list > a[href], tr a[href], " +
+                "div.content-list a[href], div.list a[href]"
+        );
 
         for (Element anchor : allAnchors) {
             String href = anchor.attr("href").trim();
@@ -283,8 +290,9 @@ public class SztuCmsListParser implements ParserStrategy {
             return h3.text().trim();
         }
 
-        // 3. 特定 class 元素
-        for (String sel : new String[]{".bt", ".text span", ".con p", "p.bt", ".soga_a"}) {
+        // 3. 特定 class 元素（各学院/部门模板用不同 class 名）
+        for (String sel : new String[]{".bt", ".title", ".text span", ".con p", "p.bt", ".soga_a",
+                                       ".info_plate .name", ".info_plate h4", ".news-title"}) {
             Element el = anchor.selectFirst(sel);
             if (el != null && StringUtils.hasText(el.text()) && !isDateString(el.text())) {
                 return el.text().trim();
@@ -322,7 +330,8 @@ public class SztuCmsListParser implements ParserStrategy {
         String dateInAnchor = findDateInElement(anchor);
         if (dateInAnchor != null) return dateInAnchor;
 
-        // 再在 a 的父级 li 内找（就业网的日期在 li > span.item-time，不在 a 内）
+        // 在 a 的各种父容器中找日期
+        // li（标准列表）
         Element parentLi = anchor.closest("li");
         if (parentLi != null) {
             for (Element el : parentLi.select("span.item-time, em, span.date, .sj p, time")) {
@@ -332,7 +341,7 @@ public class SztuCmsListParser implements ParserStrategy {
             return findDateInText(parentLi.text());
         }
 
-        // H 型（jw-jdt 等）：日期在 div.soga11 > span.timer1
+        // div.soga11（H 型布局）
         Element parentSoga = anchor.closest("div.soga11");
         if (parentSoga != null) {
             Element timer = parentSoga.selectFirst("span.timer1");
@@ -341,6 +350,18 @@ public class SztuCmsListParser implements ParserStrategy {
                 if (date != null) return date;
             }
             return findDateInText(parentSoga.text());
+        }
+
+        // div.item（图片卡片布局 - 中德学院等）
+        Element parentItem = anchor.closest("div.item");
+        if (parentItem != null) {
+            return findDateInText(parentItem.text());
+        }
+
+        // tr（TABLE 布局 - 学工部等）
+        Element parentTr = anchor.closest("tr");
+        if (parentTr != null) {
+            return findDateInText(parentTr.text());
         }
 
         return null;
