@@ -2,6 +2,14 @@ server:
   port: 8080
   tomcat:
     connection-timeout: 10000
+
+# 调度线程池：AnnouncementFastScheduler(10s) + SourceCrawlScheduler(60s) 并行
+spring:
+  task:
+    scheduling:
+      pool:
+        size: 3
+
 program:
   name: sztu
   code: 10001
