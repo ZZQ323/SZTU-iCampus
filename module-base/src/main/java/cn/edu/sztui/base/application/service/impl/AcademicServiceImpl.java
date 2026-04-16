@@ -144,36 +144,20 @@ public class AcademicServiceImpl implements AcademicService {
 
         SmartResponse response;
         try {
-            String scheduleUrl = AcdmScheduleTableURL + "?sf_request_type=ajax";
+            // ⭐ 不加 ?sf_request_type=ajax —— 教务系统需要返回完整 HTML（含 #timetable）
+            String scheduleUrl = AcdmScheduleTableURL;
 
-            Map<String, String> headers = new HashMap<>();
-            headers.put("X-Requested-With", "XMLHttpRequest");
-            headers.put("Accept", "application/json, text/javascript, */*; q=0.01");
-            headers.put("Referer", internalNetStartURL);
-            headers.put("User-Agent", UA);
+            // ⭐ 统一使用普通表单 POST（和浏览器行为一致），不用 AJAX headers
+            Map<String, String> formData = new HashMap<>();
+            formData.put("cj0701id", "");
+            formData.put("zc", query != null && query.getWeek() != null ? query.getWeek() : "");
+            formData.put("demo", "");
+            formData.put("xnxq01id", query != null && query.getSemester() != null ? query.getSemester() : "");
+            formData.put("sfFD", "1");
+            formData.put("wkbkc", "1");
+            formData.put("kbjcmsid", "EB5693B95B204102B2E28C5624C6E9ED");
 
-            if (query == null || (query.getWeek() == null && query.getSemester() == null)) {
-                // 默认查询（当前周、当前学期）—— GET 请求
-                SmartRequest request = SmartRequest.builder()
-                        .url(scheduleUrl)
-                        .method("GET")
-                        .headers(headers)
-                        .followRedirects(false)
-                        .build();
-                response = smartHttpClient.execute(request, session);
-            } else {
-                // 指定周/学期查询 —— POST 表单
-                Map<String, String> formData = new HashMap<>();
-                formData.put("zc", query.getWeek() != null ? query.getWeek() : "");
-                formData.put("xnxq01id", query.getSemester() != null ? query.getSemester() : "");
-                formData.put("cj0701id", "");
-                formData.put("demo", "");
-                formData.put("sfFD", "1");
-                formData.put("wkbkc", "1");
-                formData.put("kbjcmsid", "EB5693B95B204102B2E28C5624C6E9ED");
-
-                response = smartHttpClient.postAjax(scheduleUrl, formData, session, headers);
-            }
+            response = smartHttpClient.post(scheduleUrl, formData, session);
 
             if (!response.isSuccess()) {
                 log.error("课程表请求失败: status={}, userId={}", response.getStatusCode(), userId);
