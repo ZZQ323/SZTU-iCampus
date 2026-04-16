@@ -488,6 +488,28 @@ public class InfoCacheUtil {
     }
 
     /**
+     * ⭐ 清除全局 feed timeline 和 meta 数据（启动时调用）
+     * <p>
+     * 当 channels/sources 配置变更（如拆分频道、改名）后，
+     * 旧缓存中的 channelId/sourceOrgName 不会自动更新，
+     * 启动时清除 feed 让重新爬取后填入正确数据。
+     */
+    public void clearFeedTimeline() {
+        String feedTimelineKey = generateKey(FEED_TIMELINE);
+        // 读取所有 feed item key，清除对应 meta
+        Set<Object> allKeys = redisTemplate.opsForZSet().range(feedTimelineKey, 0, -1);
+        if (allKeys != null) {
+            for (Object keyObj : allKeys) {
+                String feedMetaKey = generateKey(FEED_META_PREFIX + keyObj.toString());
+                cacheService.del(new String[]{feedMetaKey});
+            }
+        }
+        // 清除 timeline 本身
+        cacheService.del(new String[]{feedTimelineKey});
+        log.info("已清除全局 feed timeline 和 {} 条 meta 数据", allKeys != null ? allKeys.size() : 0);
+    }
+
+    /**
      * 更新数据源最后爬取时间（按 sourceId，非 channelId）
      */
     public void updateLastCrawlTime(String sourceId) {

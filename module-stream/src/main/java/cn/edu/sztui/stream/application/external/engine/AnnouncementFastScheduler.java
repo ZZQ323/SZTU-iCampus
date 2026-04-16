@@ -3,6 +3,7 @@ package cn.edu.sztui.stream.application.external.engine;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
+import cn.edu.sztui.stream.infrastructure.websocket.registry.WsSessionRegistry;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import java.util.List;
  * 公文通（需要登录的 announcement 频道）单独用 10 秒 tick，
  * 比普通源的 60 秒 tick 更频繁，确保用户能及时看到新公告。
  * <p>
- * 无可用 Cookie 时自动跳过，不浪费请求。
+ * ⭐ 仅在有 WS 在线用户时轮询，避免使用离线用户 cookie 导致其有效期被意外延长。
  */
 @Slf4j
 @Component
@@ -35,6 +36,9 @@ public class AnnouncementFastScheduler {
     @Resource
     private CookieSourceManager cookieSourceManager;
 
+    @Resource
+    private WsSessionRegistry wsSessionRegistry;
+
     @PostConstruct
     public void init() {
         log.info("AnnouncementFastScheduler 已初始化（10s tick）");
@@ -43,11 +47,18 @@ public class AnnouncementFastScheduler {
     /**
      * 每 10 秒检查公文通是否需要爬取
      * <p>
-     * initialDelay = 30s（比 SourceInitTask 的启动初始化稍后，避免冲突）
+     * ⭐ 前置条件：必须有 WS 在线用户（证明有人在用小程序），
+     * 不使用离线用户的 cookie 轮询，避免意外延长 cookie 有效期。
      */
     @Scheduled(fixedRate = 10000, initialDelay = 30000)
     public void tickAnnouncement() {
-        // 无可用 Cookie → 跳过（公文通需要登录）
+        // ⭐ 必须有 WS 在线用户才轮询
+        if (wsSessionRegistry.getOnlineUserIds().isEmpty()) {
+            log.debug("公文通快速轮询: 无在线用户，跳过");
+            return;
+        }
+
+        // 无可用 Cookie → 跳过
         boolean hasCookie = cookieSourceManager.hasAvailableCookie();
         if (!hasCookie) {
             log.debug("公文通快速轮询: 无可用 Cookie，跳过");
