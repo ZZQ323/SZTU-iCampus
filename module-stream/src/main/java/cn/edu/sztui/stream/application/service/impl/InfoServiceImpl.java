@@ -183,17 +183,19 @@ public class InfoServiceImpl implements InfoService {
             return cached;
         }
 
-        // 2. 获取元数据以确定分类
-        if (!StringUtils.hasText(categoryCode)) {
-            ListParserResult.InfoItemMeta meta = infoCacheUtil.getMeta(channelId, id);
-            if (meta != null) {
+        // 2. 获取元数据以确定分类和数据源
+        String sourceId = null;
+        ListParserResult.InfoItemMeta meta = infoCacheUtil.getMeta(channelId, id);
+        if (meta != null) {
+            if (!StringUtils.hasText(categoryCode)) {
                 categoryCode = meta.getCategoryCode();
                 log.debug("从缓存元数据获取到分类: id={}, category={}", id, categoryCode);
             }
+            sourceId = meta.getSourceId();
         }
 
         // 3. 爬取详情页
-        ContentParserResult content = crawlDetail(channelId, id, categoryCode);
+        ContentParserResult content = crawlDetail(channelId, id, categoryCode, sourceId);
 
         // 4. 保存到缓存
         if (content != null && content.isSuccess()) {
@@ -206,12 +208,12 @@ public class InfoServiceImpl implements InfoService {
     /**
      * 爬取详情页
      * <p>
-     * ⭐ 修复：根据 categoryCode 查找正确的 source，
-     * 而不是永远用 channel.getSourceIds().get(0)。
-     * 公文通的详情 URL 是 /info/{category}/{id}.htm，
-     * 分类代码必须和文章实际分类匹配，否则 404。
+     * ⭐ 修复：三级查找策略确定正确的 source：
+     * 1. sourceId 精确匹配（从元数据获取，最可靠）
+     * 2. categoryCode 匹配（按分类代码在频道内查找）
+     * 3. fallback 到频道第一个 source
      */
-    private ContentParserResult crawlDetail(String channelId, String id, String categoryCode) {
+    private ContentParserResult crawlDetail(String channelId, String id, String categoryCode, String sourceId) {
         TokenMessage ctx = UserContext.getContext();
         String cookiesJson = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
         if (cookiesJson == null || cookiesJson.isEmpty()) {
@@ -219,8 +221,8 @@ public class InfoServiceImpl implements InfoService {
             return ContentParserResult.fail("无法获取用户会话");
         }
 
-        // ⭐ 修复：根据 categoryCode 找到正确的 source
-        CrawlerConfig.SourceConfig source = findSourceForDetail(channelId, categoryCode);
+        // ⭐ 修复：三级查找 source（sourceId > categoryCode > fallback）
+        CrawlerConfig.SourceConfig source = findSourceForDetail(channelId, categoryCode, sourceId);
         if (source == null) {
             log.warn("未找到匹配的数据源: channel={}, category={}", channelId, categoryCode);
             return ContentParserResult.fail("未找到匹配的数据源");
@@ -264,26 +266,36 @@ public class InfoServiceImpl implements InfoService {
     }
 
     /**
-     * ⭐ 新增：根据 categoryCode 在频道内查找正确的 source
+     * ⭐ 三级查找策略确定正确的 source
      * <p>
-     * 逻辑：
-     * 1. 如果有 categoryCode，遍历频道下所有 source，找到 source.category == categoryCode 的
-     * 2. 如果没有 categoryCode 或没找到匹配的，退回到第一个 source（兼容旧逻辑）
+     * 1. sourceId 精确匹配（从元数据获取，最可靠 —— 就是爬取该文章时使用的 source）
+     * 2. categoryCode 匹配（按分类代码在频道内查找）
+     * 3. fallback 到频道第一个 source
      * <p>
-     * 例如：文章分类是 1019(科研)，就要用 gwt-keyan 的 detailUrlTemplate
-     * → /info/1019/{id}.htm ✅
-     * 而不是 gwt-jiaowu 的 /info/1018/{id}.htm ✗
+     * 为什么需要 sourceId？
+     * department 频道聚合了 16+ 不同域名的 source，同一域名下的文章可能有不同 categoryCode
+     * （如 hr.sztu.edu.cn 的 1020 和 1043）。仅靠 categoryCode 无法区分域名。
+     * 但 sourceId（如 "hr-tzgg"）直接指向正确的 detailUrlTemplate。
      */
-    private CrawlerConfig.SourceConfig findSourceForDetail(String channelId, String categoryCode) {
+    private CrawlerConfig.SourceConfig findSourceForDetail(String channelId, String categoryCode, String sourceId) {
+        // 1. sourceId 精确匹配（最可靠）
+        if (StringUtils.hasText(sourceId)) {
+            CrawlerConfig.SourceConfig source = configLoader.findSourceById(sourceId);
+            if (source != null) {
+                log.debug("按 sourceId 匹配到数据源: sourceId={}", sourceId);
+                return source;
+            }
+        }
+
         CrawlerConfig.ChannelConfig channel = configLoader.findChannelById(channelId);
         if (channel == null || channel.getSourceIds() == null || channel.getSourceIds().isEmpty()) {
             return null;
         }
 
-        // 优先按 categoryCode 精确匹配
+        // 2. categoryCode 精确匹配
         if (StringUtils.hasText(categoryCode)) {
-            for (String sourceId : channel.getSourceIds()) {
-                CrawlerConfig.SourceConfig source = configLoader.findSourceById(sourceId);
+            for (String sid : channel.getSourceIds()) {
+                CrawlerConfig.SourceConfig source = configLoader.findSourceById(sid);
                 if (source != null && categoryCode.equals(source.getCategoryCode())) {
                     log.debug("按分类匹配到数据源: category={} → source={}", categoryCode, source.getId());
                     return source;
@@ -292,7 +304,7 @@ public class InfoServiceImpl implements InfoService {
             log.warn("未找到匹配分类 {} 的数据源，使用默认", categoryCode);
         }
 
-        // Fallback：使用第一个 source
+        // 3. Fallback：使用第一个 source
         String fallbackId = channel.getSourceIds().get(0);
         return configLoader.findSourceById(fallbackId);
     }

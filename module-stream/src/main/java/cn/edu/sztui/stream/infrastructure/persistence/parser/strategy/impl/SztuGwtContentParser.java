@@ -173,16 +173,31 @@ public class SztuGwtContentParser implements ParserStrategy {
     }
 
     private String[] parsePrevArticle(Document doc) {
-        Element nav = doc.selectFirst("div.article-link, .article-link");
-        if (nav != null) for (Element p : nav.select("p"))
-            if (p.text().contains("上一篇")) { Element a = p.selectFirst("a"); if (a != null) return new String[]{extractId(a.attr("href")), a.text().trim()}; }
+        // 多种选择器覆盖不同 CMS 模板
+        Element nav = doc.selectFirst("div.article-link, .article-link, .page-turning, .pre-next, .article-nav");
+        if (nav != null) {
+            for (Element el : nav.select("p, div, span, li")) {
+                String text = el.text();
+                if (text.contains("上一篇") || text.contains("上一条") || text.contains("前一篇")) {
+                    Element a = el.selectFirst("a");
+                    if (a != null) return new String[]{extractId(a.attr("href")), a.text().trim()};
+                }
+            }
+        }
         return new String[]{null, null};
     }
 
     private String[] parseNextArticle(Document doc) {
-        Element nav = doc.selectFirst("div.article-link, .article-link");
-        if (nav != null) for (Element p : nav.select("p"))
-            if (p.text().contains("下一篇")) { Element a = p.selectFirst("a"); if (a != null) return new String[]{extractId(a.attr("href")), a.text().trim()}; }
+        Element nav = doc.selectFirst("div.article-link, .article-link, .page-turning, .pre-next, .article-nav");
+        if (nav != null) {
+            for (Element el : nav.select("p, div, span, li")) {
+                String text = el.text();
+                if (text.contains("下一篇") || text.contains("下一条") || text.contains("后一篇")) {
+                    Element a = el.selectFirst("a");
+                    if (a != null) return new String[]{extractId(a.attr("href")), a.text().trim()};
+                }
+            }
+        }
         return new String[]{null, null};
     }
 
@@ -191,8 +206,30 @@ public class SztuGwtContentParser implements ParserStrategy {
     private String cleanHtml(Element el, String baseUrl) {
         Element c = el.clone();
         c.select("script, style, iframe").remove();
-        for (Element img : c.select("img")) { String s = img.attr("src"); if (!s.startsWith("http") && !s.startsWith("data:")) img.attr("src", s.startsWith("/") ? baseUrl + s : baseUrl + "/" + s.replaceAll("^\\.\\./+", "")); }
-        for (Element a : c.select("a")) { String h = a.attr("href"); if (!h.startsWith("http") && !h.startsWith("#") && !h.startsWith("javascript:")) a.attr("href", h.startsWith("/") ? baseUrl + h : baseUrl + "/" + h); }
+
+        // 处理图片：修复 URL + 注入响应式内联样式
+        for (Element img : c.select("img")) {
+            String s = img.attr("src");
+            if (!s.startsWith("http") && !s.startsWith("data:")) {
+                img.attr("src", s.startsWith("/") ? baseUrl + s : baseUrl + "/" + s.replaceAll("^\\.\\./+", ""));
+            }
+            // ⭐ 移除固定尺寸属性，注入响应式内联样式（微信小程序 rich-text 不支持 scoped CSS）
+            img.removeAttr("width");
+            img.removeAttr("height");
+            String existingStyle = img.attr("style");
+            String responsiveStyle = "max-width:100%;height:auto;display:block;";
+            img.attr("style", StringUtils.hasText(existingStyle)
+                    ? existingStyle + ";" + responsiveStyle : responsiveStyle);
+        }
+
+        // 处理链接：修复相对 URL
+        for (Element a : c.select("a")) {
+            String h = a.attr("href");
+            if (!h.startsWith("http") && !h.startsWith("#") && !h.startsWith("javascript:")) {
+                a.attr("href", h.startsWith("/") ? baseUrl + h : baseUrl + "/" + h);
+            }
+        }
+
         return c.html();
     }
 

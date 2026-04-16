@@ -567,7 +567,13 @@ public class AuthServiceImpl implements AuthService {
                 // 解析用户信息
                 UserInfoPraser.extractByRegex(ret, body);
 
-                // 发布登录成功事件
+                // ⭐ 修复竞态：先保存 Cookie（含 schoolLoggedIn=true），再发布事件
+                // 事件的异步监听器会读取 Redis Cookie，必须确保已写入
+                if (userId != null) {
+                    authSessionCacheUtil.sessionLoginBind(userId, userId, smartSession.getCookies());
+                }
+
+                // 发布登录成功事件（异步监听器依赖上面的 Cookie 保存）
                 eventPublisher.publishEvent(new UserLoginEvent(
                         this, userId,
                         ret.getRealName()
@@ -613,7 +619,8 @@ public class AuthServiceImpl implements AuthService {
             ret.setCookiesJson(JSON.toJSONString(smartSession.getCookies()));
 
             // 保存到 Redis（供爬虫引擎使用，仅当有 userId 且非错误页面时）
-            if (userId != null && !ret.isSessionInvalid()) {
+            // ⭐ 已登录时上面已用 sessionLoginBind 保存，这里仅处理未登录但有 cookie 的情况
+            if (userId != null && !ret.isSessionInvalid() && !ret.isLogined()) {
                 saveSessionCookies(userId, smartSession);
             }
 
