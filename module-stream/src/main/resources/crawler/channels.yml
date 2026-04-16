@@ -1,6 +1,6 @@
 # 频道配置
 # 每个频道可以包含多个数据源
-# sourceOrg: fixed=固定频道(始终显示), official=学校官网, department=职能部门, support=教辅科研, league=群团招就, college=学院
+# sourceOrg: fixed=固定频道(始终显示), official=学校官网, department=职能部门, support=教辅科研单位, league=群团组织, college=学院
 
 channels:
   # ==================== 固定频道（始终显示，不可退订） ====================
@@ -58,11 +58,11 @@ channels:
       - www-xqhz
       - www-kxyj
 
-  # ==================== 职能部门（用户订阅） ====================
+  # ==================== 职能部门（用户订阅，每个部门独立频道，使用全称） ====================
 
   - id: dept-sao
-    name: 学生工作部
-    description: 学生工作部通知公告、新闻信息
+    name: 党委学生工作部
+    description: 党委学生工作部/党委武装部/学生部 通知公告、新闻信息
     icon: user
     sourceOrg: department
     sort: 20
@@ -72,7 +72,7 @@ channels:
       - sao-xwxx
 
   - id: dept-kyb
-    name: 科研部
+    name: 科研与校企合作部
     description: 科研与校企合作部通知、新闻动态
     icon: explore
     sourceOrg: department
@@ -83,8 +83,8 @@ channels:
       - kyb-xwdt
 
   - id: dept-intl
-    name: 国际合作部
-    description: 国际合作与交流部焦点新闻、交流动态
+    name: 国际合作与交流部
+    description: 国际合作与交流部/港澳台工作办公室 焦点新闻、交流动态
     icon: earth
     sourceOrg: department
     sort: 22
@@ -104,90 +104,171 @@ channels:
       - xtw-tzgg
       - xtw-txfc
 
-  - id: department
-    name: 职能部门汇总
-    description: 各职能部门通知公告汇总
-    icon: city
+  - id: dept-hr
+    name: 党委教师工作部/人力资源部
+    description: 党委教师工作部/人力资源部 通知公告
+    icon: user-circle
+    sourceOrg: department
+    sort: 24
+    enabled: true
+    sources:
+      - hr-tzgg
+
+  - id: dept-cwb
+    name: 计划财务部
+    description: 计划财务部/采购与招投标管理中心 信息公开、工作动态
+    icon: money-circle
+    sourceOrg: department
+    sort: 25
+    enabled: true
+    sources:
+      - cwb-xxgk
+      - cwb-gzdt
+
+  - id: dept-sbc
+    name: 国有资产与实验室管理开发部
+    description: 国有资产与实验室管理开发部 通知公告、工作动态
+    icon: server
+    sourceOrg: department
+    sort: 26
+    enabled: true
+    sources:
+      - sbc-tzgg
+      - sbc-gzdt
+
+  - id: dept-aqbw
+    name: 党委保卫工作部/安全保卫中心
+    description: 党委保卫工作部/安全保卫中心 通知公告、工作动态、党建
+    icon: shield
+    sourceOrg: department
+    sort: 27
+    enabled: true
+    sources:
+      - aqbw-tzgg
+      - aqbw-gzdt
+      - aqbw-djdt
+
+  - id: dept-zzb
+    name: 党委组织部/党委统战部
+    description: 党委组织部/党委统战部/党校 通知公告、工作动态
+    icon: user-setting
+    sourceOrg: department
+    sort: 28
+    enabled: true
+    sources:
+      - zzb-tzgg
+      - zzb-gzdt
+
+  - id: dept-jjjc
+    name: 纪检监察室
+    description: 纪检监察室 纪检要闻、工作动态
+    icon: secured
     sourceOrg: department
     sort: 29
     enabled: true
     sources:
-      - hr-tzgg
-      - cwb-xxgk
-      - cwb-gzdt
-      - sbc-tzgg
-      - sbc-gzdt
-      - aqbw-tzgg
-      - aqbw-gzdt
-      - zzb-tzgg
-      - zzb-gzdt
       - jjjc-jjyw
       - jjjc-gzdt
+
+  - id: dept-sjs
+    name: 审计室
+    description: 审计室 工作动态、审计公告
+    icon: file-search
+    sourceOrg: department
+    sort: 30
+    enabled: true
+    sources:
       - sjs-gzdt
       - sjs-sjgg
+
+  - id: dept-hq
+    name: 后勤部
+    description: 后勤部 通知公告、动态要闻、党建
+    icon: home
+    sourceOrg: department
+    sort: 31
+    enabled: true
+    sources:
       - hq-tzgg
       - hq-dtyw
-      - it-xwgg
-      - dds-xwtz
-      - aqbw-djdt
       - hq-djdt
+
+  - id: dept-it
+    name: 信息中心
+    description: 信息中心 新闻公告、党建动态
+    icon: desktop
+    sourceOrg: department
+    sort: 32
+    enabled: true
+    sources:
+      - it-xwgg
       - it-djdt
+
+  - id: dept-dds
+    name: 教学质量督导室
+    description: 教学质量督导室 新闻通知、党建引领
+    icon: task
+    sourceOrg: department
+    sort: 33
+    enabled: true
+    sources:
+      - dds-xwtz
       - dds-djyl
 
-  # ==================== 教辅科研（用户订阅） ====================
+  # ==================== 教辅科研单位（用户订阅） ====================
 
   - id: lab-fxcs
     name: 分析测试中心
     description: 分析测试中心通知公告、新闻
     icon: precision-monitor
     sourceOrg: support
-    sort: 30
+    sort: 40
     enabled: true
     sources:
       - fxcs-tzgg
       - fxcs-xw
 
   - id: lab-cmnf
-    name: 半导体微纳中心
+    name: 半导体微纳加工中心
     description: 半导体微纳加工中心通知、动态
     icon: cpu
     sourceOrg: support
-    sort: 31
+    sort: 41
     enabled: true
     sources:
       - cmnf-tzgg
       - cmnf-zxdt
 
   - id: lab-ime
-    name: 医工交叉研究院
+    name: 医工交叉创新研究院
     description: 医工交叉创新研究院通知、新闻
     icon: hospital
     sourceOrg: support
-    sort: 32
+    sort: 42
     enabled: true
     sources:
       - ime-tzgg
       - ime-xwdt
 
-  # ==================== 群团招就（用户订阅） ====================
+  # ==================== 群团组织（用户订阅） ====================
 
   - id: job
-    name: 就业信息
+    name: 就业指导中心
     description: 就业指导中心通知、工作动态
     icon: briefcase
     sourceOrg: league
-    sort: 35
+    sort: 50
     enabled: true
     sources:
       - jyzd-tzgg
       - jyzd-gzdt
 
   - id: admission
-    name: 招生信息
+    name: 招生办公室
     description: 招生动态
     icon: user-add
     sourceOrg: league
-    sort: 36
+    sort: 51
     enabled: true
     sources:
       - zs-zsdt
@@ -199,7 +280,7 @@ channels:
     description: 研究生院新闻、通知公告
     icon: mortarboard
     sourceOrg: college
-    sort: 40
+    sort: 60
     enabled: true
     sources:
       - gra-xwdt
@@ -211,7 +292,7 @@ channels:
     description: 中德智能制造学院新闻、通知
     icon: setting
     sourceOrg: college
-    sort: 41
+    sort: 61
     enabled: true
     sources:
       - sgim-xyxw
@@ -223,7 +304,7 @@ channels:
     description: 人工智能学院新闻、通知
     icon: cpu
     sourceOrg: college
-    sort: 42
+    sort: 62
     enabled: true
     sources:
       - ai-yxxw
@@ -235,7 +316,7 @@ channels:
     description: 新材料与新能源学院动态、通知
     icon: flashlight
     sourceOrg: college
-    sort: 43
+    sort: 63
     enabled: true
     sources:
       - nmne-xydt
@@ -247,7 +328,7 @@ channels:
     description: 城市交通与物流学院动态、通知
     icon: car
     sourceOrg: college
-    sort: 44
+    sort: 64
     enabled: true
     sources:
       - utl-xydt
@@ -259,7 +340,7 @@ channels:
     description: 健康与环境工程学院动态、通知
     icon: leaf
     sourceOrg: college
-    sort: 45
+    sort: 65
     enabled: true
     sources:
       - hsee-xydt
@@ -271,7 +352,7 @@ channels:
     description: 工程物理学院新闻、通知
     icon: tower
     sourceOrg: college
-    sort: 46
+    sort: 66
     enabled: true
     sources:
       - cep-xwdt
@@ -283,7 +364,7 @@ channels:
     description: 创意设计学院新闻、通知
     icon: palette
     sourceOrg: college
-    sort: 47
+    sort: 67
     enabled: true
     sources:
       - design-yxxw
@@ -295,7 +376,7 @@ channels:
     description: 商学院/技术经理人学院新闻、通知
     icon: chart-bar
     sourceOrg: college
-    sort: 48
+    sort: 68
     enabled: true
     sources:
       - bs-xwdt
@@ -306,7 +387,7 @@ channels:
     description: 外国语学院新闻、通知
     icon: translate
     sourceOrg: college
-    sort: 49
+    sort: 69
     enabled: true
     sources:
       - sfl-xyxw
@@ -317,18 +398,18 @@ channels:
     description: 集成电路与光电芯片学院新闻、通知
     icon: cpu
     sourceOrg: college
-    sort: 50
+    sort: 70
     enabled: true
     sources:
       - icoc-xyxw
       - icoc-tzgg
 
   - id: college-cop
-    name: 药学院
-    description: 药学院/口腔学院新闻、通知
+    name: 药学院/口腔医学院
+    description: 药学院/口腔医学院新闻、通知
     icon: medicine
     sourceOrg: college
-    sort: 51
+    sort: 71
     enabled: true
     sources:
       - cop-xyxw
@@ -340,7 +421,7 @@ channels:
     description: 未来技术学院新闻、通知
     icon: rocket
     sourceOrg: college
-    sort: 52
+    sort: 72
     enabled: true
     sources:
       - future-xwzx
@@ -352,7 +433,7 @@ channels:
     description: 音乐学院院务工作
     icon: sound
     sourceOrg: college
-    sort: 53
+    sort: 73
     enabled: true
     sources:
       - music-ywgz
