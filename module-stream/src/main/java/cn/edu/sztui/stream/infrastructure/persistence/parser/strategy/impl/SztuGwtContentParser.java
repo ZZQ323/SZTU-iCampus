@@ -206,30 +206,20 @@ public class SztuGwtContentParser implements ParserStrategy {
     private String cleanHtml(Element el, String baseUrl) {
         Element c = el.clone();
         c.select("script, style, iframe").remove();
-
-        // 处理图片：修复 URL + 注入响应式内联样式
+        // 修复图片 URL（样式由前端 normalizeHtml 统一注入，后端只管 URL）
         for (Element img : c.select("img")) {
             String s = img.attr("src");
             if (!s.startsWith("http") && !s.startsWith("data:")) {
                 img.attr("src", s.startsWith("/") ? baseUrl + s : baseUrl + "/" + s.replaceAll("^\\.\\./+", ""));
             }
-            // ⭐ 移除固定尺寸属性，注入响应式内联样式（微信小程序 rich-text 不支持 scoped CSS）
-            img.removeAttr("width");
-            img.removeAttr("height");
-            String existingStyle = img.attr("style");
-            String responsiveStyle = "max-width:100%;height:auto;display:block;";
-            img.attr("style", StringUtils.hasText(existingStyle)
-                    ? existingStyle + ";" + responsiveStyle : responsiveStyle);
         }
-
-        // 处理链接：修复相对 URL
+        // 修复链接 URL
         for (Element a : c.select("a")) {
             String h = a.attr("href");
             if (!h.startsWith("http") && !h.startsWith("#") && !h.startsWith("javascript:")) {
                 a.attr("href", h.startsWith("/") ? baseUrl + h : baseUrl + "/" + h);
             }
         }
-
         return c.html();
     }
 
