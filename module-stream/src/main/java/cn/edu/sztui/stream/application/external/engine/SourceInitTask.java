@@ -79,6 +79,9 @@ public class SourceInitTask {
             log.info("已清除所有数据源 initialized 标记: 公开 {} 个, 需登录 {} 个",
                     publicSources.size(), authSources.size());
 
+            // ⭐ 清除全局 feed timeline（旧缓存可能包含已更名/拆分的频道数据）
+            infoCacheUtil.clearFeedTimeline();
+
             if (publicSources.isEmpty()) {
                 log.info("无公开数据源需要初始化");
                 return;
