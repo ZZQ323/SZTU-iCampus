@@ -3,12 +3,8 @@ server:
   tomcat:
     connection-timeout: 10000
 
-# 调度线程池：AnnouncementFastScheduler(10s) + SourceCrawlScheduler(60s) 并行
-spring:
-  task:
-    scheduling:
-      pool:
-        size: 3
+
+
 
 program:
   name: sztu
@@ -32,6 +28,11 @@ middleware:
 #  edge: "192.168.1.63"
 
 spring:
+  # 调度线程池：AnnouncementFastScheduler(10s) + SourceCrawlScheduler(60s) 并行
+  task:
+    scheduling:
+      pool:
+        size: 3
   servlet:
     multipart:
       max-file-size: 1024MB
