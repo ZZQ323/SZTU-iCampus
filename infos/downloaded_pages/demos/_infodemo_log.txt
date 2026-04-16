@@ -1,0 +1,2450 @@
+下载时间: 2026-04-16 13:48:50
+总数: 634
+成功: 532
+跳过（已存在）: 0
+跳过（无info链接）: 99
+失败: 3
+
+============================================================
+全部记录
+============================================================
+[OK] 中德智能制造学院-人才培养-学科建设.html
+    info: ../info/1166/3531.htm
+    url:  https://sgim.sztu.edu.cn/info/1166/3531.htm
+
+[OK] 中德智能制造学院-人才培养-学科竞赛.html
+    info: ../info/1169/3319.htm
+    url:  https://sgim.sztu.edu.cn/info/1169/3319.htm
+
+[OK] 中德智能制造学院-人才培养-实践教学.html
+    info: info/1236/3368.htm
+    url:  https://sgim.sztu.edu.cn/info/1236/3368.htm
+
+[OK] 中德智能制造学院-人才培养-本科生培养-专业介绍.html
+    info: info/1172/3070.htm
+    url:  https://sgim.sztu.edu.cn/info/1172/3070.htm
+
+[OK] 中德智能制造学院-人才培养-本科生培养-教学成果.html
+    info: ../../info/1173/2924.htm
+    url:  https://sgim.sztu.edu.cn/info/1173/2924.htm
+
+[OK] 中德智能制造学院-人才培养-本科生培养-课程结构.html
+    info: ../../info/1174/2839.htm
+    url:  https://sgim.sztu.edu.cn/info/1174/2839.htm
+
+[OK] 中德智能制造学院-人才培养-本科生培养-通知公告.html
+    info: info/1171/3293.htm
+    url:  https://sgim.sztu.edu.cn/info/1171/3293.htm
+
+[OK] 中德智能制造学院-人才培养-研究生培养-专业介绍.html
+    info: info/1224/3006.htm
+    url:  https://sgim.sztu.edu.cn/info/1224/3006.htm
+
+[OK] 中德智能制造学院-人才培养-研究生培养-教学成果.html
+    info: ../../info/1225/3009.htm
+    url:  https://sgim.sztu.edu.cn/info/1225/3009.htm
+
+[OK] 中德智能制造学院-人才培养-研究生培养-课程结构.html
+    info: ../../info/1226/3010.htm
+    url:  https://sgim.sztu.edu.cn/info/1226/3010.htm
+
+[OK] 中德智能制造学院-人才培养-研究生培养-通知公告.html
+    info: info/1223/3128.htm
+    url:  https://sgim.sztu.edu.cn/info/1223/3128.htm
+
+[OK] 中德智能制造学院-党团工作-党的建设.html
+    info: ../info/1157/4076.htm
+    url:  https://sgim.sztu.edu.cn/info/1157/4076.htm
+
+[OK] 中德智能制造学院-党团工作-团建工作.html
+    info: ../info/1158/4219.htm
+    url:  https://sgim.sztu.edu.cn/info/1158/4219.htm
+
+[OK] 中德智能制造学院-党团工作-学生工作.html
+    info: ../info/1159/3627.htm
+    url:  https://sgim.sztu.edu.cn/info/1159/3627.htm
+
+[OK] 中德智能制造学院-合作交流-企业合作交流-国内企业.html
+    info: info/1216/3931.htm
+    url:  https://sgim.sztu.edu.cn/info/1216/3931.htm
+
+[OK] 中德智能制造学院-合作交流-企业合作交流-国外企业.html
+    info: info/1217/2822.htm
+    url:  https://sgim.sztu.edu.cn/info/1217/2822.htm
+
+[OK] 中德智能制造学院-合作交流-高校合作交流-国内高校.html
+    info: info/1214/2802.htm
+    url:  https://sgim.sztu.edu.cn/info/1214/2802.htm
+
+[OK] 中德智能制造学院-合作交流-高校合作交流-国外高校.html
+    info: info/1215/2797.htm
+    url:  https://sgim.sztu.edu.cn/info/1215/2797.htm
+
+[OK] 中德智能制造学院-师姿队伍-人才招聘-博士后及专职研究.html
+    info: info/1199/2870.htm
+    url:  https://sgim.sztu.edu.cn/info/1199/2870.htm
+
+[OK] 中德智能制造学院-师姿队伍-人才招聘-实验技术岗.html
+    info: info/1197/2872.htm
+    url:  https://sgim.sztu.edu.cn/info/1197/2872.htm
+
+[OK] 中德智能制造学院-师姿队伍-人才招聘-教师.html
+    info: info/1196/2976.htm
+    url:  https://sgim.sztu.edu.cn/info/1196/2976.htm
+
+[OK] 中德智能制造学院-师姿队伍-人才招聘-行政管理.html
+    info: info/1198/2869.htm
+    url:  https://sgim.sztu.edu.cn/info/1198/2869.htm
+
+[OK] 中德智能制造学院-招生就业-就业信息.html
+    info: info/1262/4216.htm
+    url:  https://sgim.sztu.edu.cn/info/1262/4216.htm
+
+[OK] 中德智能制造学院-招生就业-就业指导.html
+    info: ../info/1185/3880.htm
+    url:  https://sgim.sztu.edu.cn/info/1185/3880.htm
+
+[OK] 中德智能制造学院-招生就业-招生宣传.html
+    info: ../info/1184/3878.htm
+    url:  https://sgim.sztu.edu.cn/info/1184/3878.htm
+
+[OK] 中德智能制造学院-科研实践-研究机构.html
+    info: info/1237/3407.htm
+    url:  https://sgim.sztu.edu.cn/info/1237/3407.htm
+
+[OK] 中德智能制造学院-科研实践-科研方向-半导体集成电路与精密仪器设备.html
+    info: ../../info/1234/3442.htm
+    url:  https://sgim.sztu.edu.cn/info/1234/3442.htm
+
+[OK] 中德智能制造学院-科研实践-科研方向-智能机器人.html
+    info: ../../info/1232/3473.htm
+    url:  https://sgim.sztu.edu.cn/info/1232/3473.htm
+
+[OK] 中德智能制造学院-科研实践-科研方向-激光与增材制造.html
+    info: ../../info/1235/3506.htm
+    url:  https://sgim.sztu.edu.cn/info/1235/3506.htm
+
+[OK] 中德智能制造学院-科研实践-科研方向-高端装备制造.html
+    info: ../../info/1233/3483.htm
+    url:  https://sgim.sztu.edu.cn/info/1233/3483.htm
+
+[OK] 中德智能制造学院-首页-学生活动.html
+    info: ../info/1105/3893.htm
+    url:  https://sgim.sztu.edu.cn/info/1105/3893.htm
+
+[OK] 中德智能制造学院-首页-学生生活.html
+    info: ../info/1202/3891.htm
+    url:  https://sgim.sztu.edu.cn/info/1202/3891.htm
+
+[OK] 中德智能制造学院-首页-学科竞赛.html
+    info: ../info/1204/2977.htm
+    url:  https://sgim.sztu.edu.cn/info/1204/2977.htm
+
+[OK] 中德智能制造学院-首页-学院新闻.html
+    info: info/1063/4218.htm
+    url:  https://sgim.sztu.edu.cn/info/1063/4218.htm
+
+[OK] 中德智能制造学院-首页-文化生活.html
+    info: ../info/1202/3891.htm
+    url:  https://sgim.sztu.edu.cn/info/1202/3891.htm
+
+[OK] 中德智能制造学院-首页-校园生活.html
+    info: ../info/1201/3890.htm
+    url:  https://sgim.sztu.edu.cn/info/1201/3890.htm
+
+[OK] 中德智能制造学院-首页-通知公告.html
+    info: info/1045/4080.htm
+    url:  https://sgim.sztu.edu.cn/info/1045/4080.htm
+
+[NO_INFO_LINK] 人工智能学院-下载中心.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 人工智能学院-人才培养-本科生培养-培养方案.html
+    err:  页面中未找到 info 链接
+
+[OK] 人工智能学院-人才培养-特色班培养.html
+    info: ../info/1336/5770.htm
+    url:  https://ai.sztu.edu.cn/info/1336/5770.htm
+
+[OK] 人工智能学院-人才培养-研究生培养-招生信息.html
+    info: ../../info/1207/6280.htm
+    url:  https://ai.sztu.edu.cn/info/1207/6280.htm
+
+[OK] 人工智能学院-党团风采-党群工作.html
+    info: ../info/1338/6781.htm
+    url:  https://ai.sztu.edu.cn/info/1338/6781.htm
+
+[OK] 人工智能学院-党团风采-团学风采.html
+    info: ../info/1051/6443.htm
+    url:  https://ai.sztu.edu.cn/info/1051/6443.htm
+
+[NO_INFO_LINK] 人工智能学院-合作交流-国内合作.html
+    err:  页面中未找到 info 链接
+
+[OK] 人工智能学院-合作交流-国际合作.html
+    info: ../info/1046/6783.htm
+    url:  https://ai.sztu.edu.cn/info/1046/6783.htm
+
+[OK] 人工智能学院-实习就业.html
+    info: ../info/1159/6740.htm
+    url:  https://ai.sztu.edu.cn/info/1159/6740.htm
+
+[OK] 人工智能学院-新闻中心-通知公告-全部.html
+    info: ../../info/1219/6760.htm
+    url:  https://ai.sztu.edu.cn/info/1219/6760.htm
+
+[OK] 人工智能学院-新闻中心-通知公告-教学.html
+    info: ../../info/1221/6721.htm
+    url:  https://ai.sztu.edu.cn/info/1221/6721.htm
+
+[OK] 人工智能学院-新闻中心-通知公告-校园.html
+    info: ../../info/1219/6760.htm
+    url:  https://ai.sztu.edu.cn/info/1219/6760.htm
+
+[OK] 人工智能学院-新闻中心-院系新闻.html
+    info: ../info/1048/6782.htm
+    url:  https://ai.sztu.edu.cn/info/1048/6782.htm
+
+[OK] 人工智能学院-科学研究-学术信息.html
+    info: ../info/1345/6723.htm
+    url:  https://ai.sztu.edu.cn/info/1345/6723.htm
+
+[OK] 人工智能学院-科学研究-实验中心 — 人工智能学院实验数学中心-规章制度.html
+    info: ../../../info/1403/6346.htm
+    url:  https://ai.sztu.edu.cn/info/1403/6346.htm
+
+[OK] 人工智能学院-科学研究-实验中心 — 人工智能学院实验数学中心-课程安排.html
+    info: ../../../info/1405/6366.htm
+    url:  https://ai.sztu.edu.cn/info/1405/6366.htm
+
+[OK] 人工智能学院-科学研究-数字化资源.html
+    info: ../info/1409/6449.htm
+    url:  https://ai.sztu.edu.cn/info/1409/6449.htm
+
+[OK] 人工智能学院-诚聘英才.html
+    info: info/1320/5138.htm
+    url:  https://ai.sztu.edu.cn/info/1320/5138.htm
+
+[NO_INFO_LINK] 人才招聘(待讨论)-招聘岗位.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 人才招聘(待讨论)-通知公告.html
+    err:  页面中未找到 info 链接
+
+[OK] 体育与艺术学院-体质健康.html
+    info: info/1034/1181.htm
+    url:  https://tusports.sztu.edu.cn/info/1034/1181.htm
+
+[OK] 体育与艺术学院-新闻与下载-下载中心.html
+    info: ../info/1044/1634.htm
+    url:  https://tusports.sztu.edu.cn/info/1044/1634.htm
+
+[OK] 体育与艺术学院-新闻与下载-教学动态.html
+    info: info/1043/1662.htm
+    url:  https://tusports.sztu.edu.cn/info/1043/1662.htm
+
+[OK] 体育与艺术学院-新闻与下载-通知公告.html
+    info: info/1042/1595.htm
+    url:  https://tusports.sztu.edu.cn/info/1042/1595.htm
+
+[OK] 体育与艺术学院-校园体育-体育文化节.html
+    info: info/1023/1167.htm
+    url:  https://tusports.sztu.edu.cn/info/1023/1167.htm
+
+[OK] 体育与艺术学院-校园体育-新生杯.html
+    info: info/1021/1151.htm
+    url:  https://tusports.sztu.edu.cn/info/1021/1151.htm
+
+[OK] 体育与艺术学院-校园体育-校长杯.html
+    info: info/1020/1691.htm
+    url:  https://tusports.sztu.edu.cn/info/1020/1691.htm
+
+[OK] 体育与艺术学院-校园体育-综合运动会.html
+    info: info/1022/1161.htm
+    url:  https://tusports.sztu.edu.cn/info/1022/1161.htm
+
+[OK] 体育与艺术学院-校队训练-乒乓球队.html
+    info: info/1040/1559.htm
+    url:  https://tusports.sztu.edu.cn/info/1040/1559.htm
+
+[OK] 体育与艺术学院-校队训练-体育舞蹈校队.html
+    info: info/1052/1565.htm
+    url:  https://tusports.sztu.edu.cn/info/1052/1565.htm
+
+[OK] 体育与艺术学院-校队训练-健身健美校队.html
+    info: info/1091/1569.htm
+    url:  https://tusports.sztu.edu.cn/info/1091/1569.htm
+
+[OK] 体育与艺术学院-校队训练-围棋校队.html
+    info: info/1039/1557.htm
+    url:  https://tusports.sztu.edu.cn/info/1039/1557.htm
+
+[OK] 体育与艺术学院-校队训练-定向越锂野校队.html
+    info: info/1053/1561.htm
+    url:  https://tusports.sztu.edu.cn/info/1053/1561.htm
+
+[OK] 体育与艺术学院-校队训练-排球校队.html
+    info: info/1038/1555.htm
+    url:  https://tusports.sztu.edu.cn/info/1038/1555.htm
+
+[OK] 体育与艺术学院-校队训练-排舞校队.html
+    info: info/1094/1568.htm
+    url:  https://tusports.sztu.edu.cn/info/1094/1568.htm
+
+[OK] 体育与艺术学院-校队训练-极限飞盘校队.html
+    info: info/1096/1574.htm
+    url:  https://tusports.sztu.edu.cn/info/1096/1574.htm
+
+[OK] 体育与艺术学院-校队训练-武术校队.html
+    info: info/1100/1579.htm
+    url:  https://tusports.sztu.edu.cn/info/1100/1579.htm
+
+[OK] 体育与艺术学院-校队训练-游泳校队.html
+    info: info/1098/1577.htm
+    url:  https://tusports.sztu.edu.cn/info/1098/1577.htm
+
+[OK] 体育与艺术学院-校队训练-篮球校队.html
+    info: info/1037/1499.htm
+    url:  https://tusports.sztu.edu.cn/info/1037/1499.htm
+
+[OK] 体育与艺术学院-校队训练-网球校队.html
+    info: info/1041/1592.htm
+    url:  https://tusports.sztu.edu.cn/info/1041/1592.htm
+
+[OK] 体育与艺术学院-校队训练-羽毛球校队.html
+    info: info/1051/1563.htm
+    url:  https://tusports.sztu.edu.cn/info/1051/1563.htm
+
+[OK] 体育与艺术学院-校队训练-足球校队.html
+    info: info/1036/1591.htm
+    url:  https://tusports.sztu.edu.cn/info/1036/1591.htm
+
+[OK] 体育与艺术学院-竞赛荣誉.html
+    info: info/1045/1698.htm
+    url:  https://tusports.sztu.edu.cn/info/1045/1698.htm
+
+[OK] 信息中心-党建工作-党建动态.html
+    info: info/1018/2170.htm
+    url:  https://it.sztu.edu.cn/info/1018/2170.htm
+
+[OK] 信息中心-党建工作-政策法规.html
+    info: ../info/1018/2170.htm
+    url:  https://it.sztu.edu.cn/info/1018/2170.htm
+
+[OK] 信息中心-新闻公告-科普新知.html
+    info: ../info/1036/2431.htm
+    url:  https://it.sztu.edu.cn/info/1036/2431.htm
+
+[OK] 信息中心-新闻公告-通知新闻.html
+    info: info/1036/2431.htm
+    url:  https://it.sztu.edu.cn/info/1036/2431.htm
+
+[OK] 信息中心-部门概况-法律法规.html
+    info: info/1012/1010.htm
+    url:  https://it.sztu.edu.cn/info/1012/1010.htm
+
+[OK] 信息中心-问题答疑-常用表格下载.html
+    info: ../info/1029/2240.htm
+    url:  https://it.sztu.edu.cn/info/1029/2240.htm
+
+[OK] 信息中心-问题答疑-常用软件下载.html
+    info: ../info/1028/1214.htm
+    url:  https://it.sztu.edu.cn/info/1028/1214.htm
+
+[OK] 信息中心-问题答疑-常见问题答疑.html
+    info: info/1032/2140.htm
+    url:  https://it.sztu.edu.cn/info/1032/2140.htm
+
+[OK] 健康与环境工程学院-下载.html
+    info: info/1114/3519.htm
+    url:  https://hsee.sztu.edu.cn/info/1114/3519.htm
+
+[OK] 健康与环境工程学院-人才培养-教学平台.html
+    info: ../info/1177/3743.htm
+    url:  https://hsee.sztu.edu.cn/info/1177/3743.htm
+
+[OK] 健康与环境工程学院-人才培养-本科生教育.html
+    info: ../info/1107/2351.htm
+    url:  https://hsee.sztu.edu.cn/info/1107/2351.htm
+
+[OK] 健康与环境工程学院-人才培养-研究生教育.html
+    info: ../info/1108/3781.htm
+    url:  https://hsee.sztu.edu.cn/info/1108/3781.htm
+
+[OK] 健康与环境工程学院-党建专栏-党建活动.html
+    info: ../info/1149/4002.htm
+    url:  https://hsee.sztu.edu.cn/info/1149/4002.htm
+
+[OK] 健康与环境工程学院-党建专栏-相关下载.html
+    info: ../info/1148/2730.htm
+    url:  https://hsee.sztu.edu.cn/info/1148/2730.htm
+
+[OK] 健康与环境工程学院-党建活动.html
+    info: info/1121/3998.htm
+    url:  https://hsee.sztu.edu.cn/info/1121/3998.htm
+
+[OK] 健康与环境工程学院-学院动态.html
+    info: info/1112/4042.htm
+    url:  https://hsee.sztu.edu.cn/info/1112/4042.htm
+
+[OK] 健康与环境工程学院-招生信息-招生宣传.html
+    info: ../info/1146/4029.htm
+    url:  https://hsee.sztu.edu.cn/info/1146/4029.htm
+
+[OK] 健康与环境工程学院-招生信息-本科生招生.html
+    info: ../info/1144/3819.htm
+    url:  https://hsee.sztu.edu.cn/info/1144/3819.htm
+
+[OK] 健康与环境工程学院-招生信息-研究生招生.html
+    info: https://gra.sztu.edu.cn/info/1055/2762.htm
+    url:  https://gra.sztu.edu.cn/info/1055/2762.htm
+
+[OK] 健康与环境工程学院-校园生活-升学就业.html
+    info: ../info/1138/3707.htm
+    url:  https://hsee.sztu.edu.cn/info/1138/3707.htm
+
+[OK] 健康与环境工程学院-校园生活-校园活动.html
+    info: ../info/1137/4000.htm
+    url:  https://hsee.sztu.edu.cn/info/1137/4000.htm
+
+[OK] 健康与环境工程学院-校园生活-荣誉获奖.html
+    info: ../info/1141/3706.htm
+    url:  https://hsee.sztu.edu.cn/info/1141/3706.htm
+
+[OK] 健康与环境工程学院-科学研究-学术讲座.html
+    info: ../info/1134/3523.htm
+    url:  https://hsee.sztu.edu.cn/info/1134/3523.htm
+
+[OK] 健康与环境工程学院-科学研究-科研动态.html
+    info: ../info/1109/3525.htm
+    url:  https://hsee.sztu.edu.cn/info/1109/3525.htm
+
+[OK] 健康与环境工程学院-科学研究-科研平台.html
+    info: ../info/1175/3821.htm
+    url:  https://hsee.sztu.edu.cn/info/1175/3821.htm
+
+[OK] 健康与环境工程学院-科学研究-科研设备.html
+    info: ../info/1110/3694.htm
+    url:  https://hsee.sztu.edu.cn/info/1110/3694.htm
+
+[OK] 健康与环境工程学院-通知公告.html
+    info: info/1118/3862.htm
+    url:  https://hsee.sztu.edu.cn/info/1118/3862.htm
+
+[NO_INFO_LINK] 健康与环境工程学院-院企合作-合作企业介绍.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 健康与环境工程学院-院企合作-行业与就业.html
+    err:  页面中未找到 info 链接
+
+[OK] 健康与环境工程学院-院企合作-院企合作动态.html
+    info: ../info/1154/4043.htm
+    url:  https://hsee.sztu.edu.cn/info/1154/4043.htm
+
+[NO_INFO_LINK] 党委保卫工作部_安全保卫中心-下载专区.html
+    err:  页面中未找到 info 链接
+
+[OK] 党委保卫工作部_安全保卫中心-党建工作-党建动态.html
+    info: ../info/1079/2566.htm
+    url:  https://aqbw.sztu.edu.cn/info/1079/2566.htm
+
+[OK] 党委保卫工作部_安全保卫中心-党建工作-政策信息.html
+    info: ../info/1080/2183.htm
+    url:  https://aqbw.sztu.edu.cn/info/1080/2183.htm
+
+[OK] 党委保卫工作部_安全保卫中心-安全教育-交通安全.html
+    info: ../info/1086/2196.htm
+    url:  https://aqbw.sztu.edu.cn/info/1086/2196.htm
+
+[OK] 党委保卫工作部_安全保卫中心-安全教育-消防安全.html
+    info: ../info/1087/2197.htm
+    url:  https://aqbw.sztu.edu.cn/info/1087/2197.htm
+
+[OK] 党委保卫工作部_安全保卫中心-安全教育-综合治理.html
+    info: ../info/1088/2857.htm
+    url:  https://aqbw.sztu.edu.cn/info/1088/2857.htm
+
+[OK] 党委保卫工作部_安全保卫中心-工作动态.html
+    info: info/1005/2889.htm
+    url:  https://aqbw.sztu.edu.cn/info/1005/2889.htm
+
+[OK] 党委保卫工作部_安全保卫中心-政策法规-规章制度.html
+    info: ../info/1090/2221.htm
+    url:  https://aqbw.sztu.edu.cn/info/1090/2221.htm
+
+[OK] 党委保卫工作部_安全保卫中心-通知公告.html
+    info: info/1003/2886.htm
+    url:  https://aqbw.sztu.edu.cn/info/1003/2886.htm
+
+[OK] 党委学生工作部_党委武装部_学生部 —— 学生就业指导中心、征兵工作站-办事指南.html
+    info: info/1005/1145.htm
+    url:  https://sao.sztu.edu.cn/info/1005/1145.htm
+
+[OK] 党委学生工作部_党委武装部_学生部 —— 学生就业指导中心、征兵工作站-学生资助.html
+    info: info/1035/1487.htm
+    url:  https://sao.sztu.edu.cn/info/1035/1487.htm
+
+[OK] 党委学生工作部_党委武装部_学生部 —— 学生就业指导中心、征兵工作站-政策规章.html
+    info: info/1034/1164.htm
+    url:  https://sao.sztu.edu.cn/info/1034/1164.htm
+
+[OK] 党委学生工作部_党委武装部_学生部 —— 学生就业指导中心、征兵工作站-文件下载.html
+    info: info/1006/1139.htm
+    url:  https://sao.sztu.edu.cn/info/1006/1139.htm
+
+[OK] 党委学生工作部_党委武装部_学生部 —— 学生就业指导中心、征兵工作站-新闻信息.html
+    info: info/1003/2376.htm
+    url:  https://sao.sztu.edu.cn/info/1003/2376.htm
+
+[OK] 党委学生工作部_党委武装部_学生部 —— 学生就业指导中心、征兵工作站-通知公告.html
+    info: info/1002/1118.htm
+    url:  https://sao.sztu.edu.cn/info/1002/1118.htm
+
+[OK] 党委教师工作部_人力资源部  —— 退休人员管理办公室-人事制度.html
+    info: info/1018/5482.htm
+    url:  https://hr.sztu.edu.cn/info/1018/5482.htm
+
+[OK] 党委教师工作部_人力资源部  —— 退休人员管理办公室-办事指南-博士后.html
+    info: ../info/1011/1908.htm
+    url:  https://hr.sztu.edu.cn/info/1011/1908.htm
+
+[OK] 党委教师工作部_人力资源部  —— 退休人员管理办公室-办事指南-工资福利.html
+    info: ../info/1021/4942.htm
+    url:  https://hr.sztu.edu.cn/info/1021/4942.htm
+
+[OK] 党委教师工作部_人力资源部  —— 退休人员管理办公室-办事指南-师资建设.html
+    info: ../info/1006/4704.htm
+    url:  https://hr.sztu.edu.cn/info/1006/4704.htm
+
+[OK] 党委教师工作部_人力资源部  —— 退休人员管理办公室-办事指南-综合管理.html
+    info: ../info/1005/5665.htm
+    url:  https://hr.sztu.edu.cn/info/1005/5665.htm
+
+[OK] 党委教师工作部_人力资源部  —— 退休人员管理办公室-办事指南-高端人才.html
+    info: ../info/1007/1185.htm
+    url:  https://hr.sztu.edu.cn/info/1007/1185.htm
+
+[NO_INFO_LINK] 党委教师工作部_人力资源部  —— 退休人员管理办公室-招聘启事：[人才招聘(待讨论)].html
+    err:  页面中未找到 info 链接
+
+[FAIL_DOWNLOAD] 党委教师工作部_人力资源部  —— 退休人员管理办公室-通知公告.html
+    info: https://nbw.sztu.edu.cn/info/1020/51057.htm
+    url:  https://nbw.sztu.edu.cn/info/1020/51057.htm
+    err:  连接失败: HTTPSConnectionPool(host='nbw.sztu.edu.cn', port=443): Max retries exceeded with url: /info/1020/510
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-党务学习.html
+    info: ../info/1011/4044.htm
+    url:  https://zzb.sztu.edu.cn/info/1011/4044.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-党建研究-党史学习.html
+    info: ../../info/1019/4029.htm
+    url:  https://zzb.sztu.edu.cn/info/1019/4029.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-党建研究-学习时评.html
+    info: ../../info/1017/4001.htm
+    url:  https://zzb.sztu.edu.cn/info/1017/4001.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-党建研究-思想建设.html
+    info: ../../info/1018/4027.htm
+    url:  https://zzb.sztu.edu.cn/info/1018/4027.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-党建研究-重要理论.html
+    info: ../../info/1016/4083.htm
+    url:  https://zzb.sztu.edu.cn/info/1016/4083.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-图片新闻.html
+    info: ../../info/1035/4005.htm
+    url:  https://zzb.sztu.edu.cn/info/1035/4005.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-工作动态.html
+    info: ../info/1008/4101.htm
+    url:  https://zzb.sztu.edu.cn/info/1008/4101.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-政策文件.html
+    info: ../info/1007/4026.htm
+    url:  https://zzb.sztu.edu.cn/info/1007/4026.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-党建工作-通知公告.html
+    info: ../info/1009/2333.htm
+    url:  https://zzb.sztu.edu.cn/info/1009/2333.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-干部工作-干部论坛.html
+    info: ../info/1013/3942.htm
+    url:  https://zzb.sztu.edu.cn/info/1013/3942.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-干部工作-政策文件.html
+    info: ../info/1012/3786.htm
+    url:  https://zzb.sztu.edu.cn/info/1012/3786.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-承办培训.html
+    info: info/1005/4051.htm
+    url:  https://zzb.sztu.edu.cn/info/1005/4051.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-统战工作-政策文件.html
+    info: ../info/1014/3493.htm
+    url:  https://zzb.sztu.edu.cn/info/1014/3493.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-统战工作-统战动态.html
+    info: ../info/1032/3770.htm
+    url:  https://zzb.sztu.edu.cn/info/1032/3770.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-统战工作-统战理论.html
+    info: ../info/1015/4082.htm
+    url:  https://zzb.sztu.edu.cn/info/1015/4082.htm
+
+[OK] 党委组织部_党委统战部_党校【外部链接】-统战工作-统战知识.html
+    info: ../info/1033/3773.htm
+    url:  https://zzb.sztu.edu.cn/info/1033/3773.htm
+
+[OK] 创意设计学院-为创-为系列展览-外联展.html
+    info: ../../info/1043/1922.htm
+    url:  https://design.sztu.edu.cn/info/1043/1922.htm
+
+[OK] 创意设计学院-为创-为系列展览-毕业展.html
+    info: ../../info/1041/2301.htm
+    url:  https://design.sztu.edu.cn/info/1041/2301.htm
+
+[OK] 创意设计学院-为创-为系列展览-课程展.html
+    info: ../../info/1042/2221.htm
+    url:  https://design.sztu.edu.cn/info/1042/2221.htm
+
+[OK] 创意设计学院-为创-创意100-学术讲座.html
+    info: ../info/1021/2309.htm
+    url:  https://design.sztu.edu.cn/info/1021/2309.htm
+
+[OK] 创意设计学院-国际合作.html
+    info: info/1006/2288.htm
+    url:  https://design.sztu.edu.cn/info/1006/2288.htm
+
+[OK] 创意设计学院-学术研究-优秀教材申报.html
+    info: ../../info/1072/2127.htm
+    url:  https://design.sztu.edu.cn/info/1072/2127.htm
+
+[OK] 创意设计学院-学术研究-学术小组.html
+    info: ../info/1019/1878.htm
+    url:  https://design.sztu.edu.cn/info/1019/1878.htm
+
+[OK] 创意设计学院-学院动态-党团工作.html
+    info: ../info/1024/2281.htm
+    url:  https://design.sztu.edu.cn/info/1024/2281.htm
+
+[OK] 创意设计学院-学院动态-学院焦点.html
+    info: ../info/1022/2318.htm
+    url:  https://design.sztu.edu.cn/info/1022/2318.htm
+
+[OK] 创意设计学院-学院动态-校园生活.html
+    info: ../info/1026/2272.htm
+    url:  https://design.sztu.edu.cn/info/1026/2272.htm
+
+[OK] 创意设计学院-学院动态-社会服务.html
+    info: ../info/1025/2323.htm
+    url:  https://design.sztu.edu.cn/info/1025/2323.htm
+
+[OK] 创意设计学院-学院动态-通知公告.html
+    info: ../info/1027/2313.htm
+    url:  https://design.sztu.edu.cn/info/1027/2313.htm
+
+[OK] 创意设计学院-学院动态-院系新闻.html
+    info: ../info/1023/2322.htm
+    url:  https://design.sztu.edu.cn/info/1023/2322.htm
+
+[OK] 创意设计学院-教育教学-学科建设-本科生.html
+    info: ../../info/1046/1862.htm
+    url:  https://design.sztu.edu.cn/info/1046/1862.htm
+
+[OK] 创意设计学院-教育教学-学科建设-研究生.html
+    info: ../../info/1045/1887.htm
+    url:  https://design.sztu.edu.cn/info/1045/1887.htm
+
+[OK] 创意设计学院-教育教学-实验中心-实验室.html
+    info: ../../info/1037/1407.htm
+    url:  https://design.sztu.edu.cn/info/1037/1407.htm
+
+[OK] 创意设计学院-教育教学-实验中心-工坊.html
+    info: ../../info/1038/1932.htm
+    url:  https://design.sztu.edu.cn/info/1038/1932.htm
+
+[OK] 创意设计学院-教育教学-特色课程.html
+    info: ../info/1015/1872.htm
+    url:  https://design.sztu.edu.cn/info/1015/1872.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-党建工作-党建动态.html
+    info: ../info/1036/2445.htm
+    url:  https://hq.sztu.edu.cn/info/1036/2445.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-党建工作-政策信息.html
+    info: ../info/1035/2054.htm
+    url:  https://hq.sztu.edu.cn/info/1035/2054.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-后勤概况政策规定.html
+    info: ../info/1118/1730.htm
+    url:  https://hq.sztu.edu.cn/info/1118/1730.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-后勤风采-工会活动.html
+    info: ../info/1057/1372.htm
+    url:  https://hq.sztu.edu.cn/info/1057/1372.htm
+
+[NO_INFO_LINK] 后勤部 —— 校医院、餐饮中心-后勤风采-服务监督.html
+    err:  页面中未找到 info 链接
+
+[OK] 后勤部 —— 校医院、餐饮中心-后勤风采-服务风采.html
+    info: ../info/1059/1894.htm
+    url:  https://hq.sztu.edu.cn/info/1059/1894.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-后勤风采-荣誉之窗.html
+    info: ../info/1058/2025.htm
+    url:  https://hq.sztu.edu.cn/info/1058/2025.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-服务指南-交通出行.html
+    info: ../info/1119/2057.htm
+    url:  https://hq.sztu.edu.cn/info/1119/2057.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-服务指南-公务用车.html
+    info: ../info/1049/1906.htm
+    url:  https://hq.sztu.edu.cn/info/1049/1906.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-服务指南-周转住房.html
+    info: ../info/1050/2206.htm
+    url:  https://hq.sztu.edu.cn/info/1050/2206.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-服务指南-校园就医.html
+    info: ../info/1053/1904.htm
+    url:  https://hq.sztu.edu.cn/info/1053/1904.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-服务指南-物业管理.html
+    info: ../info/1052/1604.htm
+    url:  https://hq.sztu.edu.cn/info/1052/1604.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-服务指南-维修服务.html
+    info: info/1047/1910.htm
+    url:  https://hq.sztu.edu.cn/info/1047/1910.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-服务指南-采购服务.html
+    info: ../info/1048/1283.htm
+    url:  https://hq.sztu.edu.cn/info/1048/1283.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-综合信息-动态要闻.html
+    info: ../info/1038/2436.htm
+    url:  https://hq.sztu.edu.cn/info/1038/2436.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-综合信息-大事记要.html
+    info: ../info/1039/1877.htm
+    url:  https://hq.sztu.edu.cn/info/1039/1877.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-综合信息-招生宣传.html
+    info: ../info/1120/2055.htm
+    url:  https://hq.sztu.edu.cn/info/1120/2055.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-综合信息-表格下载.html
+    info: ../info/1040/2244.htm
+    url:  https://hq.sztu.edu.cn/info/1040/2244.htm
+
+[NO_INFO_LINK] 后勤部 —— 校医院、餐饮中心-综合信息-资料下载 暂无.html
+    err:  页面中未找到 info 链接
+
+[OK] 后勤部 —— 校医院、餐饮中心-综合信息-通知公告.html
+    info: ../info/1037/2404.htm
+    url:  https://hq.sztu.edu.cn/info/1037/2404.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-餐饮服务中心-信息公告.html
+    info: info/1005/1851.htm
+    url:  https://cy.sztu.edu.cn/info/1005/1851.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-餐饮服务中心-健康文化.html
+    info: info/1011/1641.htm
+    url:  https://cy.sztu.edu.cn/info/1011/1641.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-餐饮服务中心-卫生监督.html
+    info: info/1008/1931.htm
+    url:  https://cy.sztu.edu.cn/info/1008/1931.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-餐饮服务中心-新闻动态.html
+    info: info/1003/1834.htm
+    url:  https://cy.sztu.edu.cn/info/1003/1834.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-餐饮服务中心-用餐指南.html
+    info: info/1006/1182.htm
+    url:  https://cy.sztu.edu.cn/info/1006/1182.htm
+
+[OK] 后勤部 —— 校医院、餐饮中心-餐饮服务中心-美食菜谱.html
+    info: info/1021/1759.htm
+    url:  https://cy.sztu.edu.cn/info/1021/1759.htm
+
+[OK] 商学院_技术经理人学院-人才培养-竞赛及获奖.html
+    info: ../info/1545/3942.htm
+    url:  https://bs.sztu.edu.cn/info/1545/3942.htm
+
+[OK] 商学院_技术经理人学院-党群工作.html
+    info: info/1543/4285.htm
+    url:  https://bs.sztu.edu.cn/info/1543/4285.htm
+
+[OK] 商学院_技术经理人学院-合作交流-国际合作.html
+    info: ../../info/1018/2827.htm
+    url:  https://bs.sztu.edu.cn/info/1018/2827.htm
+
+[NO_INFO_LINK] 商学院_技术经理人学院-合作交流-校企合作.html
+    err:  页面中未找到 info 链接
+
+[OK] 商学院_技术经理人学院-学术动态.html
+    info: ../info/1619/4242.htm
+    url:  https://bs.sztu.edu.cn/info/1619/4242.htm
+
+[OK] 商学院_技术经理人学院-学生工作-就业指导.html
+    info: ../info/1549/4282.htm
+    url:  https://bs.sztu.edu.cn/info/1549/4282.htm
+
+[OK] 商学院_技术经理人学院-学生工作-招生.html
+    info: ../info/1542/3367.htm
+    url:  https://bs.sztu.edu.cn/info/1542/3367.htm
+
+[OK] 商学院_技术经理人学院-学生工作-职业发展.html
+    info: ../info/1543/4285.htm
+    url:  https://bs.sztu.edu.cn/info/1543/4285.htm
+
+[OK] 商学院_技术经理人学院-数字资源.html
+    info: ../info/1561/3136.htm
+    url:  https://bs.sztu.edu.cn/info/1561/3136.htm
+
+[OK] 商学院_技术经理人学院-新闻动态.html
+    info: ../info/1023/4301.htm
+    url:  https://bs.sztu.edu.cn/info/1023/4301.htm
+
+[OK] 商学院_技术经理人学院-校园生活.html
+    info: ../info/1025/4303.htm
+    url:  https://bs.sztu.edu.cn/info/1025/4303.htm
+
+[OK] 商学院_技术经理人学院-科研与实践-学术研究-学术动态.html
+    info: ../../info/1622/4009.htm
+    url:  https://bs.sztu.edu.cn/info/1622/4009.htm
+
+[NO_INFO_LINK] 商学院_技术经理人学院-科研与实践-学术研究-研究中心-商案例研究中心【暂无.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 商学院_技术经理人学院-科研与实践-学术研究-研究中心-循环经济研究中心【暂无.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 商学院_技术经理人学院-科研与实践-学术研究-研究中心-深圳市审计科研基地【暂无.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 商学院_技术经理人学院-科研与实践-学术研究-研究中心-金融创新和金融科技研究中心【暂无.html
+    err:  页面中未找到 info 链接
+
+[OK] 商学院_技术经理人学院-科研与实践-实践教学.html
+    info: ../info/1151/4238.htm
+    url:  https://bs.sztu.edu.cn/info/1151/4238.htm
+
+[OK] 商学院_技术经理人学院-联系我们-加入我们.html
+    info: ../info/1544/4258.htm
+    url:  https://bs.sztu.edu.cn/info/1544/4258.htm
+
+[OK] 商学院_技术经理人学院-通知公告.html
+    info: ../info/1022/4302.htm
+    url:  https://bs.sztu.edu.cn/info/1022/4302.htm
+
+[NO_INFO_LINK] 国有资产与实验室管理开发部 —— 分析测试中心-信息公开.html
+    err:  页面中未找到 info 链接
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-安全宣传-安全知识.html
+    info: ../info/1042/2377.htm
+    url:  https://sbc.sztu.edu.cn/info/1042/2377.htm
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-安全宣传-视频素材.html
+    info: ../info/1078/2396.htm
+    url:  https://sbc.sztu.edu.cn/info/1078/2396.htm
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-安全宣传-警示案例.html
+    info: ../info/1057/2235.htm
+    url:  https://sbc.sztu.edu.cn/info/1057/2235.htm
+
+[NO_INFO_LINK] 国有资产与实验室管理开发部 —— 分析测试中心-新闻公告-党政建设.html
+    err:  页面中未找到 info 链接
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-新闻公告-工作动态.html
+    info: ../info/1024/2395.htm
+    url:  https://sbc.sztu.edu.cn/info/1024/2395.htm
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-新闻公告-通知公告.html
+    info: ../info/1023/2120.htm
+    url:  https://sbc.sztu.edu.cn/info/1023/2120.htm
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-服务指南-实验室管理类.html
+    info: ../info/1030/2178.htm
+    url:  https://sbc.sztu.edu.cn/info/1030/2178.htm
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-服务指南-设备管理类.html
+    info: ../info/1028/2387.htm
+    url:  https://sbc.sztu.edu.cn/info/1028/2387.htm
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-服务指南-购置预算类.html
+    info: ../info/1027/2173.htm
+    url:  https://sbc.sztu.edu.cn/info/1027/2173.htm
+
+[NO_INFO_LINK] 国有资产与实验室管理开发部 —— 分析测试中心-服务指南-资产管理类.html
+    err:  页面中未找到 info 链接
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-规章制度-政策标准.html
+    info: ../info/1051/1971.htm
+    url:  https://sbc.sztu.edu.cn/info/1051/1971.htm
+
+[NO_INFO_LINK] 国有资产与实验室管理开发部 —— 分析测试中心-规章制度-法律法规-国有资产管理.html
+    err:  页面中未找到 info 链接
+
+[OK] 国有资产与实验室管理开发部 —— 分析测试中心-规章制度-法律法规-实验室管理.html
+    info: info/1100/1946.htm
+    url:  https://sbc.sztu.edu.cn/info/1100/1946.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-交换生项目-2018 -.html
+    info: ../../info/1034/1271.htm
+    url:  https://international.sztu.edu.cn/info/1034/1271.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-交换生项目-2019 -.html
+    info: ../../info/1035/1647.htm
+    url:  https://international.sztu.edu.cn/info/1035/1647.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-交换生项目-2020 -.html
+    info: ../../info/1036/1648.htm
+    url:  https://international.sztu.edu.cn/info/1036/1648.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-交换生项目-2022 -.html
+    info: ../../info/1051/1658.htm
+    url:  https://international.sztu.edu.cn/info/1051/1658.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-国际交流-境外交流.html
+    info: ../info/1007/1988.htm
+    url:  https://international.sztu.edu.cn/info/1007/1988.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-国际交流-来访交流.html
+    info: ../info/1008/2028.htm
+    url:  https://international.sztu.edu.cn/info/1008/2028.htm
+
+[NO_INFO_LINK] 国际合作与交流部_港澳台工作办公室 (国际交流)-国际交流-礼宾知识.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 国际合作与交流部_港澳台工作办公室 (国际交流)-国际交流-领事常识.html
+    err:  页面中未找到 info 链接
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-国际交流.html
+    info: ../info/1031/4114.htm
+    url:  https://www.sztu.edu.cn/info/1031/4114.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-学生境外交流.html
+    info: ../info/1032/3969.htm
+    url:  https://www.sztu.edu.cn/info/1032/3969.htm
+
+[OK] 国际合作与交流部_港澳台工作办公室 (国际交流)-焦点新闻.html
+    info: info/1003/2027.htm
+    url:  https://international.sztu.edu.cn/info/1003/2027.htm
+
+[NO_INFO_LINK] 图书馆-新闻咨询.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 图书馆-资源动态.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 图书馆-通知公告.html
+    err:  页面中未找到 info 链接
+
+[OK] 城市交通与物流学院-ASIIN-附件-Appendix.html
+    info: ../info/1441/3412.htm
+    url:  https://utl.sztu.edu.cn/info/1441/3412.htm
+
+[OK] 城市交通与物流学院-International Exchange-International Conferences.html
+    info: ../info/1385/3139.htm
+    url:  https://utl.sztu.edu.cn/info/1385/3139.htm
+
+[OK] 城市交通与物流学院-International Exchange-International Students Exchange.html
+    info: ../info/1384/3138.htm
+    url:  https://utl.sztu.edu.cn/info/1384/3138.htm
+
+[OK] 城市交通与物流学院-International Exchange-International Teacher Exchange.html
+    info: ../info/1383/3137.htm
+    url:  https://utl.sztu.edu.cn/info/1383/3137.htm
+
+[OK] 城市交通与物流学院-人才培养-学生就业.html
+    info: ../info/1335/2486.htm
+    url:  https://utl.sztu.edu.cn/info/1335/2486.htm
+
+[OK] 城市交通与物流学院-人才培养-实教学.html
+    info: ../info/1036/2823.htm
+    url:  https://utl.sztu.edu.cn/info/1036/2823.htm
+
+[OK] 城市交通与物流学院-人才培养-本科生培养-专业设置-培养方案.html
+    info: ../../info/1332/3161.htm
+    url:  https://utl.sztu.edu.cn/info/1332/3161.htm
+
+[NO_INFO_LINK] 城市交通与物流学院-人才培养-本科生培养-专业设置-广东省优教学成果奖.html
+    err:  页面中未找到 info 链接
+
+[OK] 城市交通与物流学院-人才培养-本科生培养-专业设置-本科生管理.html
+    info: ../../info/1334/2467.htm
+    url:  https://utl.sztu.edu.cn/info/1334/2467.htm
+
+[OK] 城市交通与物流学院-人才培养-本科生培养-专业设置-特色班培养.html
+    info: ../../info/1333/2465.htm
+    url:  https://utl.sztu.edu.cn/info/1333/2465.htm
+
+[OK] 城市交通与物流学院-人才培养-研究生培养-X-talenti计划.html
+    info: ../../info/1026/3142.htm
+    url:  https://utl.sztu.edu.cn/info/1026/3142.htm
+
+[OK] 城市交通与物流学院-人才培养-研究生培养-博士点.html
+    info: ../../info/1027/2487.htm
+    url:  https://utl.sztu.edu.cn/info/1027/2487.htm
+
+[OK] 城市交通与物流学院-人才培养-研究生培养-研究生学习工作剪影.html
+    info: ../../info/1365/2749.htm
+    url:  https://utl.sztu.edu.cn/info/1365/2749.htm
+
+[OK] 城市交通与物流学院-人才培养-研究生培养-硕士点.html
+    info: ../../info/1025/2623.htm
+    url:  https://utl.sztu.edu.cn/info/1025/2623.htm
+
+[OK] 城市交通与物流学院-人才培养-研究生培养-科创平台及培养环境.html
+    info: ../../info/1028/3141.htm
+    url:  https://utl.sztu.edu.cn/info/1028/3141.htm
+
+[OK] 城市交通与物流学院-党建引领-专题学习.html
+    info: ../info/1076/3203.htm
+    url:  https://utl.sztu.edu.cn/info/1076/3203.htm
+
+[OK] 城市交通与物流学院-党建引领-党务公告.html
+    info: ../info/1337/3072.htm
+    url:  https://utl.sztu.edu.cn/info/1337/3072.htm
+
+[OK] 城市交通与物流学院-党建引领-党建品牌建设.html
+    info: ../info/1344/2796.htm
+    url:  https://utl.sztu.edu.cn/info/1344/2796.htm
+
+[OK] 城市交通与物流学院-党建引领-党建工作动态.html
+    info: ../../info/1078/3292.htm
+    url:  https://utl.sztu.edu.cn/info/1078/3292.htm
+
+[OK] 城市交通与物流学院-创新实践-地铁共建站.html
+    info: ../info/1340/2454.htm
+    url:  https://utl.sztu.edu.cn/info/1340/2454.htm
+
+[OK] 城市交通与物流学院-创新实践-无人配送基地.html
+    info: ../info/1339/3300.htm
+    url:  https://utl.sztu.edu.cn/info/1339/3300.htm
+
+[OK] 城市交通与物流学院-创新实践-赛车工作室.html
+    info: ../info/1086/1710.htm
+    url:  https://utl.sztu.edu.cn/info/1086/1710.htm
+
+[OK] 城市交通与物流学院-学工之家-学工队伍.html
+    info: ../info/1343/2514.htm
+    url:  https://utl.sztu.edu.cn/info/1343/2514.htm
+
+[OK] 城市交通与物流学院-学工之家-学生天地-团学风采.html
+    info: ../../info/1052/3497.htm
+    url:  https://utl.sztu.edu.cn/info/1052/3497.htm
+
+[OK] 城市交通与物流学院-学工之家-学生天地-学生活动.html
+    info: ../../info/1055/3511.htm
+    url:  https://utl.sztu.edu.cn/info/1055/3511.htm
+
+[OK] 城市交通与物流学院-学工之家-学生天地-社会实践.html
+    info: ../../info/1054/3056.htm
+    url:  https://utl.sztu.edu.cn/info/1054/3056.htm
+
+[OK] 城市交通与物流学院-学工之家-学生天地-竞赛风采.html
+    info: ../../info/1056/3509.htm
+    url:  https://utl.sztu.edu.cn/info/1056/3509.htm
+
+[OK] 城市交通与物流学院-学工之家-学生天地-青马工程.html
+    info: ../../info/1053/3507.htm
+    url:  https://utl.sztu.edu.cn/info/1053/3507.htm
+
+[OK] 城市交通与物流学院-学工之家-学生风采-生涯分享.html
+    info: ../../info/1374/3480.htm
+    url:  https://utl.sztu.edu.cn/info/1374/3480.htm
+
+[OK] 城市交通与物流学院-学工之家-学生风采-荣普殿堂.html
+    info: ../../info/1373/3103.htm
+    url:  https://utl.sztu.edu.cn/info/1373/3103.htm
+
+[OK] 城市交通与物流学院-学工之家-规章制度.html
+    info: ../info/1342/2518.htm
+    url:  https://utl.sztu.edu.cn/info/1342/2518.htm
+
+[OK] 城市交通与物流学院-师资队伍-人才招聘.html
+    info: ../info/1287/2803.htm
+    url:  https://utl.sztu.edu.cn/info/1287/2803.htm
+
+[OK] 城市交通与物流学院-新闻中心-学院动态.html
+    info: ../info/1014/3574.htm
+    url:  https://utl.sztu.edu.cn/info/1014/3574.htm
+
+[OK] 城市交通与物流学院-新闻中心-通知公告.html
+    info: ../info/1016/3572.htm
+    url:  https://utl.sztu.edu.cn/info/1016/3572.htm
+
+[OK] 城市交通与物流学院-科研实训-实验教学中心-交通实验教学中心.html
+    info: ../../info/1368/2669.htm
+    url:  https://utl.sztu.edu.cn/info/1368/2669.htm
+
+[OK] 城市交通与物流学院-科研实训-实验教学中心-无人机实验技术中心.html
+    info: ../../info/1401/3135.htm
+    url:  https://utl.sztu.edu.cn/info/1401/3135.htm
+
+[OK] 城市交通与物流学院-科研实训-实验教学中心-汽车实验教学中心.html
+    info: ../../info/1369/2659.htm
+    url:  https://utl.sztu.edu.cn/info/1369/2659.htm
+
+[OK] 城市交通与物流学院-科研实训-实验教学中心-物流实脸教学中心.html
+    info: ../../info/1367/2673.htm
+    url:  https://utl.sztu.edu.cn/info/1367/2673.htm
+
+[OK] 城市交通与物流学院-科研实训-校企合作 1350，有.html
+    info: ../info/1350/2775.htm
+    url:  https://utl.sztu.edu.cn/info/1350/2775.htm
+
+[OK] 城市交通与物流学院-科研实训-科研团队.html
+    info: ../info/1336/3168.htm
+    url:  https://utl.sztu.edu.cn/info/1336/3168.htm
+
+[OK] 城市交通与物流学院-科研实训-科研平台.html
+    info: ../info/1070/2512.htm
+    url:  https://utl.sztu.edu.cn/info/1070/2512.htm
+
+[OK] 外国语学院-党群工作.html
+    info: info/1067/5972.htm
+    url:  https://sfl.sztu.edu.cn/info/1067/5972.htm
+
+[OK] 外国语学院-内网相关-内网活动.html
+    info: ../info/1071/5283.htm
+    url:  https://sfl.sztu.edu.cn/info/1071/5283.htm
+
+[OK] 外国语学院-培训考试-考试资讯.html
+    info: ../info/1065/5258.htm
+    url:  https://sfl.sztu.edu.cn/info/1065/5258.htm
+
+[OK] 外国语学院-学生活动-团学活动.html
+    info: ../info/1062/5311.htm
+    url:  https://sfl.sztu.edu.cn/info/1062/5311.htm
+
+[OK] 外国语学院-学生活动-规章制度.html
+    info: ../info/1063/5257.htm
+    url:  https://sfl.sztu.edu.cn/info/1063/5257.htm
+
+[OK] 外国语学院-学生获奖.html
+    info: info/1085/3421.htm
+    url:  https://sfl.sztu.edu.cn/info/1085/3421.htm
+
+[OK] 外国语学院-学院新闻.html
+    info: info/1002/5973.htm
+    url:  https://sfl.sztu.edu.cn/info/1002/5973.htm
+
+[OK] 外国语学院-招生招聘-人才招聘.html
+    info: ../info/1082/3991.htm
+    url:  https://sfl.sztu.edu.cn/info/1082/3991.htm
+
+[OK] 外国语学院-招生招聘-本科生招生.html
+    info: ../info/1083/5578.htm
+    url:  https://sfl.sztu.edu.cn/info/1083/5578.htm
+
+[OK] 外国语学院-教学科研-实践中心-写作中心-中心活动.html
+    info: ../../../info/1013/5862.htm
+    url:  https://sfl.sztu.edu.cn/info/1013/5862.htm
+
+[OK] 外国语学院-教学科研-实践中心-外语工作室-中心活动.html
+    info: ../../../info/1132/5458.htm
+    url:  https://sfl.sztu.edu.cn/info/1132/5458.htm
+
+[OK] 外国语学院-教学科研-实践中心-德语角-中心活动.html
+    info: ../../../info/1018/5580.htm
+    url:  https://sfl.sztu.edu.cn/info/1018/5580.htm
+
+[OK] 外国语学院-教学科研-实践中心-汉语国际教育中心-中心活动.html
+    info: ../../../info/1017/4050.htm
+    url:  https://sfl.sztu.edu.cn/info/1017/4050.htm
+
+[OK] 外国语学院-教学科研-实践中心-演讲与辩论工作坊-中心活动.html
+    info: ../../../info/1020/5436.htm
+    url:  https://sfl.sztu.edu.cn/info/1020/5436.htm
+
+[OK] 外国语学院-教学科研-实践中心-翻译中心-中心活动.html
+    info: ../../../info/1014/5582.htm
+    url:  https://sfl.sztu.edu.cn/info/1014/5582.htm
+
+[OK] 外国语学院-教学科研-实践中心-英语角-中心活动.html
+    info: ../../../info/1016/5848.htm
+    url:  https://sfl.sztu.edu.cn/info/1016/5848.htm
+
+[OK] 外国语学院-教学科研-实践中心-语言文字工作委员会-中心活动.html
+    info: ../../../info/1015/5460.htm
+    url:  https://sfl.sztu.edu.cn/info/1015/5460.htm
+
+[OK] 外国语学院-教学科研-教研成果-教学成果.html
+    info: ../../info/1055/5673.htm
+    url:  https://sfl.sztu.edu.cn/info/1055/5673.htm
+
+[OK] 外国语学院-教学科研-教研成果-科研成果.html
+    info: ../../info/1056/5293.htm
+    url:  https://sfl.sztu.edu.cn/info/1056/5293.htm
+
+[OK] 外国语学院-教学科研-校企合作.html
+    info: ../info/1058/5544.htm
+    url:  https://sfl.sztu.edu.cn/info/1058/5544.htm
+
+[OK] 外国语学院-教学科研-研究中心-德国工业文明研究中心-中心活动.html
+    info: ../../../info/1053/5846.htm
+    url:  https://sfl.sztu.edu.cn/info/1053/5846.htm
+
+[OK] 外国语学院-教学科研-研究中心-技术增强语言学习中心-中心活动.html
+    info: ../../../info/1112/5786.htm
+    url:  https://sfl.sztu.edu.cn/info/1112/5786.htm
+
+[OK] 外国语学院-教学科研-研究中心-跨文化与区域国别研究中心-中心活动.html
+    info: ../../../info/1052/5683.htm
+    url:  https://sfl.sztu.edu.cn/info/1052/5683.htm
+
+[OK] 外国语学院-教学科研-研究生培养.html
+    info: ../info/1091/5529.htm
+    url:  https://sfl.sztu.edu.cn/info/1091/5529.htm
+
+[OK] 外国语学院-通知公告.html
+    info: info/1003/5962.htm
+    url:  https://sfl.sztu.edu.cn/info/1003/5962.htm
+
+[NO_INFO_LINK] 学校官网-媒体焦点-媒体聚焦.html
+    err:  页面中未找到 info 链接
+
+[OK] 学校官网-媒体焦点-校园新闻.html
+    info: ../info/1003/4285.htm
+    url:  https://www.sztu.edu.cn/info/1003/4285.htm
+
+[NO_INFO_LINK] 学校官网-官方账号信息汇聚-bilibili.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 学校官网-官方账号信息汇聚-小红书.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 学校官网-官方账号信息汇聚-微信.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 学校官网-官方账号信息汇聚-微博.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 学校官网-官方账号信息汇聚-抖音.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 学校官网-官方账号信息汇聚-视频号.html
+    err:  页面中未找到 info 链接
+
+[OK] 学校官网-对外交流-国际交流.html
+    info: ../info/1031/4114.htm
+    url:  https://www.sztu.edu.cn/info/1031/4114.htm
+
+[OK] 学校官网-对外交流-学生境外交流.html
+    info: ../info/1032/3969.htm
+    url:  https://www.sztu.edu.cn/info/1032/3969.htm
+
+[NO_INFO_LINK] 学校官网-技大 VR.html
+    err:  页面中未找到 info 链接
+
+[FAIL_DOWNLOAD] 学校官网-活力技大-体育活动.html
+    info: https://tusports.sztu.edu.cn/info/1015/1914.htm
+    url:  https://tusports.sztu.edu.cn/info/1015/1914.htm
+    err:  HTTP 404
+
+[OK] 学校官网-活力技大-技大风光.html
+    info: ../info/1037/3515.htm
+    url:  https://www.sztu.edu.cn/info/1037/3515.htm
+
+[OK] 学校官网-活力技大-文娱活动.html
+    info: ../../info/1040/4091.htm
+    url:  https://www.sztu.edu.cn/info/1040/4091.htm
+
+[OK] 学校官网-活力技大-视觉技大.html
+    info: ../info/1038/3822.htm
+    url:  https://www.sztu.edu.cn/info/1038/3822.htm
+
+[OK] 审计室-党建工作.html
+    info: info/1007/1201.htm
+    url:  https://sjs.sztu.edu.cn/info/1007/1201.htm
+
+[OK] 审计室-审计公告.html
+    info: info/1005/1171.htm
+    url:  https://sjs.sztu.edu.cn/info/1005/1171.htm
+
+[OK] 审计室-工作动态.html
+    info: info/1003/1221.htm
+    url:  https://sjs.sztu.edu.cn/info/1003/1221.htm
+
+[OK] 审计室-政策法规-上级政策法规.html
+    info: ../info/1012/1174.htm
+    url:  https://sjs.sztu.edu.cn/info/1012/1174.htm
+
+[OK] 审计室-政策法规-学校规章制度.html
+    info: ../info/1013/1153.htm
+    url:  https://sjs.sztu.edu.cn/info/1013/1153.htm
+
+[OK] 审计室-服务指南.html
+    info: info/1006/1073.htm
+    url:  https://sjs.sztu.edu.cn/info/1006/1073.htm
+
+[NO_INFO_LINK] 就业指导-事业单位.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-公务员.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-全职岗位.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-双选会.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-同类校外双选会.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-同类校外宣讲会.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-在线招聘.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-学院宣讲会.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-实习岗位.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-宣讲会回顾.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-校内宣讲会.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-校友企业.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-校外宣讲会.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 就业指导-各种会-校级宣讲会.html
+    err:  页面中未找到 info 链接
+
+[OK] 就业指导-就业指导.html
+    info: info/1021/1492.htm
+    url:  https://jyzd.sztu.edu.cn/info/1021/1492.htm
+
+[OK] 就业指导-就业政策.html
+    info: info/1020/1473.htm
+    url:  https://jyzd.sztu.edu.cn/info/1020/1473.htm
+
+[OK] 就业指导-工作动态 1013.html
+    info: info/1013/1531.htm
+    url:  https://jyzd.sztu.edu.cn/info/1013/1531.htm
+
+[OK] 就业指导-通知公告 1002.html
+    info: info/1002/1552.htm
+    url:  https://jyzd.sztu.edu.cn/info/1002/1552.htm
+
+[OK] 工程物理学院-党团建设.html
+    info: info/1161/3293.htm
+    url:  https://cep.sztu.edu.cn/info/1161/3293.htm
+
+[OK] 工程物理学院-合作交流-国内外合作.html
+    info: ../info/1020/2130.htm
+    url:  https://cep.sztu.edu.cn/info/1020/2130.htm
+
+[OK] 工程物理学院-合作交流-学术交流活动.html
+    info: ../info/1019/2748.htm
+    url:  https://cep.sztu.edu.cn/info/1019/2748.htm
+
+[OK] 工程物理学院-师生园地-奖励荣誉.html
+    info: ../info/1028/2775.htm
+    url:  https://cep.sztu.edu.cn/info/1028/2775.htm
+
+[FAIL_DOWNLOAD] 工程物理学院-师生园地-师生活动.html
+    info: https://nbw.sztu.edu.cn/info/1022/47690.htm
+    url:  https://nbw.sztu.edu.cn/info/1022/47690.htm
+    err:  连接失败: HTTPSConnectionPool(host='nbw.sztu.edu.cn', port=443): Max retries exceeded with url: /info/1022/476
+
+[OK] 工程物理学院-招生就业-就业信息.html
+    info: ../info/1026/3346.htm
+    url:  https://cep.sztu.edu.cn/info/1026/3346.htm
+
+[OK] 工程物理学院-招生就业-本科生招生.html
+    info: ../info/1023/2825.htm
+    url:  https://cep.sztu.edu.cn/info/1023/2825.htm
+
+[OK] 工程物理学院-招生就业-研究生招生-博士生招生 1036，研究生院的.html
+    info: https://gra.sztu.edu.cn/info/1059/1645.htm
+    url:  https://gra.sztu.edu.cn/info/1059/1645.htm
+
+[OK] 工程物理学院-招生就业-研究生招生-硕士生招生.html
+    info: ../../info/1037/2772.htm
+    url:  https://cep.sztu.edu.cn/info/1037/2772.htm
+
+[OK] 工程物理学院-教育教学-学科建设.html
+    info: ../info/1174/2142.htm
+    url:  https://cep.sztu.edu.cn/info/1174/2142.htm
+
+[OK] 工程物理学院-教育教学-教学实验室.html
+    info: ../info/1192/2184.htm
+    url:  https://cep.sztu.edu.cn/info/1192/2184.htm
+
+[OK] 工程物理学院-教育教学-本科教学.html
+    info: https://www.sztu.edu.cn/info/1003/3972.htm
+    url:  https://www.sztu.edu.cn/info/1003/3972.htm
+
+[OK] 工程物理学院-教育教学-研究生教学.html
+    info: ../info/1082/1563.htm
+    url:  https://cep.sztu.edu.cn/info/1082/1563.htm
+
+[NO_INFO_LINK] 工程物理学院-机构设置-研究机构-新一代信息技术研究院 [18新一代信息技术研究院].html
+    err:  页面中未找到 info 链接
+
+[OK] 工程物理学院-科学研究-科研团队.html
+    info: ../info/1191/2177.htm
+    url:  https://cep.sztu.edu.cn/info/1191/2177.htm
+
+[OK] 工程物理学院-科学研究-科研成果.html
+    info: ../info/1017/2763.htm
+    url:  https://cep.sztu.edu.cn/info/1017/2763.htm
+
+[OK] 工程物理学院-首页-招聘信息.html
+    info: ../info/1102/3151.htm
+    url:  https://cep.sztu.edu.cn/info/1102/3151.htm
+
+[NO_INFO_LINK] 工程物理学院-首页-新闻动态.html
+    err:  页面中未找到 info 链接
+
+[OK] 工程物理学院-首页-通知公告.html
+    info: ../info/1104/3522.htm
+    url:  https://cep.sztu.edu.cn/info/1104/3522.htm
+
+[OK] 快速入口-信息公开-基本信息.html
+    info: ../../info/1155/4112.htm
+    url:  https://www.sztu.edu.cn/info/1155/4112.htm
+
+[NO_INFO_LINK] 快速入口-信息公开-招生考试信息.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-信息公开-财务、资产及收费信息.html
+    err:  页面中未找到 info 链接
+
+[OK] 快速入口-信息公开-预决算公开.html
+    info: ../../info/1141/4262.htm
+    url:  https://www.sztu.edu.cn/info/1141/4262.htm
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-办事指南.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-合同公示.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-常用下载.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-成交公告.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-法规制度-国家.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-法规制度-校内.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-通知.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-采购公告.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 快速入口-招标采购（计划财务部）-采购意向.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 教务部（本科生教育板块） —— 招生办公室-上课时间.html
+    err:  页面中未找到 info 链接
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-业务办理-下载专区.html
+    info: ../info/1051/2303.htm
+    url:  https://jw.sztu.edu.cn/info/1051/2303.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-业务办理-办事指南.html
+    info: ../info/1050/1405.htm
+    url:  https://jw.sztu.edu.cn/info/1050/1405.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-业务办理.html
+    info: info/1049/3159.htm
+    url:  https://jw.sztu.edu.cn/info/1049/3159.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-信息公告.html
+    info: info/1007/3301.htm
+    url:  https://jw.sztu.edu.cn/info/1007/3301.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-党建风采.html
+    info: info/1010/1273.htm
+    url:  https://jw.sztu.edu.cn/info/1010/1273.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-教学动态.html
+    info: info/1005/3299.htm
+    url:  https://jw.sztu.edu.cn/info/1005/3299.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-教学周历.html
+    info: ../info/1042/3242.htm
+    url:  https://jw.sztu.edu.cn/info/1042/3242.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-教学质量报告.html
+    info: ../info/1032/3014.htm
+    url:  https://jw.sztu.edu.cn/info/1032/3014.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-教师发展中心.html
+    info: info/1071/3274.htm
+    url:  https://jw.sztu.edu.cn/info/1071/3274.htm
+
+[OK] 教务部（本科生教育板块） —— 招生办公室-规章制度.html
+    info: info/1009/2985.htm
+    url:  https://jw.sztu.edu.cn/info/1009/2985.htm
+
+[OK] 教学质量督导室-党建引领.html
+    info: info/1032/1641.htm
+    url:  https://dds.sztu.edu.cn/info/1032/1641.htm
+
+[NO_INFO_LINK] 教学质量督导室-工作简报.html
+    err:  页面中未找到 info 链接
+
+[OK] 教学质量督导室-新闻通知.html
+    info: info/1002/1612.htm
+    url:  https://dds.sztu.edu.cn/info/1002/1612.htm
+
+[OK] 教学质量督导室-规章制度-校级制度.html
+    info: ../info/1023/1553.htm
+    url:  https://dds.sztu.edu.cn/info/1023/1553.htm
+
+[OK] 教学质量督导室-规章制度-省部级制度.html
+    info: ../info/1022/1124.htm
+    url:  https://dds.sztu.edu.cn/info/1022/1124.htm
+
+[OK] 新一代信息技术研究院-研究成果.html
+    info: info/1008/1077.htm
+    url:  https://xxjs.sztu.edu.cn/info/1008/1077.htm
+
+[OK] 新一代信息技术研究院-研究方向-人工智能.html
+    info: ../info/1007/1071.htm
+    url:  https://xxjs.sztu.edu.cn/info/1007/1071.htm
+
+[OK] 新一代信息技术研究院-研究方向-光电器件制造技术与装备.html
+    info: ../info/1004/1024.htm
+    url:  https://xxjs.sztu.edu.cn/info/1004/1024.htm
+
+[OK] 新一代信息技术研究院-研究方向-集成电路关键技术.html
+    info: ../info/1006/1064.htm
+    url:  https://xxjs.sztu.edu.cn/info/1006/1064.htm
+
+[OK] 新材料与新能源学院-人才培养-教学平台.html
+    info: ../info/1152/3641.htm
+    url:  https://nmne.sztu.edu.cn/info/1152/3641.htm
+
+[OK] 新材料与新能源学院-人才培养-本科生教育.html
+    info: ../info/1038/1671.htm
+    url:  https://nmne.sztu.edu.cn/info/1038/1671.htm
+
+[OK] 新材料与新能源学院-人才培养-研究生教育.html
+    info: https://gra.sztu.edu.cn/info/1055/2066.htm
+    url:  https://gra.sztu.edu.cn/info/1055/2066.htm
+
+[OK] 新材料与新能源学院-党建工作-党建动态.html
+    info: ../info/1047/4412.htm
+    url:  https://nmne.sztu.edu.cn/info/1047/4412.htm
+
+[OK] 新材料与新能源学院-党建工作-相关下载.html
+    info: ../info/1049/4294.htm
+    url:  https://nmne.sztu.edu.cn/info/1049/4294.htm
+
+[OK] 新材料与新能源学院-国际交流-合作院系介绍.html
+    info: ../info/1178/1759.htm
+    url:  https://nmne.sztu.edu.cn/info/1178/1759.htm
+
+[OK] 新材料与新能源学院-国际交流-国际交流动态.html
+    info: ../info/1177/3793.htm
+    url:  https://nmne.sztu.edu.cn/info/1177/3793.htm
+
+[OK] 新材料与新能源学院-学子天地-学工新闻.html
+    info: ../../info/1161/3606.htm
+    url:  https://nmne.sztu.edu.cn/info/1161/3606.htm
+
+[OK] 新材料与新能源学院-学子天地-相关下载.html
+    info: ../info/1171/4124.htm
+    url:  https://nmne.sztu.edu.cn/info/1171/4124.htm
+
+[OK] 新材料与新能源学院-学院印象-湖畔新楼.html
+    info: ../info/1261/4282.htm
+    url:  https://nmne.sztu.edu.cn/info/1261/4282.htm
+
+[OK] 新材料与新能源学院-新闻中心-合作交流.html
+    info: ../../info/1180/1639.htm
+    url:  https://nmne.sztu.edu.cn/info/1180/1639.htm
+
+[OK] 新材料与新能源学院-新闻中心-学术动态.html
+    info: ../info/1027/4333.htm
+    url:  https://nmne.sztu.edu.cn/info/1027/4333.htm
+
+[OK] 新材料与新能源学院-新闻中心-学院动态.html
+    info: ../info/1072/4432.htm
+    url:  https://nmne.sztu.edu.cn/info/1072/4432.htm
+
+[OK] 新材料与新能源学院-新闻中心-实验平台.html
+    info: ../info/1152/3641.htm
+    url:  https://nmne.sztu.edu.cn/info/1152/3641.htm
+
+[OK] 新材料与新能源学院-新闻中心-讲座通知.html
+    info: ../info/1151/4434.htm
+    url:  https://nmne.sztu.edu.cn/info/1151/4434.htm
+
+[OK] 新材料与新能源学院-新闻中心-通知公告.html
+    info: ../info/1073/4422.htm
+    url:  https://nmne.sztu.edu.cn/info/1073/4422.htm
+
+[OK] 新材料与新能源学院-校企合作-合作企业介绍.html
+    info: ../info/1181/1760.htm
+    url:  https://nmne.sztu.edu.cn/info/1181/1760.htm
+
+[OK] 新材料与新能源学院-校企合作-校企合作动态.html
+    info: ../info/1180/4327.htm
+    url:  https://nmne.sztu.edu.cn/info/1180/4327.htm
+
+[OK] 新材料与新能源学院-科学研究-发表论文.html
+    info: ../info/1252/4152.htm
+    url:  https://nmne.sztu.edu.cn/info/1252/4152.htm
+
+[OK] 新材料与新能源学院-科学研究-学术动态.html
+    info: ../info/1027/4333.htm
+    url:  https://nmne.sztu.edu.cn/info/1027/4333.htm
+
+[OK] 新材料与新能源学院-科学研究-科研平台.html
+    info: ../info/1271/3622.htm
+    url:  https://nmne.sztu.edu.cn/info/1271/3622.htm
+
+[OK] 新材料与新能源学院-科学研究-科研项目.html
+    info: ../info/1251/3605.htm
+    url:  https://nmne.sztu.edu.cn/info/1251/3605.htm
+
+[OK] 新材料与新能源学院-科学研究-设备仪器.html
+    info: ../info/1030/1758.htm
+    url:  https://nmne.sztu.edu.cn/info/1030/1758.htm
+
+[NO_INFO_LINK] 未来技术学院-党团学风采-下载中心 暂无.html
+    err:  页面中未找到 info 链接
+
+[OK] 未来技术学院-党团学风采-党团风采.html
+    info: ../info/1063/2344.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1063/2344.htm
+
+[OK] 未来技术学院-党团学风采-学生工作.html
+    info: ../../info/1065/1878.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1065/1878.htm
+
+[OK] 未来技术学院-创业-下载中心.html
+    info: ../info/1061/1156.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1061/1156.htm
+
+[OK] 未来技术学院-创业-活动培训.html
+    info: ../../info/1056/1163.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1056/1163.htm
+
+[OK] 未来技术学院-创业-荣誉成果.html
+    info: ../info/1060/1362.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1060/1362.htm
+
+[OK] 未来技术学院-加入我们-人才招聘-专职研究人员.html
+    info: ../../info/1015/1292.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1015/1292.htm
+
+[OK] 未来技术学院-加入我们-人才招聘-博士后.html
+    info: ../../info/1014/2231.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1014/2231.htm
+
+[OK] 未来技术学院-加入我们-人才招聘-实验技术岗位.html
+    info: ../../info/1012/2171.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1012/2171.htm
+
+[OK] 未来技术学院-加入我们-人才招聘-教学科研岗位.html
+    info: ../../info/1011/1825.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1011/1825.htm
+
+[NO_INFO_LINK] 未来技术学院-加入我们-招生咨询.html
+    err:  页面中未找到 info 链接
+
+[OK] 未来技术学院-教育-培养方案.html
+    info: ../info/1052/1924.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1052/1924.htm
+
+[OK] 未来技术学院-教育-特色培养.html
+    info: ../info/1053/1141.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1053/1141.htm
+
+[OK] 未来技术学院-新闻-公告通知-学工.html
+    info: ../../info/1136/2192.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1136/2192.htm
+
+[OK] 未来技术学院-新闻-公告通知-教务.html
+    info: ../../info/1133/1651.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1133/1651.htm
+
+[OK] 未来技术学院-新闻-公告通知-校园.html
+    info: ../../info/1137/2371.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1137/2371.htm
+
+[OK] 未来技术学院-新闻-公告通知-科研.html
+    info: ../../info/1134/1883.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1134/1883.htm
+
+[OK] 未来技术学院-新闻-公告通知-行政.html
+    info: ../../info/1135/1800.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1135/1800.htm
+
+[NO_INFO_LINK] 未来技术学院-新闻-学术会议.html
+    err:  页面中未找到 info 链接
+
+[OK] 未来技术学院-新闻-新间中心.html
+    info: ../info/1021/2377.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1021/2377.htm
+
+[OK] 未来技术学院-科研-先进制造与未来工业中心-研究方向.html
+    info: ../../info/1076/1862.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1076/1862.htm
+
+[OK] 未来技术学院-科研-创意工业设计中心-研究方向.html
+    info: ../../info/1079/1136.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1079/1136.htm
+
+[OK] 未来技术学院-科研-创意工业设计中心-荣誉成果.html
+    info: ../../info/1080/1956.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1080/1956.htm
+
+[OK] 未来技术学院-科研-未来能源与环境应用工程中心-研究方向.html
+    info: ../../info/1068/1115.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1068/1115.htm
+
+[OK] 未来技术学院-科研-未来能源与环境应用工程中心-荣誉成果.html
+    info: ../../info/1069/2019.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1069/2019.htm
+
+[OK] 未来技术学院-科研-校企合作.html
+    info: ../info/1048/2125.htm
+    url:  https://futuretechnologyschool.sztu.edu.cn/info/1048/2125.htm
+
+[OK] 本科生招生网-专升本.html
+    info: info/1106/4818.htm
+    url:  https://zs.sztu.edu.cn/info/1106/4818.htm
+
+[OK] 本科生招生网-学校新闻.html
+    info: info/1075/4785.htm
+    url:  https://zs.sztu.edu.cn/info/1075/4785.htm
+
+[NO_INFO_LINK] 本科生招生网-报考指南-历年录取.html
+    err:  页面中未找到 info 链接
+
+[OK] 本科生招生网-报考指南-奖助体系.html
+    info: ../info/1014/1076.htm
+    url:  https://zs.sztu.edu.cn/info/1014/1076.htm
+
+[NO_INFO_LINK] 本科生招生网-报考指南-录取查询.html
+    err:  页面中未找到 info 链接
+
+[OK] 本科生招生网-报考指南-招生政策.html
+    info: ../info/1011/4458.htm
+    url:  https://zs.sztu.edu.cn/info/1011/4458.htm
+
+[OK] 本科生招生网-报考指南-招生计划.html
+    info: ../info/1012/4435.htm
+    url:  https://zs.sztu.edu.cn/info/1012/4435.htm
+
+[NO_INFO_LINK] 本科生招生网-报考指南-招生问答.html
+    err:  页面中未找到 info 链接
+
+[OK] 本科生招生网-报考指南-资料下载.html
+    info: ../info/1016/4451.htm
+    url:  https://zs.sztu.edu.cn/info/1016/4451.htm
+
+[OK] 本科生招生网-招生动态.html
+    info: info/1030/4788.htm
+    url:  https://zs.sztu.edu.cn/info/1030/4788.htm
+
+[OK] 本科生招生网-校园风光.html
+    info: ../info/1086/4172.htm
+    url:  https://zs.sztu.edu.cn/info/1086/4172.htm
+
+[OK] 本科生招生网-视频校园.html
+    info: info/1076/4685.htm
+    url:  https://zs.sztu.edu.cn/info/1076/4685.htm
+
+[OK] 校团委-专题专栏-主题团日.html
+    info: ../info/1152/1273.htm
+    url:  https://xtw.sztu.edu.cn/info/1152/1273.htm
+
+[OK] 校团委-专题专栏-技大青年-学子风采.html
+    info: ../../info/1160/1275.htm
+    url:  https://xtw.sztu.edu.cn/info/1160/1275.htm
+
+[OK] 校团委-专题专栏-技大青年-获奖情况.html
+    info: ../../info/1159/1373.htm
+    url:  https://xtw.sztu.edu.cn/info/1159/1373.htm
+
+[OK] 校团委-专题专栏-社会实践.html
+    info: ../info/1131/1317.htm
+    url:  https://xtw.sztu.edu.cn/info/1131/1317.htm
+
+[NO_INFO_LINK] 校团委-专题专栏-第二课堂.html
+    err:  页面中未找到 info 链接
+
+[OK] 校团委-专题专栏-青马工程.html
+    info: ../info/1153/1448.htm
+    url:  https://xtw.sztu.edu.cn/info/1153/1448.htm
+
+[NO_INFO_LINK] 校团委-团学组织 de 活动精选部分-校学生会.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 校团委-团学组织 de 活动精选部分-校志联.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 校团委-团学组织 de 活动精选部分-校社管.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 校团委-团学组织 de 活动精选部分-校艺术团.html
+    err:  页面中未找到 info 链接
+
+[OK] 校团委-团学组织 de 活动精选部分-社团.html
+    info: ../info/1146/1610.htm
+    url:  https://xtw.sztu.edu.cn/info/1146/1610.htm
+
+[OK] 校团委-新闻动态-团学风采.html
+    info: ../info/1015/1668.htm
+    url:  https://xtw.sztu.edu.cn/info/1015/1668.htm
+
+[OK] 校团委-新闻动态-灯塔引领.html
+    info: ../info/1014/1681.htm
+    url:  https://xtw.sztu.edu.cn/info/1014/1681.htm
+
+[OK] 校团委-新闻动态-科技创新.html
+    info: ../info/1148/1685.htm
+    url:  https://xtw.sztu.edu.cn/info/1148/1685.htm
+
+[OK] 校团委-新闻动态-聚焦服务.html
+    info: ../info/1016/1684.htm
+    url:  https://xtw.sztu.edu.cn/info/1016/1684.htm
+
+[NO_INFO_LINK] 校团委-智慧团建-智慧团建系统.html
+    err:  页面中未找到 info 链接
+
+[OK] 校团委-智慧团建-青年大学习.html
+    info: ../info/1163/1463.htm
+    url:  https://xtw.sztu.edu.cn/info/1163/1463.htm
+
+[NO_INFO_LINK] 校团委-网上办事-义工申请.html
+    err:  页面中未找到 info 链接
+
+[OK] 校团委-网上办事-场地借用.html
+    info: ../info/1139/1142.htm
+    url:  https://xtw.sztu.edu.cn/info/1139/1142.htm
+
+[OK] 校团委-网上办事-文件下载.html
+    info: ../info/1138/1170.htm
+    url:  https://xtw.sztu.edu.cn/info/1138/1170.htm
+
+[OK] 校团委-网上办事-社团管理.html
+    info: ../info/1142/1266.htm
+    url:  https://xtw.sztu.edu.cn/info/1142/1266.htm
+
+[OK] 校团委-通知预告-活动预告.html
+    info: ../../info/1066/1631.htm
+    url:  https://xtw.sztu.edu.cn/info/1066/1631.htm
+
+[OK] 校团委-通知预告-通知公告.html
+    info: ../info/1011/1718.htm
+    url:  https://xtw.sztu.edu.cn/info/1011/1718.htm
+
+[NO_INFO_LINK] 研究生院 （研究生招生信息）-下载专区-X-talent.html
+    err:  页面中未找到 info 链接
+
+[OK] 研究生院 （研究生招生信息）-下载专区-培养.html
+    info: ../info/1043/2174.htm
+    url:  https://gra.sztu.edu.cn/info/1043/2174.htm
+
+[NO_INFO_LINK] 研究生院 （研究生招生信息）-下载专区-学位.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 研究生院 （研究生招生信息）-下载专区-招生.html
+    err:  页面中未找到 info 链接
+
+[OK] 研究生院 （研究生招生信息）-下载专区-综合.html
+    info: ../info/1045/1593.htm
+    url:  https://gra.sztu.edu.cn/info/1045/1593.htm
+
+[OK] 研究生院 （研究生招生信息）-党群工作.html
+    info: info/1007/2095.htm
+    url:  https://gra.sztu.edu.cn/info/1007/2095.htm
+
+[OK] 研究生院 （研究生招生信息）-培养工作-专业学位培养.html
+    info: ../info/1024/2178.htm
+    url:  https://gra.sztu.edu.cn/info/1024/2178.htm
+
+[OK] 研究生院 （研究生招生信息）-培养工作-国际交流.html
+    info: ../info/1023/1209.htm
+    url:  https://gra.sztu.edu.cn/info/1023/1209.htm
+
+[OK] 研究生院 （研究生招生信息）-培养工作-学术科研.html
+    info: ../info/1022/1935.htm
+    url:  https://gra.sztu.edu.cn/info/1022/1935.htm
+
+[OK] 研究生院 （研究生招生信息）-学位工作-专业学位.html
+    info: ../info/1029/2149.htm
+    url:  https://gra.sztu.edu.cn/info/1029/2149.htm
+
+[OK] 研究生院 （研究生招生信息）-学位工作-学位授予.html
+    info: ../info/1028/2189.htm
+    url:  https://gra.sztu.edu.cn/info/1028/2189.htm
+
+[OK] 研究生院 （研究生招生信息）-学位工作-学位点授权.html
+    info: ../info/1026/2147.htm
+    url:  https://gra.sztu.edu.cn/info/1026/2147.htm
+
+[OK] 研究生院 （研究生招生信息）-学生工作-奖助工作.html
+    info: ../info/1032/2753.htm
+    url:  https://gra.sztu.edu.cn/info/1032/2753.htm
+
+[OK] 研究生院 （研究生招生信息）-学生工作-思政工作.html
+    info: ../info/1031/1591.htm
+    url:  https://gra.sztu.edu.cn/info/1031/1591.htm
+
+[OK] 研究生院 （研究生招生信息）-学生工作-校园活动.html
+    info: ../info/1033/1718.htm
+    url:  https://gra.sztu.edu.cn/info/1033/1718.htm
+
+[OK] 研究生院 （研究生招生信息）-学生工作.html
+    info: ../info/1031/1591.htm
+    url:  https://gra.sztu.edu.cn/info/1031/1591.htm
+
+[NO_INFO_LINK] 研究生院 （研究生招生信息）-学籍管理.html
+    err:  页面中未找到 info 链接
+
+[OK] 研究生院 （研究生招生信息）-招生专区-博士研究生招生-博导介绍.html
+    info: ../../info/1061/1448.htm
+    url:  https://gra.sztu.edu.cn/info/1061/1448.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-博士研究生招生-简章目录.html
+    info: ../../info/1059/2786.htm
+    url:  https://gra.sztu.edu.cn/info/1059/2786.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-博士研究生招生-考核细则.html
+    info: ../../info/1060/2795.htm
+    url:  https://gra.sztu.edu.cn/info/1060/2795.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-博士研究生招生-通知公告.html
+    info: ../../info/1062/2141.htm
+    url:  https://gra.sztu.edu.cn/info/1062/2141.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-境外联合培养招生.html
+    info: ../info/1063/1688.htm
+    url:  https://gra.sztu.edu.cn/info/1063/1688.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-常见问题.html
+    info: ../info/1067/1362.htm
+    url:  https://gra.sztu.edu.cn/info/1067/1362.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-招生专业.html
+    info: ../info/1016/1413.htm
+    url:  https://gra.sztu.edu.cn/info/1016/1413.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-硕士研究生招生-产教融合.html
+    info: ../../info/1057/1365.htm
+    url:  https://gra.sztu.edu.cn/info/1057/1365.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-硕士研究生招生-推免面试.html
+    info: ../../info/1056/1535.htm
+    url:  https://gra.sztu.edu.cn/info/1056/1535.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-硕士研究生招生-简章目录.html
+    info: ../../info/1055/2762.htm
+    url:  https://gra.sztu.edu.cn/info/1055/2762.htm
+
+[OK] 研究生院 （研究生招生信息）-招生专区-硕士研究生招生-通知公告.html
+    info: ../../info/1058/2848.htm
+    url:  https://gra.sztu.edu.cn/info/1058/2848.htm
+
+[NO_INFO_LINK] 研究生院 （研究生招生信息）-教学管理.html
+    err:  页面中未找到 info 链接
+
+[OK] 研究生院 （研究生招生信息）-综合服务-办事指南.html
+    info: ../info/1041/2807.htm
+    url:  https://gra.sztu.edu.cn/info/1041/2807.htm
+
+[OK] 研究生院 （研究生招生信息）-综合服务-教育法规.html
+    info: ../info/1040/1286.htm
+    url:  https://gra.sztu.edu.cn/info/1040/1286.htm
+
+[OK] 研究生院 （研究生招生信息）-质量管理-学位点评估.html
+    info: ../info/1035/2151.htm
+    url:  https://gra.sztu.edu.cn/info/1035/2151.htm
+
+[OK] 研究生院 （研究生招生信息）-质量管理-论文抽检.html
+    info: ../info/1036/1280.htm
+    url:  https://gra.sztu.edu.cn/info/1036/1280.htm
+
+[OK] 研究生院 （研究生招生信息）-质量管理-质量监控.html
+    info: ../info/1037/1283.htm
+    url:  https://gra.sztu.edu.cn/info/1037/1283.htm
+
+[NO_INFO_LINK] 研究生院 （研究生招生信息）-首页-新闻.html
+    err:  页面中未找到 info 链接
+
+[OK] 研究生院 （研究生招生信息）-首页-通知公告.html
+    info: ../info/1051/2075.htm
+    url:  https://gra.sztu.edu.cn/info/1051/2075.htm
+
+[OK] 科学实训板块-分析测试中心-下载中心.html
+    info: info/1015/1325.htm
+    url:  https://fxcszx.sztu.edu.cn/info/1015/1325.htm
+
+[NO_INFO_LINK] 科学实训板块-分析测试中心-仪器设备.html
+    err:  页面中未找到 info 链接
+
+[OK] 科学实训板块-分析测试中心-培训通知.html
+    info: ../info/1020/1531.htm
+    url:  https://fxcszx.sztu.edu.cn/info/1020/1531.htm
+
+[OK] 科学实训板块-分析测试中心-收费标准.html
+    info: info/1013/1601.htm
+    url:  https://fxcszx.sztu.edu.cn/info/1013/1601.htm
+
+[OK] 科学实训板块-分析测试中心-新闻.html
+    info: ../info/1019/1582.htm
+    url:  https://fxcszx.sztu.edu.cn/info/1019/1582.htm
+
+[OK] 科学实训板块-分析测试中心-测试服务.html
+    info: info/1014/1602.htm
+    url:  https://fxcszx.sztu.edu.cn/info/1014/1602.htm
+
+[OK] 科学实训板块-分析测试中心-通知公告.html
+    info: ../info/1021/1562.htm
+    url:  https://fxcszx.sztu.edu.cn/info/1021/1562.htm
+
+[OK] 科学实训板块-分析测试中心.html
+    info: info/1019/1582.htm
+    url:  https://fxcszx.sztu.edu.cn/info/1019/1582.htm
+
+[OK] 科学实训板块-医工交叉创新研究院-人才招聘.html
+    info: ../info/1061/1212.htm
+    url:  https://ime.sztu.edu.cn/info/1061/1212.htm
+
+[OK] 科学实训板块-医工交叉创新研究院-新闻.html
+    info: info/1049/1322.htm
+    url:  https://ime.sztu.edu.cn/info/1049/1322.htm
+
+[OK] 科学实训板块-医工交叉创新研究院-科研动态.html
+    info: info/1050/1241.htm
+    url:  https://ime.sztu.edu.cn/info/1050/1241.htm
+
+[OK] 科学实训板块-医工交叉创新研究院-行业动态.html
+    info: info/1062/1225.htm
+    url:  https://ime.sztu.edu.cn/info/1062/1225.htm
+
+[OK] 科学实训板块-医工交叉创新研究院-通知公告.html
+    info: info/1051/1261.htm
+    url:  https://ime.sztu.edu.cn/info/1051/1261.htm
+
+[OK] 科学实训板块-医工交叉创新研究院.html
+    info: info/1049/1322.htm
+    url:  https://ime.sztu.edu.cn/info/1049/1322.htm
+
+[OK] 科学实训板块-半导体微纳加工中心-下载专区-常用表格.html
+    info: ../info/1025/1230.htm
+    url:  https://cmnf.sztu.edu.cn/info/1025/1230.htm
+
+[NO_INFO_LINK] 科学实训板块-半导体微纳加工中心-下载专区-软件下载.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 科学实训板块-半导体微纳加工中心-培训通知.html
+    err:  页面中未找到 info 链接
+
+[OK] 科学实训板块-半导体微纳加工中心-最新动态.html
+    info: ../info/1005/1222.htm
+    url:  https://cmnf.sztu.edu.cn/info/1005/1222.htm
+
+[OK] 科学实训板块-半导体微纳加工中心-服务信息-办事流程.html
+    info: ../info/1021/1232.htm
+    url:  https://cmnf.sztu.edu.cn/info/1021/1232.htm
+
+[NO_INFO_LINK] 科学实训板块-半导体微纳加工中心-服务信息-教学课件.html
+    err:  页面中未找到 info 链接
+
+[OK] 科学实训板块-半导体微纳加工中心-服务信息-用户手册.html
+    info: ../info/1023/1238.htm
+    url:  https://cmnf.sztu.edu.cn/info/1023/1238.htm
+
+[NO_INFO_LINK] 科学实训板块-半导体微纳加工中心-服务信息-用户答疑.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 科学实训板块-半导体微纳加工中心-科研成果.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 科学实训板块-半导体微纳加工中心-设备仪器.html
+    err:  页面中未找到 info 链接
+
+[OK] 科学实训板块-半导体微纳加工中心-通知公告.html
+    info: ../info/1006/1239.htm
+    url:  https://cmnf.sztu.edu.cn/info/1006/1239.htm
+
+[OK] 科学实训板块-半导体微纳加工中心.html
+    info: info/1006/1239.htm
+    url:  https://cmnf.sztu.edu.cn/info/1006/1239.htm
+
+[OK] 科学实训板块-校企合作.html
+    info: ../info/1027/4006.htm
+    url:  https://www.sztu.edu.cn/info/1027/4006.htm
+
+[OK] 科学实训板块-科学研究.html
+    info: ../info/1028/1126.htm
+    url:  https://www.sztu.edu.cn/info/1028/1126.htm
+
+[OK] 科研与校企合作部-学术交流-学术活动.html
+    info: ../info/1025/1703.htm
+    url:  https://kyb.sztu.edu.cn/info/1025/1703.htm
+
+[OK] 科研与校企合作部-学术交流-技大讲坛.html
+    info: ../info/1024/2752.htm
+    url:  https://kyb.sztu.edu.cn/info/1024/2752.htm
+
+[OK] 科研与校企合作部-服务指南-政策法规-人文社科.html
+    info: ../info/1049/2368.htm
+    url:  https://kyb.sztu.edu.cn/info/1049/2368.htm
+
+[OK] 科研与校企合作部-服务指南-政策法规-国家级.html
+    info: ../info/1033/2442.htm
+    url:  https://kyb.sztu.edu.cn/info/1033/2442.htm
+
+[OK] 科研与校企合作部-服务指南-政策法规-市厅级.html
+    info: ../info/1035/2317.htm
+    url:  https://kyb.sztu.edu.cn/info/1035/2317.htm
+
+[OK] 科研与校企合作部-服务指南-政策法规-省部级.html
+    info: ../info/1034/2361.htm
+    url:  https://kyb.sztu.edu.cn/info/1034/2361.htm
+
+[OK] 科研与校企合作部-服务指南-政策法规.html
+    info: info/1032/2601.htm
+    url:  https://kyb.sztu.edu.cn/info/1032/2601.htm
+
+[OK] 科研与校企合作部-校企合作-成果转化.html
+    info: ../info/1028/1404.htm
+    url:  https://kyb.sztu.edu.cn/info/1028/1404.htm
+
+[OK] 科研与校企合作部-校企合作-校企合作.html
+    info: ../info/1019/2646.htm
+    url:  https://kyb.sztu.edu.cn/info/1019/2646.htm
+
+[OK] 科研与校企合作部-科研资讯.html
+    info: ../info/1017/2791.htm
+    url:  https://kyb.sztu.edu.cn/info/1017/2791.htm
+
+[OK] 科研与校企合作部-通知公告-新闻动态.html
+    info: ../info/1015/2644.htm
+    url:  https://kyb.sztu.edu.cn/info/1015/2644.htm
+
+[OK] 科研与校企合作部-通知公告-通知公告.html
+    info: ../info/1029/2711.htm
+    url:  https://kyb.sztu.edu.cn/info/1029/2711.htm
+
+[OK] 纪检监察室-党纪法规-党内法规制度.html
+    info: ../info/1010/1396.htm
+    url:  https://jjjc.sztu.edu.cn/info/1010/1396.htm
+
+[OK] 纪检监察室-党纪法规-国家法律法规.html
+    info: ../info/1011/1391.htm
+    url:  https://jjjc.sztu.edu.cn/info/1011/1391.htm
+
+[NO_INFO_LINK] 纪检监察室-党纪法规-校内规章制度.html
+    err:  页面中未找到 info 链接
+
+[OK] 纪检监察室-工作动态.html
+    info: info/1007/1664.htm
+    url:  https://jjjc.sztu.edu.cn/info/1007/1664.htm
+
+[NO_INFO_LINK] 纪检监察室-廉洁文化-党纪学习教育.html
+    err:  页面中未找到 info 链接
+
+[OK] 纪检监察室-廉洁文化-廉洁文化.html
+    info: ../info/1035/1743.htm
+    url:  https://jjjc.sztu.edu.cn/info/1035/1743.htm
+
+[OK] 纪检监察室-纪检要闻.html
+    info: info/1005/1771.htm
+    url:  https://jjjc.sztu.edu.cn/info/1005/1771.htm
+
+[OK] 药学院_口腔学院-人才培养-X-Talant program.html
+    info: ../info/1164/2763.htm
+    url:  https://cop.sztu.edu.cn/info/1164/2763.htm
+
+[OK] 药学院_口腔学院-人才培养-本科生教育-专业介绍.html
+    info: ../../info/1195/3141.htm
+    url:  https://cop.sztu.edu.cn/info/1195/3141.htm
+
+[OK] 药学院_口腔学院-人才培养-本科生教育-培养方案.html
+    info: ../../info/1196/3144.htm
+    url:  https://cop.sztu.edu.cn/info/1196/3144.htm
+
+[OK] 药学院_口腔学院-人才培养-本科生教育-教学通知.html
+    info: ../../info/1028/3460.htm
+    url:  https://cop.sztu.edu.cn/info/1028/3460.htm
+
+[OK] 药学院_口腔学院-人才培养-研究生教育.html
+    info: ../info/1029/2992.htm
+    url:  https://cop.sztu.edu.cn/info/1029/2992.htm
+
+[OK] 药学院_口腔学院-党建之窗-党建活动.html
+    info: ../info/1146/3338.htm
+    url:  https://cop.sztu.edu.cn/info/1146/3338.htm
+
+[OK] 药学院_口腔学院-党建之窗-党纪学习.html
+    info: ../info/1176/2838.htm
+    url:  https://cop.sztu.edu.cn/info/1176/2838.htm
+
+[OK] 药学院_口腔学院-党建之窗-公示通知.html
+    info: ../info/1144/3438.htm
+    url:  https://cop.sztu.edu.cn/info/1144/3438.htm
+
+[OK] 药学院_口腔学院-党建之窗-政策制度.html
+    info: ../info/1147/2938.htm
+    url:  https://cop.sztu.edu.cn/info/1147/2938.htm
+
+[OK] 药学院_口腔学院-党建之窗-理论学习.html
+    info: ../info/1145/2869.htm
+    url:  https://cop.sztu.edu.cn/info/1145/2869.htm
+
+[OK] 药学院_口腔学院-合作交流-国际交流.html
+    info: ../info/1065/3373.htm
+    url:  https://cop.sztu.edu.cn/info/1065/3373.htm
+
+[OK] 药学院_口腔学院-合作交流-校企合作.html
+    info: ../info/1066/3270.htm
+    url:  https://cop.sztu.edu.cn/info/1066/3270.htm
+
+[OK] 药学院_口腔学院-学生工作-团学活动.html
+    info: ../info/1114/3464.htm
+    url:  https://cop.sztu.edu.cn/info/1114/3464.htm
+
+[OK] 药学院_口腔学院-学生工作-学生组织.html
+    info: ../info/1166/2790.htm
+    url:  https://cop.sztu.edu.cn/info/1166/2790.htm
+
+[OK] 药学院_口腔学院-学生工作-校园生活.html
+    info: ../info/1053/3463.htm
+    url:  https://cop.sztu.edu.cn/info/1053/3463.htm
+
+[OK] 药学院_口腔学院-学生工作-管理制度.html
+    info: ../info/1184/3459.htm
+    url:  https://cop.sztu.edu.cn/info/1184/3459.htm
+
+[OK] 药学院_口腔学院-学生工作-荣誉殿堂.html
+    info: ../info/1056/3458.htm
+    url:  https://cop.sztu.edu.cn/info/1056/3458.htm
+
+[OK] 药学院_口腔学院-学院新闻.html
+    info: ../info/1017/3448.htm
+    url:  https://cop.sztu.edu.cn/info/1017/3448.htm
+
+[OK] 药学院_口腔学院-招生就业-就板块.html
+    info: ../info/1033/3428.htm
+    url:  https://cop.sztu.edu.cn/info/1033/3428.htm
+
+[OK] 药学院_口腔学院-招生就业-招生板块.html
+    info: ../info/1175/2948.htm
+    url:  https://cop.sztu.edu.cn/info/1175/2948.htm
+
+[OK] 药学院_口腔学院-教学科研-仪器设备.html
+    info: ../info/1039/2835.htm
+    url:  https://cop.sztu.edu.cn/info/1039/2835.htm
+
+[OK] 药学院_口腔学院-教学科研-学术动态.html
+    info: ../info/1038/3069.htm
+    url:  https://cop.sztu.edu.cn/info/1038/3069.htm
+
+[OK] 药学院_口腔学院-教学科研-科研平台.html
+    info: ../info/1040/2777.htm
+    url:  https://cop.sztu.edu.cn/info/1040/2777.htm
+
+[OK] 药学院_口腔学院-诺贝尔奖和药学家-药物制造.html
+    info: ../info/1097/2833.htm
+    url:  https://cop.sztu.edu.cn/info/1097/2833.htm
+
+[OK] 药学院_口腔学院-诺贝尔奖和药学家-药物发现.html
+    info: ../info/1095/1340.htm
+    url:  https://cop.sztu.edu.cn/info/1095/1340.htm
+
+[OK] 药学院_口腔学院-诺贝尔奖和药学家-药物靶点.html
+    info: ../info/1096/3362.htm
+    url:  https://cop.sztu.edu.cn/info/1096/3362.htm
+
+[OK] 药学院_口腔学院-通知公告.html
+    info: ../info/1050/3341.htm
+    url:  https://cop.sztu.edu.cn/info/1050/3341.htm
+
+[OK] 计划财务部 —— 采购与招投标管理中心-下载专区.html
+    info: info/1008/3022.htm
+    url:  https://cwb.sztu.edu.cn/info/1008/3022.htm
+
+[OK] 计划财务部 —— 采购与招投标管理中心-信息公开.html
+    info: info/1004/3052.htm
+    url:  https://cwb.sztu.edu.cn/info/1004/3052.htm
+
+[OK] 计划财务部 —— 采购与招投标管理中心-工作动态.html
+    info: info/1005/3061.htm
+    url:  https://cwb.sztu.edu.cn/info/1005/3061.htm
+
+[OK] 计划财务部 —— 采购与招投标管理中心-政策法规.html
+    info: info/1006/3041.htm
+    url:  https://cwb.sztu.edu.cn/info/1006/3041.htm
+
+[OK] 计划财务部 —— 采购与招投标管理中心-服务指南.html
+    info: info/1007/2921.htm
+    url:  https://cwb.sztu.edu.cn/info/1007/2921.htm
+
+[OK] 质量和标准学院-新闻中心-人才招聘.html
+    info: info/1048/3911.htm
+    url:  https://qsa.sztu.edu.cn/info/1048/3911.htm
+
+[OK] 质量和标准学院-新闻中心-新闻动态.html
+    info: info/1048/3911.htm
+    url:  https://qsa.sztu.edu.cn/info/1048/3911.htm
+
+[OK] 质量和标准学院-新闻中心-通知公告.html
+    info: info/1048/3911.htm
+    url:  https://qsa.sztu.edu.cn/info/1048/3911.htm
+
+[OK] 质量和标准学院-标准化教育-主要课程.html
+    info: info/1144/2047.htm
+    url:  https://qsa.sztu.edu.cn/info/1144/2047.htm
+
+[OK] 质量和标准学院-标准化教育-出版物.html
+    info: info/1144/2047.htm
+    url:  https://qsa.sztu.edu.cn/info/1144/2047.htm
+
+[OK] 质量和标准学院-标准化教育-国外标准化参考资料.html
+    info: info/1144/2047.htm
+    url:  https://qsa.sztu.edu.cn/info/1144/2047.htm
+
+[OK] 集成电路与光电芯片学院-人才培养-本科生培养.html
+    info: ../info/1024/1234.htm
+    url:  https://icoc.sztu.edu.cn/info/1024/1234.htm
+
+[OK] 集成电路与光电芯片学院-人才培养-特色班培养.html
+    info: ../info/1026/1236.htm
+    url:  https://icoc.sztu.edu.cn/info/1026/1236.htm
+
+[OK] 集成电路与光电芯片学院-人才培养-研究生培养.html
+    info: ../info/1025/1532.htm
+    url:  https://icoc.sztu.edu.cn/info/1025/1532.htm
+
+[OK] 集成电路与光电芯片学院-人才招聘.html
+    info: info/1045/1337.htm
+    url:  https://icoc.sztu.edu.cn/info/1045/1337.htm
+
+[OK] 集成电路与光电芯片学院-党团建设.html
+    info: info/1036/1613.htm
+    url:  https://icoc.sztu.edu.cn/info/1036/1613.htm
+
+[OK] 集成电路与光电芯片学院-合作交流-国际合作.html
+    info: ../info/1039/1628.htm
+    url:  https://icoc.sztu.edu.cn/info/1039/1628.htm
+
+[OK] 集成电路与光电芯片学院-合作交流-校企合作.html
+    info: ../info/1040/1617.htm
+    url:  https://icoc.sztu.edu.cn/info/1040/1617.htm
+
+[OK] 集成电路与光电芯片学院-招生就业-就业前景.html
+    info: ../info/1044/1781.htm
+    url:  https://icoc.sztu.edu.cn/info/1044/1781.htm
+
+[OK] 集成电路与光电芯片学院-招生就业-未来学子.html
+    info: ../info/1043/1627.htm
+    url:  https://icoc.sztu.edu.cn/info/1043/1627.htm
+
+[OK] 集成电路与光电芯片学院-新闻中心-学院新闻.html
+    info: ../info/1008/1852.htm
+    url:  https://icoc.sztu.edu.cn/info/1008/1852.htm
+
+[OK] 集成电路与光电芯片学院-新闻中心-通知公告.html
+    info: ../info/1009/1853.htm
+    url:  https://icoc.sztu.edu.cn/info/1009/1853.htm
+
+[OK] 集成电路与光电芯片学院-校园生活.html
+    info: info/1041/1301.htm
+    url:  https://icoc.sztu.edu.cn/info/1041/1301.htm
+
+[OK] 集成电路与光电芯片学院-科学研究-学术动态.html
+    info: ../info/1034/1822.htm
+    url:  https://icoc.sztu.edu.cn/info/1034/1822.htm
+
+[NO_INFO_LINK] 集成电路与光电芯片学院-科学研究-实验室及设备仪器-半导体微纳加工中心.html
+    err:  页面中未找到 info 链接
+
+[OK] 集成电路与光电芯片学院-科学研究-实验室及设备仪器-实验数学中心.html
+    info: ../../info/1029/1276.htm
+    url:  https://icoc.sztu.edu.cn/info/1029/1276.htm
+
+[OK] 集成电路与光电芯片学院-科学研究-实验室及设备仪器-科研机构和实验室.html
+    info: ../../info/1031/1398.htm
+    url:  https://icoc.sztu.edu.cn/info/1031/1398.htm
+
+[OK] 集成电路与光电芯片学院-科学研究-实验室及设备仪器-设备仪器.html
+    info: ../../info/1032/1260.htm
+    url:  https://icoc.sztu.edu.cn/info/1032/1260.htm
+
+[OK] 集成电路与光电芯片学院-科学研究.html
+    info: ../info/1035/1832.htm
+    url:  https://icoc.sztu.edu.cn/info/1035/1832.htm
+
+[NO_INFO_LINK] 音乐学院-人才培养-本科教学.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 音乐学院-人才培养-英才专兰.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 音乐学院-党务学工-党建工作.html
+    err:  页面中未找到 info 链接
+
+[OK] 音乐学院-党务学工-团学工作.html
+    info: ../info/1091/1652.htm
+    url:  https://musicyyds.sztu.edu.cn/info/1091/1652.htm
+
+[NO_INFO_LINK] 音乐学院-党务学工-理论学习.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 音乐学院-党务学工-规章制度.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 音乐学院-学术交流-合作交流.html
+    err:  页面中未找到 info 链接
+
+[NO_INFO_LINK] 音乐学院-学术交流-学术会议.html
+    err:  页面中未找到 info 链接
+
+[OK] 音乐学院-学术交流-学术讲座.html
+    info: ../info/1093/1391.htm
+    url:  https://musicyyds.sztu.edu.cn/info/1093/1391.htm
+
+[OK] 音乐学院-学术交流-精品课程.html
+    info: ../info/1094/1433.htm
+    url:  https://musicyyds.sztu.edu.cn/info/1094/1433.htm
+
+[OK] 音乐学院-学院公告-下载中心.html
+    info: ../info/1104/1513.htm
+    url:  https://musicyyds.sztu.edu.cn/info/1104/1513.htm
+
+[OK] 音乐学院-学院公告-院务工作.html
+    info: ../info/1103/1611.htm
+    url:  https://musicyyds.sztu.edu.cn/info/1103/1611.htm
+
+[OK] 音乐学院-招生信息.html
+    info: info/1100/1512.htm
+    url:  https://musicyyds.sztu.edu.cn/info/1100/1512.htm
+
+[OK] 音乐学院-行业认知.html
+    info: info/1101/1554.htm
+    url:  https://musicyyds.sztu.edu.cn/info/1101/1554.htm
+
