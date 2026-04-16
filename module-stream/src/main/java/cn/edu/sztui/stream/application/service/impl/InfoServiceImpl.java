@@ -183,8 +183,9 @@ public class InfoServiceImpl implements InfoService {
             return cached;
         }
 
-        // 2. 获取元数据以确定分类和数据源
+        // 2. 获取元数据以确定分类、数据源和原始 URL
         String sourceId = null;
+        String originalUrl = null;
         ListParserResult.InfoItemMeta meta = infoCacheUtil.getMeta(channelId, id);
         if (meta != null) {
             if (!StringUtils.hasText(categoryCode)) {
@@ -192,10 +193,11 @@ public class InfoServiceImpl implements InfoService {
                 log.debug("从缓存元数据获取到分类: id={}, category={}", id, categoryCode);
             }
             sourceId = meta.getSourceId();
+            originalUrl = meta.getUrl(); // ⭐ 列表解析时提取的原始 URL（可能指向不同域名）
         }
 
         // 3. 爬取详情页
-        ContentParserResult content = crawlDetail(channelId, id, categoryCode, sourceId);
+        ContentParserResult content = crawlDetail(channelId, id, categoryCode, sourceId, originalUrl);
 
         // 4. 保存到缓存
         if (content != null && content.isSuccess()) {
@@ -208,12 +210,16 @@ public class InfoServiceImpl implements InfoService {
     /**
      * 爬取详情页
      * <p>
-     * ⭐ 修复：三级查找策略确定正确的 source：
-     * 1. sourceId 精确匹配（从元数据获取，最可靠）
-     * 2. categoryCode 匹配（按分类代码在频道内查找）
-     * 3. fallback 到频道第一个 source
+     * ⭐ URL 确定策略：
+     * 1. 优先使用元数据中的原始 URL（列表解析时已提取，可能指向不同域名如 nbw.sztu.edu.cn）
+     * 2. fallback 使用 source 的 detailUrlTemplate 构建
+     * <p>
+     * 为什么需要原始 URL？
+     * 部分部门网站（如 hr.sztu.edu.cn）列表页中的文章链接实际指向 WebVPN 网关域名
+     * （nbw.sztu.edu.cn），用 detailUrlTemplate 构建的 URL 会 404。
      */
-    private ContentParserResult crawlDetail(String channelId, String id, String categoryCode, String sourceId) {
+    private ContentParserResult crawlDetail(String channelId, String id, String categoryCode,
+                                             String sourceId, String originalUrl) {
         TokenMessage ctx = UserContext.getContext();
         String cookiesJson = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
         if (cookiesJson == null || cookiesJson.isEmpty()) {
@@ -221,7 +227,7 @@ public class InfoServiceImpl implements InfoService {
             return ContentParserResult.fail("无法获取用户会话");
         }
 
-        // ⭐ 修复：三级查找 source（sourceId > categoryCode > fallback）
+        // 查找 source config（用于解析器类型和 baseUrl）
         CrawlerConfig.SourceConfig source = findSourceForDetail(channelId, categoryCode, sourceId);
         if (source == null) {
             log.warn("未找到匹配的数据源: channel={}, category={}", channelId, categoryCode);
@@ -232,8 +238,15 @@ public class InfoServiceImpl implements InfoService {
             SmartSession smartSession = smartHttpClient.newSession(
                     SmartCookieConverter.jsonToSmartCookies(cookiesJson));
 
-            // 构建详情 URL（使用正确 source 的 detailUrlTemplate）
-            String url = buildDetailUrl(source, id, categoryCode);
+            // ⭐ 优先使用元数据中的原始 URL，fallback 用 template 构建
+            String url = null;
+            if (StringUtils.hasText(originalUrl) && originalUrl.startsWith("http")) {
+                url = originalUrl;
+                log.debug("使用元数据原始 URL: {}", url);
+            }
+            if (url == null) {
+                url = buildDetailUrl(source, id, categoryCode);
+            }
             if (url == null) {
                 log.error("无法构建详情 URL: source={}, id={}", source.getId(), id);
                 return ContentParserResult.fail("无法构建详情 URL");

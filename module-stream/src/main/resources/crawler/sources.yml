@@ -109,7 +109,7 @@ sources:
     detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1040"
     categoryName: 文娱活动
-    contentType: campus
+    contentType: news
     subContentType: student
     requiresAuth: false
     crawlIntervalMinutes: 60
@@ -126,7 +126,7 @@ sources:
     detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1041"
     categoryName: 体育活动
-    contentType: campus
+    contentType: news
     subContentType: student
     # 未来哪天其他catagory不404了，我就去看看
     # 不设 categoryCode — 本页混合了 1041/1088/1087/1067/1015 五个分类
@@ -242,7 +242,7 @@ sources:
     detailUrlTemplate: https://jw.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 教学动态
-    contentType: academic
+    contentType: news
     subContentType: academic
     requiresAuth: false
     crawlIntervalMinutes: 30
@@ -303,7 +303,7 @@ sources:
     categoryCode: "1013"
     categoryName: 工作动态
     contentType: news
-    subContentType: employment
+    subContentType: general-news
     requiresAuth: false
     crawlIntervalMinutes: 60
     # crawlPageCount: 1
@@ -362,7 +362,7 @@ sources:
     detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1028"
     categoryName: 科学研究
-    contentType: academic
+    contentType: news
     subContentType: academic
     requiresAuth: false
     crawlIntervalMinutes: 120
@@ -432,7 +432,7 @@ sources:
     detailUrlTemplate: https://kyb.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1015"
     categoryName: 新闻动态
-    contentType: academic
+    contentType: news
     subContentType: academic
     requiresAuth: false
     crawlIntervalMinutes: 60
@@ -502,7 +502,7 @@ sources:
     detailUrlTemplate: https://xtw.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1015"
     categoryName: 团学风采
-    contentType: campus
+    contentType: news
     subContentType: student
     requiresAuth: false
     crawlIntervalMinutes: 60
@@ -1370,3 +1370,267 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 17
+
+  # ========================================================================
+  #  党建工作源（各学院+部门）
+  #  parserType: sztu-cms（部分学院用 sztu-gwt）
+  # ========================================================================
+
+  # ---------- 学院党建 ----------
+
+  - id: ai-dqgz
+    name: 人工智能学院党群工作
+    channelId: college-ai
+    parserType: sztu-cms
+    baseUrl: https://ai.sztu.edu.cn
+    listUrl: https://ai.sztu.edu.cn/dtfc/dqgz1.htm
+    detailUrlTemplate: https://ai.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1338"
+    categoryName: 党群工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: sgim-ddjs
+    name: 中德学院党的建设
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: https://sgim.sztu.edu.cn
+    listUrl: https://sgim.sztu.edu.cn/dtgz2022/ddjs.htm
+    detailUrlTemplate: https://sgim.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1157"
+    categoryName: 党的建设
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: nmne-djdt
+    name: 新材料学院党建动态
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: https://nmne.sztu.edu.cn
+    listUrl: https://nmne.sztu.edu.cn/djgz/djdt.htm
+    detailUrlTemplate: https://nmne.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1047"
+    categoryName: 党建动态
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: utl-djgzdt
+    name: 交通学院党建工作动态
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: https://utl.sztu.edu.cn
+    listUrl: https://utl.sztu.edu.cn/djyl/jcdj/djgzdt.htm
+    detailUrlTemplate: https://utl.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1078"
+    categoryName: 党建工作动态
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: hsee-djhd
+    name: 健康环境学院党建活动
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: https://hsee.sztu.edu.cn
+    listUrl: https://hsee.sztu.edu.cn/djzl/djhd.htm
+    detailUrlTemplate: https://hsee.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1149"
+    categoryName: 党建活动
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: cep-dtjs
+    name: 工程物理学院党团建设
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: https://cep.sztu.edu.cn
+    listUrl: https://cep.sztu.edu.cn/dtjs.htm
+    detailUrlTemplate: https://cep.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1163"
+    categoryName: 党团建设
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: cop-djhd
+    name: 药学院党建活动
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: https://cop.sztu.edu.cn
+    listUrl: https://cop.sztu.edu.cn/djzc/djhd.htm
+    detailUrlTemplate: https://cop.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1146"
+    categoryName: 党建活动
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: future-dtfc
+    name: 未来技术学院党团风采
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: https://futuretechnologyschool.sztu.edu.cn
+    listUrl: https://futuretechnologyschool.sztu.edu.cn/dtfc/dtfc.htm
+    detailUrlTemplate: https://futuretechnologyschool.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1063"
+    categoryName: 党团风采
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: design-dtgz
+    name: 创意设计学院党团工作
+    channelId: college-design
+    parserType: sztu-cms
+    baseUrl: https://design.sztu.edu.cn
+    listUrl: https://design.sztu.edu.cn/xydt/dtgz.htm
+    detailUrlTemplate: https://design.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1024"
+    categoryName: 党团工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: gra-dqgz
+    name: 研究生院党群工作
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: https://gra.sztu.edu.cn
+    listUrl: https://gra.sztu.edu.cn/dqgz.htm
+    detailUrlTemplate: https://gra.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1007"
+    categoryName: 党群工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  # ---------- 职能部门党建 ----------
+
+  - id: jw-djfc
+    name: 教务部党建风采
+    channelId: academic
+    parserType: sztu-cms
+    baseUrl: https://jw.sztu.edu.cn
+    listUrl: https://jw.sztu.edu.cn/djf.htm
+    detailUrlTemplate: https://jw.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1010"
+    categoryName: 党建风采
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: aqbw-djdt
+    name: 保卫部党建动态
+    channelId: department
+    parserType: sztu-cms
+    baseUrl: https://aqbw.sztu.edu.cn
+    listUrl: https://aqbw.sztu.edu.cn/djgz/djd.htm
+    detailUrlTemplate: https://aqbw.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1079"
+    categoryName: 党建动态
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 18
+
+  - id: hq-djdt
+    name: 后勤部党建动态
+    channelId: department
+    parserType: sztu-cms
+    baseUrl: https://hq.sztu.edu.cn
+    listUrl: https://hq.sztu.edu.cn/djgz/djdt.htm
+    detailUrlTemplate: https://hq.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1036"
+    categoryName: 党建动态
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 19
+
+  - id: it-djdt
+    name: 信息中心党建动态
+    channelId: department
+    parserType: sztu-cms
+    baseUrl: https://it.sztu.edu.cn
+    listUrl: https://it.sztu.edu.cn/djgz1.htm
+    detailUrlTemplate: https://it.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1018"
+    categoryName: 党建动态
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 20
+
+  - id: dds-djyl
+    name: 督导室党建引领
+    channelId: department
+    parserType: sztu-cms
+    baseUrl: https://dds.sztu.edu.cn
+    listUrl: https://dds.sztu.edu.cn/djyl.htm
+    detailUrlTemplate: https://dds.sztu.edu.cn/info/{category}/{id}.htm
+    categoryCode: "1032"
+    categoryName: 党建引领
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 21

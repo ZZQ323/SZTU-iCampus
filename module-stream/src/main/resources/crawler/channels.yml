@@ -31,6 +31,7 @@ channels:
     sources:
       - jw-jdt
       - jw-xxg
+      - jw-djfc
 
   - id: campus-life
     name: 校园生活
@@ -128,6 +129,10 @@ channels:
       - hq-dtyw
       - it-xwgg
       - dds-xwtz
+      - aqbw-djdt
+      - hq-djdt
+      - it-djdt
+      - dds-djyl
 
   # ==================== 教辅科研（用户订阅） ====================
 
@@ -199,6 +204,7 @@ channels:
     sources:
       - gra-xwdt
       - gra-tzgg
+      - gra-dqgz
 
   - id: college-sgim
     name: 中德智能制造学院
@@ -210,6 +216,7 @@ channels:
     sources:
       - sgim-xyxw
       - sgim-tzgg
+      - sgim-ddjs
 
   - id: college-ai
     name: 人工智能学院
@@ -221,6 +228,7 @@ channels:
     sources:
       - ai-yxxw
       - ai-tzgg
+      - ai-dqgz
 
   - id: college-nmne
     name: 新材料与新能源学院
@@ -232,6 +240,7 @@ channels:
     sources:
       - nmne-xydt
       - nmne-tzgg
+      - nmne-djdt
 
   - id: college-utl
     name: 城市交通与物流学院
@@ -243,6 +252,7 @@ channels:
     sources:
       - utl-xydt
       - utl-tzgg
+      - utl-djgzdt
 
   - id: college-hsee
     name: 健康与环境工程学院
@@ -254,6 +264,7 @@ channels:
     sources:
       - hsee-xydt
       - hsee-tzgg
+      - hsee-djhd
 
   - id: college-cep
     name: 工程物理学院
@@ -265,6 +276,7 @@ channels:
     sources:
       - cep-xwdt
       - cep-tzgg
+      - cep-dtjs
 
   - id: college-design
     name: 创意设计学院
@@ -276,6 +288,7 @@ channels:
     sources:
       - design-yxxw
       - design-tzgg
+      - design-dtgz
 
   - id: college-bs
     name: 商学院
@@ -320,6 +333,7 @@ channels:
     sources:
       - cop-xyxw
       - cop-tzgg
+      - cop-djhd
 
   - id: college-future
     name: 未来技术学院
@@ -331,6 +345,7 @@ channels:
     sources:
       - future-xwzx
       - future-tzgg
+      - future-dtfc
 
   - id: college-music
     name: 音乐学院
