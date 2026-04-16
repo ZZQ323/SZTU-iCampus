@@ -10,6 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,8 +21,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 1. 应用启动后：立即初始化所有不需要登录的公开源（学校官网、学院等）
  * 2. 用户登录后：初始化需要登录的源（公文通等）
  * <p>
- * 公开源每次启动都强制重新初始化（清除 initialized 标记），
- * 确保开发调试时 Redis 清空后也能正常加载。
+ * ⭐ 每次启动都强制重新初始化：
+ * - 公开源：立即执行
+ * - 需登录源（公文通）：清除 initialized 标记，等用户登录后由事件触发执行
  */
 @Slf4j
 @Component
@@ -40,10 +42,12 @@ public class SourceInitTask {
     private final AtomicBoolean authInitializing = new AtomicBoolean(false);
 
     /**
-     * 应用启动后，立即初始化所有公开源（requiresAuth=false）
+     * 应用启动后，立即初始化所有公开源 + 清除需登录源的 initialized 标记
      * <p>
-     * 每次启动都强制重新初始化：先清除 initialized 标记，再执行初始化。
-     * 公开源不需要 Cookie，不需要等用户登录。
+     * ⭐ 每次启动都强制重新初始化所有源：
+     * - 公开源：清除标记后立即爬取
+     * - 需登录源（公文通等）：只清除标记，等用户登录后由 triggerAuthSourceInit 执行
+     *   AnnouncementFastScheduler 也会在检测到 cookie 后自动触发增量爬取
      */
     @Async
     @EventListener(ApplicationReadyEvent.class)
@@ -54,20 +58,33 @@ public class SourceInitTask {
 
         try {
             List<CrawlerConfig.SourceConfig> sources = configLoader.getEnabledSources();
-            List<CrawlerConfig.SourceConfig> publicSources = sources.stream()
-                    .filter(s -> !s.isRequiresAuth())
-                    .toList();
+            List<CrawlerConfig.SourceConfig> publicSources = new ArrayList<>();
+            List<CrawlerConfig.SourceConfig> authSources = new ArrayList<>();
+
+            for (CrawlerConfig.SourceConfig source : sources) {
+                if (source.isRequiresAuth()) {
+                    authSources.add(source);
+                } else {
+                    publicSources.add(source);
+                }
+            }
+
+            // ⭐ 强制清除所有源的 initialized 标记（公开源 + 需登录源）
+            for (CrawlerConfig.SourceConfig source : publicSources) {
+                infoCacheUtil.clearSourceInitialized(source.getId());
+            }
+            for (CrawlerConfig.SourceConfig source : authSources) {
+                infoCacheUtil.clearSourceInitialized(source.getId());
+            }
+            log.info("已清除所有数据源 initialized 标记: 公开 {} 个, 需登录 {} 个",
+                    publicSources.size(), authSources.size());
 
             if (publicSources.isEmpty()) {
                 log.info("无公开数据源需要初始化");
                 return;
             }
 
-            // 强制清除 initialized 标记（每次启动都重新初始化公开源）
-            for (CrawlerConfig.SourceConfig source : publicSources) {
-                infoCacheUtil.clearSourceInitialized(source.getId());
-            }
-
+            // 立即初始化公开源
             log.info("开始初始化 {} 个公开数据源...", publicSources.size());
             int initCount = 0;
             int failCount = 0;
@@ -108,7 +125,7 @@ public class SourceInitTask {
 
             for (CrawlerConfig.SourceConfig source : sources) {
                 if (!source.isRequiresAuth()) {
-                    continue; // 公开源已在启动时初始化
+                    continue;
                 }
 
                 if (infoCacheUtil.isSourceInitialized(source.getId())) {
