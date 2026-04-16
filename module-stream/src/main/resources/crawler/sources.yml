@@ -1084,7 +1084,7 @@ sources:
 
   - id: hr-tzgg
     name: 人力资源部通知
-    channelId: department
+    channelId: dept-hr
     parserType: sztu-cms
     baseUrl: https://hr.sztu.edu.cn
     listUrl: https://hr.sztu.edu.cn/tzgg.htm
@@ -1101,7 +1101,7 @@ sources:
 
   - id: cwb-xxgk
     name: 财务部信息公开
-    channelId: department
+    channelId: dept-cwb
     parserType: sztu-cms
     baseUrl: https://cwb.sztu.edu.cn
     listUrl: https://cwb.sztu.edu.cn/xxgk.htm
@@ -1118,7 +1118,7 @@ sources:
 
   - id: cwb-gzdt
     name: 财务部工作动态
-    channelId: department
+    channelId: dept-cwb
     parserType: sztu-cms
     baseUrl: https://cwb.sztu.edu.cn
     listUrl: https://cwb.sztu.edu.cn/gzdt.htm
@@ -1135,7 +1135,7 @@ sources:
 
   - id: sbc-tzgg
     name: 国资实验室部通知
-    channelId: department
+    channelId: dept-sbc
     parserType: sztu-cms
     baseUrl: https://sbc.sztu.edu.cn
     listUrl: https://sbc.sztu.edu.cn/xwgg/tzgg.htm
@@ -1152,7 +1152,7 @@ sources:
 
   - id: sbc-gzdt
     name: 国资实验室部动态
-    channelId: department
+    channelId: dept-sbc
     parserType: sztu-cms
     baseUrl: https://sbc.sztu.edu.cn
     listUrl: https://sbc.sztu.edu.cn/xwgg/gzdt.htm
@@ -1169,7 +1169,7 @@ sources:
 
   - id: aqbw-tzgg
     name: 保卫部通知
-    channelId: department
+    channelId: dept-aqbw
     parserType: sztu-cms
     baseUrl: https://aqbw.sztu.edu.cn
     listUrl: https://aqbw.sztu.edu.cn/tzgg.htm
@@ -1186,7 +1186,7 @@ sources:
 
   - id: aqbw-gzdt
     name: 保卫部动态
-    channelId: department
+    channelId: dept-aqbw
     parserType: sztu-cms
     baseUrl: https://aqbw.sztu.edu.cn
     listUrl: https://aqbw.sztu.edu.cn/gzdt.htm
@@ -1203,7 +1203,7 @@ sources:
 
   - id: zzb-tzgg
     name: 组织统战部通知
-    channelId: department
+    channelId: dept-zzb
     parserType: sztu-cms
     baseUrl: https://zzb.sztu.edu.cn
     listUrl: https://zzb.sztu.edu.cn/djgz1/tzgg1.htm
@@ -1220,7 +1220,7 @@ sources:
 
   - id: zzb-gzdt
     name: 组织统战部动态
-    channelId: department
+    channelId: dept-zzb
     parserType: sztu-cms
     baseUrl: https://zzb.sztu.edu.cn
     listUrl: https://zzb.sztu.edu.cn/djgz1/gzdt1.htm
@@ -1237,7 +1237,7 @@ sources:
 
   - id: jjjc-jjyw
     name: 纪检要闻
-    channelId: department
+    channelId: dept-jjjc
     parserType: sztu-cms
     baseUrl: https://jjjc.sztu.edu.cn
     listUrl: https://jjjc.sztu.edu.cn/jjyw.htm
@@ -1254,7 +1254,7 @@ sources:
 
   - id: jjjc-gzdt
     name: 纪检动态
-    channelId: department
+    channelId: dept-jjjc
     parserType: sztu-cms
     baseUrl: https://jjjc.sztu.edu.cn
     listUrl: https://jjjc.sztu.edu.cn/gzdt.htm
@@ -1271,7 +1271,7 @@ sources:
 
   - id: sjs-gzdt
     name: 审计室动态
-    channelId: department
+    channelId: dept-sjs
     parserType: sztu-cms
     baseUrl: https://sjs.sztu.edu.cn
     listUrl: https://sjs.sztu.edu.cn/gzdt.htm
@@ -1288,7 +1288,7 @@ sources:
 
   - id: sjs-sjgg
     name: 审计公告
-    channelId: department
+    channelId: dept-sjs
     parserType: sztu-cms
     baseUrl: https://sjs.sztu.edu.cn
     listUrl: https://sjs.sztu.edu.cn/sjgg.htm
@@ -1305,7 +1305,7 @@ sources:
 
   - id: hq-tzgg
     name: 后勤部通知
-    channelId: department
+    channelId: dept-hq
     parserType: sztu-cms
     baseUrl: https://hq.sztu.edu.cn
     listUrl: https://hq.sztu.edu.cn/zhxx/tzgg.htm
@@ -1322,7 +1322,7 @@ sources:
 
   - id: hq-dtyw
     name: 后勤部动态
-    channelId: department
+    channelId: dept-hq
     parserType: sztu-cms
     baseUrl: https://hq.sztu.edu.cn
     listUrl: https://hq.sztu.edu.cn/zhxx/dtyw.htm
@@ -1339,7 +1339,7 @@ sources:
 
   - id: it-xwgg
     name: 信息中心新闻
-    channelId: department
+    channelId: dept-it
     parserType: sztu-cms
     baseUrl: https://it.sztu.edu.cn
     listUrl: https://it.sztu.edu.cn/xwgg.htm
@@ -1356,7 +1356,7 @@ sources:
 
   - id: dds-xwtz
     name: 督导室新闻通知
-    channelId: department
+    channelId: dept-dds
     parserType: sztu-cms
     baseUrl: https://dds.sztu.edu.cn
     listUrl: https://dds.sztu.edu.cn/xwtz.htm
@@ -1569,7 +1569,7 @@ sources:
 
   - id: aqbw-djdt
     name: 保卫部党建动态
-    channelId: department
+    channelId: dept-aqbw
     parserType: sztu-cms
     baseUrl: https://aqbw.sztu.edu.cn
     listUrl: https://aqbw.sztu.edu.cn/djgz/djd.htm
@@ -1586,7 +1586,7 @@ sources:
 
   - id: hq-djdt
     name: 后勤部党建动态
-    channelId: department
+    channelId: dept-hq
     parserType: sztu-cms
     baseUrl: https://hq.sztu.edu.cn
     listUrl: https://hq.sztu.edu.cn/djgz/djdt.htm
@@ -1603,7 +1603,7 @@ sources:
 
   - id: it-djdt
     name: 信息中心党建动态
-    channelId: department
+    channelId: dept-it
     parserType: sztu-cms
     baseUrl: https://it.sztu.edu.cn
     listUrl: https://it.sztu.edu.cn/djgz1.htm
@@ -1620,7 +1620,7 @@ sources:
 
   - id: dds-djyl
     name: 督导室党建引领
-    channelId: department
+    channelId: dept-dds
     parserType: sztu-cms
     baseUrl: https://dds.sztu.edu.cn
     listUrl: https://dds.sztu.edu.cn/djyl.htm
