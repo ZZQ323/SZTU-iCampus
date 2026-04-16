@@ -285,7 +285,7 @@ sources:
     detailUrlTemplate: https://jyzd.sztu.edu.cn/info/1002/{id}.htm
     categoryCode: "1002"
     categoryName: 就业通知
-    contentType: employment
+    contentType: notice
     subContentType: employment
     requiresAuth: false
     crawlIntervalMinutes: 60
@@ -302,7 +302,7 @@ sources:
     detailUrlTemplate: https://jyzd.sztu.edu.cn/info/1013/{id}.htm
     categoryCode: "1013"
     categoryName: 工作动态
-    contentType: employment
+    contentType: news
     subContentType: employment
     requiresAuth: false
     crawlIntervalMinutes: 60
@@ -323,8 +323,8 @@ sources:
     detailUrlTemplate: https://zs.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1030"
     categoryName: 招生动态
-    contentType: employment
-    subContentType: employment
+    contentType: notice
+    subContentType: admission
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
@@ -1210,7 +1210,7 @@ sources:
     detailUrlTemplate: https://zzb.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1009"
     categoryName: 通知公告
-    contentType: party
+    contentType: notice
     subContentType: party
     requiresAuth: false
     crawlIntervalMinutes: 120
@@ -1227,7 +1227,7 @@ sources:
     detailUrlTemplate: https://zzb.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1008"
     categoryName: 工作动态
-    contentType: party
+    contentType: news
     subContentType: party
     requiresAuth: false
     crawlIntervalMinutes: 120
@@ -1244,7 +1244,7 @@ sources:
     detailUrlTemplate: https://jjjc.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 纪检要闻
-    contentType: party
+    contentType: news
     subContentType: party
     requiresAuth: false
     crawlIntervalMinutes: 120
@@ -1261,7 +1261,7 @@ sources:
     detailUrlTemplate: https://jjjc.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1007"
     categoryName: 工作动态
-    contentType: party
+    contentType: news
     subContentType: party
     requiresAuth: false
     crawlIntervalMinutes: 120
@@ -1278,7 +1278,7 @@ sources:
     detailUrlTemplate: https://sjs.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1003"
     categoryName: 工作动态
-    contentType: party
+    contentType: news
     subContentType: party
     requiresAuth: false
     crawlIntervalMinutes: 120
@@ -1295,7 +1295,7 @@ sources:
     detailUrlTemplate: https://sjs.sztu.edu.cn/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 审计公告
-    contentType: party
+    contentType: notice
     subContentType: party
     requiresAuth: false
     crawlIntervalMinutes: 120

@@ -167,7 +167,8 @@ public class CrawlEngine {
         log.info("======== 开始初始化数据源: {} ({}) ========", source.getName(), sourceId);
 
         try {
-            CookieSourceManager.CookieSessionPair pair = resolveSessionPair(source);
+            // ⭐ 使用指定 userId 版本，避免登录后 WS 尚未连接的竞态
+            CookieSourceManager.CookieSessionPair pair = resolveSessionPair(source, userId);
             SmartSession session = pair.getSession();
 
             // ==================== 阶段 1：同步爬第 1 页 ====================
@@ -303,6 +304,35 @@ public class CrawlEngine {
             return cookieSourceManager.getAvailableSessionWithUser();
         }
         return new CookieSourceManager.CookieSessionPair(null, smartHttpClient.newSession(), null);
+    }
+
+    /**
+     * ⭐ 解析爬取 session（指定 userId 版本）
+     * <p>
+     * 用于 initSource 场景：UserLoginEvent 传入了明确的 userId，
+     * 直接从 Redis 读取该用户的 Cookie，不通过 CookieSourceManager 搜索。
+     * 避免登录后 WS 尚未连接、CookieSourceManager 找不到在线用户的竞态问题。
+     */
+    private CookieSourceManager.CookieSessionPair resolveSessionPair(CrawlerConfig.SourceConfig source, String userId) {
+        if (!source.isRequiresAuth()) {
+            return new CookieSourceManager.CookieSessionPair(null, smartHttpClient.newSession(), null);
+        }
+
+        // 优先使用指定的 userId 直接查找
+        if (userId != null) {
+            cn.edu.sztui.common.cache.dto.ProxySession proxy = authSessionCacheUtil.getSession(userId);
+            if (proxy != null && org.springframework.util.StringUtils.hasText(proxy.getCookiesJson())) {
+                List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(proxy.getCookiesJson());
+                List<SmartCookie> snapshot = new ArrayList<>(cookies);
+                SmartSession session = smartHttpClient.newSession(cookies);
+                log.info("使用指定用户 {} 的 Cookie 进行初始化", userId);
+                return new CookieSourceManager.CookieSessionPair(userId, session, snapshot);
+            }
+            log.warn("指定用户 {} 的 Cookie 不可用，回退到 CookieSourceManager", userId);
+        }
+
+        // 回退到通用搜索
+        return cookieSourceManager.getAvailableSessionWithUser();
     }
 
     /**
