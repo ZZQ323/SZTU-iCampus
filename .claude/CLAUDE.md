@@ -191,3 +191,172 @@ YAML 驱动（`crawler/channels.yml` + `crawler/sources.yml`）：
 - FastJSON2（JSON 序列化）
 - Spring WebSocket
 - SnakeYAML（爬虫配置加载）
+
+## 项目进度（2026-04-17 更新）
+
+### 数据接入统计
+
+| 维度 | 数量 |
+|------|------|
+| 数据源（sources.yml） | 92 个（88 启用 + 4 禁用） |
+| 频道（channels.yml） | 37 个 |
+| 需登录源（公文通） | 5 个 |
+| 公开源 | 87 个 |
+| 学院 | 14 个 |
+| 职能部门 | 14 个 |
+| 教辅科研单位 | 3 个 |
+| 群团组织 | 2 个 |
+| 党建工作源 | 21 个 |
+| 下载的 HTML 样本（infos/downloaded_pages） | 636 个 |
+
+### 分类覆盖
+
+| contentType | subContentType | 源数量 |
+|---|---|---|
+| notice | general-notice | 30 |
+| news | general-news | 26 |
+| news | party | 21 |
+| news | cooperation | 5 |
+| news | student | 4 |
+| news | academic | 3 |
+| notice | employment | 1 |
+| notice | admission | 1 |
+
+### 已完成的核心功能
+
+1. **单 Auth 认证架构**：Cookie 直通、无 Token、小程序模拟浏览器
+2. **SmartHttpClient**：6 种重定向处理器，替代 Playwright
+3. **Cookie 池 + 活跃度感知**：在线用户优先，自动切换
+4. **公文通爬取**：5 个分类（教务/科研/行政/学工/校园），10 秒快速轮询（仅在线时）
+5. **全校 CMS 爬取**：sztu-cms + sztu-gwt 两种解析器，覆盖 87 个公开源
+6. **WebSocket 推送**：Redis Pub/Sub + Stream，统一 Handler
+7. **课表查询**：教务系统 Cookie 初始化 + 课表 HTML 解析
+8. **信息流三维筛选**：sourceOrg / contentType / subContentType
+9. **前端 HTML 预处理**：normalizeHtml 注入 inline style（绕过 rich-text :deep 限制）
+10. **上下篇导航**：基于列表缓存的前端导航（不依赖后端解析）
+11. **详情页原始 URL**：优先使用 meta.url 而非 template 构建（解决跨域 404）
+
+### 未接入的学校单位
+
+| 单位 | 域名 | 状态 |
+|------|------|------|
+| 质量和标准学院 | qsa.sztu.edu.cn | 使用 jsp 格式，需 sztu-gwt 解析器 |
+| 马克思主义学院 | marxism.sztu.edu.cn | 待验证 CMS 兼容性 |
+| 体育与艺术学院 | tusports.sztu.edu.cn | 有 downloaded_pages 样本 |
+| 新一代信息技术研究院 | — | 可能是工程物理学院子页面 |
+| 应用高等教育研究院 | — | 待确认是否有独立网站 |
+| 继续教育学院 | — | 待确认 |
+| 党政办公室/督查室 | — | 待确认 |
+| 党委宣传部 | — | 待确认 |
+| 发展规划部 | — | 待确认 |
+| 图书馆 | lib.sztu.edu.cn | 待确认 CMS 兼容性 |
+
+### 已知待解决问题
+
+1. **BackTop 组件**：`<t-back-top>` 在小程序中可能需要额外配置才能显示
+2. **课表网格**：小屏设备上字体可能过小，需要实际设备测试调优
+3. **频道订阅**：subscribe.vue 页面存在但功能未完善
+4. **活动日历**：calendar.vue 页面存在但内容为空
+5. **搜索体验**：全局搜索可用但未优化（性能、高亮等）
+
+## 开发失误与经验教训
+
+### 失误记录
+
+1. **后端加 CSS 解决前端渲染问题**（图片过大）
+   - 错误：在后端 `cleanHtml()` 注入 `max-width:100%` inline style
+   - 原因：小程序 `rich-text` 组件和 Web 的 CSS 行为不同，`:deep()` 穿透无效
+   - 正确做法：前端 `normalizeHtml()` 预处理 HTML，注入 inline style
+   - 教训：**显示问题从前端调，后端只管数据**
+
+2. **课表请求加了 `?sf_request_type=ajax`**
+   - 错误：照搬了登录接口的 AJAX 请求模式
+   - 原因：教务系统对 AJAX 请求返回不同格式的响应（非完整 HTML）
+   - 正确做法：对照 HAR 抓包，用和浏览器一致的请求方式
+   - 教训：**爬虫的请求必须和浏览器行为一致，用 HAR 验证**
+
+3. **`department` 频道聚合导致标签全显示"职能部门汇总"**
+   - 错误：把 10+ 不同部门的源合并到一个频道
+   - 原因：`enrichItemsWithSourceMeta` 取 `channel.getName()` 作为标签
+   - 正确做法：每个部门独立频道，使用官方全称
+   - 教训：**频道是展示粒度，不是存储粒度**
+
+4. **Cookie 竞态（NoCookieAvailableException）**
+   - 错误：`doRefreshCookies` 中先发布事件再保存 Cookie
+   - 原因：异步事件监听器在 Cookie 写入 Redis 之前就尝试读取
+   - 正确做法：先 `sessionLoginBind`（含 `schoolLoggedIn=true`）再 `publishEvent`
+   - 教训：**事件发布前确保依赖数据已持久化**
+
+5. **`findSourceForDetail` 按 categoryCode 匹配失败**
+   - 错误：文章的实际 categoryCode（如 1043）不等于 source 配置的 categoryCode（如 1020）
+   - 原因：同一域名下文章可能有不同 category，且部分域名的文章 URL 指向 nbw.sztu.edu.cn
+   - 正确做法：优先用 `meta.sourceId` 查找 source，再用 `meta.url` 作为实际请求 URL
+   - 教训：**列表解析时保存的元数据（sourceId, url）是详情请求的真正依据**
+
+6. **contentType 不在 news/notice 体系内**
+   - 错误：`campus`、`academic`、`employment` 等 contentType 不在前端 Tab 过滤器中
+   - 原因：分类体系没有一开始就统一设计
+   - 正确做法：所有 contentType 只用 `news` 和 `notice` 两个值，细分靠 subContentType
+   - 教训：**分类体系先设计，再写配置**
+
+7. **公文通无人在线时仍轮询**
+   - 错误：`CookieSourceManager.hasAvailableCookie()` 会使用离线用户的 Redis Cookie
+   - 原因：只检查了 cookie 存在性，没检查用户在线状态
+   - 正确做法：先检查 `wsSessionRegistry.getOnlineUserIds().isEmpty()`
+   - 教训：**轮询的前置条件是"有人在用"，不是"有 cookie 可用"**
+
+### 关键设计经验
+
+1. **YAML 驱动配置**：添加新数据源只需编辑 YAML，不改代码。这使得 92 个源的管理成为可能
+2. **两阶段初始化**：阶段 1 同步爬第 1 页让用户立即可见，阶段 2 异步补全历史数据
+3. **Spring 事件解耦**：避免 module-base 和 module-stream 的循环依赖
+4. **meta.url 优先**：详情请求优先用列表解析时提取的原始 URL，而非 template 构建
+5. **前端缓存列表导航**：上下篇切换基于前端缓存的列表，不依赖后端解析
+
+## 测试策略
+
+### 爬虫源健康检查（建议方案）
+
+项目有 92 个源、636 个 HTML 样本。需要一套自动化机制验证：
+1. 列表页是否可访问（HTTP 200）
+2. 列表解析是否有结果（items 不为空）
+3. 文章详情是否可访问
+4. 文章结构是否完整（标题、作者、时间、正文）
+
+**推荐：基于 downloaded_pages 的离线单元测试**
+
+不需要实际网络请求，直接用 636 个本地 HTML 文件测试解析器：
+
+```java
+// 测试类：CrawlerParserTest
+@SpringBootTest
+class CrawlerParserTest {
+    @Resource ParserFactory parserFactory;
+    @Resource CrawlerConfigLoader configLoader;
+
+    // 测试所有 downloaded_pages 的解析
+    @ParameterizedTest
+    @MethodSource("htmlFileProvider")
+    void testParseListPage(Path htmlFile) {
+        String html = Files.readString(htmlFile);
+        String parserType = inferParserType(htmlFile); // 从文件名推断
+        ListParserResult result = parserFactory.parseList(parserType, html, mockConfig, 1);
+
+        assertNotNull(result);
+        assertFalse(result.getItems().isEmpty(), "列表解析为空: " + htmlFile.getFileName());
+
+        for (var item : result.getItems()) {
+            assertNotNull(item.getTitle(), "缺标题: " + htmlFile.getFileName());
+            assertNotNull(item.getId(), "缺ID: " + htmlFile.getFileName());
+        }
+    }
+}
+```
+
+**在线健康检查（定期运行）**
+
+可以在后端加一个管理端点 `/admin/health-check`，遍历所有启用的源：
+- GET 列表页 → 检查 HTTP 状态码
+- 解析列表 → 检查 items 数量
+- 取第一篇文章 GET 详情 → 检查标题/正文是否非空
+- 结果写入 Redis，前端管理面板查看
