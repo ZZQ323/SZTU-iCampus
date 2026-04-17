@@ -385,3 +385,14 @@ class CrawlerParserTest {
 - JVM 的 `sun.jnu.encoding` 决定文件系统 API 对中文路径的处理
 - 必须通过 `jvmArgs '-Dfile.encoding=UTF-8', '-Dsun.jnu.encoding=UTF-8'` 传入（不能用 `systemProperty`，因为 `sun.jnu.encoding` 在 JVM 启动后不可变）
 - 最稳健方案：测试样本用 ASCII 文件名放 `resources` 下，通过 classpath 加载
+
+## 开发环境约束
+
+**AI 不在内网**：所有需要访问学校网站或 Redis 的操作（启动后端、运行在线测试、调试前端）都必须由用户在本地执行。AI 只负责写代码并推送到 git。
+
+运行诊断工具：
+```bash
+cd SZTU-iCampus-backend
+./gradlew :module-stream:test --tests "OnlineCrawlDiagnostic" --console=plain --info
+# 报告输出到 diagnostic-report.txt
+```
