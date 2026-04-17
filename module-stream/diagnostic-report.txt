@@ -2,6 +2,7 @@
 诊断时间: 2026-04-17T14:30:14.967821500
 公开源数量: 83
 
+
 ──── 中德学院新闻 (sgim-xyxw, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://sgim.sztu.edu.cn/xyxw.htm
   [1] ⚠️  缺标题 | 青春逐梦正当时 不负韶华勇担当 ——中... | https://sgim.sztu.edu.cn/info/1063/4218.htm
