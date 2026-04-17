@@ -897,8 +897,15 @@
 
 
 #### 药学院/口腔学院
-+ 学院新闻 1017：[https://cop.sztu.edu.cn/index/xyxw.htm](https://cop.sztu.edu.cn/index/xyxw.htm)
-+ 通知公告 1050：[https://cop.sztu.edu.cn/index/tzgg.htm](https://cop.sztu.edu.cn/index/tzgg.htm)
++ 学院新闻 1017：https://cop.sztu.edu.cn/index/yyyw.htm
++ 通知公告 1050：
+  + 党群 https://cop.sztu.edu.cn/index/tzgg/dq.htm
+  + 教学 https://cop.sztu.edu.cn/index/tzgg/jx.htm
+  + 学工 https://cop.sztu.edu.cn/index/tzgg/xg.htm
+  + 科研 https://cop.sztu.edu.cn/index/tzgg/ky.htm
+  + 行政 https://cop.sztu.edu.cn/index/tzgg/xz.htm
+  + 竞赛 https://cop.sztu.edu.cn/index/tzgg/js.htm
+  + 招生就业 https://cop.sztu.edu.cn/index/tzgg/zsjy.htm
 + 师资队伍
     - 教学科研
     - 行业导师
@@ -906,13 +913,17 @@
 + 人才培养
     - 本科生教育
         * 教学通知 1028：[https://cop.sztu.edu.cn/rcpy/bksjy/jxtz.htm](https://cop.sztu.edu.cn/rcpy/bksjy/jxtz.htm)
-        * 专业介绍 1195：[https://cop.sztu.edu.cn/rcpy/bksjy/zyjs.htm](https://cop.sztu.edu.cn/rcpy/bksjy/zyjs.htm)
-        * 培养方案 1196：[https://cop.sztu.edu.cn/rcpy/bksjy/pyfa.htm](https://cop.sztu.edu.cn/rcpy/bksjy/pyfa.htm)
+        * 专业设置 1195：https://cop.sztu.edu.cn/rcpy/bkjx/zysz.htm
+        * 培养方案 1196：https://cop.sztu.edu.cn/rcpy/bkjx/pyfa.htm
+        * 特色班培养：https://cop.sztu.edu.cn/rcpy/bkjx/tsbpy.htm
+        * X-taland Program：https://cop.sztu.edu.cn/rcpy/bkjx/X_taland_Program.htm
     - 研究生教育 1029：[https://cop.sztu.edu.cn/rcpy/yjsjy.htm](https://cop.sztu.edu.cn/rcpy/yjsjy.htm)
     - X-Talant program 1164：[https://cop.sztu.edu.cn/rcpy/X_Talant_program.htm](https://cop.sztu.edu.cn/rcpy/X_Talant_program.htm)
+  - 仪器设备 1039：https://cop.sztu.edu.cn/rcpy/syzx/yqsb.htm
+  - 最新动态 https://cop.sztu.edu.cn/rcpy/syzx/zxdt.htm
 + 教学科研
     - 学术动态 1038：[https://cop.sztu.edu.cn/jxky/xsdt.htm](https://cop.sztu.edu.cn/jxky/xsdt.htm)
-    - 仪器设备 1039：[https://cop.sztu.edu.cn/jxky/yqsb.htm](https://cop.sztu.edu.cn/jxky/yqsb.htm)
+    
     - 科研平台 1040：[https://cop.sztu.edu.cn/jxky/kypt.htm](https://cop.sztu.edu.cn/jxky/kypt.htm)
 + 招生就业
     - 招生板块 1175：[https://cop.sztu.edu.cn/zsjy/zsbk1.htm](https://cop.sztu.edu.cn/zsjy/zsbk1.htm)
