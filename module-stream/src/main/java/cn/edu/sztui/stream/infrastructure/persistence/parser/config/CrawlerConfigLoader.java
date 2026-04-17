@@ -12,53 +12,101 @@ import org.yaml.snakeyaml.LoaderOptions;
 import jakarta.annotation.PostConstruct;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * 爬虫配置加载器
- * <p>
- * 从 classpath:crawler/ 目录加载 YAML 配置文件
- */
 @Slf4j
 @Component
 public class CrawlerConfigLoader {
 
-    /**
-     * 频道配置 Map: channelId -> ChannelConfig
-     */
+    private static final Pattern PLACEHOLDER = Pattern.compile("\\$\\{([^}]+)}");
+
     @Getter
     private Map<String, ChannelConfig> channelMap = new HashMap<>();
 
-    /**
-     * 数据源配置 Map: sourceId -> SourceConfig
-     */
     @Getter
     private Map<String, SourceConfig> sourceMap = new HashMap<>();
 
-    /**
-     * 按频道分组的数据源 Map: channelId -> List<SourceConfig>
-     */
     @Getter
     private Map<String, List<SourceConfig>> sourcesByChannel = new HashMap<>();
 
-    /**
-     * 按解析器类型分组的数据源 Map: parserType -> List<SourceConfig>
-     */
     @Getter
     private Map<String, List<SourceConfig>> sourcesByParser = new HashMap<>();
 
+    private Map<String, String> urlVars = new LinkedHashMap<>();
+
     @PostConstruct
     public void init() {
+        loadUrls();
         loadChannels();
         loadSources();
         buildIndexes();
-        log.info("爬虫配置加载完成 - 频道: {} 个, 数据源: {} 个", channelMap.size(), sourceMap.size());
+        log.info("爬虫配置加载完成 - 频道: {} 个, 数据源: {} 个, URL变量: {} 个",
+                channelMap.size(), sourceMap.size(), urlVars.size());
     }
 
-    /**
-     * 加载频道配置
-     */
+    // ==================== URL 变量加载 ====================
+
+    private void loadUrls() {
+        try {
+            ClassPathResource resource = new ClassPathResource("crawler/urls.yml");
+            if (!resource.exists()) {
+                log.info("urls.yml 不存在，跳过 URL 变量加载");
+                return;
+            }
+
+            Yaml yaml = new Yaml();
+            try (InputStream is = resource.getInputStream()) {
+                Map<String, Object> root = yaml.load(is);
+                if (root != null) {
+                    flattenMap("", root, urlVars);
+                }
+            }
+            log.info("加载 URL 变量: {} 个", urlVars.size());
+        } catch (Exception e) {
+            log.error("加载 urls.yml 失败", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void flattenMap(String prefix, Map<String, Object> map, Map<String, String> result) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                flattenMap(key, (Map<String, Object>) value, result);
+            } else if (value != null) {
+                result.put(key, value.toString());
+            }
+        }
+    }
+
+    private String resolvePlaceholders(String text) {
+        if (text == null || urlVars.isEmpty()) return text;
+        Matcher matcher = PLACEHOLDER.matcher(text);
+        if (!matcher.find()) return text;
+
+        StringBuilder sb = new StringBuilder();
+        matcher.reset();
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            String value = urlVars.get(key);
+            if (value != null) {
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(value));
+            } else {
+                log.warn("未找到 URL 变量: {}", key);
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
+            }
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    // ==================== 配置加载 ====================
+
     private void loadChannels() {
         try {
             ClassPathResource resource = new ClassPathResource("crawler/channels.yml");
@@ -86,9 +134,6 @@ public class CrawlerConfigLoader {
         }
     }
 
-    /**
-     * 加载数据源配置
-     */
     private void loadSources() {
         try {
             ClassPathResource resource = new ClassPathResource("crawler/sources.yml");
@@ -97,18 +142,22 @@ public class CrawlerConfigLoader {
                 return;
             }
 
+            String yamlContent;
+            try (InputStream is = resource.getInputStream()) {
+                yamlContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            }
+            yamlContent = resolvePlaceholders(yamlContent);
+
             LoaderOptions options = new LoaderOptions();
             Yaml yaml = new Yaml(new Constructor(SourcesRoot.class, options));
+            SourcesRoot root = yaml.load(yamlContent);
 
-            try (InputStream is = resource.getInputStream()) {
-                SourcesRoot root = yaml.load(is);
-                if (root != null && root.getSources() != null) {
-                    for (SourceConfig source : root.getSources()) {
-                        if (source.isEnabled()) {
-                            sourceMap.put(source.getId(), source);
-                            log.debug("加载数据源: {} - {} (parser: {})",
-                                    source.getId(), source.getName(), source.getParserType());
-                        }
+            if (root != null && root.getSources() != null) {
+                for (SourceConfig source : root.getSources()) {
+                    if (source.isEnabled()) {
+                        sourceMap.put(source.getId(), source);
+                        log.debug("加载数据源: {} - {} (parser: {})",
+                                source.getId(), source.getName(), source.getParserType());
                     }
                 }
             }
@@ -117,16 +166,11 @@ public class CrawlerConfigLoader {
         }
     }
 
-    /**
-     * 构建索引
-     */
     private void buildIndexes() {
-        // 按频道分组
         sourcesByChannel = sourceMap.values().stream()
                 .filter(s -> s.getChannelId() != null)
                 .collect(Collectors.groupingBy(SourceConfig::getChannelId));
 
-        // 按解析器类型分组
         sourcesByParser = sourceMap.values().stream()
                 .filter(s -> s.getParserType() != null)
                 .collect(Collectors.groupingBy(SourceConfig::getParserType));
@@ -134,37 +178,22 @@ public class CrawlerConfigLoader {
 
     // ==================== 查询方法 ====================
 
-    /**
-     * 获取频道配置
-     */
     public ChannelConfig getChannel(String channelId) {
         return channelMap.get(channelId);
     }
 
-    /**
-     * 获取数据源配置
-     */
     public SourceConfig getSource(String sourceId) {
         return sourceMap.get(sourceId);
     }
 
-    /**
-     * 获取频道下的所有数据源
-     */
     public List<SourceConfig> getSourcesByChannel(String channelId) {
         return sourcesByChannel.getOrDefault(channelId, Collections.emptyList());
     }
 
-    /**
-     * 获取使用指定解析器的所有数据源
-     */
     public List<SourceConfig> getSourcesByParser(String parserType) {
         return sourcesByParser.getOrDefault(parserType, Collections.emptyList());
     }
 
-    /**
-     * 获取所有启用的频道
-     */
     public List<ChannelConfig> getEnabledChannels() {
         return channelMap.values().stream()
                 .filter(c -> c.getEnabled() == null || c.getEnabled())
@@ -172,9 +201,6 @@ public class CrawlerConfigLoader {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 获取所有启用的数据源
-     */
     public List<SourceConfig> getEnabledSources() {
         return sourceMap.values().stream()
                 .filter(SourceConfig::isEnabled)
@@ -182,48 +208,31 @@ public class CrawlerConfigLoader {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 重新加载配置
-     */
     public synchronized void reload() {
         channelMap.clear();
         sourceMap.clear();
         sourcesByChannel.clear();
         sourcesByParser.clear();
+        urlVars.clear();
         init();
     }
 
-    /**
-     * 别名：findChannelById → getChannel
-     */
     public ChannelConfig findChannelById(String channelId) {
         return getChannel(channelId);
     }
 
-    /**
-     * 别名：findSourceById → getSource
-     */
     public SourceConfig findSourceById(String sourceId) {
         return getSource(sourceId);
     }
 
-    /**
-     * 别名：getChannels → getEnabledChannels（InfoController/InfoServiceImpl 调用）
-     */
     public List<ChannelConfig> getChannels() {
         return getEnabledChannels();
     }
 
-    /**
-     * 别名：getSources → getEnabledSources（InfoController 调用）
-     */
     public List<SourceConfig> getSources() {
         return getEnabledSources();
     }
 
-    /**
-     * 获取分类树（InfoController 调用）
-     */
     public Map<String, Object> getCategoryTree() {
         Map<String, Object> tree = new HashMap<>();
         List<Map<String, Object>> channelList = new ArrayList<>();
@@ -234,7 +243,6 @@ public class CrawlerConfigLoader {
             chMap.put("name", channel.getName());
             chMap.put("icon", channel.getIcon());
 
-            // 收集该频道下所有源的分类
             List<Map<String, String>> categories = new ArrayList<>();
             List<SourceConfig> sources = getSourcesByChannel(channel.getId());
             for (SourceConfig source : sources) {

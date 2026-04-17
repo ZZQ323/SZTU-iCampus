@@ -12,9 +12,9 @@ sources:
     name: 教务公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
-    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1018&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1018/{id}.htm
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1018&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1018/{id}.htm
     categoryCode: "1018"
     categoryName: 教务
     contentType: notice
@@ -29,9 +29,9 @@ sources:
     name: 科研公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
-    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1019&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1019/{id}.htm
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1019&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1019/{id}.htm
     categoryCode: "1019"
     categoryName: 科研
     contentType: notice
@@ -46,9 +46,9 @@ sources:
     name: 行政公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
-    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1020/{id}.htm
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1020/{id}.htm
     categoryCode: "1020"
     categoryName: 行政
     contentType: notice
@@ -63,9 +63,9 @@ sources:
     name: 学工公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
-    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1021/{id}.htm
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1021/{id}.htm
     categoryCode: "1021"
     categoryName: 学工
     contentType: notice
@@ -80,9 +80,9 @@ sources:
     name: 校园公告
     channelId: announcement
     parserType: sztu-gwt
-    baseUrl: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
-    listUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1022&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/info/1022/{id}.htm
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1022&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1022/{id}.htm
     categoryCode: "1022"
     categoryName: 校园
     contentType: notice
@@ -104,9 +104,9 @@ sources:
     name: 文娱活动
     channelId: campus-life
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/hljd/xyhd/wyhd.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/hljd/xyhd/wyhd.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1040"
     categoryName: 文娱活动
     contentType: news
@@ -121,9 +121,9 @@ sources:
     name: 体育活动
     channelId: campus-life
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/hljd/xyhd/tyhd.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/hljd/xyhd/tyhd.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1041"
     categoryName: 体育活动
     contentType: news
@@ -142,9 +142,9 @@ sources:
     name: 技大风光
     channelId: campus-life
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/hljd/jdfg.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/hljd/jdfg.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1037"
     categoryName: 技大风光
     contentType: news
@@ -162,9 +162,9 @@ sources:
     name: 校园新闻
     channelId: news
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/jdjd/xyxw.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/jdjd/xyxw.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1003"
     categoryName: 校园新闻
     contentType: news
@@ -179,9 +179,9 @@ sources:
     name: 媒体聚焦
     channelId: news
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/jdjd/mtjj.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/jdjd/mtjj.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     requiresAuth: false
     crawlIntervalMinutes: 120
     # crawlPageCount: 1
@@ -197,9 +197,9 @@ sources:
     name: 国际交流
     channelId: news
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/dwjl/gjjl.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/dwjl/gjjl.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1031"
     categoryName: 国际交流
     contentType: news
@@ -214,9 +214,9 @@ sources:
     name: 学生境外交流
     channelId: news
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/dwjl/xsjwjl.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/dwjl/xsjwjl.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1032"
     categoryName: 学生境外交流
     contentType: news
@@ -237,9 +237,9 @@ sources:
     name: 教学动态
     channelId: academic
     parserType: sztu-cms
-    baseUrl: https://jw.sztu.edu.cn
-    listUrl: https://jw.sztu.edu.cn/jdt.htm
-    detailUrlTemplate: https://jw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.jw}
+    listUrl: ${urls.znbm.jw}/jdt.htm
+    detailUrlTemplate: ${urls.znbm.jw}/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 教学动态
     contentType: news
@@ -255,9 +255,9 @@ sources:
     name: 信息公告
     channelId: academic
     parserType: sztu-cms
-    baseUrl: https://jw.sztu.edu.cn
-    listUrl: https://jw.sztu.edu.cn/xxg.htm
-    detailUrlTemplate: https://jw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.jw}
+    listUrl: ${urls.znbm.jw}/xxg.htm
+    detailUrlTemplate: ${urls.znbm.jw}/info/{category}/{id}.htm
     categoryCode: "1007"
     categoryName: 信息公告
     contentType: notice
@@ -280,9 +280,9 @@ sources:
     name: 就业通知公告
     channelId: job
     parserType: sztu-cms
-    baseUrl: https://jyzd.sztu.edu.cn
-    listUrlTemplate: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1002&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://jyzd.sztu.edu.cn/info/1002/{id}.htm
+    baseUrl: ${urls.znbm.jyzd}
+    listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1002&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/1002/{id}.htm
     categoryCode: "1002"
     categoryName: 就业通知
     contentType: notice
@@ -297,9 +297,9 @@ sources:
     name: 就业工作动态
     channelId: job
     parserType: sztu-cms
-    baseUrl: https://jyzd.sztu.edu.cn
-    listUrlTemplate: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://jyzd.sztu.edu.cn/info/1013/{id}.htm
+    baseUrl: ${urls.znbm.jyzd}
+    listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/1013/{id}.htm
     categoryCode: "1013"
     categoryName: 工作动态
     contentType: news
@@ -318,9 +318,9 @@ sources:
     name: 招生动态
     channelId: admission
     parserType: sztu-cms
-    baseUrl: https://zs.sztu.edu.cn
-    listUrl: https://zs.sztu.edu.cn/zsdt.htm
-    detailUrlTemplate: https://zs.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.zs}
+    listUrl: ${urls.znbm.zs}/zsdt.htm
+    detailUrlTemplate: ${urls.znbm.zs}/info/{category}/{id}.htm
     categoryCode: "1030"
     categoryName: 招生动态
     contentType: notice
@@ -340,9 +340,9 @@ sources:
     name: 校企合作
     channelId: news
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/kysx/xqhz.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/kysx/xqhz.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1027"
     categoryName: 校企合作
     contentType: news
@@ -357,9 +357,9 @@ sources:
     name: 科学研究
     channelId: news
     parserType: sztu-cms
-    baseUrl: https://www.sztu.edu.cn
-    listUrl: https://www.sztu.edu.cn/kysx/kxyj.htm
-    detailUrlTemplate: https://www.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/kysx/kxyj.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
     categoryCode: "1028"
     categoryName: 科学研究
     contentType: news
@@ -375,9 +375,9 @@ sources:
     name: 党委学工部通知公告
     channelId: dept-sao
     parserType: sztu-cms
-    baseUrl: https://sao.sztu.edu.cn
-    listUrl: https://sao.sztu.edu.cn/tzgg.htm
-    detailUrlTemplate: https://sao.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.sao}
+    listUrl: ${urls.znbm.sao}/tzgg.htm
+    detailUrlTemplate: ${urls.znbm.sao}/info/{category}/{id}.htm
     categoryCode: "1002"
     categoryName: 通知公告
     contentType: notice
@@ -392,9 +392,9 @@ sources:
     name: 党委学工部新闻信息
     channelId: dept-sao
     parserType: sztu-cms
-    baseUrl: https://sao.sztu.edu.cn
-    listUrl: https://sao.sztu.edu.cn/xwxx.htm
-    detailUrlTemplate: https://sao.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.sao}
+    listUrl: ${urls.znbm.sao}/xwxx.htm
+    detailUrlTemplate: ${urls.znbm.sao}/info/{category}/{id}.htm
     categoryCode: "1003"
     categoryName: 新闻信息
     contentType: news
@@ -410,9 +410,9 @@ sources:
     name: 科研部通知公告
     channelId: dept-kyb
     parserType: sztu-cms
-    baseUrl: https://kyb.sztu.edu.cn
-    listUrl: https://kyb.sztu.edu.cn/tzg/t.htm
-    detailUrlTemplate: https://kyb.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.kyb}
+    listUrl: ${urls.znbm.kyb}/tzg/t.htm
+    detailUrlTemplate: ${urls.znbm.kyb}/info/{category}/{id}.htm
     categoryCode: "1029"
     categoryName: 通知公告
     contentType: notice
@@ -427,9 +427,9 @@ sources:
     name: 科研部新闻动态
     channelId: dept-kyb
     parserType: sztu-cms
-    baseUrl: https://kyb.sztu.edu.cn
-    listUrl: https://kyb.sztu.edu.cn/tzg/xwdt.htm
-    detailUrlTemplate: https://kyb.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.kyb}
+    listUrl: ${urls.znbm.kyb}/tzg/xwdt.htm
+    detailUrlTemplate: ${urls.znbm.kyb}/info/{category}/{id}.htm
     categoryCode: "1015"
     categoryName: 新闻动态
     contentType: news
@@ -445,9 +445,9 @@ sources:
     name: 国际合作部焦点新闻
     channelId: dept-intl
     parserType: sztu-cms
-    baseUrl: https://international.sztu.edu.cn
-    listUrl: https://international.sztu.edu.cn/jdxw.htm
-    detailUrlTemplate: https://international.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.intl}
+    listUrl: ${urls.znbm.intl}/jdxw.htm
+    detailUrlTemplate: ${urls.znbm.intl}/info/{category}/{id}.htm
     categoryCode: "1003"
     categoryName: 焦点新闻
     contentType: news
@@ -462,9 +462,9 @@ sources:
     name: 国际合作部境外交流
     channelId: dept-intl
     parserType: sztu-cms
-    baseUrl: https://international.sztu.edu.cn
-    listUrl: https://international.sztu.edu.cn/gjjl/jwjl.htm
-    detailUrlTemplate: https://international.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.intl}
+    listUrl: ${urls.znbm.intl}/gjjl/jwjl.htm
+    detailUrlTemplate: ${urls.znbm.intl}/info/{category}/{id}.htm
     categoryCode: "1007"
     categoryName: 境外交流
     contentType: news
@@ -480,9 +480,9 @@ sources:
     name: 校团委通知公告
     channelId: dept-xtw
     parserType: sztu-cms
-    baseUrl: https://xtw.sztu.edu.cn
-    listUrl: https://xtw.sztu.edu.cn/tzyg/tzgg.htm
-    detailUrlTemplate: https://xtw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/tzyg/tzgg.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
     categoryCode: "1011"
     categoryName: 通知公告
     contentType: notice
@@ -497,9 +497,9 @@ sources:
     name: 校团委团学风采
     channelId: dept-xtw
     parserType: sztu-cms
-    baseUrl: https://xtw.sztu.edu.cn
-    listUrl: https://xtw.sztu.edu.cn/xwdt/txfc.htm
-    detailUrlTemplate: https://xtw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/xwdt/txfc.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
     categoryCode: "1015"
     categoryName: 团学风采
     contentType: news
@@ -517,9 +517,9 @@ sources:
     name: 分析测试中心通知
     channelId: lab-fxcs
     parserType: sztu-cms
-    baseUrl: https://fxcszx.sztu.edu.cn
-    listUrl: https://fxcszx.sztu.edu.cn/index/tzgg.htm
-    detailUrlTemplate: https://fxcszx.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.kyjf.fxcs}
+    listUrl: ${urls.kyjf.fxcs}/index/tzgg.htm
+    detailUrlTemplate: ${urls.kyjf.fxcs}/info/{category}/{id}.htm
     categoryCode: "1021"
     categoryName: 通知公告
     contentType: notice
@@ -534,9 +534,9 @@ sources:
     name: 分析测试中心新闻
     channelId: lab-fxcs
     parserType: sztu-cms
-    baseUrl: https://fxcszx.sztu.edu.cn
-    listUrl: https://fxcszx.sztu.edu.cn/index/zxxw.htm
-    detailUrlTemplate: https://fxcszx.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.kyjf.fxcs}
+    listUrl: ${urls.kyjf.fxcs}/index/zxxw.htm
+    detailUrlTemplate: ${urls.kyjf.fxcs}/info/{category}/{id}.htm
     categoryCode: "1019"
     categoryName: 最新新闻
     contentType: news
@@ -551,9 +551,9 @@ sources:
     name: 微纳中心通知
     channelId: lab-cmnf
     parserType: sztu-cms
-    baseUrl: https://cmnf.sztu.edu.cn
-    listUrl: https://cmnf.sztu.edu.cn/xwzx/tzgg.htm
-    detailUrlTemplate: https://cmnf.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.kyjf.cmnf}
+    listUrl: ${urls.kyjf.cmnf}/xwzx/tzgg.htm
+    detailUrlTemplate: ${urls.kyjf.cmnf}/info/{category}/{id}.htm
     categoryCode: "1006"
     categoryName: 通知公告
     contentType: notice
@@ -568,9 +568,9 @@ sources:
     name: 微纳中心动态
     channelId: lab-cmnf
     parserType: sztu-cms
-    baseUrl: https://cmnf.sztu.edu.cn
-    listUrl: https://cmnf.sztu.edu.cn/xwzx/zxdt.htm
-    detailUrlTemplate: https://cmnf.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.kyjf.cmnf}
+    listUrl: ${urls.kyjf.cmnf}/xwzx/zxdt.htm
+    detailUrlTemplate: ${urls.kyjf.cmnf}/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 最新动态
     contentType: news
@@ -585,9 +585,9 @@ sources:
     name: 医工研究院通知
     channelId: lab-ime
     parserType: sztu-cms
-    baseUrl: https://ime.sztu.edu.cn
-    listUrl: https://ime.sztu.edu.cn/tzgg1.htm
-    detailUrlTemplate: https://ime.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.kyjf.ime}
+    listUrl: ${urls.kyjf.ime}/tzgg1.htm
+    detailUrlTemplate: ${urls.kyjf.ime}/info/{category}/{id}.htm
     categoryCode: "1051"
     categoryName: 通知公告
     contentType: notice
@@ -602,9 +602,9 @@ sources:
     name: 医工研究院新闻
     channelId: lab-ime
     parserType: sztu-cms
-    baseUrl: https://ime.sztu.edu.cn
-    listUrl: https://ime.sztu.edu.cn/xwdt.htm
-    detailUrlTemplate: https://ime.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.kyjf.ime}
+    listUrl: ${urls.kyjf.ime}/xwdt.htm
+    detailUrlTemplate: ${urls.kyjf.ime}/info/{category}/{id}.htm
     categoryCode: "1049"
     categoryName: 新闻动态
     contentType: news
@@ -623,9 +623,9 @@ sources:
     name: 研究生院新闻
     channelId: college-gra
     parserType: sztu-cms
-    baseUrl: https://gra.sztu.edu.cn
-    listUrl: https://gra.sztu.edu.cn/index/xwdt.htm
-    detailUrlTemplate: https://gra.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/index/xwdt.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
     categoryCode: "1046"
     categoryName: 新闻动态
     contentType: news
@@ -640,9 +640,9 @@ sources:
     name: 研究生院通知
     channelId: college-gra
     parserType: sztu-cms
-    baseUrl: https://gra.sztu.edu.cn
-    listUrl: https://gra.sztu.edu.cn/index/tzgg.htm
-    detailUrlTemplate: https://gra.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/index/tzgg.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
     categoryCode: "1051"
     categoryName: 通知公告
     contentType: notice
@@ -657,9 +657,9 @@ sources:
     name: 中德学院新闻
     channelId: college-sgim
     parserType: sztu-cms
-    baseUrl: https://sgim.sztu.edu.cn
-    listUrl: https://sgim.sztu.edu.cn/xyxw.htm
-    detailUrlTemplate: https://sgim.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/xyxw.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
     categoryCode: "1063"
     categoryName: 学院新闻
     contentType: news
@@ -674,9 +674,9 @@ sources:
     name: 中德学院通知
     channelId: college-sgim
     parserType: sztu-gwt
-    baseUrl: https://sgim.sztu.edu.cn
-    listUrlTemplate: https://sgim.sztu.edu.cn/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: https://sgim.sztu.edu.cn/info/1045/{id}.htm
+    baseUrl: ${urls.xy.sgim}
+    listUrlTemplate: ${urls.xy.sgim}/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.sgim}/info/1045/{id}.htm
     categoryCode: "1045"
     categoryName: 通知公告
     contentType: notice
@@ -691,9 +691,9 @@ sources:
     name: 人工智能学院新闻
     channelId: college-ai
     parserType: sztu-cms
-    baseUrl: https://ai.sztu.edu.cn
-    listUrl: https://ai.sztu.edu.cn/xwzx/yxxw1.htm
-    detailUrlTemplate: https://ai.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/xwzx/yxxw1.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
     categoryCode: "1048"
     categoryName: 院系新闻
     contentType: news
@@ -708,9 +708,9 @@ sources:
     name: 人工智能学院通知
     channelId: college-ai
     parserType: sztu-cms
-    baseUrl: https://ai.sztu.edu.cn
-    listUrl: https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm
-    detailUrlTemplate: https://ai.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/xwzx/tzgg1/qb.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
     categoryCode: "1219"
     categoryName: 通知公告
     contentType: notice
@@ -725,9 +725,9 @@ sources:
     name: 新材料学院动态
     channelId: college-nmne
     parserType: sztu-cms
-    baseUrl: https://nmne.sztu.edu.cn
-    listUrl: https://nmne.sztu.edu.cn/xwzx/xydt.htm
-    detailUrlTemplate: https://nmne.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/xwzx/xydt.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
     categoryCode: "1072"
     categoryName: 学院动态
     contentType: news
@@ -742,9 +742,9 @@ sources:
     name: 新材料学院通知
     channelId: college-nmne
     parserType: sztu-cms
-    baseUrl: https://nmne.sztu.edu.cn
-    listUrl: https://nmne.sztu.edu.cn/xwzx/tzgg.htm
-    detailUrlTemplate: https://nmne.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/xwzx/tzgg.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
     categoryCode: "1073"
     categoryName: 通知公告
     contentType: notice
@@ -759,9 +759,9 @@ sources:
     name: 交通学院动态
     channelId: college-utl
     parserType: sztu-cms
-    baseUrl: https://utl.sztu.edu.cn
-    listUrl: https://utl.sztu.edu.cn/xwzx/xydt.htm
-    detailUrlTemplate: https://utl.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xwzx/xydt.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
     categoryCode: "1014"
     categoryName: 学院动态
     contentType: news
@@ -776,9 +776,9 @@ sources:
     name: 交通学院通知
     channelId: college-utl
     parserType: sztu-cms
-    baseUrl: https://utl.sztu.edu.cn
-    listUrl: https://utl.sztu.edu.cn/xwzx/tzgg.htm
-    detailUrlTemplate: https://utl.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xwzx/tzgg.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
     categoryCode: "1016"
     categoryName: 通知公告
     contentType: notice
@@ -793,9 +793,9 @@ sources:
     name: 健康环境学院动态
     channelId: college-hsee
     parserType: sztu-cms
-    baseUrl: https://hsee.sztu.edu.cn
-    listUrl: https://hsee.sztu.edu.cn/xydt.htm
-    detailUrlTemplate: https://hsee.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/xydt.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
     categoryCode: "1112"
     categoryName: 学院动态
     contentType: news
@@ -810,9 +810,9 @@ sources:
     name: 健康环境学院通知
     channelId: college-hsee
     parserType: sztu-cms
-    baseUrl: https://hsee.sztu.edu.cn
-    listUrl: https://hsee.sztu.edu.cn/tzgg.htm
-    detailUrlTemplate: https://hsee.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/tzgg.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
     categoryCode: "1118"
     categoryName: 通知公告
     contentType: notice
@@ -827,9 +827,9 @@ sources:
     name: 工程物理学院新闻
     channelId: college-cep
     parserType: sztu-cms
-    baseUrl: https://cep.sztu.edu.cn
-    listUrl: https://cep.sztu.edu.cn/tzgg1/xwdt/16.htm
-    detailUrlTemplate: https://cep.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/tzgg1/xwdt/16.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
     categoryCode: "1103"
     categoryName: 新闻动态
     contentType: news
@@ -844,9 +844,9 @@ sources:
     name: 工程物理学院通知
     channelId: college-cep
     parserType: sztu-cms
-    baseUrl: https://cep.sztu.edu.cn
-    listUrl: https://cep.sztu.edu.cn/tzgg1/tzg.htm
-    detailUrlTemplate: https://cep.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/tzgg1/tzg.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
     categoryCode: "1104"
     categoryName: 通知公告
     contentType: notice
@@ -861,9 +861,9 @@ sources:
     name: 创意设计学院新闻
     channelId: college-design
     parserType: sztu-cms
-    baseUrl: https://design.sztu.edu.cn
-    listUrl: https://design.sztu.edu.cn/xydt/yxxw.htm
-    detailUrlTemplate: https://design.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.design}
+    listUrl: ${urls.xy.design}/xydt/yxxw.htm
+    detailUrlTemplate: ${urls.xy.design}/info/{category}/{id}.htm
     categoryCode: "1023"
     categoryName: 院系新闻
     contentType: news
@@ -878,9 +878,9 @@ sources:
     name: 创意设计学院通知
     channelId: college-design
     parserType: sztu-cms
-    baseUrl: https://design.sztu.edu.cn
-    listUrl: https://design.sztu.edu.cn/xydt/tzgg.htm
-    detailUrlTemplate: https://design.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.design}
+    listUrl: ${urls.xy.design}/xydt/tzgg.htm
+    detailUrlTemplate: ${urls.xy.design}/info/{category}/{id}.htm
     categoryCode: "1027"
     categoryName: 通知公告
     contentType: notice
@@ -895,9 +895,9 @@ sources:
     name: 商学院新闻
     channelId: college-bs
     parserType: sztu-cms
-    baseUrl: https://bs.sztu.edu.cn
-    listUrl: https://bs.sztu.edu.cn/index/xwdt.htm
-    detailUrlTemplate: https://bs.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/index/xwdt.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
     categoryCode: "1023"
     categoryName: 新闻动态
     contentType: news
@@ -912,9 +912,9 @@ sources:
     name: 商学院通知
     channelId: college-bs
     parserType: sztu-cms
-    baseUrl: https://bs.sztu.edu.cn
-    listUrl: https://bs.sztu.edu.cn/index/tzgg.htm
-    detailUrlTemplate: https://bs.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/index/tzgg.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
     categoryCode: "1022"
     categoryName: 通知公告
     contentType: notice
@@ -929,9 +929,9 @@ sources:
     name: 外国语学院新闻
     channelId: college-sfl
     parserType: sztu-cms
-    baseUrl: https://sfl.sztu.edu.cn
-    listUrl: https://sfl.sztu.edu.cn/xyxw.htm
-    detailUrlTemplate: https://sfl.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/xyxw.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
     categoryCode: "1002"
     categoryName: 学院新闻
     contentType: news
@@ -946,9 +946,9 @@ sources:
     name: 外国语学院通知
     channelId: college-sfl
     parserType: sztu-cms
-    baseUrl: https://sfl.sztu.edu.cn
-    listUrl: https://sfl.sztu.edu.cn/tzgg.htm
-    detailUrlTemplate: https://sfl.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/tzgg.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
     categoryCode: "1003"
     categoryName: 通知公告
     contentType: notice
@@ -963,9 +963,9 @@ sources:
     name: 集成电路学院新闻
     channelId: college-icoc
     parserType: sztu-cms
-    baseUrl: https://icoc.sztu.edu.cn
-    listUrl: https://icoc.sztu.edu.cn/xwzx/xyxw.htm
-    detailUrlTemplate: https://icoc.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/xwzx/xyxw.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
     categoryCode: "1008"
     categoryName: 学院新闻
     contentType: news
@@ -980,9 +980,9 @@ sources:
     name: 集成电路学院通知
     channelId: college-icoc
     parserType: sztu-cms
-    baseUrl: https://icoc.sztu.edu.cn
-    listUrl: https://icoc.sztu.edu.cn/xwzx/tzgg.htm
-    detailUrlTemplate: https://icoc.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/xwzx/tzgg.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
     categoryCode: "1009"
     categoryName: 通知公告
     contentType: notice
@@ -997,9 +997,9 @@ sources:
     name: 药学院新闻
     channelId: college-cop
     parserType: sztu-cms
-    baseUrl: https://cop.sztu.edu.cn
-    listUrl: https://cop.sztu.edu.cn/index/xyxw.htm
-    detailUrlTemplate: https://cop.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/index/xyxw.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
     categoryCode: "1017"
     categoryName: 学院新闻
     contentType: news
@@ -1014,9 +1014,9 @@ sources:
     name: 药学院通知
     channelId: college-cop
     parserType: sztu-cms
-    baseUrl: https://cop.sztu.edu.cn
-    listUrl: https://cop.sztu.edu.cn/index/tzgg.htm
-    detailUrlTemplate: https://cop.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/index/tzgg.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
     categoryCode: "1050"
     categoryName: 通知公告
     contentType: notice
@@ -1031,9 +1031,9 @@ sources:
     name: 未来技术学院新闻
     channelId: college-future
     parserType: sztu-cms
-    baseUrl: https://futuretechnologyschool.sztu.edu.cn
-    listUrl: https://futuretechnologyschool.sztu.edu.cn/xw_hd/xwzx.htm
-    detailUrlTemplate: https://futuretechnologyschool.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/xw_hd/xwzx.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
     categoryCode: "1021"
     categoryName: 新闻中心
     contentType: news
@@ -1048,9 +1048,9 @@ sources:
     name: 未来技术学院通知
     channelId: college-future
     parserType: sztu-cms
-    baseUrl: https://futuretechnologyschool.sztu.edu.cn
-    listUrl: https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/jw.htm
-    detailUrlTemplate: https://futuretechnologyschool.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/xw_hd/tzgg1/jw.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
     categoryCode: "1133"
     categoryName: 教务通知
     contentType: notice
@@ -1065,9 +1065,9 @@ sources:
     name: 音乐学院院务
     channelId: college-music
     parserType: sztu-cms
-    baseUrl: https://musicyyds.sztu.edu.cn
-    listUrl: https://musicyyds.sztu.edu.cn/xygg/ywgz.htm
-    detailUrlTemplate: https://musicyyds.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/xygg/ywgz.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
     categoryCode: "1103"
     categoryName: 院务工作
     contentType: news
@@ -1086,9 +1086,9 @@ sources:
     name: 人力资源部通知
     channelId: dept-hr
     parserType: sztu-cms
-    baseUrl: https://hr.sztu.edu.cn
-    listUrl: https://hr.sztu.edu.cn/tzgg.htm
-    detailUrlTemplate: https://hr.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.hr}
+    listUrl: ${urls.znbm.hr}/tzgg.htm
+    detailUrlTemplate: ${urls.znbm.hr}/info/{category}/{id}.htm
     categoryCode: "1020"
     categoryName: 通知公告
     contentType: notice
@@ -1103,9 +1103,9 @@ sources:
     name: 财务部信息公开
     channelId: dept-cwb
     parserType: sztu-cms
-    baseUrl: https://cwb.sztu.edu.cn
-    listUrl: https://cwb.sztu.edu.cn/xxgk.htm
-    detailUrlTemplate: https://cwb.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.cwb}
+    listUrl: ${urls.znbm.cwb}/xxgk.htm
+    detailUrlTemplate: ${urls.znbm.cwb}/info/{category}/{id}.htm
     categoryCode: "1004"
     categoryName: 信息公开
     contentType: notice
@@ -1120,9 +1120,9 @@ sources:
     name: 财务部工作动态
     channelId: dept-cwb
     parserType: sztu-cms
-    baseUrl: https://cwb.sztu.edu.cn
-    listUrl: https://cwb.sztu.edu.cn/gzdt.htm
-    detailUrlTemplate: https://cwb.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.cwb}
+    listUrl: ${urls.znbm.cwb}/gzdt.htm
+    detailUrlTemplate: ${urls.znbm.cwb}/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 工作动态
     contentType: news
@@ -1137,9 +1137,9 @@ sources:
     name: 国资实验室部通知
     channelId: dept-sbc
     parserType: sztu-cms
-    baseUrl: https://sbc.sztu.edu.cn
-    listUrl: https://sbc.sztu.edu.cn/xwgg/tzgg.htm
-    detailUrlTemplate: https://sbc.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.sbc}
+    listUrl: ${urls.znbm.sbc}/xwgg/tzgg.htm
+    detailUrlTemplate: ${urls.znbm.sbc}/info/{category}/{id}.htm
     categoryCode: "1023"
     categoryName: 通知公告
     contentType: notice
@@ -1154,9 +1154,9 @@ sources:
     name: 国资实验室部动态
     channelId: dept-sbc
     parserType: sztu-cms
-    baseUrl: https://sbc.sztu.edu.cn
-    listUrl: https://sbc.sztu.edu.cn/xwgg/gzdt.htm
-    detailUrlTemplate: https://sbc.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.sbc}
+    listUrl: ${urls.znbm.sbc}/xwgg/gzdt.htm
+    detailUrlTemplate: ${urls.znbm.sbc}/info/{category}/{id}.htm
     categoryCode: "1024"
     categoryName: 工作动态
     contentType: news
@@ -1171,9 +1171,9 @@ sources:
     name: 保卫部通知
     channelId: dept-aqbw
     parserType: sztu-cms
-    baseUrl: https://aqbw.sztu.edu.cn
-    listUrl: https://aqbw.sztu.edu.cn/tzgg.htm
-    detailUrlTemplate: https://aqbw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.aqbw}
+    listUrl: ${urls.znbm.aqbw}/tzgg.htm
+    detailUrlTemplate: ${urls.znbm.aqbw}/info/{category}/{id}.htm
     categoryCode: "1003"
     categoryName: 通知公告
     contentType: notice
@@ -1188,9 +1188,9 @@ sources:
     name: 保卫部动态
     channelId: dept-aqbw
     parserType: sztu-cms
-    baseUrl: https://aqbw.sztu.edu.cn
-    listUrl: https://aqbw.sztu.edu.cn/gzdt.htm
-    detailUrlTemplate: https://aqbw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.aqbw}
+    listUrl: ${urls.znbm.aqbw}/gzdt.htm
+    detailUrlTemplate: ${urls.znbm.aqbw}/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 工作动态
     contentType: news
@@ -1205,9 +1205,9 @@ sources:
     name: 组织统战部通知
     channelId: dept-zzb
     parserType: sztu-cms
-    baseUrl: https://zzb.sztu.edu.cn
-    listUrl: https://zzb.sztu.edu.cn/djgz1/tzgg1.htm
-    detailUrlTemplate: https://zzb.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.zzb}
+    listUrl: ${urls.znbm.zzb}/djgz1/tzgg1.htm
+    detailUrlTemplate: ${urls.znbm.zzb}/info/{category}/{id}.htm
     categoryCode: "1009"
     categoryName: 通知公告
     contentType: notice
@@ -1222,9 +1222,9 @@ sources:
     name: 组织统战部动态
     channelId: dept-zzb
     parserType: sztu-cms
-    baseUrl: https://zzb.sztu.edu.cn
-    listUrl: https://zzb.sztu.edu.cn/djgz1/gzdt1.htm
-    detailUrlTemplate: https://zzb.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.zzb}
+    listUrl: ${urls.znbm.zzb}/djgz1/gzdt1.htm
+    detailUrlTemplate: ${urls.znbm.zzb}/info/{category}/{id}.htm
     categoryCode: "1008"
     categoryName: 工作动态
     contentType: news
@@ -1239,9 +1239,9 @@ sources:
     name: 纪检要闻
     channelId: dept-jjjc
     parserType: sztu-cms
-    baseUrl: https://jjjc.sztu.edu.cn
-    listUrl: https://jjjc.sztu.edu.cn/jjyw.htm
-    detailUrlTemplate: https://jjjc.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.jjjc}
+    listUrl: ${urls.znbm.jjjc}/jjyw.htm
+    detailUrlTemplate: ${urls.znbm.jjjc}/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 纪检要闻
     contentType: news
@@ -1256,9 +1256,9 @@ sources:
     name: 纪检动态
     channelId: dept-jjjc
     parserType: sztu-cms
-    baseUrl: https://jjjc.sztu.edu.cn
-    listUrl: https://jjjc.sztu.edu.cn/gzdt.htm
-    detailUrlTemplate: https://jjjc.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.jjjc}
+    listUrl: ${urls.znbm.jjjc}/gzdt.htm
+    detailUrlTemplate: ${urls.znbm.jjjc}/info/{category}/{id}.htm
     categoryCode: "1007"
     categoryName: 工作动态
     contentType: news
@@ -1273,9 +1273,9 @@ sources:
     name: 审计室动态
     channelId: dept-sjs
     parserType: sztu-cms
-    baseUrl: https://sjs.sztu.edu.cn
-    listUrl: https://sjs.sztu.edu.cn/gzdt.htm
-    detailUrlTemplate: https://sjs.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.sjs}
+    listUrl: ${urls.znbm.sjs}/gzdt.htm
+    detailUrlTemplate: ${urls.znbm.sjs}/info/{category}/{id}.htm
     categoryCode: "1003"
     categoryName: 工作动态
     contentType: news
@@ -1290,9 +1290,9 @@ sources:
     name: 审计公告
     channelId: dept-sjs
     parserType: sztu-cms
-    baseUrl: https://sjs.sztu.edu.cn
-    listUrl: https://sjs.sztu.edu.cn/sjgg.htm
-    detailUrlTemplate: https://sjs.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.sjs}
+    listUrl: ${urls.znbm.sjs}/sjgg.htm
+    detailUrlTemplate: ${urls.znbm.sjs}/info/{category}/{id}.htm
     categoryCode: "1005"
     categoryName: 审计公告
     contentType: notice
@@ -1307,9 +1307,9 @@ sources:
     name: 后勤部通知
     channelId: dept-hq
     parserType: sztu-cms
-    baseUrl: https://hq.sztu.edu.cn
-    listUrl: https://hq.sztu.edu.cn/zhxx/tzgg.htm
-    detailUrlTemplate: https://hq.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.hq}
+    listUrl: ${urls.znbm.hq}/zhxx/tzgg.htm
+    detailUrlTemplate: ${urls.znbm.hq}/info/{category}/{id}.htm
     categoryCode: "1020"
     categoryName: 通知公告
     contentType: notice
@@ -1324,9 +1324,9 @@ sources:
     name: 后勤部动态
     channelId: dept-hq
     parserType: sztu-cms
-    baseUrl: https://hq.sztu.edu.cn
-    listUrl: https://hq.sztu.edu.cn/zhxx/dtyw.htm
-    detailUrlTemplate: https://hq.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.hq}
+    listUrl: ${urls.znbm.hq}/zhxx/dtyw.htm
+    detailUrlTemplate: ${urls.znbm.hq}/info/{category}/{id}.htm
     categoryCode: "1038"
     categoryName: 动态要闻
     contentType: news
@@ -1341,9 +1341,9 @@ sources:
     name: 信息中心新闻
     channelId: dept-it
     parserType: sztu-cms
-    baseUrl: https://it.sztu.edu.cn
-    listUrl: https://it.sztu.edu.cn/xwgg.htm
-    detailUrlTemplate: https://it.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.it}
+    listUrl: ${urls.znbm.it}/xwgg.htm
+    detailUrlTemplate: ${urls.znbm.it}/info/{category}/{id}.htm
     categoryCode: "1036"
     categoryName: 新闻公告
     contentType: news
@@ -1358,9 +1358,9 @@ sources:
     name: 督导室新闻通知
     channelId: dept-dds
     parserType: sztu-cms
-    baseUrl: https://dds.sztu.edu.cn
-    listUrl: https://dds.sztu.edu.cn/xwtz.htm
-    detailUrlTemplate: https://dds.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.dds}
+    listUrl: ${urls.znbm.dds}/xwtz.htm
+    detailUrlTemplate: ${urls.znbm.dds}/info/{category}/{id}.htm
     categoryCode: "1002"
     categoryName: 新闻通知
     contentType: news
@@ -1382,9 +1382,9 @@ sources:
     name: 人工智能学院党群工作
     channelId: college-ai
     parserType: sztu-cms
-    baseUrl: https://ai.sztu.edu.cn
-    listUrl: https://ai.sztu.edu.cn/dtfc/dqgz1.htm
-    detailUrlTemplate: https://ai.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/dtfc/dqgz1.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
     categoryCode: "1338"
     categoryName: 党群工作
     contentType: news
@@ -1399,9 +1399,9 @@ sources:
     name: 中德学院党的建设
     channelId: college-sgim
     parserType: sztu-cms
-    baseUrl: https://sgim.sztu.edu.cn
-    listUrl: https://sgim.sztu.edu.cn/dtgz2022/ddjs.htm
-    detailUrlTemplate: https://sgim.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/dtgz2022/ddjs.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
     categoryCode: "1157"
     categoryName: 党的建设
     contentType: news
@@ -1416,9 +1416,9 @@ sources:
     name: 新材料学院党建动态
     channelId: college-nmne
     parserType: sztu-cms
-    baseUrl: https://nmne.sztu.edu.cn
-    listUrl: https://nmne.sztu.edu.cn/djgz/djdt.htm
-    detailUrlTemplate: https://nmne.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/djgz/djdt.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
     categoryCode: "1047"
     categoryName: 党建动态
     contentType: news
@@ -1433,9 +1433,9 @@ sources:
     name: 交通学院党建工作动态
     channelId: college-utl
     parserType: sztu-cms
-    baseUrl: https://utl.sztu.edu.cn
-    listUrl: https://utl.sztu.edu.cn/djyl/jcdj/djgzdt.htm
-    detailUrlTemplate: https://utl.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/djyl/jcdj/djgzdt.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
     categoryCode: "1078"
     categoryName: 党建工作动态
     contentType: news
@@ -1450,9 +1450,9 @@ sources:
     name: 健康环境学院党建活动
     channelId: college-hsee
     parserType: sztu-cms
-    baseUrl: https://hsee.sztu.edu.cn
-    listUrl: https://hsee.sztu.edu.cn/djzl/djhd.htm
-    detailUrlTemplate: https://hsee.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/djzl/djhd.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
     categoryCode: "1149"
     categoryName: 党建活动
     contentType: news
@@ -1467,9 +1467,9 @@ sources:
     name: 工程物理学院党团建设
     channelId: college-cep
     parserType: sztu-cms
-    baseUrl: https://cep.sztu.edu.cn
-    listUrl: https://cep.sztu.edu.cn/dtjs.htm
-    detailUrlTemplate: https://cep.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/dtjs.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
     categoryCode: "1163"
     categoryName: 党团建设
     contentType: news
@@ -1484,9 +1484,9 @@ sources:
     name: 药学院党建活动
     channelId: college-cop
     parserType: sztu-cms
-    baseUrl: https://cop.sztu.edu.cn
-    listUrl: https://cop.sztu.edu.cn/djzc/djhd.htm
-    detailUrlTemplate: https://cop.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/djzc/djhd.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
     categoryCode: "1146"
     categoryName: 党建活动
     contentType: news
@@ -1501,9 +1501,9 @@ sources:
     name: 未来技术学院党团风采
     channelId: college-future
     parserType: sztu-cms
-    baseUrl: https://futuretechnologyschool.sztu.edu.cn
-    listUrl: https://futuretechnologyschool.sztu.edu.cn/dtfc/dtfc.htm
-    detailUrlTemplate: https://futuretechnologyschool.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/dtfc/dtfc.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
     categoryCode: "1063"
     categoryName: 党团风采
     contentType: news
@@ -1518,9 +1518,9 @@ sources:
     name: 创意设计学院党团工作
     channelId: college-design
     parserType: sztu-cms
-    baseUrl: https://design.sztu.edu.cn
-    listUrl: https://design.sztu.edu.cn/xydt/dtgz.htm
-    detailUrlTemplate: https://design.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.design}
+    listUrl: ${urls.xy.design}/xydt/dtgz.htm
+    detailUrlTemplate: ${urls.xy.design}/info/{category}/{id}.htm
     categoryCode: "1024"
     categoryName: 党团工作
     contentType: news
@@ -1535,9 +1535,9 @@ sources:
     name: 研究生院党群工作
     channelId: college-gra
     parserType: sztu-cms
-    baseUrl: https://gra.sztu.edu.cn
-    listUrl: https://gra.sztu.edu.cn/dqgz.htm
-    detailUrlTemplate: https://gra.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/dqgz.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
     categoryCode: "1007"
     categoryName: 党群工作
     contentType: news
@@ -1554,9 +1554,9 @@ sources:
     name: 教务部党建风采
     channelId: academic
     parserType: sztu-cms
-    baseUrl: https://jw.sztu.edu.cn
-    listUrl: https://jw.sztu.edu.cn/djf.htm
-    detailUrlTemplate: https://jw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.jw}
+    listUrl: ${urls.znbm.jw}/djf.htm
+    detailUrlTemplate: ${urls.znbm.jw}/info/{category}/{id}.htm
     categoryCode: "1010"
     categoryName: 党建风采
     contentType: news
@@ -1571,9 +1571,9 @@ sources:
     name: 保卫部党建动态
     channelId: dept-aqbw
     parserType: sztu-cms
-    baseUrl: https://aqbw.sztu.edu.cn
-    listUrl: https://aqbw.sztu.edu.cn/djgz/djd.htm
-    detailUrlTemplate: https://aqbw.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.aqbw}
+    listUrl: ${urls.znbm.aqbw}/djgz/djd.htm
+    detailUrlTemplate: ${urls.znbm.aqbw}/info/{category}/{id}.htm
     categoryCode: "1079"
     categoryName: 党建动态
     contentType: news
@@ -1588,9 +1588,9 @@ sources:
     name: 后勤部党建动态
     channelId: dept-hq
     parserType: sztu-cms
-    baseUrl: https://hq.sztu.edu.cn
-    listUrl: https://hq.sztu.edu.cn/djgz/djdt.htm
-    detailUrlTemplate: https://hq.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.hq}
+    listUrl: ${urls.znbm.hq}/djgz/djdt.htm
+    detailUrlTemplate: ${urls.znbm.hq}/info/{category}/{id}.htm
     categoryCode: "1036"
     categoryName: 党建动态
     contentType: news
@@ -1605,9 +1605,9 @@ sources:
     name: 信息中心党建动态
     channelId: dept-it
     parserType: sztu-cms
-    baseUrl: https://it.sztu.edu.cn
-    listUrl: https://it.sztu.edu.cn/djgz1.htm
-    detailUrlTemplate: https://it.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.it}
+    listUrl: ${urls.znbm.it}/djgz1.htm
+    detailUrlTemplate: ${urls.znbm.it}/info/{category}/{id}.htm
     categoryCode: "1018"
     categoryName: 党建动态
     contentType: news
@@ -1622,9 +1622,9 @@ sources:
     name: 督导室党建引领
     channelId: dept-dds
     parserType: sztu-cms
-    baseUrl: https://dds.sztu.edu.cn
-    listUrl: https://dds.sztu.edu.cn/djyl.htm
-    detailUrlTemplate: https://dds.sztu.edu.cn/info/{category}/{id}.htm
+    baseUrl: ${urls.znbm.dds}
+    listUrl: ${urls.znbm.dds}/djyl.htm
+    detailUrlTemplate: ${urls.znbm.dds}/info/{category}/{id}.htm
     categoryCode: "1032"
     categoryName: 党建引领
     contentType: news
