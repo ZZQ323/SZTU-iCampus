@@ -37,4 +37,4 @@ out/
 .vscode/
 
 main/src/main/resources/application-dev.yml
-diagnostic-report.txt
+
