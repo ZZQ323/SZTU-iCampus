@@ -360,3 +360,28 @@ class CrawlerParserTest {
 - 解析列表 → 检查 items 数量
 - 取第一篇文章 GET 详情 → 检查标题/正文是否非空
 - 结果写入 Redis，前端管理面板查看
+
+### 已实现的测试
+
+运行 `./gradlew test` 执行所有测试（32 个）：
+
+| 测试类 | 位置 | 覆盖 |
+|------|------|------|
+| `ArticleUrlResolverTest` | module-stream/src/test | URL 解析/外链识别/ID提取（20 个） |
+| `SztuCmsListParserTest` | module-stream/src/test | 7 种 CMS 页面变体（7 个） |
+| `ParserHealthCheckTest` | module-stream/src/test | 批量遍历 634 个样本生成报告 |
+| `CrouseParserTest` | module-base/src/test | 课表 HTML 解析边界场景（4 个） |
+
+**健康检查样例输出**（634 个样本）：
+- 527 成功解析（83%）
+- 105 无 items（导航页/图片库）
+- 2 解析失败（0 字节空文件、登录墙页面）
+
+**测试样本存放**：`src/test/resources/parser-samples/*.html`（ASCII 文件名）
+- 避免 JVM 中文路径编码问题
+- 避免依赖外部 `infos/downloaded_pages/` 目录
+
+**中文路径编码问题（教训）**：
+- JVM 的 `sun.jnu.encoding` 决定文件系统 API 对中文路径的处理
+- 必须通过 `jvmArgs '-Dfile.encoding=UTF-8', '-Dsun.jnu.encoding=UTF-8'` 传入（不能用 `systemProperty`，因为 `sun.jnu.encoding` 在 JVM 启动后不可变）
+- 最稳健方案：测试样本用 ASCII 文件名放 `resources` 下，通过 classpath 加载

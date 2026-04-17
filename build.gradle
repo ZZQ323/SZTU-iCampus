@@ -82,5 +82,8 @@ subprojects {
             events 'PASSED', 'FAILED', 'SKIPPED'
             showStandardStreams = false
         }
+        // ⭐ 中文文件名测试支持：强制 UTF-8 编码
+        // sun.jnu.encoding 必须作为 JVM 启动参数传入，不能用 systemProperty
+        jvmArgs '-Dfile.encoding=UTF-8', '-Dsun.jnu.encoding=UTF-8'
     }
 }
