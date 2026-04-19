@@ -52,7 +52,7 @@ public class CrawlerConfigLoader {
 
     private void loadUrls() {
         try {
-            ClassPathResource resource = new ClassPathResource("crawler/urls.yml");
+            ClassPathResource resource = new ClassPathResource("crawler/archived/urls.yml");
             if (!resource.exists()) {
                 log.info("urls.yml 不存在，跳过 URL 变量加载");
                 return;
@@ -109,7 +109,7 @@ public class CrawlerConfigLoader {
 
     private void loadChannels() {
         try {
-            ClassPathResource resource = new ClassPathResource("crawler/channels.yml");
+            ClassPathResource resource = new ClassPathResource("crawler/archived/channels.yml");
             if (!resource.exists()) {
                 log.warn("channels.yml 不存在，跳过加载");
                 return;
@@ -136,7 +136,7 @@ public class CrawlerConfigLoader {
 
     private void loadSources() {
         try {
-            ClassPathResource resource = new ClassPathResource("crawler/sources.yml");
+            ClassPathResource resource = new ClassPathResource("crawler/archived/sources.yml");
             if (!resource.exists()) {
                 log.warn("sources.yml 不存在，跳过加载");
                 return;

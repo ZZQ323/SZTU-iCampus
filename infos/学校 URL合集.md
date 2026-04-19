@@ -1172,6 +1172,7 @@
 
 
 #### 集成电路与光电芯片学院
+
 + 新闻中心
     - 学院新闻 1008：[https://icoc.sztu.edu.cn/xwzx/xyxw.htm](https://icoc.sztu.edu.cn/xwzx/xyxw.htm)
     - 通知公告 1009：[https://icoc.sztu.edu.cn/xwzx/tzgg.htm](https://icoc.sztu.edu.cn/xwzx/tzgg.htm)
@@ -1201,12 +1202,8 @@
 
 
 > [https://www.sztu.edu.cn/zzjg/jxdw/mkszyxy.htm](https://www.sztu.edu.cn/zzjg/jxdw/mkszyxy.htm)
->
-
-
 
 #### 体育与艺术学院
-
 
 + 学院概况
 + 师资力量
@@ -1238,10 +1235,7 @@
     - 教学动态：[https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1043](https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1043)
     - 下载中心 1044：[https://tusports.sztu.edu.cn/xwyxz/xzzx.htm](https://tusports.sztu.edu.cn/xwyxz/xzzx.htm)
 
-
-
 #### 音乐学院
-
 
 + 学院概况
     - 发展历史
@@ -1272,10 +1266,7 @@
     - 院务工作 1103 1005：[https://musicyyds.sztu.edu.cn/xygg/ywgz.htm](https://musicyyds.sztu.edu.cn/xygg/ywgz.htm)
     - 下载中心 1104：[https://musicyyds.sztu.edu.cn/xygg/xzzx.htm](https://musicyyds.sztu.edu.cn/xygg/xzzx.htm)
 
-
-
 #### 新一代信息技术研究院
-
 
 + 研究院简介
     - 简介
@@ -1292,39 +1283,31 @@
         * 智能物联网大数据研究中心
 + 研究成果 1008：[https://xxjs.sztu.edu.cn/yjcg.htm](https://xxjs.sztu.edu.cn/yjcg.htm)
 
-
-
 #### 应用高等教育研究院 
 
-
 无
-
-
 
 #### 继续教育学院
 
-
 无
-
-
 
 ## URL 分类
 
+维度 A：sourceOrg（来源归属 / 谁发布的）——这对应图1
 
-因为太多了，希望选择分类的竖条能滑动。
+- fixed（公文通，特殊固定频道）
+- official（学校官网，即 www.sztu.edu.cn 本域）
+- department（职能部门）
+- support（教辅科研单位）
+- league（群团组织）
+- audit（纪检审计）—— 图1明确列为独立一类，但 channels.yml 里没有这个值
+- college（学院）
 
+维度 B：contentType + subContentType（内容类型 / 发布了什么）——对应图2、3、4
 
-
-我的想法是，通知公告文件类的全部放通知，新闻放新闻，校园、招聘 等活动放活动。 那么如此一来的话，通知公告主要是文件，新闻主要是图文报道，活动信息可能藏在新闻里  
-
-
-
-一级分类：通知公告、新闻动态、活动、规章制度文件、招聘、教务（学生的信息）、党务、科研、行政、学工、校园
-
-二级分类：职能部门、群团、教辅单位、学院、公文通
-
-
-
+- 大类：news（新闻动态）/ notice（通知公告）
+- news 下的子类：general-news、party、cooperation、academic、student
+- notice 下的子类：general-notice、regulation、guide、admission、education
 
 
 
