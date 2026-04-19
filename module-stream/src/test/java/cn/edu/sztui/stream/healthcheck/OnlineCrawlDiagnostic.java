@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -270,6 +271,100 @@ class OnlineCrawlDiagnostic {
             report.append("\n");
         } else {
             report.append("✅ 所有源的 title + content 均被选择器回退链覆盖\n\n");
+        }
+
+        // ==================== 失败分类表 ====================
+        report.append("═══════════════════════════════════════\n");
+        report.append("            失败分类表\n");
+        report.append("═══════════════════════════════════════\n");
+        report.append("按失败类型聚合源，修一个类型即可批量止损。\n\n");
+
+        LinkedHashMap<String, List<String>> byCategory = new LinkedHashMap<>();
+        byCategory.put("LIST_NO_URL",        new ArrayList<>());  // YAML 未配 listUrl
+        byCategory.put("LIST_HTTP_ERROR",    new ArrayList<>());  // 列表页 HTTP 4xx/5xx
+        byCategory.put("LIST_EMPTY",         new ArrayList<>());  // 列表 200 但解析 0 条
+        byCategory.put("DETAIL_HTTP_ERROR",  new ArrayList<>());  // 抽查详情 HTTP 错误 ≥1
+        byCategory.put("DETAIL_REQUEST_ERROR", new ArrayList<>()); // 抽查详情网络异常 ≥1
+        byCategory.put("DETAIL_PARSE_FAIL",  new ArrayList<>());  // 抽查详情解析失败 ≥1
+        byCategory.put("NO_TITLE_MOST",      new ArrayList<>());  // ≥半数抽查缺标题
+        byCategory.put("NO_DATE_MOST",       new ArrayList<>());  // ≥半数抽查缺日期
+        byCategory.put("NO_AUTHOR_MOST",     new ArrayList<>());  // ≥半数抽查缺来源
+        byCategory.put("NO_CONTENT_MOST",    new ArrayList<>());  // ≥半数抽查正文过短
+
+        for (SourceConfig source : publicSources) {
+            SourceReport r = resultsById.get(source.getId());
+            if (r == null) continue;
+            String idLine = String.format("%-24s %s", source.getId(), r.listUrl() != null ? r.listUrl() : "");
+
+            if ("fail".equals(r.outcome())) {
+                if (r.failReason() != null && r.failReason().contains("无列表URL")) {
+                    byCategory.get("LIST_NO_URL").add(idLine);
+                } else {
+                    byCategory.get("LIST_HTTP_ERROR").add(idLine + "  [" + r.failReason() + "]");
+                }
+                continue;
+            }
+            if ("empty".equals(r.outcome())) {
+                byCategory.get("LIST_EMPTY").add(idLine);
+                continue;
+            }
+
+            // 对"ok"源扫描其抽查文章
+            int checked = 0, httpErrN = 0, reqErrN = 0, parseFailN = 0;
+            int noTitle = 0, noDate = 0, noAuthor = 0, noContent = 0;
+            for (ArticleReport a : r.articles()) {
+                if ("external".equals(a.status())) continue;  // 外链不纳入字段统计
+                checked++;
+                switch (a.status()) {
+                    case "http-error" -> httpErrN++;
+                    case "request-error" -> reqErrN++;
+                    case "parse-fail" -> parseFailN++;
+                    case "incomplete" -> {
+                        if (a.issues().contains("缺标题")) noTitle++;
+                        if (a.issues().contains("缺日期")) noDate++;
+                        if (a.issues().contains("缺来源")) noAuthor++;
+                        if (a.issues().stream().anyMatch(s -> s.startsWith("缺正文"))) noContent++;
+                    }
+                    default -> {}
+                }
+            }
+            if (httpErrN > 0)
+                byCategory.get("DETAIL_HTTP_ERROR").add(idLine + "  [" + httpErrN + "/" + checked + " 篇 HTTP 错误]");
+            if (reqErrN > 0)
+                byCategory.get("DETAIL_REQUEST_ERROR").add(idLine + "  [" + reqErrN + "/" + checked + " 篇请求异常]");
+            if (parseFailN > 0)
+                byCategory.get("DETAIL_PARSE_FAIL").add(idLine + "  [" + parseFailN + "/" + checked + " 篇解析失败]");
+            // "多数缺失"阈值：抽查 ≥ 2 篇时 ≥ 半数；只 1 篇时 = 1
+            int threshold = Math.max(1, (checked + 1) / 2);
+            if (checked > 0 && noTitle   >= threshold) byCategory.get("NO_TITLE_MOST").add(idLine);
+            if (checked > 0 && noDate    >= threshold) byCategory.get("NO_DATE_MOST").add(idLine);
+            if (checked > 0 && noAuthor  >= threshold) byCategory.get("NO_AUTHOR_MOST").add(idLine);
+            if (checked > 0 && noContent >= threshold) byCategory.get("NO_CONTENT_MOST").add(idLine);
+        }
+
+        Map<String, String> categoryDesc = Map.of(
+                "LIST_NO_URL",         "YAML 未配 listUrl",
+                "LIST_HTTP_ERROR",     "列表页 HTTP 4xx/5xx",
+                "LIST_EMPTY",          "列表 200 但 parser 提取 0 条",
+                "DETAIL_HTTP_ERROR",   "抽查详情 HTTP 4xx/5xx",
+                "DETAIL_REQUEST_ERROR","抽查详情网络异常(ConnectException/超时)",
+                "DETAIL_PARSE_FAIL",   "详情 parser 返回 success=false",
+                "NO_TITLE_MOST",       "≥半数抽查缺标题",
+                "NO_DATE_MOST",        "≥半数抽查缺日期",
+                "NO_AUTHOR_MOST",      "≥半数抽查缺来源(页面本身常无作者)",
+                "NO_CONTENT_MOST",    "≥半数抽查正文 <50 字"
+        );
+        for (Map.Entry<String, List<String>> e : byCategory.entrySet()) {
+            List<String> list = e.getValue();
+            report.append("▶ ").append(e.getKey())
+                    .append(" (").append(categoryDesc.get(e.getKey())).append(") — ")
+                    .append(list.size()).append(" 个源\n");
+            if (list.isEmpty()) {
+                report.append("  (无)\n");
+            } else {
+                list.forEach(s -> report.append("  - ").append(s).append("\n"));
+            }
+            report.append("\n");
         }
 
         System.out.println(report);
