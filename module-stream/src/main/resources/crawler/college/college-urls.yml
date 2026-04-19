@@ -1,0 +1,24 @@
+# ============================================================
+# 学院 URL（研究生院 + 14 个学院）
+# ============================================================
+
+urls:
+
+  # ========================
+  # 学院 (xy)
+  # ========================
+  xy:
+    gra: https://gra.sztu.edu.cn                         # 研究生院
+    sgim: https://sgim.sztu.edu.cn                       # 中德智能制造学院
+    ai: https://ai.sztu.edu.cn                           # 人工智能学院
+    nmne: https://nmne.sztu.edu.cn                       # 新材料与新能源学院
+    utl: https://utl.sztu.edu.cn                         # 城市交通与物流学院
+    hsee: https://hsee.sztu.edu.cn                       # 健康与环境工程学院
+    cep: https://cep.sztu.edu.cn                         # 工程物理学院
+    design: https://design.sztu.edu.cn                   # 创意设计学院
+    bs: https://bs.sztu.edu.cn                           # 商学院
+    sfl: https://sfl.sztu.edu.cn                         # 外国语学院
+    icoc: https://icoc.sztu.edu.cn                       # 集成电路与光电芯片学院
+    cop: https://cop.sztu.edu.cn                         # 药学院
+    future: https://futuretechnologyschool.sztu.edu.cn   # 未来技术学院
+    music: https://musicyyds.sztu.edu.cn                 # 音乐学院

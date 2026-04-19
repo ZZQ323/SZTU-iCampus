@@ -1,0 +1,24 @@
+# ============================================================
+# 职能部门 URL
+# ============================================================
+
+urls:
+
+  # ========================
+  # 职能部门 (znbm)
+  # ========================
+  znbm:
+    jw: https://jw.sztu.edu.cn               # 教务部
+    jyzd: https://jyzd.sztu.edu.cn           # 就业指导中心
+    zs: https://zs.sztu.edu.cn               # 招生办
+    sao: https://sao.sztu.edu.cn             # 党委学生工作部
+    kyb: https://kyb.sztu.edu.cn             # 科研部
+    intl: https://international.sztu.edu.cn  # 国际合作部
+    hr: https://hr.sztu.edu.cn               # 人力资源部
+    cwb: https://cwb.sztu.edu.cn             # 财务部
+    sbc: https://sbc.sztu.edu.cn             # 国资实验室部
+    aqbw: https://aqbw.sztu.edu.cn           # 保卫部
+    zzb: https://zzb.sztu.edu.cn             # 组织统战部
+    jjjc: https://jjjc.sztu.edu.cn           # 纪检监察
+    sjs: https://sjs.sztu.edu.cn             # 审计室
+    hq: https://hq.sztu.edu.cn               # 后勤部

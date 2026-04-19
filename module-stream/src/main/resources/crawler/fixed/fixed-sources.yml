@@ -1,0 +1,90 @@
+# 数据源配置：公文通（WebVPN，需要登录）
+# parserType: sztu-gwt
+# 列表格式：list.jsp?wbtreeid=XXXX 表格式
+
+sources:
+
+  - id: gwt-jiaowu
+    name: 教务公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1018&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1018/{id}.htm
+    categoryCode: "1018"
+    categoryName: 教务
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    # crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: gwt-keyan
+    name: 科研公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1019&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1019/{id}.htm
+    categoryCode: "1019"
+    categoryName: 科研
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  - id: gwt-xingzheng
+    name: 行政公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1020/{id}.htm
+    categoryCode: "1020"
+    categoryName: 行政
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: gwt-xuegong
+    name: 学工公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1021/{id}.htm
+    categoryCode: "1021"
+    categoryName: 学工
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: gwt-xiaoyuan
+    name: 校园公告
+    channelId: announcement
+    parserType: sztu-gwt
+    baseUrl: ${urls.gwt}
+    listUrlTemplate: ${urls.gwt}/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1022&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.gwt}/info/1022/{id}.htm
+    categoryCode: "1022"
+    categoryName: 校园
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    crawlPageCount: 1
+    enabled: true
+    sort: 5

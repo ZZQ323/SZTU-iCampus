@@ -1,0 +1,12 @@
+# ============================================================
+# 公文通 URL（WebVPN 内网入口，需要登录）
+# ============================================================
+
+urls:
+
+  # ========================
+  # 公文通（WebVPN 内网入口）
+  # ========================
+  gwt:
+    jiaowu : https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1018&a1020514p={page}&a1020514c=20
+    keyan : https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1019&a1020514p={page}&a1020514c=20

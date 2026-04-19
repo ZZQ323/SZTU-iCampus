@@ -1,0 +1,17 @@
+# 公文通频道配置（固定频道，始终显示，不可退订）
+
+channels:
+
+  - id: announcement
+    name: 公文通
+    description: 学校公文通公告信息
+    icon: notice
+    sourceOrg: fixed
+    sort: 1
+    enabled: true
+    sources:
+      - gwt-jiaowu
+      - gwt-keyan
+      - gwt-xingzheng
+      - gwt-xuegong
+      - gwt-xiaoyuan

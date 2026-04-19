@@ -1,0 +1,70 @@
+# 群团、教辅频道配置
+# sourceOrg: support
+
+channels:
+
+  - id: dept-xtw
+    name: 校团委
+    description: 校团委通知公告、团学风采
+    icon: flag
+    sourceOrg: support
+    sort: 23
+    enabled: true
+    sources:
+      - xtw-tzgg
+      - xtw-txfc
+
+  - id: dept-it
+    name: 信息中心
+    description: 信息中心 新闻公告、党建动态
+    icon: desktop
+    sourceOrg: support
+    sort: 32
+    enabled: true
+    sources:
+      - it-xwgg
+      - it-djdt
+
+  - id: dept-dds
+    name: 教学质量督导室
+    description: 教学质量督导室 新闻通知、党建引领
+    icon: task
+    sourceOrg: support
+    sort: 33
+    enabled: true
+    sources:
+      - dds-xwtz
+      - dds-djyl
+
+  - id: lab-fxcs
+    name: 分析测试中心
+    description: 分析测试中心通知公告、新闻
+    icon: precision-monitor
+    sourceOrg: support
+    sort: 40
+    enabled: true
+    sources:
+      - fxcs-tzgg
+      - fxcs-xw
+
+  - id: lab-cmnf
+    name: 半导体微纳加工中心
+    description: 半导体微纳加工中心通知、动态
+    icon: cpu
+    sourceOrg: support
+    sort: 41
+    enabled: true
+    sources:
+      - cmnf-tzgg
+      - cmnf-zxdt
+
+  - id: lab-ime
+    name: 医工交叉创新研究院
+    description: 医工交叉创新研究院通知、新闻
+    icon: hospital
+    sourceOrg: support
+    sort: 42
+    enabled: true
+    sources:
+      - ime-tzgg
+      - ime-xwdt

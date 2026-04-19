@@ -1,0 +1,159 @@
+# 职能部门频道配置
+# sourceOrg: department
+
+channels:
+
+  - id: academic
+    name: 教务信息
+    description: 教务部教学动态、信息公告
+    icon: book
+    sourceOrg: department
+    sort: 10
+    enabled: true
+    sources:
+      - jw-jdt
+      - jw-xxg
+      - jw-djfc
+
+  - id: admission
+    name: 招生办公室
+    description: 招生动态
+    icon: user-add
+    sourceOrg: department
+    sort: 51
+    enabled: true
+    sources:
+      - zs-zsdt
+
+  - id: job
+    name: 就业指导中心
+    description: 就业指导中心通知、工作动态
+    icon: briefcase
+    sourceOrg: department
+    sort: 50
+    enabled: true
+    sources:
+      - jyzd-tzgg
+      - jyzd-gzdt
+
+  - id: dept-sao
+    name: 党委学生工作部
+    description: 党委学生工作部/党委武装部/学生部 通知公告、新闻信息
+    icon: user
+    sourceOrg: department
+    sort: 20
+    enabled: true
+    sources:
+      - sao-tzgg
+      - sao-xwxx
+
+  - id: dept-kyb
+    name: 科研与校企合作部
+    description: 科研与校企合作部通知、新闻动态
+    icon: explore
+    sourceOrg: department
+    sort: 21
+    enabled: true
+    sources:
+      - kyb-tzgg
+      - kyb-xwdt
+
+  - id: dept-intl
+    name: 国际合作与交流部
+    description: 国际合作与交流部/港澳台工作办公室 焦点新闻、交流动态
+    icon: earth
+    sourceOrg: department
+    sort: 22
+    enabled: true
+    sources:
+      - intl-jdxw
+      - intl-jwjl
+
+  - id: dept-hr
+    name: 党委教师工作部/人力资源部
+    description: 党委教师工作部/人力资源部 通知公告
+    icon: user-circle
+    sourceOrg: department
+    sort: 24
+    enabled: true
+    sources:
+      - hr-tzgg
+
+  - id: dept-cwb
+    name: 计划财务部
+    description: 计划财务部/采购与招投标管理中心 信息公开、工作动态
+    icon: money-circle
+    sourceOrg: department
+    sort: 25
+    enabled: true
+    sources:
+      - cwb-xxgk
+      - cwb-gzdt
+
+  - id: dept-sbc
+    name: 国有资产与实验室管理开发部
+    description: 国有资产与实验室管理开发部 通知公告、工作动态
+    icon: server
+    sourceOrg: department
+    sort: 26
+    enabled: true
+    sources:
+      - sbc-tzgg
+      - sbc-gzdt
+
+  - id: dept-aqbw
+    name: 党委保卫工作部/安全保卫中心
+    description: 党委保卫工作部/安全保卫中心 通知公告、工作动态、党建
+    icon: shield
+    sourceOrg: department
+    sort: 27
+    enabled: true
+    sources:
+      - aqbw-tzgg
+      - aqbw-gzdt
+      - aqbw-djdt
+
+  - id: dept-zzb
+    name: 党委组织部/党委统战部
+    description: 党委组织部/党委统战部/党校 通知公告、工作动态
+    icon: user-setting
+    sourceOrg: department
+    sort: 28
+    enabled: true
+    sources:
+      - zzb-tzgg
+      - zzb-gzdt
+
+  - id: dept-jjjc
+    name: 纪检监察室
+    description: 纪检监察室 纪检要闻、工作动态
+    icon: secured
+    sourceOrg: department
+    sort: 29
+    enabled: true
+    sources:
+      - jjjc-jjyw
+      - jjjc-gzdt
+
+  - id: dept-sjs
+    name: 审计室
+    description: 审计室 工作动态、审计公告
+    icon: file-search
+    sourceOrg: department
+    sort: 30
+    enabled: true
+    sources:
+      - sjs-gzdt
+      - sjs-sjgg
+
+  - id: dept-hq
+    name: 后勤部
+    description: 后勤部 通知公告、动态要闻、党建
+    icon: home
+    sourceOrg: department
+    sort: 31
+    enabled: true
+    sources:
+      - hq-tzgg
+      - hq-dtyw
+      - hq-djdt

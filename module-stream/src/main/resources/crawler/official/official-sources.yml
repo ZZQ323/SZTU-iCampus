@@ -1,0 +1,170 @@
+# 数据源配置：学校官网（www.sztu.edu.cn，公开，不需要登录）
+# parserType: sztu-cms
+# 列表格式：卡片式 li[id^=line_] 或 li > a
+
+sources:
+
+  # ---------- 活力技大 ----------
+
+  - id: www-wyhd
+    name: 文娱活动
+    channelId: campus-life
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/hljd/xyhd/wyhd.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1040"
+    categoryName: 文娱活动
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    # crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: www-tyhd
+    name: 体育活动
+    channelId: campus-life
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/hljd/xyhd/tyhd.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1041"
+    categoryName: 体育活动
+    contentType: news
+    subContentType: student
+    # 未来哪天其他catagory不404了，我就去看看
+    # 不设 categoryCode — 本页混合了 1041/1088/1087/1067/1015 五个分类
+    #   且部分文章指向 tusports.sztu.edu.cn（跨域绝对URL）
+    #   SztuCmsListParser 从每篇文章的 href 中提取真实分类
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    # crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  - id: www-jdfg
+    name: 技大风光
+    channelId: campus-life
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/hljd/jdfg.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1037"
+    categoryName: 技大风光
+    contentType: news
+    subContentType: general-news
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    # ⚠️ 纯图片画廊，文章标题 display:none，爬取价值不大，先关闭
+    enabled: true
+    sort: 3
+
+  # ---------- 媒体焦点 ----------
+
+  - id: www-xyxw
+    name: 校园新闻
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/jdjd/xyxw.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1003"
+    categoryName: 校园新闻
+    contentType: news
+    subContentType: general-news
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    # crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: www-mtjj
+    name: 媒体聚焦
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/jdjd/mtjj.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    # ⚠️ 100% 外部链接（深圳特区报/新华社/南方Plus/科技日报），
+    #    无 info/ 链接，无法爬取详情，仅存元数据+外链 URL。
+    #    前端展示为"外部链接"标签，点击复制链接或 web-view 打开。
+    enabled: true
+    sort: 2
+
+  # ---------- 对外交流 ----------
+
+  - id: www-gjjl
+    name: 国际交流
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/dwjl/gjjl.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1031"
+    categoryName: 国际交流
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: www-xsjwjl
+    name: 学生境外交流
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/dwjl/xsjwjl.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1032"
+    categoryName: 学生境外交流
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    # crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  # ---------- 官网科研板块 ----------
+
+  - id: www-xqhz
+    name: 校企合作
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/kysx/xqhz.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1027"
+    categoryName: 校企合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: www-kxyj
+    name: 科学研究
+    channelId: news
+    parserType: sztu-cms
+    baseUrl: ${urls.www}
+    listUrl: ${urls.www}/kysx/kxyj.htm
+    detailUrlTemplate: ${urls.www}/info/{category}/{id}.htm
+    categoryCode: "1028"
+    categoryName: 科学研究
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
