@@ -1,7 +1,6 @@
 === 全量在线诊断报告 ===
-诊断时间: 2026-04-17T14:30:14.967821500
+诊断时间: 2026-04-19T08:53:42.716362166
 公开源数量: 83
-
 
 ──── 中德学院新闻 (sgim-xyxw, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://sgim.sztu.edu.cn/xyxw.htm
@@ -35,7 +34,7 @@
 
 ──── 集成电路学院新闻 (icoc-xyxw, parser=sztu-cms) ────
   列表页 OK: 11 条  URL: https://icoc.sztu.edu.cn/xwzx/xyxw.htm
-  [1] ❌ 请求异常: HttpConnectTimeoutException: HTTP connect timed out | http://10.1.20.39/
+  [1] ❌ HTTP 403: http://10.1.20.39/
   [2] ⚠️  缺标题, 缺来源 | 宁存政院长当选深圳光学光电子行业协会轮值会长 | https://icoc.sztu.edu.cn/info/1008/1852.htm
   [3] ⚠️  缺标题, 缺来源 | 集成电路与光电芯片学院王戊副教授物理顶级期刊成果揭示原子结构调控热电输运新机制 | https://icoc.sztu.edu.cn/info/1008/1841.htm
 
@@ -53,7 +52,7 @@
 
 ──── 研究生院新闻 (gra-xwdt, parser=sztu-cms) ────
   列表页 OK: 7 条  URL: https://gra.sztu.edu.cn/index/xwdt.htm
-  [1] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 学籍管理 | http://ehall.szu.edu.cn/new/index.html
+  [1] ❌ 请求异常: ConnectException: null | http://ehall.szu.edu.cn/new/index.html
   [2] ⚠️  缺标题, 缺来源, 缺正文(len=0) | “研”途加油站丨第六期考研经验分享会成功举办！ | https://mp.weixin.qq.com/s/HeQW3JZUtfqti9jDbxsjnw
   [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | “研”途加油站 | 这份考研福利请查收！ | https://mp.weixin.qq.com/s/0JhZWMSRK2Lewk3qkYLGnQ
 
@@ -77,9 +76,9 @@
 
 ──── 校园新闻 (www-xyxw, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://www.sztu.edu.cn/jdjd/xyxw.htm
-  [1] ⚠️  缺标题, 缺来源 | 俄罗斯青少年，欢迎来深技大！ | https://www.sztu.edu.cn/info/1003/4285.htm
-  [2] ⚠️  缺标题, 缺来源 | 深技大校长傅继阳带队赴中山市开展招生宣传与合作交流 | https://www.sztu.edu.cn/info/1003/4284.htm
-  [3] ⚠️  缺标题, 缺来源 | 高质量发展，深技大基教集团这么干！ | https://www.sztu.edu.cn/info/1003/4283.htm
+  [1] ⚠️  缺标题, 缺来源 | 深技大校长傅继阳带队赴江门市开展招生宣传与合作交流 | https://www.sztu.edu.cn/info/1003/4288.htm
+  [2] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 深圳技术大学2026年体育文化节开幕 | https://mp.weixin.qq.com/s/hy9_bebRiYoVDq9lm_QpIA
+  [3] ⚠️  缺标题, 缺来源 | 俄罗斯青少年，欢迎来深技大！ | https://www.sztu.edu.cn/info/1003/4285.htm
 
 ──── 新材料学院动态 (nmne-xydt, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xwzx/xydt.htm
@@ -106,16 +105,13 @@
   [1] ⚠️  缺来源, 缺正文(len=0) | 智慧团建系统 | https://tuan.12355.net/
 
 ──── 分析测试中心通知 (fxcs-tzgg, parser=sztu-cms) ────
-  列表页 OK: 4 条  URL: https://fxcszx.sztu.edu.cn/index/tzgg.htm
-  [1] ⚠️  缺标题, 缺来源 | 招聘副研究员 | https://fxcszx.sztu.edu.cn/info/1021/1562.htm
-  [2] ⚠️  缺标题, 缺来源 | 招聘测试工程师（博士）4人 | https://fxcszx.sztu.edu.cn/info/1021/1561.htm
-  [3] ⚠️  缺标题, 缺来源 | 扫描隧道显微镜测试工程师与双束电子显微镜测试工程师招聘 | https://fxcszx.sztu.edu.cn/info/1021/1501.htm
+  ❌ 列表页 HTTP 403: https://fxcszx.sztu.edu.cn/index/tzgg.htm
 
 ──── 未来技术学院新闻 (future-xwzx, parser=sztu-cms) ────
   列表页 OK: 9 条  URL: https://futuretechnologyschool.sztu.edu.cn/xw_hd/xwzx.htm
   [1] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 狂斩世界TOP100名校offer，我院新才学子用实力说话！ | https://mp.weixin.qq.com/s/JgXu6R5Oud1NUxJNYhw5KA
-  [2] ⚠️  缺标题, 缺来源 | 访企拓岗简讯| 深圳市嘉尔兴科技有限公司 | https://futuretechnologyschool.sztu.edu.cn/info/1021/2378.htm
-  [3] ⚠️  缺标题, 缺来源 | 我院双创工作者赴南京参加广东省高校双创实践指导师资研修班 | https://futuretechnologyschool.sztu.edu.cn/info/1021/2377.htm
+  [2] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 煤基负极提速！刘清侠院士团队与贝特瑞产学研落地 | https://mp.weixin.qq.com/s/anvaPTSB1zy5vggHLTPK3A
+  [3] ⚠️  缺标题, 缺来源 | 访企拓岗简讯| 深圳市嘉尔兴科技有限公司 | https://futuretechnologyschool.sztu.edu.cn/info/1021/2378.htm
 
 ──── 外国语学院新闻 (sfl-xyxw, parser=sztu-cms) ────
   列表页 OK: 11 条  URL: https://sfl.sztu.edu.cn/xyxw.htm
@@ -152,26 +148,20 @@
   [2] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 赴大亚湾开发区调研，与企业签约！深技大加快推进与地方及企业合作 | https://mp.weixin.qq.com/s/dfwuaxjlmoNt4IuMkCt41w
   [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 我校城市交通与物流学院成功认证吉尼斯世界纪录 | https://mp.weixin.qq.com/s/pJzDzV87m9JyuKEMAB-lSA
 
-──── 就业工作动态 (jyzd-gzdt, parser=sztu-cms) ────
-  列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p=1&a1020514c=20
-  [1] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 喜报：我校在第三届全国大学生职业规划大赛广东省分赛决赛中荣获佳绩 | https://mp.weixin.qq.com/s/FaGzBfvFoIa9-2kChWsXqQ
-  [2] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 深圳技术大学2026年深圳精英企业专场招聘会（第二场）圆满举办 | https://mp.weixin.qq.com/s/kH0Ffg2DpHjCTII0BR2kgA
-  [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 招聘会 | 重磅！3月24日深圳技术大学2026春季就业双选会来啦！ | https://mp.weixin.qq.com/s/pol9IR1yrfEX0U6YU6CBdw
-
 ──── 未来技术学院通知 (future-tzgg, parser=sztu-cms) ────
   列表页 OK: 7 条  URL: https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/jw.htm
   [1] ⚠️  缺标题, 缺来源 | 未来技术学院关于2023级新才特色班接收新生选拔申请的通知 | https://futuretechnologyschool.sztu.edu.cn/info/1133/1651.htm
   [2] ⚠️  缺标题, 缺来源 | 2022-2023学年第二学期任课教师课外辅导答疑安排 | https://futuretechnologyschool.sztu.edu.cn/info/1133/1541.htm
   [3] ⚠️  缺标题, 缺来源 | 2022-2023学年第一学期任课教师课外辅导答疑安排 | https://futuretechnologyschool.sztu.edu.cn/info/1133/1542.htm
 
+──── 就业工作动态 (jyzd-gzdt, parser=sztu-cms) ────
+  列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p=1&a1020514c=20
+  [1] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 喜报：我校在第三届全国大学生职业规划大赛广东省分赛决赛中荣获佳绩 | https://mp.weixin.qq.com/s/FaGzBfvFoIa9-2kChWsXqQ
+  [2] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 【用人单位邀请函】4月27日深圳技术大学2026年春季就业实习双选会 | https://mp.weixin.qq.com/s/MC5wqUht9hK2JgOLhpI-mA
+  [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 深圳技术大学2026年深圳精英企业专场招聘会（第二场）圆满举办 | https://mp.weixin.qq.com/s/kH0Ffg2DpHjCTII0BR2kgA
+
 ──── 微纳中心动态 (cmnf-zxdt, parser=sztu-cms) ────
   ⚠️  列表解析无结果: https://cmnf.sztu.edu.cn/xwzx/zxdt.htm
-
-──── 国际合作部境外交流 (intl-jwjl, parser=sztu-cms) ────
-  列表页 OK: 7 条  URL: https://international.sztu.edu.cn/gjjl/jwjl.htm
-  [1] ⚠️  缺来源, 缺正文(len=0) | 领事常识 | https://www.fmprc.gov.cn/web/ziliao_674904/lszs_674973/
-  [2] ⚠️  缺来源, 缺正文(len=0) | 礼宾知识 | https://www.fmprc.gov.cn/web/ziliao_674904/lbzs_674975/
-  [3] ⚠️  缺标题, 缺来源 | 路，就是书 | https://international.sztu.edu.cn/info/1007/1988.htm
 
 ──── 新材料学院通知 (nmne-tzgg, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xwzx/tzgg.htm
@@ -179,17 +169,23 @@
   [2] ⚠️  缺标题, 缺来源 | 新材料与新能源学院2025-2026-2学期重修替代选课指引 | https://nmne.sztu.edu.cn/info/1073/4372.htm
   [3] ⚠️  缺标题, 缺来源 | 关于拟确定陈洋洋等56名同志为入党积极分子的公示 | https://nmne.sztu.edu.cn/info/1073/4362.htm
 
+──── 国际合作部境外交流 (intl-jwjl, parser=sztu-cms) ────
+  列表页 OK: 7 条  URL: https://international.sztu.edu.cn/gjjl/jwjl.htm
+  [1] ⚠️  缺来源, 缺正文(len=0) | 领事常识 | https://www.fmprc.gov.cn/web/ziliao_674904/lszs_674973/
+  [2] ⚠️  缺来源, 缺正文(len=0) | 礼宾知识 | https://www.fmprc.gov.cn/web/ziliao_674904/lbzs_674975/
+  [3] ⚠️  缺标题, 缺来源 | 路，就是书 | https://international.sztu.edu.cn/info/1007/1988.htm
+
+──── 研究生院通知 (gra-tzgg, parser=sztu-cms) ────
+  列表页 OK: 16 条  URL: https://gra.sztu.edu.cn/index/tzgg.htm
+  [1] ❌ 请求异常: ConnectException: null | http://ehall.szu.edu.cn/new/index.html
+  [2] ⚠️  缺标题, 缺来源 | 深圳技术大学/深圳大学应用技术学院2025年招生目录 | https://gra.sztu.edu.cn/info/1051/2075.htm
+  [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 深圳技术大学2024年硕士研究生招生接收调剂需求 | https://mp.weixin.qq.com/s/GFOwQZMe98Vy_GAjak__Mg
+
 ──── 党委学工部新闻信息 (sao-xwxx, parser=sztu-cms) ────
   列表页 OK: 14 条  URL: https://sao.sztu.edu.cn/xwxx.htm
   [1] ⚠️  缺标题, 缺来源 | 环境设计赋能乡村振兴——创意设计学院师生赴河源市连平县开展实地调研教学活动 | https://sao.sztu.edu.cn/info/1003/2376.htm
   [2] ⚠️  缺标题, 缺来源 | 无人配送工作室 | 首次无人车点对点配送技术培训 | https://sao.sztu.edu.cn/info/1003/2375.htm
   [3] ⚠️  缺标题, 缺来源 | MBTI人格大乱斗 | 商学院心理活动回顾 | https://sao.sztu.edu.cn/info/1003/2374.htm
-
-──── 研究生院通知 (gra-tzgg, parser=sztu-cms) ────
-  列表页 OK: 16 条  URL: https://gra.sztu.edu.cn/index/tzgg.htm
-  [1] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 学籍管理 | http://ehall.szu.edu.cn/new/index.html
-  [2] ⚠️  缺标题, 缺来源 | 深圳技术大学/深圳大学应用技术学院2025年招生目录 | https://gra.sztu.edu.cn/info/1051/2075.htm
-  [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 深圳技术大学2024年硕士研究生招生接收调剂需求 | https://mp.weixin.qq.com/s/GFOwQZMe98Vy_GAjak__Mg
 
 ──── 医工研究院新闻 (ime-xwdt, parser=sztu-cms) ────
   列表页 OK: 10 条  URL: https://ime.sztu.edu.cn/xwdt.htm
@@ -267,9 +263,9 @@
 
 ──── 集成电路学院通知 (icoc-tzgg, parser=sztu-cms) ────
   列表页 OK: 11 条  URL: https://icoc.sztu.edu.cn/xwzx/tzgg.htm
-  [1] ❌ 请求异常: HttpConnectTimeoutException: HTTP connect timed out | http://10.1.20.39/
-  [2] ⚠️  缺标题, 缺来源 | 集成电路与光电芯片学院关于深圳技术大学2025-2026年度共青团先进集体、先进个人初评结果公示 | https://icoc.sztu.edu.cn/info/1009/1853.htm
-  [3] ⚠️  缺标题, 缺来源 | 集成电路与光电芯片学院2025-2026-2学期重修替代选课指引 | https://icoc.sztu.edu.cn/info/1009/1823.htm
+  [1] ❌ HTTP 403: http://10.1.20.39/
+  [2] ⚠️  缺标题, 缺来源 | 关于拟确定李沅襄等57名同志为入党积极分子的公示 | https://icoc.sztu.edu.cn/info/1009/1854.htm
+  [3] ⚠️  缺标题, 缺来源 | 集成电路与光电芯片学院关于深圳技术大学2025-2026年度共青团先进集体、先进个人初评结果公示 | https://icoc.sztu.edu.cn/info/1009/1853.htm
 
 ──── 中德学院党的建设 (sgim-ddjs, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://sgim.sztu.edu.cn/dtgz2022/ddjs.htm
@@ -279,7 +275,7 @@
 
 ──── 研究生院党群工作 (gra-dqgz, parser=sztu-cms) ────
   列表页 OK: 16 条  URL: https://gra.sztu.edu.cn/dqgz.htm
-  [1] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 学籍管理 | http://ehall.szu.edu.cn/new/index.html
+  [1] ❌ 请求异常: ConnectException: null | http://ehall.szu.edu.cn/new/index.html
   [2] ⚠️  缺标题, 缺来源 | 智驭研路，强国有我--深圳技术大学第三届研究生英语演讲比赛成功举办 | https://gra.sztu.edu.cn/info/1007/2095.htm
   [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | “研”途加油站丨第六期考研经验分享会成功举办！ | https://mp.weixin.qq.com/s/HeQW3JZUtfqti9jDbxsjnw
 
@@ -430,7 +426,7 @@
 ──── 后勤部动态 (hq-dtyw, parser=sztu-cms) ────
   列表页 OK: 15 条  URL: https://hq.sztu.edu.cn/zhxx/dtyw.htm
   [1] ⚠️  缺标题, 缺来源 | 后勤部召开新学期部门工作会议 | https://hq.sztu.edu.cn/info/1038/2436.htm
-  [2] ⚠️  缺标题, 缺来源 | 深圳技术大学开展元旦假期前校园安全大检查 | https://hq.sztu.edu.cn/info/1038/2424.htm
+  [2] ❌ HTTP 403: https://hq.sztu.edu.cn/info/1038/2424.htm
   [3] ⚠️  缺标题, 缺来源 | 戎装砺志书韶华，后勤保障筑后盾——深圳技术大学2025级新生军训后勤保障纪实 | https://hq.sztu.edu.cn/info/1038/2388.htm
 
 ──── 信息中心新闻 (it-xwgg, parser=sztu-cms) ────
@@ -441,8 +437,8 @@
 
 ──── 督导室新闻通知 (dds-xwtz, parser=sztu-cms) ────
   列表页 OK: 13 条  URL: https://dds.sztu.edu.cn/xwtz.htm
-  [1] ❌ 请求异常: HttpConnectTimeoutException: HTTP connect timed out | http://10.11.154.188/#/opinion
-  [2] ❌ 请求异常: HttpConnectTimeoutException: HTTP connect timed out | http://10.11.154.176/
+  [1] ❌ HTTP 403: http://10.11.154.188/#/opinion
+  [2] ❌ HTTP 403: http://10.11.154.176/
   [3] ⚠️  缺标题, 缺来源, 缺正文(len=0) | 初春启新程，招生正当时 | https://mp.weixin.qq.com/s/pU5MYrRXPzr0JaN8VcWLgA
 
 ──── 保卫部党建动态 (aqbw-djdt, parser=sztu-cms) ────
@@ -465,23 +461,23 @@
 
 ──── 督导室党建引领 (dds-djyl, parser=sztu-cms) ────
   列表页 OK: 13 条  URL: https://dds.sztu.edu.cn/djyl.htm
-  [1] ❌ 请求异常: HttpConnectTimeoutException: HTTP connect timed out | http://10.11.154.188/#/opinion
-  [2] ❌ 请求异常: HttpConnectTimeoutException: HTTP connect timed out | http://10.11.154.176/
+  [1] ❌ HTTP 403: http://10.11.154.188/#/opinion
+  [2] ❌ HTTP 403: http://10.11.154.176/
   [3] ⚠️  缺标题, 缺来源 | 教学质量督导室党支部书记讲党课 | https://dds.sztu.edu.cn/info/1032/1641.htm
 
 ═══════════════════════════════════════
                汇  总
 ═══════════════════════════════════════
 源统计:
-  正常(有items): 74
+  正常(有items): 73
   空(无items):   6
-  失败(HTTP错误): 3
+  失败(HTTP错误): 4
   总计:           83
 
 文章统计:
-  完整:     0/217
-  缺标题:   179
-  缺来源:   188
-  缺正文:   50
-  详情404:  6
-  请求异常: 15
+  完整:     0/214
+  缺标题:   172
+  缺来源:   181
+  缺正文:   49
+  详情404:  13
+  请求异常: 12
