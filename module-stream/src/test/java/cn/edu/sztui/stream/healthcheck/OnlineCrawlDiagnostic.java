@@ -615,6 +615,19 @@ class OnlineCrawlDiagnostic {
                 return new ArticleReport(idx, safeTitle(item), detailUrl, "http-error",
                         List.of("HTTP " + detailResp.statusCode()), null, 0);
             }
+            // 检测：detail 实际重定向到登录/系统提示页（content.jsp → auth.htm 等）
+            // 这种文章对未登录用户不可见，不计入 NO_TITLE/CONTENT 统计
+            String body = detailResp.body();
+            String finalPath = detailResp.uri() != null ? detailResp.uri().getPath() : "";
+            boolean isAuthRedirect = finalPath.contains("/auth.htm")
+                    || finalPath.contains("/system/resource/code/auth")
+                    || (body != null && body.length() < 2000
+                        && (body.contains("您访问的页面未找到") || body.contains("<title>系统提示</title>")));
+            if (isAuthRedirect) {
+                return new ArticleReport(idx, safeTitle(item), detailUrl, "external",
+                        List.of("跳转到登录/系统提示页"), null, 0);
+            }
+
             ContentParserResult content = parseContent(source, detailResp.body(), item.getId());
             TemplateFingerprint fingerprint = gwtContentParser.detectTemplate(Jsoup.parse(detailResp.body()));
 

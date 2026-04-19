@@ -175,7 +175,15 @@ public class SztuCmsListParser implements ParserStrategy {
             Element title = card.selectFirst(
                     "h3.article-item-title, div.text-box, p.event-title, .article-text p:first-child"
             );
-            if (title != null) virtual.appendChild(title.clone());
+            if (title != null) {
+                virtual.appendChild(title.clone());
+            } else {
+                // 兜底：cop-jzhb 这种纯图片卡片，标题在 <img alt="..."> 上
+                Element img = card.selectFirst("img[alt]");
+                if (img != null && StringUtils.hasText(img.attr("alt"))) {
+                    virtual.appendText(img.attr("alt"));
+                }
+            }
             Element date = card.selectFirst(
                     "span.image-date, .image-date, div.article-item-date, div.text-date"
             );
@@ -257,7 +265,10 @@ public class SztuCmsListParser implements ParserStrategy {
     /** 把一个 anchor（可能是真实 <a>，也可能是从 onclick 合成的虚拟节点）转成 InfoItemMeta。 */
     private void processAnchor(Element anchor, SourceConfig sourceConfig, String baseUrl,
                                List<InfoItemMeta> items, Set<String> seenIds) {
-        String href = anchor.attr("href").trim();
+        // 清理 href：去除前/后 zero-width 字符（U+200B/U+200C/U+200D/U+FEFF 等）
+        // 案例：hq-tzgg 列表里 anchor href 形如 "\u200Bhttps://nbw.sztu.edu.cn/..."
+        // 不去掉就会被 resolve 当相对路径，拼成 "hq.sztu.edu.cn/\u200Bhttps://..." 400
+        String href = anchor.attr("href").replaceAll("[\\p{Cf}\\p{Cc}]+", "").trim();
         if (!isArticleCandidate(href)) return;
 
         String title = extractTitle(anchor);
