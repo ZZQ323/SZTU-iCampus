@@ -1,5 +1,6 @@
 package cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.impl;
 
+import cn.edu.sztui.stream.application.external.engine.ArticleUrlResolver;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig.SourceConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult;
@@ -149,9 +150,14 @@ public class SztuGwtListParser implements ParserStrategy {
             Element dateElem = item.selectFirst(".width06");
             if (dateElem != null) publishDate = dateElem.text().trim();
 
+            // 统一存绝对 URL（方案 C：废弃 detailUrlTemplate 依赖）
+            String absUrl = ArticleUrlResolver.resolve(href, sourceConfig.getBaseUrl());
+            if (absUrl != null && absUrl.startsWith(ArticleUrlResolver.EXTERNAL_PREFIX)) {
+                absUrl = absUrl.substring(ArticleUrlResolver.EXTERNAL_PREFIX.length());
+            }
             return InfoItemMeta.builder()
                     .id(id)
-                    .url(href)
+                    .url(absUrl != null ? absUrl : href)
                     .title(title)
                     .categoryCode(categoryCode)     // ⭐ 从 URL 提取，不再是 null
                     .categoryName(categoryName)
