@@ -19,7 +19,7 @@ channels:
 
   - id: admission
     name: 招生办公室
-    description: 招生动态、招生政策/计划、奖助体系、专升本
+    description: 招生动态、政策、计划、奖助、专升本、学校新闻
     icon: user-add
     sourceOrg: department
     sort: 51
@@ -30,6 +30,7 @@ channels:
       - zs-zsjh
       - zs-jztx
       - zs-zsb
+      - zs-xyxw
 
   - id: job
     name: 就业指导中心
@@ -60,7 +61,7 @@ channels:
 
   - id: dept-kyb
     name: 科研与校企合作部
-    description: 通知/新闻/科研资讯/校企合作/成果转化/学术活动
+    description: 通知/新闻/科研资讯/校企合作/成果转化/学术活动/政策法规（国家/省部/市厅/人文社科）
     icon: explore
     sourceOrg: department
     sort: 21
@@ -73,10 +74,15 @@ channels:
       - kyb-cgz
       - kyb-jdjt
       - kyb-xshd
+      - kyb-zcfg
+      - kyb-zcfg-gj
+      - kyb-zcfg-sb
+      - kyb-zcfg-st
+      - kyb-zcfg-rwsk
 
   - id: dept-intl
     name: 国际合作与交流部
-    description: 焦点新闻、境外交流、来访交流
+    description: 焦点新闻、境外交流、来访交流、历年合作项目（2018-2022）
     icon: earth
     sourceOrg: department
     sort: 22
@@ -85,10 +91,14 @@ channels:
       - intl-jdxw
       - intl-jwjl
       - intl-lfjl
+      - intl-ykzxm-2018
+      - intl-ykzxm-2019
+      - intl-ykzxm-2020
+      - intl-ykzxm-2022
 
   - id: dept-hr
     name: 党委教师工作部/人力资源部
-    description: 通知公告、人事制度
+    description: 通知公告、人事制度、办事指南（综合管理/师资建设/高端人才/博士后/工资福利）
     icon: user-circle
     sourceOrg: department
     sort: 24
@@ -96,6 +106,11 @@ channels:
     sources:
       - hr-tzgg
       - hr-rszd
+      - hr-bszn-zhgl
+      - hr-bszn-szjs
+      - hr-bszn-gdrc
+      - hr-bszn-bsh
+      - hr-bszn-gzfl
 
   - id: dept-cwb
     name: 计划财务部
@@ -112,7 +127,7 @@ channels:
 
   - id: dept-sbc
     name: 国有资产与实验室管理开发部
-    description: 国有资产与实验室管理开发部 通知公告、工作动态
+    description: 通知/动态、实验室管理、政策标准、服务指南（购置预算/设备/实验室管理）、安全知识/警示案例
     icon: server
     sourceOrg: department
     sort: 26
@@ -120,10 +135,17 @@ channels:
     sources:
       - sbc-tzgg
       - sbc-gzdt
+      - sbc-syglzd
+      - sbc-zcbz
+      - sbc-gzysl
+      - sbc-sbgll
+      - sbc-sysgll
+      - sbc-aqzs
+      - sbc-jsal
 
   - id: dept-aqbw
     name: 党委保卫工作部/安全保卫中心
-    description: 通知公告、工作动态、党建、政策信息、规章制度
+    description: 通知公告、工作动态、党建、政策信息、规章制度、交通/消防/综合治理安全教育
     icon: shield
     sourceOrg: department
     sort: 27
@@ -134,10 +156,13 @@ channels:
       - aqbw-djdt
       - aqbw-zcx
       - aqbw-gzzd
+      - aqbw-jtaq
+      - aqbw-xfaq
+      - aqbw-zhzl
 
   - id: dept-zzb
     name: 党委组织部/党委统战部
-    description: 通知公告、工作动态、政策文件、党务学习
+    description: 通知/动态/政策文件/党务学习/党建研究（理论/时评/思想建设/党史）/干部工作/统战工作
     icon: user-setting
     sourceOrg: department
     sort: 28
@@ -147,10 +172,20 @@ channels:
       - zzb-gzdt
       - zzb-zcwj
       - zzb-dwxx
+      - zzb-djyj-zyll
+      - zzb-djyj-xxsp
+      - zzb-djyj-sxjs
+      - zzb-djyj-dsxx
+      - zzb-gbgz-zcwj
+      - zzb-gbgz-gblt
+      - zzb-tzgz-zcwj
+      - zzb-tzgz-tzll
+      - zzb-tzgz-tzdt
+      - zzb-tzgz-tzzs
 
   - id: dept-jjjc
     name: 纪检监察室
-    description: 纪检要闻、工作动态、廉洁文化
+    description: 纪检要闻、工作动态、廉洁文化、党内/国家法规
     icon: secured
     sourceOrg: department
     sort: 29
@@ -159,10 +194,12 @@ channels:
       - jjjc-jjyw
       - jjjc-gzdt
       - jjjc-ljwh
+      - jjjc-dnfgzd
+      - jjjc-gjflfg
 
   - id: dept-sjs
     name: 审计室
-    description: 工作动态、审计公告、党建工作、服务指南
+    description: 工作动态、审计公告、党建工作、服务指南、上级政策/学校规章
     icon: file-search
     sourceOrg: department
     sort: 30
@@ -172,10 +209,12 @@ channels:
       - sjs-sjgg
       - sjs-djgz
       - sjs-fwzn
+      - sjs-sjzcfg
+      - sjs-xxgzzd
 
   - id: dept-hq
     name: 后勤部
-    description: 通知公告、动态要闻、党建、政策规定、大事记要
+    description: 通知/动态/党建/政策规定/大事记要/服务指南（维修/采购/用车/住房/物业/就医/交通）/工会风采/招生宣传/党建政策
     icon: home
     sourceOrg: department
     sort: 31
@@ -186,3 +225,15 @@ channels:
       - hq-djdt
       - hq-zcgd
       - hq-dsjy
+      - hq-fwzn-wxfw
+      - hq-fwzn-cgfw
+      - hq-fwzn-gwyc
+      - hq-fwzn-zzzf
+      - hq-fwzn-wygl
+      - hq-fwzn-xyjy
+      - hq-fwzn-jtcx
+      - hq-ghhd
+      - hq-ryzc
+      - hq-fwfc
+      - hq-zsxc
+      - hq-zcxx
