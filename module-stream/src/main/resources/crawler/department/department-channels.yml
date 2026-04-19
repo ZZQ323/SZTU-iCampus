@@ -187,7 +187,7 @@ channels:
     name: 纪检监察室
     description: 纪检要闻、工作动态、廉洁文化、党内/国家法规
     icon: secured
-    sourceOrg: department
+    sourceOrg: audit
     sort: 29
     enabled: true
     sources:
@@ -201,7 +201,7 @@ channels:
     name: 审计室
     description: 工作动态、审计公告、党建工作、服务指南、上级政策/学校规章
     icon: file-search
-    sourceOrg: department
+    sourceOrg: audit
     sort: 30
     enabled: true
     sources:
