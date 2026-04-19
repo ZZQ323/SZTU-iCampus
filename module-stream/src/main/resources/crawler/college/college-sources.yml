@@ -136,7 +136,7 @@ sources:
     parserType: sztu-gwt
     baseUrl: ${urls.xy.sgim}
     listUrlTemplate: ${urls.xy.sgim}/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: ${urls.xy.sgim}/info/1045/{id}.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
     categoryCode: "1045"
     categoryName: 通知公告
     contentType: notice
@@ -1504,3 +1504,123 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 6
+
+  # ========================================================================
+  #  质量和标准学院（qsa.sztu.edu.cn）
+  #  用 xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=XXXX 格式（与 jyzd 同）
+  # ========================================================================
+
+  - id: qsa-xwdt
+    name: 质量标准学院新闻动态
+    channelId: college-qsa
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.qsa}
+    listUrlTemplate: ${urls.xy.qsa}/xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=1048&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.qsa}/info/{category}/{id}.htm
+    categoryCode: "1048"
+    categoryName: 新闻动态
+    contentType: news
+    subContentType: general-news
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  # 注：URL 合集把"通知公告 1049"和"人才招聘 1174"的 URL 都抄成了 wbtreeid=1048，
+  # 与"新闻动态"指向同一页。暂无真实的 tzgg/rczp 独立 URL，不加冗余源。
+
+  # ========================================================================
+  #  体育与艺术学院（tusports.sztu.edu.cn）
+  #  用 dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=XXXX 格式
+  # ========================================================================
+
+  - id: tusports-tzgg
+    name: 体艺学院通知公告
+    channelId: college-tusports
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1042&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1042"
+    categoryName: 通知公告
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: tusports-jxdt
+    name: 体艺学院教学动态
+    channelId: college-tusports
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1043&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1043"
+    categoryName: 教学动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  - id: tusports-jsry
+    name: 体艺学院竞赛荣誉
+    channelId: college-tusports
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1045"
+    categoryName: 竞赛荣誉
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  # ========================================================================
+  #  新一代信息技术研究院（xxjs.sztu.edu.cn）
+  #  研究机构，URL 合集里只给了研究方向/成果（偏静态）
+  # ========================================================================
+
+  - id: xxjs-yjcg
+    name: 新一代信息技术研究院研究成果
+    channelId: college-xxjs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.xxjs}
+    listUrl: ${urls.xy.xxjs}/yjcg.htm
+    detailUrlTemplate: ${urls.xy.xxjs}/info/{category}/{id}.htm
+    categoryCode: "1008"
+    categoryName: 研究成果
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: xxjs-rgzn
+    name: 新一代信息技术研究院人工智能方向
+    channelId: college-xxjs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.xxjs}
+    listUrl: ${urls.xy.xxjs}/yjfx/rgzn.htm
+    detailUrlTemplate: ${urls.xy.xxjs}/info/{category}/{id}.htm
+    categoryCode: "1007"
+    categoryName: 人工智能
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 2

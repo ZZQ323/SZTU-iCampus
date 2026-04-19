@@ -197,7 +197,7 @@ sources:
     parserType: sztu-cms
     baseUrl: ${urls.znbm.jyzd}
     listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1002&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: ${urls.znbm.jyzd}/info/1002/{id}.htm
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/{category}/{id}.htm
     categoryCode: "1002"
     categoryName: 就业通知
     contentType: notice
@@ -214,7 +214,7 @@ sources:
     parserType: sztu-cms
     baseUrl: ${urls.znbm.jyzd}
     listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: ${urls.znbm.jyzd}/info/1013/{id}.htm
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/{category}/{id}.htm
     categoryCode: "1013"
     categoryName: 工作动态
     contentType: news
@@ -231,7 +231,7 @@ sources:
     parserType: sztu-cms
     baseUrl: ${urls.znbm.jyzd}
     listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: ${urls.znbm.jyzd}/info/1020/{id}.htm
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/{category}/{id}.htm
     categoryCode: "1020"
     categoryName: 就业政策
     contentType: notice
@@ -248,7 +248,7 @@ sources:
     parserType: sztu-cms
     baseUrl: ${urls.znbm.jyzd}
     listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p={page}&a1020514c=20
-    detailUrlTemplate: ${urls.znbm.jyzd}/info/1021/{id}.htm
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/{category}/{id}.htm
     categoryCode: "1021"
     categoryName: 就业指导
     contentType: notice

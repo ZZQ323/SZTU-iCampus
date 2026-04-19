@@ -213,3 +213,36 @@ channels:
       - music-xsjz
       - music-hzjl
       - music-zsxx
+
+  - id: college-qsa
+    name: 质量和标准学院
+    description: 新闻动态
+    icon: check
+    sourceOrg: college
+    sort: 74
+    enabled: true
+    sources:
+      - qsa-xwdt
+
+  - id: college-tusports
+    name: 体育与艺术学院
+    description: 通知、教学、竞赛荣誉
+    icon: trophy
+    sourceOrg: college
+    sort: 75
+    enabled: true
+    sources:
+      - tusports-tzgg
+      - tusports-jxdt
+      - tusports-jsry
+
+  - id: college-xxjs
+    name: 新一代信息技术研究院
+    description: 研究成果、人工智能方向
+    icon: research
+    sourceOrg: college
+    sort: 76
+    enabled: true
+    sources:
+      - xxjs-yjcg
+      - xxjs-rgzn
