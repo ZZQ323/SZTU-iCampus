@@ -1105,101 +1105,185 @@ sources:
   #  药学院/口腔医学院（cop.sztu.edu.cn）
   # ========================================================================
 
-  # cop 站点的学院新闻实际路径是 /index/yyyw.htm（URL 合集核对）
-  - id: cop-xyxw
-    name: 药学院新闻
+  # cop 站点没有 /index/xyxw 或 /index/tzgg 汇总页，按网站实际结构重写（图源：用户截图）
+  - id: cop-kydt
+    name: 药学院科研动态
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/index/yyyw.htm
+    listUrl: ${urls.xy.cop}/kydt/kydt.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1017"
-    categoryName: 学院新闻
+    categoryCode: "1038"
+    categoryName: 科研动态
     contentType: news
-    subContentType: general-news
+    subContentType: academic
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
     enabled: true
     sort: 1
 
-  # cop 通知是按 党群/教学/学工/科研/行政/竞赛/招生就业 7 个子分类分页，无汇总页
-  - id: cop-tzgg-dq
-    name: 药学院党群通知
+  - id: cop-jzxw
+    name: 药学院讲座新闻
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/index/tzgg/dq.htm
+    listUrl: ${urls.xy.cop}/kydt/xsjz/jzxw.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1050"
-    categoryName: 党群通知
-    contentType: notice
-    subContentType: general-notice
+    categoryCode: "1038"
+    categoryName: 讲座新闻
+    contentType: news
+    subContentType: academic
     requiresAuth: false
-    crawlIntervalMinutes: 60
+    crawlIntervalMinutes: 120
     crawlPageCount: 1
     enabled: true
     sort: 2
 
-  - id: cop-tzgg-jx
-    name: 药学院教学通知
+  - id: cop-tzgg
+    name: 药学院党建通知公告
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/index/tzgg/jx.htm
+    listUrl: ${urls.xy.cop}/dqgz/djzj/tzgg.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1050"
-    categoryName: 教学通知
+    categoryCode: "1144"
+    categoryName: 通知公告
     contentType: notice
     subContentType: general-notice
     requiresAuth: false
-    crawlIntervalMinutes: 60
+    crawlIntervalMinutes: 30
     crawlPageCount: 1
     enabled: true
     sort: 3
 
-  - id: cop-tzgg-xg
-    name: 药学院学工通知
+  - id: cop-llxx
+    name: 药学院理论学习
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/index/tzgg/xg.htm
+    listUrl: ${urls.xy.cop}/dqgz/djzj/llxx.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1050"
-    categoryName: 学工通知
-    contentType: notice
-    subContentType: general-notice
+    categoryCode: "1145"
+    categoryName: 理论学习
+    contentType: news
+    subContentType: party
     requiresAuth: false
-    crawlIntervalMinutes: 60
+    crawlIntervalMinutes: 120
     crawlPageCount: 1
     enabled: true
     sort: 4
 
-  - id: cop-tzgg-ky
-    name: 药学院科研通知
+  - id: cop-ghhd
+    name: 药学院工会活动
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/index/tzgg/ky.htm
+    listUrl: ${urls.xy.cop}/dqgz/ghzj/ghhd.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1050"
-    categoryName: 科研通知
-    contentType: notice
-    subContentType: general-notice
+    categoryCode: "1146"
+    categoryName: 工会活动
+    contentType: news
+    subContentType: student
     requiresAuth: false
-    crawlIntervalMinutes: 60
+    crawlIntervalMinutes: 120
     crawlPageCount: 1
     enabled: true
     sort: 5
+
+  - id: cop-gjjl
+    name: 药学院国际交流
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/hzjl/gjjl.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1065"
+    categoryName: 国际交流
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: cop-xqhz
+    name: 药学院校企合作
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/hzjl/xqhz.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1066"
+    categoryName: 校企合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: cop-rydt
+    name: 药学院荣誉殿堂
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/xsgz/rydt.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1056"
+    categoryName: 荣誉殿堂
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: cop-txfc
+    name: 药学院团学风采
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/xsgz/txfc.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1114"
+    categoryName: 团学风采
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: cop-zsjy
+    name: 药学院招生就业
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/zsjy.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1175"
+    categoryName: 招生就业
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
 
   - id: cop-djhd
     name: 药学院党建活动
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/djzc/djhd.htm
+    listUrl: ${urls.xy.cop}/dqgz/djzj/djhd.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1146"
+    categoryCode: "1147"
     categoryName: 党建活动
     contentType: news
     subContentType: party
@@ -1207,7 +1291,7 @@ sources:
     crawlIntervalMinutes: 120
     crawlPageCount: 1
     enabled: true
-    sort: 3
+    sort: 11
 
   # ========================================================================
   #  未来技术学院（futuretechnologyschool.sztu.edu.cn）
