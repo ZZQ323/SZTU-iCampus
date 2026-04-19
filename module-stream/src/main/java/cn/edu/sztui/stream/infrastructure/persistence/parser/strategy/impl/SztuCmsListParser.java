@@ -49,10 +49,10 @@ public class SztuCmsListParser implements ParserStrategy {
     public static final String TYPE = "sztu-cms";
 
     /**
-     * 日期正则
+     * 日期正则（支持 2025-06-26 / 2025/06/26 / 2025.06.26 / 2025年06月26日）
      */
     private static final Pattern DATE_PATTERN =
-            Pattern.compile("(\\d{4}[-/.]\\d{1,2}[-/.]\\d{1,2})");
+            Pattern.compile("(\\d{4})[-/年.](\\d{1,2})[-/月.](\\d{1,2})[日]?");
 
     /**
      * info/{category}/{id}.htm
@@ -163,10 +163,17 @@ public class SztuCmsListParser implements ParserStrategy {
         // 3. div.item a[href] — 中德学院等图片卡片布局
         // 4. div.havePictureList_list > a[href] — 人工智能学院等图片列表布局
         // 5. tr a[href] — 学工部等 TABLE 布局（老版 CMS）
+        // 6. div.newlistItem1 a[href] — 纪检监察室 (jjjc-jjyw/gzdt) 无图列表
+        // 7. a.filterList_row[href] — 人工智能学院 (ai-tzgg) 表格式带正文预览布局
+        // 8. div.space-y-4 > a[href] — 半导体微纳中心 (cmnf) Tailwind 卡片布局
+        // 9. div.noPictureList_list > a[href] — ai-xsxx 左日期 + info_plate 布局
+        // 10. div.content_main_newItem a[href] — jjjc-ljwh 廉洁文化扁平布局
         Elements allAnchors = doc.select(
                 "li a[href], div.soga11 a[href], div.item a[href], " +
                 "div.havePictureList_list > a[href], tr a[href], " +
-                "div.content-list a[href], div.list a[href]"
+                "div.content-list a[href], div.list a[href], " +
+                "div.newlistItem1 a[href], a.filterList_row[href], div.space-y-4 > a[href], " +
+                "div.noPictureList_list > a[href], div.content_main_newItem a[href]"
         );
 
         for (Element anchor : allAnchors) {
@@ -284,10 +291,10 @@ public class SztuCmsListParser implements ParserStrategy {
             return titleAttr.trim();
         }
 
-        // 2. a 内的 h3
-        Element h3 = anchor.selectFirst("h3");
-        if (h3 != null && StringUtils.hasText(h3.text())) {
-            return h3.text().trim();
+        // 2. a 内的标题 heading（h3 常见；h5 用于 ai.filterList_row 格式）
+        Element heading = anchor.selectFirst("h3, h5");
+        if (heading != null && StringUtils.hasText(heading.text())) {
+            return heading.text().trim();
         }
 
         // 3. 特定 class 元素（各学院/部门模板用不同 class 名）
@@ -364,17 +371,43 @@ public class SztuCmsListParser implements ParserStrategy {
             return findDateInText(parentTr.text());
         }
 
+        // div.newlistItem1（纪检监察室 jjjc）：日期在 .note 子节点
+        Element parentNewListItem = anchor.closest("div.newlistItem1");
+        if (parentNewListItem != null) {
+            Element note = parentNewListItem.selectFirst("div.note");
+            if (note != null) {
+                String date = findDateInText(note.text());
+                if (date != null) return date;
+            }
+            return findDateInText(parentNewListItem.text());
+        }
+
+        // div.content_main_newItem（jjjc-ljwh 廉洁文化）：日期在 item 里的第二个 div
+        Element parentNewItem = anchor.closest("div.content_main_newItem");
+        if (parentNewItem != null) {
+            return findDateInText(parentNewItem.text());
+        }
+
         return null;
     }
 
     private String findDateInElement(Element element) {
         for (String sel : new String[]{
                 "span.date", "span.item-time", "em", ".sj p", ".sj", "time",
-                ".jl-tx p", ".ty-tx span", "p.p1", ".yy-ifo > span"}) {
+                ".jl-tx p", ".ty-tx span", "p.p1", ".yy-ifo > span", "div.note div"}) {
             Element dateEl = element.selectFirst(sel);
             if (dateEl != null) {
                 String date = findDateInText(dateEl.text());
                 if (date != null) return date;
+            }
+        }
+        // cmnf 模板：两个 font-mono span 分别存"日"和"年-月"，组合成完整日期
+        Elements monos = element.select("span.font-mono");
+        if (monos.size() >= 2) {
+            String day = monos.get(0).text().trim();
+            String yearMonth = monos.get(1).text().trim();
+            if (day.matches("\\d{1,2}") && yearMonth.matches("\\d{4}[-/]\\d{1,2}")) {
+                return findDateInText(yearMonth + "-" + day);
             }
         }
         return findDateInText(element.text());
@@ -384,7 +417,8 @@ public class SztuCmsListParser implements ParserStrategy {
         if (text == null) return null;
         Matcher m = DATE_PATTERN.matcher(text);
         if (m.find()) {
-            return m.group(1).replace("/", "-").replace(".", "-");
+            return String.format("%s-%02d-%02d",
+                    m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)));
         }
         return null;
     }

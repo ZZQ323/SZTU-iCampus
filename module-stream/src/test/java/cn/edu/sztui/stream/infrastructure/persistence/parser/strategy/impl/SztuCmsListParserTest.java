@@ -110,6 +110,71 @@ class SztuCmsListParserTest {
         assertHasValidItems(result);
     }
 
+    // ==================== 新增模板变体 ====================
+
+    @Test
+    @DisplayName("I型-纪检监察室 newlistItem1 无图列表")
+    void parseList_type_I_jjjc() throws Exception {
+        String html = readSample("list/list-jjjc.html");
+        ListParserResult result = parser.parseList(
+                html, mockConfig("jjjc-jjyw", "https://jjjc.sztu.edu.cn", "1005"), 1);
+        assertHasValidItems(result);
+        // 至少解析出数条（页面有 15 项）
+        assertTrue(result.getItems().size() >= 10, "jjjc 应至少解析出 10 条");
+        // 验证日期（年月日格式）
+        boolean hasDate = result.getItems().stream()
+                .anyMatch(i -> i.getPublishDate() != null && i.getPublishDate().matches("\\d{4}-\\d{2}-\\d{2}"));
+        assertTrue(hasDate, "jjjc 应能解析出年月日格式日期");
+    }
+
+    @Test
+    @DisplayName("J型-人工智能学院 filterList_row 表格列表")
+    void parseList_type_J_ai() throws Exception {
+        String html = readSample("list/list-ai.html");
+        ListParserResult result = parser.parseList(
+                html, mockConfig("ai-tzgg", "https://ai.sztu.edu.cn", "1219"), 1);
+        assertHasValidItems(result);
+        // 验证标题来自 h5 而非正文预览段（"…[详情]"）
+        boolean allTitlesValid = result.getItems().stream()
+                .allMatch(i -> !i.getTitle().contains("[详情]"));
+        assertTrue(allTitlesValid, "ai 标题必须来自 h5，不能是含 [详情] 的预览段");
+    }
+
+    @Test
+    @DisplayName("K型-半导体微纳中心 space-y-4 Tailwind 卡片")
+    void parseList_type_K_cmnf() throws Exception {
+        String html = readSample("list/list-cmnf.html");
+        ListParserResult result = parser.parseList(
+                html, mockConfig("cmnf-zxdt", "https://cmnf.sztu.edu.cn", "1005"), 1);
+        assertHasValidItems(result);
+        // 验证组合日期（两个 font-mono span）
+        boolean hasCombinedDate = result.getItems().stream()
+                .anyMatch(i -> i.getPublishDate() != null && i.getPublishDate().matches("\\d{4}-\\d{2}-\\d{2}"));
+        assertTrue(hasCombinedDate, "cmnf 应能从双 span 组合出完整日期");
+    }
+
+    @Test
+    @DisplayName("L型-ai-xsxx noPictureList 左日期布局")
+    void parseList_type_L_ai_xsxx() throws Exception {
+        String html = readSample("list/list-ai-xsxx.html");
+        ListParserResult result = parser.parseList(
+                html, mockConfig("ai-xsxx", "https://ai.sztu.edu.cn", "1345"), 1);
+        assertHasValidItems(result);
+        // 标题来自 .info_plate h4
+        boolean titlesFromH4 = result.getItems().stream()
+                .allMatch(i -> i.getTitle().length() > 5 && !i.getTitle().startsWith("一、"));
+        assertTrue(titlesFromH4, "ai-xsxx 标题应来自 h4 而非 p 预览段");
+    }
+
+    @Test
+    @DisplayName("M型-jjjc-ljwh content_main_newItem 扁平布局")
+    void parseList_type_M_jjjc_ljwh() throws Exception {
+        String html = readSample("list/list-jjjc-ljwh.html");
+        ListParserResult result = parser.parseList(
+                html, mockConfig("jjjc-ljwh", "https://jjjc.sztu.edu.cn", "1035"), 1);
+        assertHasValidItems(result);
+    }
+
     // ==================== 边界场景 ====================
 
     @Test

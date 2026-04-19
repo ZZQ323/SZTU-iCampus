@@ -49,7 +49,9 @@ public class SztuGwtContentParser implements ParserStrategy {
             "div.content_t h3",                          // icoc
             "div.detail-content h2.ft-18",               // jyzd
             "div.detail-content h2",
-            "div.news_conent_two_title",                 // sao / intl / nmne 变体
+            "div.news_conent_two_title",                 // sao / intl 等变体（不含 nmne）
+            "div.news_conent div[align=center] span[style*=font-weight]",  // nmne：无 class 仅内联样式
+            "div.news_conent div[align=center] span",                       // nmne fallback：任意 span
             "section.n_detail div.ar_title h3",          // gra
             "div.ar_title h3",
             "#article-content h1",                       // cmnf
