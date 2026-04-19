@@ -1,5 +1,6 @@
 package cn.edu.sztui.stream.healthcheck;
 
+import cn.edu.sztui.stream.application.external.engine.ArticleUrlResolver;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig.SourceConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
@@ -128,10 +129,14 @@ class OnlineCrawlDiagnostic {
                     totalArticles++;
 
                     String detailUrl = resolveDetailUrl(source, item);
-                    if (detailUrl == null || detailUrl.startsWith("EXTERNAL:")) {
+                    if (detailUrl == null
+                            || detailUrl.startsWith("EXTERNAL:")
+                            || ArticleUrlResolver.isExternalLink(detailUrl)) {
                         report.append("  [").append(i + 1).append("] ⏭️  外链/无URL: ")
-                                .append(item.getTitle()).append("\n");
-                        okArticles++; // 外链不算错误
+                                .append(item.getTitle())
+                                .append(detailUrl != null ? " | " + detailUrl : "")
+                                .append("\n");
+                        okArticles++; // 外链由前端"打开浏览器"跳转，不爬取
                         continue;
                     }
 

@@ -149,11 +149,28 @@ ws://host:port/ws?userId=XXX&topics=announcement,schedule,calendar
 
 ## 爬虫配置系统
 
-YAML 驱动（`crawler/channels.yml` + `crawler/sources.yml`）：
-- **频道**：28 个（公文通、教务、校园生活、各部门、各学院...）
-- **数据源**：约 90 个，覆盖全校网站
+YAML 驱动（按来源组织拆分，`crawler/{fixed,official,department,support,college}/*-{channels,sources,urls}.yml`）：
+- **频道**：37 个（公文通、教务、校园生活、各部门、各学院...）
+- **数据源**：约 92 个，覆盖全校网站
 - **解析器**：`sztu-gwt`（公文通 list.jsp）和 `sztu-cms`（学院 CMS 标准列表）
+- `CrawlerConfigLoader` 用 `classpath:crawler/*/*-urls.yml` 等 glob 自动扫描，归档文件在 `crawler/archived/` 不再加载
 - 添加新数据源只需编辑 YAML，不需要改代码
+
+### 博达 CMS 详情模板变体
+
+学校各子域名基于同一博达 CMS 但换了 15+ 套皮肤，`SztuGwtContentParser` 采用"有序选择器回退链"应对：
+- 标题候选：`h1.article-title` / `div.detail-title h4` / `div.tybt` / `div.c-tit h3` / `div.news_conent_two_title` 等 18 种
+- 元信息容器（作者/来源/发布时间）：`div.article-sm` / `div.detail-title h6` / `div.c-ifo` / `p.info` 等 18 种，按 `作者|来源|发布单位|信息来源|发布人` 标签扫描文本提取
+- 正文通用：`[id^=vsb_content] .v_news_content`（id 常带数字后缀如 `vsb_content_1081`），fallback 到 `.v_news_content`
+- 测试样本在 `module-stream/src/test/resources/parser-samples/content/`（ASCII 文件名，20 个模板一对一）
+
+### 外链条目短路
+
+列表里出现 `mp.weixin.qq.com`、政府/媒体域名等非 sztu 链接时：
+- `SztuCmsListParser` 在 `meta.extra` 写入 `{"external":true}` 并保留完整 URL
+- `InfoServiceImpl.getDetail` 检测到 `ArticleUrlResolver.isExternalLink(url)=true` 时短路：不发 HTTP 请求，不调 parser，直接返回 `ContentParserResult{success=true, title, externalUrl}`
+- 前端据 `externalUrl` 字段渲染"在浏览器中打开"按钮而非正文
+- `OnlineCrawlDiagnostic` 同步跳过外链不计为错误
 
 ## 两阶段初始化（CrawlEngine）
 
