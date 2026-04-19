@@ -157,6 +157,22 @@ public class SztuCmsListParser implements ParserStrategy {
     private List<InfoItemMeta> extractItems(Document doc, SourceConfig sourceConfig, String baseUrl) {
         List<InfoItemMeta> items = new ArrayList<>();
         Set<String> seenIds = new HashSet<>();
+
+        // 特殊模板：cop 用 <div class="article-card" onclick="window.location.href='..'">
+        // 没有 <a href>，URL 藏在 JS。提取时先把 onclick 转成虚拟 anchor。
+        for (Element card : doc.select("div.article-card[onclick]")) {
+            String onclick = card.attr("onclick");
+            Matcher m = Pattern.compile("href\\s*=\\s*['\"]([^'\"]+)['\"]").matcher(onclick);
+            if (!m.find()) continue;
+            String href = m.group(1);
+            Element virtual = new Element("a").attr("href", href);
+            // 拷贝内部 title/日期节点
+            Element title = card.selectFirst("p.event-title, .article-text p:first-child");
+            if (title != null) virtual.appendChild(title.clone());
+            Element date = card.selectFirst("span.image-date, .image-date");
+            if (date != null) virtual.appendChild(date.clone());
+            processAnchor(virtual, sourceConfig, baseUrl, items, seenIds);
+        }
         // 匹配所有可能包含文章链接的容器：
         // 1. li a[href] — 标准 CMS 列表
         // 2. div.soga11 a[href] — H型布局
@@ -177,63 +193,56 @@ public class SztuCmsListParser implements ParserStrategy {
         );
 
         for (Element anchor : allAnchors) {
-            String href = anchor.attr("href").trim();
-
-            // 第一层过滤：排除明显的非文章链接
-            if (!isArticleCandidate(href)) continue;
-
-            // 第二层过滤：必须有实质内容（标题或 title 属性）
-            String title = extractTitle(anchor);
-            if (!StringUtils.hasText(title)) continue;
-
-            // 解析 URL 和外链状态
-            boolean isExternal = isExternalUrl(href, baseUrl);
-            String fullUrl;
-            if (href.startsWith("http")) {
-                fullUrl = href;
-            } else {
-                fullUrl = ArticleUrlResolver.resolve(href, baseUrl);
-                if (fullUrl != null && fullUrl.startsWith(ArticleUrlResolver.EXTERNAL_PREFIX)) {
-                    fullUrl = fullUrl.substring(ArticleUrlResolver.EXTERNAL_PREFIX.length());
-                    isExternal = true;
-                }
-            }
-            if (fullUrl == null) continue;
-
-            // 提取 ID
-            String id = extractId(href, fullUrl, isExternal);
-            if (id == null || id.isEmpty()) continue;
-
-            // 去重
-            if (seenIds.contains(id)) continue;
-            seenIds.add(id);
-
-            // 提取分类码（从 URL）
-            String categoryCode = ArticleUrlResolver.extractCategory(fullUrl);
-            if (categoryCode == null) {
-                categoryCode = ArticleUrlResolver.extractCategory(href);
-            }
-
-            // 提取日期
-            String publishDate = extractDate(anchor);
-
-            InfoItemMeta meta = InfoItemMeta.builder()
-                    .id(id)
-                    .url(isExternal ? fullUrl : href)
-                    .title(title.trim())
-                    .categoryCode(categoryCode != null ? categoryCode : sourceConfig.getCategoryCode())
-                    .categoryName(sourceConfig.getCategoryName())
-                    .publishDate(publishDate)
-                    .source(sourceConfig.getName())
-                    .channelId(sourceConfig.getChannelId())
-                    .crawledAt(System.currentTimeMillis())
-                    .extra(isExternal ? "{\"external\":true}" : null)
-                    .build();
-
-            items.add(meta);
+            processAnchor(anchor, sourceConfig, baseUrl, items, seenIds);
         }
 
         return items;
+    }
+
+    /** 把一个 anchor（可能是真实 <a>，也可能是从 onclick 合成的虚拟节点）转成 InfoItemMeta。 */
+    private void processAnchor(Element anchor, SourceConfig sourceConfig, String baseUrl,
+                               List<InfoItemMeta> items, Set<String> seenIds) {
+        String href = anchor.attr("href").trim();
+        if (!isArticleCandidate(href)) return;
+
+        String title = extractTitle(anchor);
+        if (!StringUtils.hasText(title)) return;
+
+        boolean isExternal = isExternalUrl(href, baseUrl);
+        String fullUrl;
+        if (href.startsWith("http")) {
+            fullUrl = href;
+        } else {
+            fullUrl = ArticleUrlResolver.resolve(href, baseUrl);
+            if (fullUrl != null && fullUrl.startsWith(ArticleUrlResolver.EXTERNAL_PREFIX)) {
+                fullUrl = fullUrl.substring(ArticleUrlResolver.EXTERNAL_PREFIX.length());
+                isExternal = true;
+            }
+        }
+        if (fullUrl == null) return;
+
+        String id = extractId(href, fullUrl, isExternal);
+        if (id == null || id.isEmpty()) return;
+        if (seenIds.contains(id)) return;
+        seenIds.add(id);
+
+        String categoryCode = ArticleUrlResolver.extractCategory(fullUrl);
+        if (categoryCode == null) categoryCode = ArticleUrlResolver.extractCategory(href);
+
+        String publishDate = extractDate(anchor);
+
+        items.add(InfoItemMeta.builder()
+                .id(id)
+                .url(isExternal ? fullUrl : href)
+                .title(title.trim())
+                .categoryCode(categoryCode != null ? categoryCode : sourceConfig.getCategoryCode())
+                .categoryName(sourceConfig.getCategoryName())
+                .publishDate(publishDate)
+                .source(sourceConfig.getName())
+                .channelId(sourceConfig.getChannelId())
+                .crawledAt(System.currentTimeMillis())
+                .extra(isExternal ? "{\"external\":true}" : null)
+                .build());
     }
 
     // ==================== 链接过滤（两层） ====================
