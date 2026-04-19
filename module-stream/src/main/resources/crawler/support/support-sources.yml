@@ -41,6 +41,125 @@ sources:
     enabled: true
     sort: 2
 
+  - id: xtw-dtyl
+    name: 校团委灯塔引领
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/xwdt/dtyl.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1014"
+    categoryName: 灯塔引领
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: xtw-kjcx
+    name: 校团委科技创新
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/xwdt/kjcx.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1148"
+    categoryName: 科技创新
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: xtw-jjfw
+    name: 校团委聚焦服务
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/xwdt/jjfw.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1016"
+    categoryName: 聚焦服务
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: xtw-zttr
+    name: 校团委主题团日
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/ztzl1/zttr.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1152"
+    categoryName: 主题团日
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: xtw-qmgc
+    name: 校团委青马工程
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/ztzl1/qmgc.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1153"
+    categoryName: 青马工程
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: xtw-shsj
+    name: 校团委社会实践
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/ztzl1/shsj.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1131"
+    categoryName: 社会实践
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: xtw-qndxx
+    name: 校团委青年大学习
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/zhtj1/qndxx.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1163"
+    categoryName: 青年大学习
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
   # ========================================================================
   #  信息中心（it.sztu.edu.cn）
   # ========================================================================
@@ -78,6 +197,40 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 20
+
+  - id: it-kpxz
+    name: 信息中心科普新知
+    channelId: dept-it
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.it}
+    listUrl: ${urls.znbm.it}/xwgg/kpxz.htm
+    detailUrlTemplate: ${urls.znbm.it}/info/{category}/{id}.htm
+    categoryCode: "1076"
+    categoryName: 科普新知
+    contentType: news
+    subContentType: general-news
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 17
+
+  - id: it-zcfg
+    name: 信息中心党建政策法规
+    channelId: dept-it
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.it}
+    listUrl: ${urls.znbm.it}/djgz1/zcfg1.htm
+    detailUrlTemplate: ${urls.znbm.it}/info/{category}/{id}.htm
+    categoryCode: "1019"
+    categoryName: 党建政策法规
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 21
 
   # ========================================================================
   #  教学质量督导室（dds.sztu.edu.cn）
@@ -117,6 +270,40 @@ sources:
     enabled: true
     sort: 21
 
+  - id: dds-sbjzd
+    name: 督导室省部级制度
+    channelId: dept-dds
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.dds}
+    listUrl: ${urls.znbm.dds}/gzzd/sbjzd.htm
+    detailUrlTemplate: ${urls.znbm.dds}/info/{category}/{id}.htm
+    categoryCode: "1022"
+    categoryName: 省部级制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 22
+
+  - id: dds-xjzd
+    name: 督导室校级制度
+    channelId: dept-dds
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.dds}
+    listUrl: ${urls.znbm.dds}/gzzd/xjzd.htm
+    detailUrlTemplate: ${urls.znbm.dds}/info/{category}/{id}.htm
+    categoryCode: "1023"
+    categoryName: 校级制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 23
+
   # ========================================================================
   #  分析测试中心（fxcszx.sztu.edu.cn）
   # ========================================================================
@@ -154,6 +341,57 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 2
+
+  - id: fxcs-pxtz
+    name: 分析测试中心培训通知
+    channelId: lab-fxcs
+    parserType: sztu-cms
+    baseUrl: ${urls.kyjf.fxcs}
+    listUrl: ${urls.kyjf.fxcs}/index/pxtz.htm
+    detailUrlTemplate: ${urls.kyjf.fxcs}/info/{category}/{id}.htm
+    categoryCode: "1020"
+    categoryName: 培训通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: fxcs-sfbz
+    name: 分析测试中心收费标准
+    channelId: lab-fxcs
+    parserType: sztu-cms
+    baseUrl: ${urls.kyjf.fxcs}
+    listUrl: ${urls.kyjf.fxcs}/sfbz.htm
+    detailUrlTemplate: ${urls.kyjf.fxcs}/info/{category}/{id}.htm
+    categoryCode: "1013"
+    categoryName: 收费标准
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: fxcs-csfw
+    name: 分析测试中心测试服务
+    channelId: lab-fxcs
+    parserType: sztu-cms
+    baseUrl: ${urls.kyjf.fxcs}
+    listUrl: ${urls.kyjf.fxcs}/csfw.htm
+    detailUrlTemplate: ${urls.kyjf.fxcs}/info/{category}/{id}.htm
+    categoryCode: "1014"
+    categoryName: 测试服务
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   # ========================================================================
   #  半导体微纳加工中心（cmnf.sztu.edu.cn）
@@ -230,3 +468,54 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 2
+
+  - id: ime-kydt
+    name: 医工研究院科研动态
+    channelId: lab-ime
+    parserType: sztu-cms
+    baseUrl: ${urls.kyjf.ime}
+    listUrl: ${urls.kyjf.ime}/kydt.htm
+    detailUrlTemplate: ${urls.kyjf.ime}/info/{category}/{id}.htm
+    categoryCode: "1050"
+    categoryName: 科研动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: ime-xydt
+    name: 医工研究院行业动态
+    channelId: lab-ime
+    parserType: sztu-cms
+    baseUrl: ${urls.kyjf.ime}
+    listUrl: ${urls.kyjf.ime}/xydt.htm
+    detailUrlTemplate: ${urls.kyjf.ime}/info/{category}/{id}.htm
+    categoryCode: "1062"
+    categoryName: 行业动态
+    contentType: news
+    subContentType: general-news
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: ime-rczp
+    name: 医工研究院人才招聘
+    channelId: lab-ime
+    parserType: sztu-cms
+    baseUrl: ${urls.kyjf.ime}
+    listUrl: ${urls.kyjf.ime}/jrwm/rczp.htm
+    detailUrlTemplate: ${urls.kyjf.ime}/info/{category}/{id}.htm
+    categoryCode: "1061"
+    categoryName: 人才招聘
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 5

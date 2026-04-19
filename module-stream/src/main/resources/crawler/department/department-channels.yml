@@ -5,7 +5,7 @@ channels:
 
   - id: academic
     name: 教务信息
-    description: 教务部教学动态、信息公告
+    description: 教务部教学动态、信息公告、规章制度、办事指南
     icon: book
     sourceOrg: department
     sort: 10
@@ -14,20 +14,26 @@ channels:
       - jw-jdt
       - jw-xxg
       - jw-djfc
+      - jw-gzz
+      - jw-bszn
 
   - id: admission
     name: 招生办公室
-    description: 招生动态
+    description: 招生动态、招生政策/计划、奖助体系、专升本
     icon: user-add
     sourceOrg: department
     sort: 51
     enabled: true
     sources:
       - zs-zsdt
+      - zs-zszc
+      - zs-zsjh
+      - zs-jztx
+      - zs-zsb
 
   - id: job
     name: 就业指导中心
-    description: 就业指导中心通知、工作动态
+    description: 就业指导中心通知、工作动态、就业指导、就业政策
     icon: briefcase
     sourceOrg: department
     sort: 50
@@ -35,10 +41,12 @@ channels:
     sources:
       - jyzd-tzgg
       - jyzd-gzdt
+      - jyzd-jyzc
+      - jyzd-jyzd
 
   - id: dept-sao
     name: 党委学生工作部
-    description: 党委学生工作部/党委武装部/学生部 通知公告、新闻信息
+    description: 党委学生工作部通知/新闻/政策规章/办事指南/学生资助
     icon: user
     sourceOrg: department
     sort: 20
@@ -46,10 +54,13 @@ channels:
     sources:
       - sao-tzgg
       - sao-xwxx
+      - sao-zcgz
+      - sao-bszn
+      - sao-xsz
 
   - id: dept-kyb
     name: 科研与校企合作部
-    description: 科研与校企合作部通知、新闻动态
+    description: 通知/新闻/科研资讯/校企合作/成果转化/学术活动
     icon: explore
     sourceOrg: department
     sort: 21
@@ -57,10 +68,15 @@ channels:
     sources:
       - kyb-tzgg
       - kyb-xwdt
+      - kyb-kyzx
+      - kyb-xqh
+      - kyb-cgz
+      - kyb-jdjt
+      - kyb-xshd
 
   - id: dept-intl
     name: 国际合作与交流部
-    description: 国际合作与交流部/港澳台工作办公室 焦点新闻、交流动态
+    description: 焦点新闻、境外交流、来访交流
     icon: earth
     sourceOrg: department
     sort: 22
@@ -68,20 +84,22 @@ channels:
     sources:
       - intl-jdxw
       - intl-jwjl
+      - intl-lfjl
 
   - id: dept-hr
     name: 党委教师工作部/人力资源部
-    description: 党委教师工作部/人力资源部 通知公告
+    description: 通知公告、人事制度
     icon: user-circle
     sourceOrg: department
     sort: 24
     enabled: true
     sources:
       - hr-tzgg
+      - hr-rszd
 
   - id: dept-cwb
     name: 计划财务部
-    description: 计划财务部/采购与招投标管理中心 信息公开、工作动态
+    description: 信息公开、工作动态、政策法规、服务指南
     icon: money-circle
     sourceOrg: department
     sort: 25
@@ -89,6 +107,8 @@ channels:
     sources:
       - cwb-xxgk
       - cwb-gzdt
+      - cwb-zcfg
+      - cwb-fwzn
 
   - id: dept-sbc
     name: 国有资产与实验室管理开发部
@@ -103,7 +123,7 @@ channels:
 
   - id: dept-aqbw
     name: 党委保卫工作部/安全保卫中心
-    description: 党委保卫工作部/安全保卫中心 通知公告、工作动态、党建
+    description: 通知公告、工作动态、党建、政策信息、规章制度
     icon: shield
     sourceOrg: department
     sort: 27
@@ -112,10 +132,12 @@ channels:
       - aqbw-tzgg
       - aqbw-gzdt
       - aqbw-djdt
+      - aqbw-zcx
+      - aqbw-gzzd
 
   - id: dept-zzb
     name: 党委组织部/党委统战部
-    description: 党委组织部/党委统战部/党校 通知公告、工作动态
+    description: 通知公告、工作动态、政策文件、党务学习
     icon: user-setting
     sourceOrg: department
     sort: 28
@@ -123,10 +145,12 @@ channels:
     sources:
       - zzb-tzgg
       - zzb-gzdt
+      - zzb-zcwj
+      - zzb-dwxx
 
   - id: dept-jjjc
     name: 纪检监察室
-    description: 纪检监察室 纪检要闻、工作动态
+    description: 纪检要闻、工作动态、廉洁文化
     icon: secured
     sourceOrg: department
     sort: 29
@@ -134,10 +158,11 @@ channels:
     sources:
       - jjjc-jjyw
       - jjjc-gzdt
+      - jjjc-ljwh
 
   - id: dept-sjs
     name: 审计室
-    description: 审计室 工作动态、审计公告
+    description: 工作动态、审计公告、党建工作、服务指南
     icon: file-search
     sourceOrg: department
     sort: 30
@@ -145,10 +170,12 @@ channels:
     sources:
       - sjs-gzdt
       - sjs-sjgg
+      - sjs-djgz
+      - sjs-fwzn
 
   - id: dept-hq
     name: 后勤部
-    description: 后勤部 通知公告、动态要闻、党建
+    description: 通知公告、动态要闻、党建、政策规定、大事记要
     icon: home
     sourceOrg: department
     sort: 31
@@ -157,3 +184,5 @@ channels:
       - hq-tzgg
       - hq-dtyw
       - hq-djdt
+      - hq-zcgd
+      - hq-dsjy

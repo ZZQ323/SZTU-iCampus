@@ -5,7 +5,7 @@ channels:
 
   - id: campus-life
     name: 校园生活
-    description: 官网文娱活动、体育活动
+    description: 官网文娱活动、体育活动、技大风光
     icon: heart
     sourceOrg: official
     sort: 11
@@ -13,16 +13,18 @@ channels:
     sources:
       - www-wyhd
       - www-tyhd
+      - www-jdfg
 
   - id: news
     name: 学校新闻
-    description: 校园新闻、科研动态、国际交流
+    description: 校园新闻、媒体聚焦、科研动态、国际交流
     icon: newspaper
     sourceOrg: official
     sort: 12
     enabled: true
     sources:
       - www-xyxw
+      - www-mtjj
       - www-gjjl
       - www-xsjwjl
       - www-xqhz

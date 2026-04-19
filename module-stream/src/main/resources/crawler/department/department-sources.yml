@@ -62,6 +62,40 @@ sources:
     enabled: true
     sort: 3
 
+  - id: jw-gzz
+    name: 教务部规章制度
+    channelId: academic
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.jw}
+    listUrl: ${urls.znbm.jw}/gzz.htm
+    detailUrlTemplate: ${urls.znbm.jw}/info/{category}/{id}.htm
+    categoryCode: "1009"
+    categoryName: 规章制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: jw-bszn
+    name: 教务部办事指南
+    channelId: academic
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.jw}
+    listUrl: ${urls.znbm.jw}/ywbl/bszn.htm
+    detailUrlTemplate: ${urls.znbm.jw}/info/{category}/{id}.htm
+    categoryCode: "1050"
+    categoryName: 办事指南
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
   # ========================================================================
   #  招生网（zs.sztu.edu.cn，公开）
   # ========================================================================
@@ -82,6 +116,74 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 1
+
+  - id: zs-zszc
+    name: 招生政策
+    channelId: admission
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.zs}
+    listUrl: ${urls.znbm.zs}/bkzn/zszc1.htm
+    detailUrlTemplate: ${urls.znbm.zs}/info/{category}/{id}.htm
+    categoryCode: "1011"
+    categoryName: 招生政策
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  - id: zs-zsjh
+    name: 招生计划
+    channelId: admission
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.zs}
+    listUrl: ${urls.znbm.zs}/bkzn/zsjh1.htm
+    detailUrlTemplate: ${urls.znbm.zs}/info/{category}/{id}.htm
+    categoryCode: "1012"
+    categoryName: 招生计划
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: zs-jztx
+    name: 奖助体系
+    channelId: admission
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.zs}
+    listUrl: ${urls.znbm.zs}/bkzn/jztx1.htm
+    detailUrlTemplate: ${urls.znbm.zs}/info/{category}/{id}.htm
+    categoryCode: "1014"
+    categoryName: 奖助体系
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: zs-zsb
+    name: 专升本
+    channelId: admission
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.zs}
+    listUrl: ${urls.znbm.zs}/zsb1.htm
+    detailUrlTemplate: ${urls.znbm.zs}/info/{category}/{id}.htm
+    categoryCode: "1106"
+    categoryName: 专升本
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   # ========================================================================
   #  就业指导中心（jyzd.sztu.edu.cn，公开）
@@ -123,6 +225,40 @@ sources:
     enabled: true
     sort: 2
 
+  - id: jyzd-jyzc
+    name: 就业政策
+    channelId: job
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.jyzd}
+    listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/1020/{id}.htm
+    categoryCode: "1020"
+    categoryName: 就业政策
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: jyzd-jyzd
+    name: 就业指导
+    channelId: job
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.jyzd}
+    listUrlTemplate: ${urls.znbm.jyzd}/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.znbm.jyzd}/info/1021/{id}.htm
+    categoryCode: "1021"
+    categoryName: 就业指导
+    contentType: notice
+    subContentType: employment
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
   # ========================================================================
   #  党委学生工作部（sao.sztu.edu.cn）
   # ========================================================================
@@ -160,6 +296,57 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 2
+
+  - id: sao-zcgz
+    name: 党委学工部政策规章
+    channelId: dept-sao
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.sao}
+    listUrl: ${urls.znbm.sao}/zcgz.htm
+    detailUrlTemplate: ${urls.znbm.sao}/info/{category}/{id}.htm
+    categoryCode: "1034"
+    categoryName: 政策规章
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: sao-bszn
+    name: 党委学工部办事指南
+    channelId: dept-sao
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.sao}
+    listUrl: ${urls.znbm.sao}/bszn.htm
+    detailUrlTemplate: ${urls.znbm.sao}/info/{category}/{id}.htm
+    categoryCode: "1005"
+    categoryName: 办事指南
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: sao-xsz
+    name: 学生资助
+    channelId: dept-sao
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.sao}
+    listUrl: ${urls.znbm.sao}/xsz.htm
+    detailUrlTemplate: ${urls.znbm.sao}/info/{category}/{id}.htm
+    categoryCode: "1035"
+    categoryName: 学生资助
+    contentType: notice
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   # ========================================================================
   #  科研与校企合作部（kyb.sztu.edu.cn）
@@ -199,6 +386,91 @@ sources:
     enabled: true
     sort: 2
 
+  - id: kyb-kyzx
+    name: 科研资讯
+    channelId: dept-kyb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.kyb}
+    listUrl: ${urls.znbm.kyb}/kyzx/kydt.htm
+    detailUrlTemplate: ${urls.znbm.kyb}/info/{category}/{id}.htm
+    categoryCode: "1017"
+    categoryName: 科研资讯
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: kyb-xqh
+    name: 科研部校企合作
+    channelId: dept-kyb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.kyb}
+    listUrl: ${urls.znbm.kyb}/xqhz/xqh.htm
+    detailUrlTemplate: ${urls.znbm.kyb}/info/{category}/{id}.htm
+    categoryCode: "1019"
+    categoryName: 校企合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: kyb-cgz
+    name: 成果转化
+    channelId: dept-kyb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.kyb}
+    listUrl: ${urls.znbm.kyb}/xqhz/cgz.htm
+    detailUrlTemplate: ${urls.znbm.kyb}/info/{category}/{id}.htm
+    categoryCode: "1028"
+    categoryName: 成果转化
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: kyb-jdjt
+    name: 技大讲坛
+    channelId: dept-kyb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.kyb}
+    listUrl: ${urls.znbm.kyb}/xsjl/jdjt.htm
+    detailUrlTemplate: ${urls.znbm.kyb}/info/{category}/{id}.htm
+    categoryCode: "1024"
+    categoryName: 技大讲坛
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: kyb-xshd
+    name: 学术活动
+    channelId: dept-kyb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.kyb}
+    listUrl: ${urls.znbm.kyb}/xsjl/xshd.htm
+    detailUrlTemplate: ${urls.znbm.kyb}/info/{category}/{id}.htm
+    categoryCode: "1025"
+    categoryName: 学术活动
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
   # ========================================================================
   #  国际合作与交流部（international.sztu.edu.cn）
   # ========================================================================
@@ -237,6 +509,23 @@ sources:
     enabled: true
     sort: 2
 
+  - id: intl-lfjl
+    name: 国际合作部来访交流
+    channelId: dept-intl
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.intl}
+    listUrl: ${urls.znbm.intl}/gjjl/lfjl.htm
+    detailUrlTemplate: ${urls.znbm.intl}/info/{category}/{id}.htm
+    categoryCode: "1008"
+    categoryName: 来访交流
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
   # ========================================================================
   #  党委教师工作部/人力资源部（hr.sztu.edu.cn）
   # ========================================================================
@@ -257,6 +546,23 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 1
+
+  - id: hr-rszd
+    name: 人事制度
+    channelId: dept-hr
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.hr}
+    listUrl: ${urls.znbm.hr}/rszd.htm
+    detailUrlTemplate: ${urls.znbm.hr}/info/{category}/{id}.htm
+    categoryCode: "1018"
+    categoryName: 人事制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 2
 
   # ========================================================================
   #  计划财务部（cwb.sztu.edu.cn）
@@ -295,6 +601,40 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 3
+
+  - id: cwb-zcfg
+    name: 财务部政策法规
+    channelId: dept-cwb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.cwb}
+    listUrl: ${urls.znbm.cwb}/zcfg.htm
+    detailUrlTemplate: ${urls.znbm.cwb}/info/{category}/{id}.htm
+    categoryCode: "1006"
+    categoryName: 政策法规
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: cwb-fwzn
+    name: 财务部服务指南
+    channelId: dept-cwb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.cwb}
+    listUrl: ${urls.znbm.cwb}/fwzn.htm
+    detailUrlTemplate: ${urls.znbm.cwb}/info/{category}/{id}.htm
+    categoryCode: "1007"
+    categoryName: 服务指南
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   # ========================================================================
   #  国有资产与实验室管理开发部（sbc.sztu.edu.cn）
@@ -389,6 +729,40 @@ sources:
     enabled: true
     sort: 18
 
+  - id: aqbw-zcx
+    name: 保卫部党建政策信息
+    channelId: dept-aqbw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.aqbw}
+    listUrl: ${urls.znbm.aqbw}/djgz/zcx.htm
+    detailUrlTemplate: ${urls.znbm.aqbw}/info/{category}/{id}.htm
+    categoryCode: "1080"
+    categoryName: 党建政策信息
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 19
+
+  - id: aqbw-gzzd
+    name: 保卫部规章制度
+    channelId: dept-aqbw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.aqbw}
+    listUrl: ${urls.znbm.aqbw}/zcfg1/gzzd.htm
+    detailUrlTemplate: ${urls.znbm.aqbw}/info/{category}/{id}.htm
+    categoryCode: "1090"
+    categoryName: 规章制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 20
+
   # ========================================================================
   #  党委组织部/党委统战部（zzb.sztu.edu.cn）
   # ========================================================================
@@ -426,6 +800,40 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 9
+
+  - id: zzb-zcwj
+    name: 组织统战部政策文件
+    channelId: dept-zzb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.zzb}
+    listUrl: ${urls.znbm.zzb}/djgz1/zcwj1.htm
+    detailUrlTemplate: ${urls.znbm.zzb}/info/{category}/{id}.htm
+    categoryCode: "1007"
+    categoryName: 政策文件
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: zzb-dwxx
+    name: 组织统战部党务学习
+    channelId: dept-zzb
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.zzb}
+    listUrl: ${urls.znbm.zzb}/djgz1/dwxx1.htm
+    detailUrlTemplate: ${urls.znbm.zzb}/info/{category}/{id}.htm
+    categoryCode: "1011"
+    categoryName: 党务学习
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
 
   # ========================================================================
   #  纪检监察室（jjjc.sztu.edu.cn）
@@ -465,6 +873,23 @@ sources:
     enabled: true
     sort: 11
 
+  - id: jjjc-ljwh
+    name: 廉洁文化
+    channelId: dept-jjjc
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.jjjc}
+    listUrl: ${urls.znbm.jjjc}/ljwh1/ljwh.htm
+    detailUrlTemplate: ${urls.znbm.jjjc}/info/{category}/{id}.htm
+    categoryCode: "1035"
+    categoryName: 廉洁文化
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 12
+
   # ========================================================================
   #  审计室（sjs.sztu.edu.cn）
   # ========================================================================
@@ -502,6 +927,40 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 13
+
+  - id: sjs-djgz
+    name: 审计室党建工作
+    channelId: dept-sjs
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.sjs}
+    listUrl: ${urls.znbm.sjs}/djgz.htm
+    detailUrlTemplate: ${urls.znbm.sjs}/info/{category}/{id}.htm
+    categoryCode: "1007"
+    categoryName: 党建工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 14
+
+  - id: sjs-fwzn
+    name: 审计室服务指南
+    channelId: dept-sjs
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.sjs}
+    listUrl: ${urls.znbm.sjs}/fwzn.htm
+    detailUrlTemplate: ${urls.znbm.sjs}/info/{category}/{id}.htm
+    categoryCode: "1006"
+    categoryName: 服务指南
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 15
 
   # ========================================================================
   #  后勤部（hq.sztu.edu.cn）
@@ -557,3 +1016,37 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 19
+
+  - id: hq-zcgd
+    name: 后勤部政策规定
+    channelId: dept-hq
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.hq}
+    listUrl: ${urls.znbm.hq}/hqgk/zcgd.htm
+    detailUrlTemplate: ${urls.znbm.hq}/info/{category}/{id}.htm
+    categoryCode: "1118"
+    categoryName: 政策规定
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 20
+
+  - id: hq-dsjy
+    name: 后勤部大事记要
+    channelId: dept-hq
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.hq}
+    listUrl: ${urls.znbm.hq}/zhxx/dsjy.htm
+    detailUrlTemplate: ${urls.znbm.hq}/info/{category}/{id}.htm
+    categoryCode: "1039"
+    categoryName: 大事记要
+    contentType: news
+    subContentType: general-news
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 21
