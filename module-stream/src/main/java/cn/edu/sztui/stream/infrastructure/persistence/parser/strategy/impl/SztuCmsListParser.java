@@ -175,7 +175,15 @@ public class SztuCmsListParser implements ParserStrategy {
             Element title = card.selectFirst(
                     "h3.article-item-title, div.text-box, p.event-title, .article-text p:first-child"
             );
-            if (title != null) virtual.appendChild(title.clone());
+            if (title != null) {
+                virtual.appendChild(title.clone());
+            } else {
+                // 兜底：cop-jzhb 这种纯图片卡片，标题在 <img alt="..."> 上
+                Element img = card.selectFirst("img[alt]");
+                if (img != null && StringUtils.hasText(img.attr("alt"))) {
+                    virtual.appendText(img.attr("alt"));
+                }
+            }
             Element date = card.selectFirst(
                     "span.image-date, .image-date, div.article-item-date, div.text-date"
             );

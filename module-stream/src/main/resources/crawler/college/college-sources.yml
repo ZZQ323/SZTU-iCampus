@@ -2492,74 +2492,186 @@ sources:
     enabled: true
     sort: 11
 
-  # --- 药学院补充（cop 的老路径 /djzc/* + 其他）---
-  - id: cop-djxx
-    name: 药学院党纪学习
+  # --- 药学院补充（按用户提供的真实结构 c24bb6d 重写）---
+  # 老路径 /djzc/* 与 /jxky/xsdt /rcpy/bksjy/jxtz 已 404，删除；
+  # 新增"人才培养"板块（本科教学 4 + 实验中心 2）+ 讲座海报 + 学生工作 3 个补充。
+
+  # 科学动态 - 学术讲座
+  - id: cop-jzhb
+    name: 药学院讲座海报
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/djzc/djxx.htm
+    listUrl: ${urls.xy.cop}/kydt/xsjz/jzhb.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1176"
-    categoryName: 党纪学习
+    categoryCode: "1136"
+    categoryName: 讲座海报
     contentType: news
-    subContentType: party
+    subContentType: academic
     requiresAuth: false
     crawlIntervalMinutes: 240
     crawlPageCount: 1
     enabled: true
     sort: 12
 
-  - id: cop-gstz
-    name: 药学院公示通知
+  # 学生工作 - 补充 3 项
+  - id: cop-xzfc
+    name: 药学院学子风采
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/djzc/gstz.htm
+    listUrl: ${urls.xy.cop}/xsgz/xzfc.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1144"
-    categoryName: 公示通知
-    contentType: notice
-    subContentType: general-notice
+    categoryCode: "1115"
+    categoryName: 学子风采
+    contentType: news
+    subContentType: student
     requiresAuth: false
-    crawlIntervalMinutes: 120
+    crawlIntervalMinutes: 240
     crawlPageCount: 1
     enabled: true
     sort: 13
 
-  - id: cop-xsdt
-    name: 药学院学术动态
+  - id: cop-glzd
+    name: 药学院学工管理制度
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/jxky/xsdt.htm
+    listUrl: ${urls.xy.cop}/xsgz/glzd.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1038"
-    categoryName: 学术动态
+    categoryCode: "1117"
+    categoryName: 管理制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 14
+
+  - id: cop-shine
+    name: 药学院 SHINE+
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/xsgz/SHINE_2.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1118"
+    categoryName: SHINE+
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    # 该页面是 4 分类导航卡片（学科竞赛/职业规划/素养论坛/科普文化），非新闻列表，
+    # 跳到 SHINE_2/Shine_xxx.htm 子页。前端如要展示需做"分类入口"组件，暂关闭。
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: false
+    sort: 15
+
+  # 人才培养 · 本科教学（4 个）
+  - id: cop-rcpy-zysz
+    name: 药学院本科专业设置
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/rcpy/bkjx/zysz.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1195"
+    categoryName: 专业设置
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 16
+
+  - id: cop-rcpy-pyfa
+    name: 药学院本科培养方案
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/rcpy/bkjx/pyfa.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1196"
+    categoryName: 培养方案
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 17
+
+  - id: cop-rcpy-tsbpy
+    name: 药学院特色班培养
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/rcpy/bkjx/tsbpy.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1197"
+    categoryName: 特色班培养
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 18
+
+  - id: cop-rcpy-xtalent
+    name: 药学院 X-taland Program
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/rcpy/bkjx/X_taland_Program.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1198"
+    categoryName: X-taland Program
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 19
+
+  # 人才培养 · 实验中心（2 个）
+  - id: cop-syzx-zxdt
+    name: 药学院实验中心最新动态
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/rcpy/syzx/zxdt.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1041"
+    categoryName: 实验中心最新动态
     contentType: news
     subContentType: academic
     requiresAuth: false
     crawlIntervalMinutes: 120
     crawlPageCount: 1
     enabled: true
-    sort: 14
+    sort: 20
 
-  - id: cop-bksjy-jxtz
-    name: 药学院本科教学通知
+  - id: cop-syzx-fwzn
+    name: 药学院实验中心服务指南
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/rcpy/bksjy/jxtz.htm
+    listUrl: ${urls.xy.cop}/rcpy/syzx/fwzn.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
-    categoryCode: "1028"
-    categoryName: 本科教学通知
+    categoryCode: "1042"
+    categoryName: 实验中心服务指南
     contentType: notice
     subContentType: general-notice
     requiresAuth: false
-    crawlIntervalMinutes: 120
+    # 该页面是导航/流程说明，非新闻列表（无 article-list 元素），暂关闭。
+    crawlIntervalMinutes: 240
     crawlPageCount: 1
-    enabled: true
-    sort: 15
+    enabled: false
+    sort: 21
 
 
   # --- 交通学院补充（12 个细分板块）---

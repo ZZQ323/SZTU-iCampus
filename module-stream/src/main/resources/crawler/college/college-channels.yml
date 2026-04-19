@@ -223,27 +223,40 @@ channels:
 
   - id: college-cop
     name: 药学院/口腔医学院
-    description: 科研、讲座、党建通知、党建活动、工会、国际/校企合作、荣誉团学、招生就业、党纪学习、公示通知、学术动态、教学通知
+    description: 科研动态、讲座、党建/工会、国际/校企合作、招生就业、学生工作（荣誉/团学/学子/制度/SHINE+）、人才培养（专业/培养方案/特色班/X-taland、实验中心动态/服务指南）
     icon: medicine
     sourceOrg: college
     sort: 71
     enabled: true
     sources:
+      # 科学动态
       - cop-kydt
       - cop-jzxw
+      - cop-jzhb
+      # 招生就业
+      - cop-zsjy
+      # 党群工作
       - cop-tzgg
       - cop-llxx
       - cop-djhd
       - cop-ghhd
+      # 合作交流
       - cop-gjjl
       - cop-xqhz
+      # 学生工作
       - cop-rydt
       - cop-txfc
-      - cop-zsjy
-      - cop-djxx
-      - cop-gstz
-      - cop-xsdt
-      - cop-bksjy-jxtz
+      - cop-xzfc
+      - cop-glzd
+      # cop-shine 是分类导航卡片非新闻列表，已 enabled:false
+      # 人才培养 · 本科教学
+      - cop-rcpy-zysz
+      - cop-rcpy-pyfa
+      - cop-rcpy-tsbpy
+      - cop-rcpy-xtalent
+      # 人才培养 · 实验中心
+      - cop-syzx-zxdt
+      # cop-syzx-fwzn 是流程导航非新闻列表，已 enabled:false
 
   - id: college-future
     name: 未来技术学院
