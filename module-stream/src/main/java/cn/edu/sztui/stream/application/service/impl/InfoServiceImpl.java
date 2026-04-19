@@ -6,6 +6,7 @@ import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
+import cn.edu.sztui.stream.application.external.engine.ArticleUrlResolver;
 import cn.edu.sztui.stream.application.service.InfoService;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult;
@@ -186,6 +187,7 @@ public class InfoServiceImpl implements InfoService {
         // 2. 获取元数据以确定分类、数据源和原始 URL
         String sourceId = null;
         String originalUrl = null;
+        String metaTitle = null;
         ListParserResult.InfoItemMeta meta = infoCacheUtil.getMeta(channelId, id);
         if (meta != null) {
             if (!StringUtils.hasText(categoryCode)) {
@@ -194,6 +196,22 @@ public class InfoServiceImpl implements InfoService {
             }
             sourceId = meta.getSourceId();
             originalUrl = meta.getUrl(); // ⭐ 列表解析时提取的原始 URL（可能指向不同域名）
+            metaTitle = meta.getTitle();
+        }
+
+        // 2.5 外链短路：条目指向非 sztu 域名（微信/政府网站等）时，直接返回外链而不爬取
+        if (StringUtils.hasText(originalUrl)
+                && originalUrl.startsWith("http")
+                && ArticleUrlResolver.isExternalLink(originalUrl)) {
+            log.debug("外链条目，跳过爬取: id={}, url={}", id, originalUrl);
+            ContentParserResult external = ContentParserResult.builder()
+                    .success(true)
+                    .id(id)
+                    .title(metaTitle)
+                    .externalUrl(originalUrl)
+                    .build();
+            infoCacheUtil.saveContent(channelId, id, external);
+            return external;
         }
 
         // 3. 爬取详情页

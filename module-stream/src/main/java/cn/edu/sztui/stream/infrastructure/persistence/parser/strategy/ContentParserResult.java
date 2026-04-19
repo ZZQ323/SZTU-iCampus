@@ -53,6 +53,12 @@ public class ContentParserResult {
     /** 下一篇标题 */
     private String nextTitle;
 
+    /**
+     * 外链 URL：当条目指向非 sztu.edu.cn 域名（如微信公众号、政府网站）时填此字段，
+     * 前端据此渲染"跳转到外部浏览器"按钮而非正文。此时 content 可为空。
+     */
+    private String externalUrl;
+
     /** 扩展字段 */
     private Map<String, Object> extra;
 
