@@ -1,7 +1,7 @@
 === 全量在线诊断报告 ===
-诊断时间: 2026-04-19T11:00:14.659108146
+诊断时间: 2026-04-19T12:16:31.603030682
 公开源数量: 176
-耗时: 52298 ms (并发=8)
+耗时: 50889 ms (并发=8)
 
 ──── 人力资源部通知 (hr-tzgg, parser=sztu-cms) ────
   列表页 OK: 10 条  URL: https://hr.sztu.edu.cn/tzgg.htm
@@ -65,8 +65,8 @@
 
 ──── 新材料学院动态 (nmne-xydt, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xwzx/xydt.htm
-  [1] ✅ ● 韩培刚院长致辞：凝聚青年力量共促学科发展  [T=heuristic:nearest… M=div.news_conent_t… C=[id^=vsb_content]…]
-  [2] ✅ 2025年，深圳技术大学新材料与新能源学院学子在多项高水平学科竞赛中奋勇争先、载誉而归。学院秉持“以赛促学、科创融合”理念，在“华港杯”广东大学生材料创新大赛、全国大学生光电设计竞赛、全国大学生节能减排社会实践与科技竞赛、“挑战杯”广东大学生课外学术科技作品竞赛、蓝桥杯全国软件和信息技术专业人才大赛、全国金相技能大赛等权威赛事中全面开花，共计斩获国家级奖项13项、省级奖项15项，其中包括国家一等奖1项、国家二等奖2项、国家三等奖7项，省赛一等奖2项、省赛二等奖5项、省赛三等奖8项，充分彰显了学院拔尖创新人才培养的丰硕成果。  [T=heuristic:nearest… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [1] ✅ 深圳技术大学2026年润园青年学者论坛——新材料与新能源学院分论坛成功举行  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [2] ✅ 🏆 创新领航 | 2025年度学科竞赛我院再创佳绩！  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
   [3] ⏭️  外链: 再突破！我校新增1个ESI全球前1%学科 | https://mp.weixin.qq.com/s/dIJv240YvpG2Ed3eNLTCpg
 
 ──── 交通学院动态 (utl-xydt, parser=sztu-cms) ────
@@ -208,7 +208,10 @@
   ⚠️  列表解析无结果: https://sgim.sztu.edu.cn/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p=1&a1020514c=20
 
 ──── 人工智能学院通知 (ai-tzgg, parser=sztu-cms) ────
-  ⚠️  列表解析无结果: https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm
+  列表页 OK: 10 条  URL: https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm
+  [1] ⚠️  缺来源 | 关于举办“深技大OpenClaw智能体技术节”（简称“深技大·龙虾节”）系列主题活动的通知（第一、二期） | https://ai.sztu.edu.cn/info/1219/6760.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  [2] ⚠️  缺来源 | 致全体同学的寒假温馨提示 | https://ai.sztu.edu.cn/info/1219/6722.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  [3] ⚠️  缺来源 | 关于人工智能学院2024级本科生重修选课的说明 | https://ai.sztu.edu.cn/info/1221/6721.htm  [T=heuristic:nearest… M=· C=.v_news_content]
 
 ──── 校团委团学风采 (xtw-txfc, parser=sztu-cms) ────
   列表页 OK: 7 条  URL: https://xtw.sztu.edu.cn/xwdt/txfc.htm
@@ -247,16 +250,19 @@
   [3] ⚠️  缺来源 | 深圳技术大学2025年本科艺术类专业招生简章 | https://zs.sztu.edu.cn/info/1011/4412.htm  [T=div.con_title h2.… M=p.info C=[id^=vsb_content]…]
 
 ──── 微纳中心动态 (cmnf-zxdt, parser=sztu-cms) ────
-  ⚠️  列表解析无结果: https://cmnf.sztu.edu.cn/xwzx/zxdt.htm
+  列表页 OK: 5 条  URL: https://cmnf.sztu.edu.cn/xwzx/zxdt.htm
+  [1] ⚠️  缺来源 | “芯”火初燃，实战启航｜半导体微纳加工中心教学线首门实验课圆满开课 | https://cmnf.sztu.edu.cn/info/1005/1222.htm  [T=#article-content h1 M=#article-content … C=[id^=vsb_content]…]
+  [2] ⚠️  缺来源 | 宁存政院长当选深圳光学光电子行业协会轮值会长 | https://cmnf.sztu.edu.cn/info/1005/1213.htm  [T=#article-content h1 M=#article-content … C=[id^=vsb_content]…]
+  [3] ⚠️  缺来源 | 积极开展科普教育｜深圳华朗学校高中部前来半导体微纳加工中心参观交流 | https://cmnf.sztu.edu.cn/info/1005/1202.htm  [T=#article-content h1 M=#article-content … C=[id^=vsb_content]…]
 
 ──── 药学院党群通知 (cop-tzgg-dq, parser=sztu-cms) ────
   ⚠️  列表解析无结果: https://cop.sztu.edu.cn/index/tzgg/dq.htm
 
 ──── 新材料学院通知 (nmne-tzgg, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xwzx/tzgg.htm
-  [1] ⚠️  缺标题 | 关于新材料与新能源学院2024级本科生重修选课的说明 | https://nmne.sztu.edu.cn/info/1073/4422.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [2] ⚠️  缺标题 | 新材料与新能源学院2025-2026-2学期重修替代选课指引 | https://nmne.sztu.edu.cn/info/1073/4372.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [3] ⚠️  缺标题 | 关于拟确定陈洋洋等56名同志为入党积极分子的公示 | https://nmne.sztu.edu.cn/info/1073/4362.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
+  [1] ✅ 关于新材料与新能源学院2024级本科生重修选课的说明  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [2] ✅ 新材料与新能源学院2025-2026-2学期重修替代选课指引  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [3] ✅ 关于拟确定陈洋洋等56名同志为入党积极分子的公示  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
 
 ──── 国际合作部境外交流 (intl-jwjl, parser=sztu-cms) ────
   列表页 OK: 7 条  URL: https://international.sztu.edu.cn/gjjl/jwjl.htm
@@ -497,7 +503,7 @@
   列表页 OK: 6 条  URL: https://icoc.sztu.edu.cn/kxyj/xsdt.htm
   [1] ⏭️  外链: 会议室预约 | http://10.1.20.39/
   [2] ✅ 探索压力调控磁基态的奥秘：我校集成电路与光电芯片学院团队在《Nature Communications》发表研究成果  [T=div.content_t h3 M=div.content_t p C=[id^=vsb_content]…]
-  [3] ❌ HTTP 403: https://icoc.sztu.edu.cn/info/1034/1616.htm
+  [3] ✅ 突破！我院科研团队新发现刷新传统物理认知  [T=div.content_t h3 M=div.content_t p C=[id^=vsb_content]…]
 
 ──── 研究生院思政工作 (gra-szgz, parser=sztu-cms) ────
   列表页 OK: 9 条  URL: https://gra.sztu.edu.cn/xsgz/szgz.htm
@@ -543,9 +549,9 @@
 
 ──── 新材料学院讲座通知 (nmne-jzt, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xwzx/jzt.htm
-  [1] ⚠️  缺标题 | “新材料与新能源讲坛”第67讲：低碳新能源高分子膜与创新创业 | https://nmne.sztu.edu.cn/info/1151/4434.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [2] ⚠️  缺标题 | 技大讲坛第120讲暨“新材料与新能源讲坛”第66讲：光电功能高分子的合成与加工 | https://nmne.sztu.edu.cn/info/1151/4433.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [3] ⚠️  缺标题 | “新材料与新能源讲坛”第64讲:《绿色低碳的新型电力系统的枢纽——电化学储能技术与装备》 | https://nmne.sztu.edu.cn/info/1151/4402.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
+  [1] ✅ “新材料与新能源讲坛”第67讲：低碳新能源高分子膜与创新创业  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [2] ✅ 技大讲坛第120讲暨“新材料与新能源讲坛”第66讲：光电功能高分子的合成与加工  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [3] ✅ “新材料与新能源讲坛”第64讲:《绿色低碳的新型电力系统的枢纽——电化学储能技术与装备》  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
 
 ──── 医工研究院行业动态 (ime-xydt, parser=sztu-cms) ────
   列表页 OK: 1 条  URL: https://ime.sztu.edu.cn/xydt.htm
@@ -608,8 +614,8 @@
 ──── 新材料学院学术动态 (nmne-xsd, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xwzx/xsd.htm
   [1] ⏭️  外链: 我院科研团队在有机太阳能电池与钙钛矿太阳能电池两大领域取得多项突破性进展 | https://mp.weixin.qq.com/s/-HTGZrIHg5kcAa-oL9kzgA
-  [2] ⚠️  缺标题 | 我院苏耀荣教授团队在太阳能-氢能转换领域取得新进展 | https://nmne.sztu.edu.cn/info/1027/4333.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [3] ⚠️  缺标题 | 我院尤朋副教授团队在国际著名期刊Chemical Engineering Journal上发表最新研究成果 | https://nmne.sztu.edu.cn/info/1027/4253.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
+  [2] ✅ 我院苏耀荣教授团队在太阳能-氢能转换领域取得新进展  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [3] ✅ 我院尤朋副教授团队在国际著名期刊Chemical Engineering Journal上发表最新研究成果  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
 
 ──── 研究生院学术科研 (gra-xsky, parser=sztu-cms) ────
   列表页 OK: 7 条  URL: https://gra.sztu.edu.cn/pygz/xsky1.htm
@@ -618,10 +624,7 @@
   [3] ⚠️  缺来源 | 我校博士生徐思志获第三届全国光子技术论坛“最佳论文奖” | https://gra.sztu.edu.cn/info/1022/1935.htm  [T=section.n_detail … M=div.ar_title h6 C=[id^=vsb_content]…]
 
 ──── 国资实验室部动态 (sbc-gzdt, parser=sztu-cms) ────
-  列表页 OK: 20 条  URL: https://sbc.sztu.edu.cn/xwgg/gzdt.htm
-  [1] ⚠️  缺来源 | 新闻公告 | https://sbc.sztu.edu.cn/info/1024/2395.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
-  [2] ❌ HTTP 404: https://www.sztu.edu.cn/info/1043/4201.htm
-  [3] ⚠️  缺来源 | 新闻公告 | https://sbc.sztu.edu.cn/info/1024/2090.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
+  ❌ 列表页 HTTP 403: https://sbc.sztu.edu.cn/xwgg/gzdt.htm
 
 ──── 健康环境学院院企合作 (hsee-yqhz, parser=sztu-cms) ────
   列表页 OK: 20 条  URL: https://hsee.sztu.edu.cn/yqhz/yqhzdt.htm
@@ -732,7 +735,10 @@
   [2] ⚠️  缺来源 | 医疗机器人与智能系统实验室-生命健康仪器方向：招聘专职副研究员（2人）、博士后（2人） | https://ime.sztu.edu.cn/info/1061/1213.htm  [T=div.tybt M=div.newshow_timer C=[id^=vsb_content]…]
 
 ──── 人工智能学院学术信息 (ai-xsxx, parser=sztu-cms) ────
-  ⚠️  列表解析无结果: https://ai.sztu.edu.cn/kxyj1/xsxx.htm
+  列表页 OK: 10 条  URL: https://ai.sztu.edu.cn/kxyj1/xsxx.htm
+  [1] ⚠️  缺来源 | 人工智能学院关于举办“全球人工智能发展的基本态势”讲座的通知 | https://ai.sztu.edu.cn/info/1345/6723.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  [2] ⚠️  缺来源 | 大数据与互联网学院关于举办“黑客攻防与应急响应实战体验”讲座的通知 | https://ai.sztu.edu.cn/info/1345/6551.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  [3] ⚠️  缺来源 | 大数据与互联网学院关于举办“昇腾人工智能趋势”讲座的通知 | https://ai.sztu.edu.cn/info/1345/6541.htm  [T=heuristic:nearest… M=· C=.v_news_content]
 
 ──── 保卫部通知 (aqbw-tzgg, parser=sztu-cms) ────
   列表页 OK: 5 条  URL: https://aqbw.sztu.edu.cn/tzgg.htm
@@ -790,9 +796,9 @@
 
 ──── 新材料学院校企合作动态 (nmne-xqhz, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xqh/xqhzdt.htm
-  [1] ⚠️  缺标题 | 访企拓岗搭桥梁 校企同心促就业—— 我院联合瑞丰光电企业开展校园招聘宣讲及面试活动 | https://nmne.sztu.edu.cn/info/1180/4436.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [2] ⚠️  缺标题 | 深圳技术大学新材料与新能源学院赴理邦精密仪器股份有限公司开展党建交流活动 | https://nmne.sztu.edu.cn/info/1180/4327.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [3] ⚠️  缺标题 | 校企合作再添新成员！深圳技术大学与深圳粤宝电子科技有限公司共建校企联合实验室 | https://nmne.sztu.edu.cn/info/1180/4316.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
+  [1] ✅ 访企拓岗搭桥梁 校企同心促就业—— 我院联合瑞丰光电企业开展校园招聘宣讲及面试活动  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [2] ✅ 深圳技术大学新材料与新能源学院赴理邦精密仪器股份有限公司开展党建交流活动  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
+  [3] ✅ 校企合作再添新成员！深圳技术大学与深圳粤宝电子科技有限公司共建校企联合实验室  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
 
 ──── 交通学院校企合作 (utl-xqhz, parser=sztu-cms) ────
   列表页 OK: 2 条  URL: https://utl.sztu.edu.cn/kysx/xqhz.htm
@@ -812,10 +818,7 @@
   [3] ⚠️  缺来源 | 传承红色基因 赓续奋斗荣光|第二期校青马班赴广州实践研学 | https://xtw.sztu.edu.cn/info/1153/1434.htm  [T=div.article_secti… M=div.details_msg C=[id^=vsb_content]…]
 
 ──── 保卫部动态 (aqbw-gzdt, parser=sztu-cms) ────
-  列表页 OK: 5 条  URL: https://aqbw.sztu.edu.cn/gzdt.htm
-  [1] ⏭️  外链: 坪山公安分局 | http://www.szpsq.gov.cn/gafj/
-  [2] ⏭️  外链: 深圳交警 | http://szjj.sz.gov.cn/JTAQ/AQCS/
-  [3] ⏭️  外链: 深圳市公安局 | http://ga.sz.gov.cn/
+  ❌ 列表页 HTTP 403: https://aqbw.sztu.edu.cn/gzdt.htm
 
 ──── 学术活动 (kyb-xshd, parser=sztu-cms) ────
   列表页 OK: 1 条  URL: https://kyb.sztu.edu.cn/xsjl/xshd.htm
@@ -856,10 +859,16 @@
   [3] ✅ 《全国干部教育培训规划（2023－2027年）》  [T=div.con_title h2.… M=p.info C=[id^=vsb_content]…]
 
 ──── 纪检要闻 (jjjc-jjyw, parser=sztu-cms) ────
-  ⚠️  列表解析无结果: https://jjjc.sztu.edu.cn/jjyw.htm
+  列表页 OK: 15 条  URL: https://jjjc.sztu.edu.cn/jjyw.htm
+  [1] ⚠️  缺标题, 缺来源 | 中央层面深入贯彻中央八项规定精神学习教育工作专班、中央纪委办公厅公开通报魏栓师等人违规吃喝严重违反中央八项规定精神问题 | https://jjjc.sztu.edu.cn/info/1005/1771.htm  [T=· M=· C=[id^=vsb_content]…]
+  [2] ⚠️  缺标题, 缺来源 | 中共中央办公厅印发《党组讨论和决定党员处分事项工作程序规定》 | https://jjjc.sztu.edu.cn/info/1005/1761.htm  [T=· M=· C=[id^=vsb_content]…]
+  [3] ⚠️  缺标题, 缺来源 | 中华人民共和国国家监察委员会公告（第2号） | https://jjjc.sztu.edu.cn/info/1005/1752.htm  [T=· M=· C=[id^=vsb_content]…]
 
 ──── 纪检动态 (jjjc-gzdt, parser=sztu-cms) ────
-  ⚠️  列表解析无结果: https://jjjc.sztu.edu.cn/gzdt.htm
+  列表页 OK: 4 条  URL: https://jjjc.sztu.edu.cn/gzdt.htm
+  [1] ⚠️  缺标题, 缺来源 | 中秋国庆节点，狠刹违规收送礼歪风 | https://jjjc.sztu.edu.cn/info/1007/1664.htm  [T=· M=· C=[id^=vsb_content]…]
+  [2] ⚠️  缺标题, 缺来源 | 我校纪检监察干部参加市纪委监委高校纪检监察干部专题培训 | https://jjjc.sztu.edu.cn/info/1007/1341.htm  [T=· M=· C=[id^=vsb_content]…]
+  [3] ⚠️  缺标题, 缺来源 | 我校纪检监察人员参加市纪委监委专题培训 | https://jjjc.sztu.edu.cn/info/1007/1161.htm  [T=· M=· C=[id^=vsb_content]…]
 
 ──── 组织统战部党务学习 (zzb-dwxx, parser=sztu-cms) ────
   列表页 OK: 15 条  URL: https://zzb.sztu.edu.cn/djgz1/dwxx1.htm
@@ -868,7 +877,10 @@
   [3] ✅ 党纪学习教育|应知应会100条（一）  [T=div.con_title h2.… M=p.info C=[id^=vsb_content]…]
 
 ──── 廉洁文化 (jjjc-ljwh, parser=sztu-cms) ────
-  ⚠️  列表解析无结果: https://jjjc.sztu.edu.cn/ljwh1/ljwh.htm
+  列表页 OK: 15 条  URL: https://jjjc.sztu.edu.cn/ljwh1/ljwh.htm
+  [1] ⚠️  缺标题, 缺来源, 缺正文(len=33) | “廉洁圳能量”微电影微视频展播⑲｜《传承》 | https://jjjc.sztu.edu.cn/info/1035/1743.htm  [T=· M=· C=[id^=vsb_content]…]
+  [2] ⚠️  缺标题, 缺来源, 缺正文(len=33) | “廉洁圳能量”微电影微视频展播⑱｜《一念之间》 | https://jjjc.sztu.edu.cn/info/1035/1742.htm  [T=· M=· C=[id^=vsb_content]…]
+  [3] ⚠️  缺标题, 缺来源, 缺正文(len=33) | “廉洁圳能量”微电影微视频展播⑰｜《知止》 | https://jjjc.sztu.edu.cn/info/1035/1741.htm  [T=· M=· C=[id^=vsb_content]…]
 
 ──── 审计室动态 (sjs-gzdt, parser=sztu-cms) ────
   列表页 OK: 10 条  URL: https://sjs.sztu.edu.cn/gzdt.htm
@@ -956,7 +968,7 @@
   列表页 OK: 10 条  URL: https://it.sztu.edu.cn/djgz1.htm
   [1] ⚠️  缺来源 | 信息中心党支部开展学习贯彻习近平新时代中国特色社会主义思想主题教育动员部署会 | https://it.sztu.edu.cn/info/1018/2170.htm  [T=heuristic:nearest… M=· C=.v_news_content]
   [2] ⚠️  缺来源 | 信息中心党支部参观《中国共产党人的家风》档案展 | https://it.sztu.edu.cn/info/1018/2270.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [3] ⚠️  缺来源 | 党建引领促安全、校企携手新征程 ——深圳技术大学信息中心党支部、深信服党委联合党建活动 | https://it.sztu.edu.cn/info/1018/2225.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  [3] ❌ HTTP 403: https://it.sztu.edu.cn/info/1018/2225.htm
 
 ──── 信息中心党建政策法规 (it-zcfg, parser=sztu-cms) ────
   列表页 OK: 2 条  URL: https://it.sztu.edu.cn/djgz1/zcfg1.htm
@@ -991,70 +1003,70 @@
                汇  总
 ═══════════════════════════════════════
 源统计:
-  正常(有items): 162
-  空(无items):   13
-  失败(HTTP错误): 1
+  正常(有items): 166
+  空(无items):   7
+  失败(HTTP错误): 3
   总计:           176
 
 文章统计:
-  完整(解析+字段齐全): 148/456
-  外链(短路不解析):   126
-  缺标题:   14
-  缺来源:   156
-  缺正文:   4
+  完整(解析+字段齐全): 160/468
+  外链(短路不解析):   123
+  缺标题:   12
+  缺来源:   171
+  缺正文:   7
   解析失败: 2
-  详情HTTP错误: 7
+  详情HTTP错误: 6
   请求异常: 3
 
 正文长度分布 (字符数):
-  <50:     4
+  <50:     7
   50~200:  6
   200~500: 20
-  500~2k:  48
-  ≥2k:     240
+  500~2k:  49
+  ≥2k:     252
 
 模板指纹分布 (命中即按序采用，未列出的选择器=0 命中):
   标题选择器:
-    heuristic:nearest-heading                     × 95
+    heuristic:nearest-heading                     × 96
     div.news_conent_two_title                     × 45
     div.con_title h2.title                        × 35
     div.c-tit h3                                  × 20
     section.n_detail div.ar_title h3              × 19
     div.cnt_tit h2                                × 15
-    <none>                                        × 14
-    div.content_t h3                              × 13
+    div.content_t h3                              × 14
+    div.news_conent div[align=center] span[style*=font-weight] × 13
+    <none>                                        × 12
     div.detail-title h4                           × 12
     div.tybt                                      × 11
     div.content > div.title                       × 10
     div.contentBox h2.title                       × 10
     div.article_section div.article_title         × 7
     div.article_box h2                            × 7
-    #article-content h1                           × 3
+    #article-content h1                           × 6
     div.detail-content h2.ft-18                   × 2
   元信息容器:
-    <none>                                        × 96
+    <none>                                        × 108
     div.news_conent_two_js                        × 58
     p.info                                        × 35
     div.c-ifo                                     × 20
     div.ar_title h6                               × 19
     div.cnt_note                                  × 15
-    div.content_t p                               × 13
+    div.content_t p                               × 14
     div.detail-title h6                           × 12
     div.newshow_timer                             × 11
     div.parameter                                 × 10
     div.left div.info                             × 10
     div.sub_box                                   × 7
     div.details_msg                               × 7
-    #article-content div.flex                     × 3
+    #article-content div.flex                     × 6
     div.sub-row                                   × 2
   正文选择器:
-    [id^=vsb_content] .v_news_content             × 255
-    .v_news_content                               × 63
+    [id^=vsb_content] .v_news_content             × 266
+    .v_news_content                               × 68
 
 ⚠️  未识别模板的源 (title 或 content 选择器为 null，需要补模板):
-  - nmne-tzgg
   - utl-rczp
-  - nmne-jzt
-  - nmne-xsd
-  - nmne-xqhz
+  - jjjc-jjyw
+  - jjjc-gzdt
+  - jjjc-ljwh
 

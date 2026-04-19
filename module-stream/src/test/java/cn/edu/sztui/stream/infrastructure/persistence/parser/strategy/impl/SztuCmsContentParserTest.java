@@ -65,6 +65,7 @@ class SztuCmsContentParserTest {
                 Arguments.of("xtw-tzgg",  "https://xtw.sztu.edu.cn",              "content-xtw.html",      false, true),
                 Arguments.of("future-xwzx","https://futuretechnologyschool.sztu.edu.cn","content-future.html",false,true),
                 Arguments.of("nmne-xydt", "https://nmne.sztu.edu.cn",             "content-nmne.html",     true,  true),
+                Arguments.of("nmne-tzgg", "https://nmne.sztu.edu.cn",             "content-nmne-tzgg.html",false, true),
                 Arguments.of("sfl-xyxw",  "https://sfl.sztu.edu.cn",              "content-sfl.html",      true,  true),
                 Arguments.of("music-ywgz","https://musicyyds.sztu.edu.cn",        "content-music.html",    true,  false),
                 Arguments.of("ai-yxxw",   "https://ai.sztu.edu.cn",               "content-ai.html",       false, false)
