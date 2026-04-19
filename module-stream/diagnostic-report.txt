@@ -1,7 +1,7 @@
 === 全量在线诊断报告 ===
-诊断时间: 2026-04-19T13:24:36.183546868
-公开源数量: 6 (过滤: ^(qsa|tusports|xxjs)-)
-耗时: 4591 ms (并发=8)
+诊断时间: 2026-04-19T13:37:14.077304821
+公开源数量: 13 (过滤: ^(jyzd|sgim|qsa|tusports)-)
+耗时: 6487 ms (并发=8)
 
 ──── 质量标准学院新闻动态 (qsa-xwdt, parser=sztu-cms) ────
   列表页 OK: 21 条  URL: https://qsa.sztu.edu.cn/xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=1048&a1020514p=1&a1020514c=20
@@ -9,11 +9,17 @@
   [2] ⚠️  缺来源, 缺日期 | 南北高校携手擘画冰雪产业新标准 黑龙江冰雪体育职业学院与深技大达成战略合作 | https://qsa.sztu.edu.cn/info/1048/3901.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
   [3] ⚠️  缺来源, 缺日期 | 喜报｜质量和标准学院2025届本科毕业生升学情况 | https://qsa.sztu.edu.cn/info/1048/3790.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
 
-──── 新一代信息技术研究院研究成果 (xxjs-yjcg, parser=sztu-cms) ────
-  列表页 OK: 7 条  URL: https://xxjs.sztu.edu.cn/yjcg.htm
-  [1] ⚠️  缺标题, 缺来源, 缺日期 | 论文简介提出了一种基于虚假标记和秘密共享的通用联邦推荐框架，该工作扩展现有的虚假物品（fake items）技术至虚假标记（fake marks）技术，并将其与秘密共享（secret sharing）结合起来，解决了两种技术各自存在的缺点。该框架可以保护用户的评分行为和评分数值，且不牺牲模型的推荐性能。该框架还具有很好的通用性，可以应用在不同评分预测、物品排序、序列推荐等不同推荐任务的具体模型上 | https://xxjs.sztu.edu.cn/info/1008/1077.htm  [T=· M=· C=[id^=vsb_content]…]
-  [2] ⚠️  缺标题, 缺来源, 缺日期 | 论文简介该工作提出了一种面向反事实推荐（或纠偏推荐）的基于均匀数据的通用知识蒸馏框架。该工作基于更广泛的知识蒸馏定义来对均匀数据在反事实推荐中的使用策略进行构建、设计和讨论，其中均匀数据可以分别在标签蒸馏、样本蒸馏、特征蒸馏和结构蒸馏这四种视角中被充分地挖掘所蕴含的纠偏信息，该框架将这四种视角视为框架中的不同模块，且在每个模块中分别给出了一些具体可行的实现方案。该框架为反事实推荐中对稀少且珍... | https://xxjs.sztu.edu.cn/info/1008/1076.htm  [T=· M=· C=[id^=vsb_content]…]
-  [3] ⚠️  缺标题, 缺来源, 缺日期 | 论文简介随着联邦机器学习和推荐系统在隐私偏好建模和个性化方面的结合，出现了一个新的研究分支，称为联邦推荐系统，旨在以分布式的方式构建推荐模型，即每个用户被表示为分布式客户端，其中他/她的原始评分数据不与服务器或其他客户端共享。需要注意的是，除了用户对某一项目的具体评分的敏感信息外，用户对某一项目的评分集的信息也需要得到很好的保护。最近的一些研究建议为每个用户随机抽取一些未评级的项目，然后分配一... | https://xxjs.sztu.edu.cn/info/1008/1075.htm  [T=· M=· C=[id^=vsb_content]…]
+──── 中德学院新闻 (sgim-xyxw, parser=sztu-cms) ────
+  列表页 OK: 6 条  URL: https://sgim.sztu.edu.cn/xyxw.htm
+  [1] ⚠️  缺来源 | 青春逐梦正当时 不负韶华勇担当 ——中德智能制造学院郭灿辉同学优秀事迹 | https://sgim.sztu.edu.cn/info/1063/4218.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+  [2] ⚠️  缺来源 | 关于2026年“全国大学生电子设计竞赛”第三届校内选拔赛报名的通知 | https://sgim.sztu.edu.cn/info/1063/4096.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+  [3] ⚠️  缺来源 | 第三届三助（助老、助力、助残）机器人大会暨中德智能制造学院第七届校企合作论坛在深圳技术大学举办 | https://sgim.sztu.edu.cn/info/1063/4077.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+
+──── 就业通知公告 (jyzd-tzgg, parser=sztu-cms) ────
+  列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1002&a1020514p=1&a1020514c=20
+  [1] ⏭️  外链: 2026届|深圳技术大学2026届毕业生生源信息重磅发布！ | https://mp.weixin.qq.com/s/TWbJs_DVv3NIAcvndoX7hw
+  [2] ⏭️  外链: 400+国有企业、5000+岗位，等您来！ | https://mp.weixin.qq.com/s/jDDBRjYf6PXAU5nDHCmkiw
+  [3] ⏭️  外链: “百万英才汇南粤”春招岗位“全景图”来啦！1次活动，2场招聘，7w+好岗等你来解锁 | https://mp.weixin.qq.com/s/N4ijdeJhCmUL-gKxurfnNQ
 
 ──── 体艺学院通知公告 (tusports-tzgg, parser=sztu-cms) ────
   ⚠️  列表解析无结果: https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1042&a1020514p=1&a1020514c=20
@@ -21,27 +27,61 @@
 ──── 体艺学院教学动态 (tusports-jxdt, parser=sztu-cms) ────
   ⚠️  列表解析无结果: https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1043&a1020514p=1&a1020514c=20
 
-──── 新一代信息技术研究院人工智能方向 (xxjs-rgzn, parser=sztu-cms) ────
-  ⚠️  列表解析无结果: https://xxjs.sztu.edu.cn/yjfx/rgzn.htm
+──── 中德学院通知 (sgim-tzgg, parser=sztu-gwt) ────
+  ⚠️  列表解析无结果: https://sgim.sztu.edu.cn/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p=1&a1020514c=20
+
+──── 就业工作动态 (jyzd-gzdt, parser=sztu-cms) ────
+  列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p=1&a1020514c=20
+  [1] ⏭️  外链: 喜报：我校在第三届全国大学生职业规划大赛广东省分赛决赛中荣获佳绩 | https://mp.weixin.qq.com/s/FaGzBfvFoIa9-2kChWsXqQ
+  [2] ⏭️  外链: 【用人单位邀请函】4月27日深圳技术大学2026年春季就业实习双选会 | https://mp.weixin.qq.com/s/MC5wqUht9hK2JgOLhpI-mA
+  [3] ⏭️  外链: 深圳技术大学2026年深圳精英企业专场招聘会（第二场）圆满举办 | https://mp.weixin.qq.com/s/kH0Ffg2DpHjCTII0BR2kgA
 
 ──── 体艺学院竞赛荣誉 (tusports-jsry, parser=sztu-cms) ────
   ⚠️  列表解析无结果: https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p=1&a1020514c=20
+
+──── 就业政策 (jyzd-jyzc, parser=sztu-cms) ────
+  列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p=1&a1020514c=20
+  [1] ⚠️  缺来源 | 关于受理2026届毕业生求职创业补贴的通知 | https://jyzd.sztu.edu.cn/info/1020/1473.htm  [T=div.detail-conten… M=div.sub-row C=[id^=vsb_content]…]
+  [2] ⏭️  外链: 政策知多少|④高校学生应征入伍政策公告 | https://mp.weixin.qq.com/s/mQXdfXtdjOcYZZwGumGdww
+  [3] ⏭️  外链: 政策知多少|③高校学生自主创业政策公告 | https://mp.weixin.qq.com/s/MI1li7kt8SlgN9-woP4n6w
+
+──── 中德学院党的建设 (sgim-ddjs, parser=sztu-cms) ────
+  列表页 OK: 6 条  URL: https://sgim.sztu.edu.cn/dtgz2022/ddjs.htm
+  [1] ⚠️  缺来源 | 关于中德智能制造学院入党积极分子和发展对象拟确定名单公示 | https://sgim.sztu.edu.cn/info/1157/4076.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+  [2] ⚠️  缺来源 | 开展党建示范品牌培育——红色基地参观学习及公益家电维修党建特色活动 | https://sgim.sztu.edu.cn/info/1157/4026.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+  [3] ⚠️  缺来源 | 学院党总支一行赴浙大宁波理工学院开展专题调研学习 | https://sgim.sztu.edu.cn/info/1157/4018.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+
+──── 中德学院学生活动 (sgim-xshd, parser=sztu-cms) ────
+  列表页 OK: 6 条  URL: https://sgim.sztu.edu.cn/sshd/xshd1.htm
+  [1] ⚠️  缺来源 | “三八”妇女节回眸|芳华相伴岁月静，优雅同行人生路 | https://sgim.sztu.edu.cn/info/1105/3893.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+  [2] ⚠️  缺来源 | 哨停球落 | 让我们，下一年球场再会！ | https://sgim.sztu.edu.cn/info/1105/3894.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+  [3] ⚠️  缺来源 | 身穿迷彩少年气，神采飞扬正青春 | https://sgim.sztu.edu.cn/info/1105/3260.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
+
+──── 就业指导 (jyzd-jyzd, parser=sztu-cms) ────
+  列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p=1&a1020514c=20
+  [1] ⏭️  外链: 深圳市2026年公务员招考宣讲活动走进深技大 | https://mp.weixin.qq.com/s/vuPTa9WEdwop7yOwUPpaQg
+  [2] ⚠️  缺来源 | 关于举办2025年下半年 “中央专项彩票公益金宏志助航计划”全国高校 毕业生就业能力提升培训的通知 | https://jyzd.sztu.edu.cn/info/1021/1492.htm  [T=div.detail-conten… M=div.sub-row C=[id^=vsb_content]…]
+  [3] ⏭️  外链: 广东省2026年考试录用公务员公告 | https://mp.weixin.qq.com/s/ZVWKyoHMRgrnk4Jdcz3x_g
+
+──── 中德学院学科竞赛 (sgim-xkjs, parser=sztu-cms) ────
+  列表页 OK: 1 条  URL: https://sgim.sztu.edu.cn/xywh2022/xkjs.htm
+  [1] ⚠️  缺来源 | 我院学子在“中国大学生机械工程创新创意大赛”中喜获佳绩 | https://sgim.sztu.edu.cn/info/1204/2977.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
 
 ═══════════════════════════════════════
                汇  总
 ═══════════════════════════════════════
 源统计:
-  正常(有items): 2
+  正常(有items): 9
   空(无items):   4
   失败(HTTP错误): 0
-  总计:           6
+  总计:           13
 
 文章统计:
-  完整(解析+字段齐全): 0/6
-  外链(短路不解析):   0
-  缺标题:   3
-  缺来源:   6
-  缺日期:   6
+  完整(解析+字段齐全): 0/25
+  外链(短路不解析):   10
+  缺标题:   0
+  缺来源:   15
+  缺日期:   3
   缺正文:   0
   解析失败: 0
   详情HTTP错误: 0
@@ -51,20 +91,22 @@
   <50:     0
   50~200:  0
   200~500: 1
-  500~2k:  5
-  ≥2k:     0
+  500~2k:  4
+  ≥2k:     10
 
 模板指纹分布 (命中即按序采用，未列出的选择器=0 命中):
   标题选择器:
-    <none>                                        × 3
+    div.content > div.title                       × 10
     heuristic:nearest-heading                     × 3
+    div.detail-content h2.ft-18                   × 2
   元信息容器:
-    <none>                                        × 6
+    div.parameter                                 × 10
+    <none>                                        × 3
+    div.sub-row                                   × 2
   正文选择器:
-    [id^=vsb_content] .v_news_content             × 6
+    [id^=vsb_content] .v_news_content             × 15
 
-⚠️  未识别模板的源 (title 或 content 选择器为 null，需要补模板):
-  - xxjs-yjcg
+✅ 所有源的 title + content 均被选择器回退链覆盖
 
 ═══════════════════════════════════════
             失败分类表
@@ -80,7 +122,7 @@
 ▶ LIST_EMPTY (列表 200 但 parser 提取 0 条) — 4 个源
   - tusports-tzgg            https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1042&a1020514p=1&a1020514c=20
   - tusports-jxdt            https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1043&a1020514p=1&a1020514c=20
-  - xxjs-rgzn                https://xxjs.sztu.edu.cn/yjfx/rgzn.htm
+  - sgim-tzgg                https://sgim.sztu.edu.cn/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p=1&a1020514c=20
   - tusports-jsry            https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p=1&a1020514c=20
 
 ▶ DETAIL_HTTP_ERROR (抽查详情 HTTP 4xx/5xx) — 0 个源
@@ -92,16 +134,20 @@
 ▶ DETAIL_PARSE_FAIL (详情 parser 返回 success=false) — 0 个源
   (无)
 
-▶ NO_TITLE_MOST (≥半数抽查缺标题) — 1 个源
-  - xxjs-yjcg                https://xxjs.sztu.edu.cn/yjcg.htm
+▶ NO_TITLE_MOST (≥半数抽查缺标题) — 0 个源
+  (无)
 
-▶ NO_DATE_MOST (≥半数抽查缺日期) — 2 个源
+▶ NO_DATE_MOST (≥半数抽查缺日期) — 1 个源
   - qsa-xwdt                 https://qsa.sztu.edu.cn/xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=1048&a1020514p=1&a1020514c=20
-  - xxjs-yjcg                https://xxjs.sztu.edu.cn/yjcg.htm
 
-▶ NO_AUTHOR_MOST (≥半数抽查缺来源(页面本身常无作者)) — 2 个源
+▶ NO_AUTHOR_MOST (≥半数抽查缺来源(页面本身常无作者)) — 7 个源
   - qsa-xwdt                 https://qsa.sztu.edu.cn/xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=1048&a1020514p=1&a1020514c=20
-  - xxjs-yjcg                https://xxjs.sztu.edu.cn/yjcg.htm
+  - sgim-xyxw                https://sgim.sztu.edu.cn/xyxw.htm
+  - jyzd-jyzc                https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1020&a1020514p=1&a1020514c=20
+  - sgim-ddjs                https://sgim.sztu.edu.cn/dtgz2022/ddjs.htm
+  - sgim-xshd                https://sgim.sztu.edu.cn/sshd/xshd1.htm
+  - jyzd-jyzd                https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1021&a1020514p=1&a1020514c=20
+  - sgim-xkjs                https://sgim.sztu.edu.cn/xywh2022/xkjs.htm
 
 ▶ NO_CONTENT_MOST (≥半数抽查正文 <50 字) — 0 个源
   (无)
