@@ -22,3 +22,6 @@ urls:
     cop: https://cop.sztu.edu.cn                         # 药学院
     future: https://futuretechnologyschool.sztu.edu.cn   # 未来技术学院
     music: https://musicyyds.sztu.edu.cn                 # 音乐学院
+    qsa: https://qsa.sztu.edu.cn                         # 质量和标准学院
+    tusports: https://tusports.sztu.edu.cn               # 体育与艺术学院
+    xxjs: https://xxjs.sztu.edu.cn                       # 新一代信息技术研究院
