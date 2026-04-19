@@ -134,7 +134,7 @@ class OnlineCrawlDiagnostic {
         // 按 config 顺序输出
         int okSources = 0, emptySources = 0, failSources = 0;
         int totalArticles = 0, okArticles = 0, externalArticles = 0;
-        int missingTitle = 0, missingAuthor = 0, missingContent = 0, detail404 = 0, detailError = 0, parseFail = 0;
+        int missingTitle = 0, missingAuthor = 0, missingDate = 0, missingContent = 0, detail404 = 0, detailError = 0, parseFail = 0;
         Map<String, LongAdder> titleSelCounts = new ConcurrentHashMap<>();
         Map<String, LongAdder> metaSelCounts = new ConcurrentHashMap<>();
         Map<String, LongAdder> contentSelCounts = new ConcurrentHashMap<>();
@@ -188,6 +188,7 @@ class OnlineCrawlDiagnostic {
                     case "incomplete" -> {
                         if (a.issues().contains("缺标题")) missingTitle++;
                         if (a.issues().contains("缺来源")) missingAuthor++;
+                        if (a.issues().contains("缺日期")) missingDate++;
                         if (a.issues().stream().anyMatch(s -> s.startsWith("缺正文"))) missingContent++;
                         report.append("  [").append(a.index()).append("] ⚠️  ")
                                 .append(String.join(", ", a.issues()))
@@ -241,6 +242,7 @@ class OnlineCrawlDiagnostic {
         report.append("  外链(短路不解析):   ").append(externalArticles).append("\n");
         report.append("  缺标题:   ").append(missingTitle).append("\n");
         report.append("  缺来源:   ").append(missingAuthor).append("\n");
+        report.append("  缺日期:   ").append(missingDate).append("\n");
         report.append("  缺正文:   ").append(missingContent).append("\n");
         report.append("  解析失败: ").append(parseFail).append("\n");
         report.append("  详情HTTP错误: ").append(detail404).append("\n");
@@ -332,6 +334,7 @@ class OnlineCrawlDiagnostic {
             List<String> issues = new ArrayList<>();
             if (!StringUtils.hasText(content.getTitle())) issues.add("缺标题");
             if (!StringUtils.hasText(content.getAuthor())) issues.add("缺来源");
+            if (!StringUtils.hasText(content.getPublishTime())) issues.add("缺日期");
             int contentLen = content.getContent() != null ? content.getContent().length() : 0;
             if (contentLen < 50) issues.add("缺正文(len=" + contentLen + ")");
 
