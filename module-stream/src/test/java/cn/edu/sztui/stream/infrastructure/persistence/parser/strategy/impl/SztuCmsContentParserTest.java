@@ -71,7 +71,7 @@ class SztuCmsContentParserTest {
         );
     }
 
-    @ParameterizedTest(name = "{0} - {3}")
+    @ParameterizedTest(name = "{0}")
     @MethodSource("samples")
     @DisplayName("博达 CMS 详情解析跨模板兼容")
     void parseContent_coversTemplates(String id, String baseUrl, String file,
