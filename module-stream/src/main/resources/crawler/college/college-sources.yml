@@ -1625,3 +1625,1456 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 2
+  # ========================================================================
+  #  以下为第 2 轮补充源（55 建议 + tusports 14 校队 + utl 交通细分 = ~86 源）
+  # ========================================================================
+
+  # --- 人工智能学院补充 ---
+  - id: ai-cpyc
+    name: 人工智能学院诚聘英才
+    channelId: college-ai
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/cpyc.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
+    categoryCode: "1320"
+    categoryName: 诚聘英才
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: ai-xssxjy
+    name: 人工智能学院实习就业
+    channelId: college-ai
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/sxjy/xssxjy.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
+    categoryCode: "1159"
+    categoryName: 实习就业
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: ai-yjs-zsxx
+    name: 人工智能学院研究生招生信息
+    channelId: college-ai
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/rcpy/yjspy/zsxx1.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
+    categoryCode: "1207"
+    categoryName: 研究生招生信息
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  # --- 商学院补充 ---
+  - id: bs-zs
+    name: 商学院招生
+    channelId: college-bs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/xsgz/zs.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
+    categoryCode: "1542"
+    categoryName: 招生
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: bs-jyzd
+    name: 商学院就业指导
+    channelId: college-bs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/xsgz/jyzd.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
+    categoryCode: "1549"
+    categoryName: 就业指导
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: bs-zyfz
+    name: 商学院职业发展
+    channelId: college-bs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/xsgz/zyfz.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
+    categoryCode: "1541"
+    categoryName: 职业发展
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: bs-jsjhj
+    name: 商学院竞赛及获奖
+    channelId: college-bs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/rcpy/jsjhj.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
+    categoryCode: "1545"
+    categoryName: 竞赛及获奖
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  # --- 工程物理学院补充 ---
+  - id: cep-gnwhz
+    name: 工程物理学院国内外合作
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/hzjl/gnwhz.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1020"
+    categoryName: 国内外合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: cep-sshd
+    name: 工程物理学院师生活动
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/ssyd1/sshd/6.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1022"
+    categoryName: 师生活动
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: cep-jlry
+    name: 工程物理学院奖励荣誉
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/ssyd1/jlry.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1028"
+    categoryName: 奖励荣誉
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: cep-bkszs
+    name: 工程物理学院本科生招生
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/zsjy/bkszs1.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1023"
+    categoryName: 本科生招生
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: cep-jyxx
+    name: 工程物理学院就业信息
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/zsjy/jyxx.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1026"
+    categoryName: 就业信息
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  - id: cep-ssszs
+    name: 工程物理学院硕士生招生
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/zsjy/yjszs1/ssszs.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1037"
+    categoryName: 硕士生招生
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 12
+
+  # --- 创意设计学院补充 ---
+  - id: design-xsxz
+    name: 创意设计学院学术新秀
+    channelId: college-design
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.design}
+    listUrl: ${urls.xy.design}/xsyj/xsxz.htm
+    detailUrlTemplate: ${urls.xy.design}/info/{category}/{id}.htm
+    categoryCode: "1150"
+    categoryName: 学术新秀
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+
+  # --- 未来技术学院补充 ---
+  - id: future-tzgg-xy
+    name: 未来技术学院校园通知
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/xw_hd/tzgg1/xy.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1137"
+    categoryName: 校园通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: future-tzgg-xz
+    name: 未来技术学院行政通知
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/xw_hd/tzgg1/xz.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1135"
+    categoryName: 行政通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: future-rczp-jxky
+    name: 未来技术学院教学科研岗招聘
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/jrwm/rczp/jxkygw.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1011"
+    categoryName: 教学科研岗
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: future-jobs-hdpx
+    name: 未来技术学院活动培训
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/jobs/hdpx/1.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1056"
+    categoryName: 活动培训
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: future-jobs-rycg
+    name: 未来技术学院创业荣誉成果
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/jobs/rycg.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1060"
+    categoryName: 创业荣誉成果
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  # --- 研究生院补充 ---
+  - id: gra-jzgz
+    name: 研究生院奖助工作
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/xsgz/jzgz.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1032"
+    categoryName: 奖助工作
+    contentType: notice
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: gra-xyhd
+    name: 研究生院校园活动
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/xsgz/xyhd.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1033"
+    categoryName: 校园活动
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: gra-zyxw
+    name: 研究生院专业学位
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/xwgz/zyxw.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1029"
+    categoryName: 专业学位
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: gra-ssyjs-tzgg
+    name: 研究生院硕招通知公告
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/zsxx/ssyjszs1/tzgg.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1058"
+    categoryName: 硕招通知公告
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: gra-bsyjs-tzgg
+    name: 研究生院博招通知公告
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/zsxx/bsyjszs/tzgg.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1062"
+    categoryName: 博招通知公告
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  - id: gra-jwlhpyzs
+    name: 研究生院境外联合培养招生
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/zsxx/jwlhpyzs.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1063"
+    categoryName: 境外联合培养
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 12
+
+  - id: gra-bszn
+    name: 研究生院办事指南
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/zhfw/bszn1.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1041"
+    categoryName: 办事指南
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 13
+
+  - id: gra-jyfg
+    name: 研究生院教育法规
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/zhfw/jyfg1.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1040"
+    categoryName: 教育法规
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 14
+
+  # --- 健康环境学院补充 ---
+  - id: hsee-xyhd
+    name: 健康环境学院校园活动
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/xysh/xyhd.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
+    categoryCode: "1137"
+    categoryName: 校园活动
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: hsee-sxjy
+    name: 健康环境学院升学就业
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/xysh/sxjy.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
+    categoryCode: "1138"
+    categoryName: 升学就业
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: hsee-ryhj
+    name: 健康环境学院荣誉获奖
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/xysh/ryhj.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
+    categoryCode: "1141"
+    categoryName: 荣誉获奖
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: hsee-zsxc
+    name: 健康环境学院招生宣传
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/zsxx/zsxc.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
+    categoryCode: "1146"
+    categoryName: 招生宣传
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: hsee-xsjz
+    name: 健康环境学院学术讲座
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/kxyj/xsjz.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
+    categoryCode: "1134"
+    categoryName: 学术讲座
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  # --- 集成电路学院补充 ---
+  - id: icoc-xysh
+    name: 集成电路学院校园生活
+    channelId: college-icoc
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/xysh.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
+    categoryCode: "1041"
+    categoryName: 校园生活
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: icoc-jyqj
+    name: 集成电路学院就业前景
+    channelId: college-icoc
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/zsjy/jyqj.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
+    categoryCode: "1044"
+    categoryName: 就业前景
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+
+  # --- 新材料学院补充 ---
+  - id: nmne-xgxw
+    name: 新材料学院学工新闻
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/xztd/xgxw/7.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
+    categoryCode: "1161"
+    categoryName: 学工新闻
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: nmne-gjjldt
+    name: 新材料学院国际交流动态
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/gjj/gjjldt.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
+    categoryCode: "1177"
+    categoryName: 国际交流动态
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: nmne-hzj
+    name: 新材料学院合作交流
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/xwzx/hzj/1.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
+    categoryCode: "1180"
+    categoryName: 合作交流
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: nmne-kxyj-xsdt
+    name: 新材料学院科研学术动态
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/kxyj1/xsdt.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
+    categoryCode: "1027"
+    categoryName: 科研学术动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  # --- 外国语学院补充 ---
+  - id: sfl-xshj
+    name: 外国语学院学生获奖
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/xshj.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1085"
+    categoryName: 学生获奖
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: sfl-gzzd
+    name: 外国语学院学生规章制度
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/xshd/gzzd.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1063"
+    categoryName: 规章制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: sfl-kszx
+    name: 外国语学院考试资讯
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/pxks/kszx.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1065"
+    categoryName: 考试资讯
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: sfl-rczp
+    name: 外国语学院人才招聘
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/zszp/rczp.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1082"
+    categoryName: 人才招聘
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: sfl-bkszs
+    name: 外国语学院本科生招生
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/zszp/bkszs.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1083"
+    categoryName: 本科生招生
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: sfl-yjspy
+    name: 外国语学院研究生培养
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/jxky/yjspy.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1091"
+    categoryName: 研究生培养
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  # --- 中德学院补充 ---
+  - id: sgim-tjgz
+    name: 中德学院团建工作
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/dtgz2022/tjgz.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1158"
+    categoryName: 团建工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: sgim-xsgz
+    name: 中德学院学生工作
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/dtgz2022/xsgz.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1159"
+    categoryName: 学生工作
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: sgim-xysh
+    name: 中德学院校园生活
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/xywh2022/xysh.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1201"
+    categoryName: 校园生活
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: sgim-xkjs2
+    name: 中德学院学科建设
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/rcpy2022/xkjs.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1166"
+    categoryName: 学科建设
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: sgim-zsxc
+    name: 中德学院招生宣传
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/zsjy2022/zsxc.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1184"
+    categoryName: 招生宣传
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: sgim-jyzd
+    name: 中德学院就业指导
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/zsjy2022/jyzd.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1185"
+    categoryName: 就业指导
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  # --- 药学院补充（cop 的老路径 /djzc/* + 其他）---
+  - id: cop-djxx
+    name: 药学院党纪学习
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/djzc/djxx.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1176"
+    categoryName: 党纪学习
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 12
+
+  - id: cop-gstz
+    name: 药学院公示通知
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/djzc/gstz.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1144"
+    categoryName: 公示通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 13
+
+  - id: cop-xsdt
+    name: 药学院学术动态
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/jxky/xsdt.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1038"
+    categoryName: 学术动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 14
+
+  - id: cop-bksjy-jxtz
+    name: 药学院本科教学通知
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/rcpy/bksjy/jxtz.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1028"
+    categoryName: 本科教学通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 15
+
+
+  # --- 交通学院补充（12 个细分板块）---
+  - id: utl-ztxx
+    name: 交通学院专题学习
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/djyl/ztxx.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1076"
+    categoryName: 专题学习
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: utl-dwgg
+    name: 交通学院党务公告
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/djyl/dwgg.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1337"
+    categoryName: 党务公告
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: utl-djppjs
+    name: 交通学院党建品牌建设
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/djyl/djppjs.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1344"
+    categoryName: 党建品牌建设
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: utl-sjjx
+    name: 交通学院实践教学
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/rcpy/sjjx.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1036"
+    categoryName: 实践教学
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: utl-xsjy
+    name: 交通学院学生就业
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/rcpy/xsjy.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1335"
+    categoryName: 学生就业
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  - id: utl-gzzd
+    name: 交通学院学工规章制度
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xgzj/gzzd.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1342"
+    categoryName: 学工规章制度
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 12
+
+  - id: utl-xsfc-rydt
+    name: 交通学院荣誉殿堂
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xgzj/xsfc/rydt.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1373"
+    categoryName: 荣誉殿堂
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 13
+
+  - id: utl-qmgc
+    name: 交通学院青马工程
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xgzj/xstd/qmgc.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1053"
+    categoryName: 青马工程
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 14
+
+  - id: utl-shsj
+    name: 交通学院社会实践
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xgzj/xstd/shsj.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1054"
+    categoryName: 社会实践
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 15
+
+  - id: utl-xshd
+    name: 交通学院学生活动
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xgzj/xstd/xshd.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1055"
+    categoryName: 学生活动
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 16
+
+  - id: utl-kypt
+    name: 交通学院科研平台
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/kysx/kypt.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1070"
+    categoryName: 科研平台
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 17
+
+  - id: utl-kytd
+    name: 交通学院科研团队
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/kysx/kytd.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1336"
+    categoryName: 科研团队
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 18
+
+  # --- 音乐学院补充 ---
+  - id: music-jpkc
+    name: 音乐学院精品课程
+    channelId: college-music
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/xsjl/jpkc.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
+    categoryCode: "1094"
+    categoryName: 精品课程
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: music-xyrz
+    name: 音乐学院行业认知
+    channelId: college-music
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/xyrz.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
+    categoryCode: "1101"
+    categoryName: 行业认知
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  # --- 新一代信息研究院补充 ---
+  - id: xxjs-gdqjzzjsyzb
+    name: 新一代信息技术研究院光电器件方向
+    channelId: college-xxjs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.xxjs}
+    listUrl: ${urls.xy.xxjs}/yjfx/gdqjzzjsyzb.htm
+    detailUrlTemplate: ${urls.xy.xxjs}/info/{category}/{id}.htm
+    categoryCode: "1004"
+    categoryName: 光电器件方向
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: xxjs-jcdlgjjs
+    name: 新一代信息技术研究院集成电路方向
+    channelId: college-xxjs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.xxjs}
+    listUrl: ${urls.xy.xxjs}/yjfx/jcdlgjjs.htm
+    detailUrlTemplate: ${urls.xy.xxjs}/info/{category}/{id}.htm
+    categoryCode: "1006"
+    categoryName: 集成电路方向
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+
+  # --- 体育与艺术学院 · 校队训练（14 支校队）---
+  # 用户要求：尊重每个运动队，单独成源；独立 channel college-tusports-teams
+  - id: tusports-zuqiu
+    name: 体艺学院足球校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1036&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1036"
+    categoryName: 足球校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 1
+
+  - id: tusports-lanqiu
+    name: 体艺学院篮球校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1037&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1037"
+    categoryName: 篮球校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  - id: tusports-paiqiu
+    name: 体艺学院排球校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1038&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1038"
+    categoryName: 排球校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: tusports-weiqi
+    name: 体艺学院围棋校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1039&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1039"
+    categoryName: 围棋校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: tusports-pingpang
+    name: 体艺学院乒乓球校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1040&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1040"
+    categoryName: 乒乓球校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: tusports-wangqiu
+    name: 体艺学院网球校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1041&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1041"
+    categoryName: 网球校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: tusports-yumaoqiu
+    name: 体艺学院羽毛球校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1051&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1051"
+    categoryName: 羽毛球校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
+  - id: tusports-tyww
+    name: 体艺学院体育舞蹈校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1052&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1052"
+    categoryName: 体育舞蹈校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 8
+
+  - id: tusports-dxyy
+    name: 体艺学院定向越野校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1053&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1053"
+    categoryName: 定向越野校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 9
+
+  - id: tusports-jianshen
+    name: 体艺学院健身健美校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1091&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1091"
+    categoryName: 健身健美校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: tusports-paiwu
+    name: 体艺学院排舞校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1094&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1094"
+    categoryName: 排舞校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  - id: tusports-jxfp
+    name: 体艺学院极限飞盘校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1096&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1096"
+    categoryName: 极限飞盘校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 12
+
+  - id: tusports-youyong
+    name: 体艺学院游泳校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1098&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1098"
+    categoryName: 游泳校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 13
+
+  - id: tusports-wushu
+    name: 体艺学院武术校队
+    channelId: college-tusports-teams
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.tusports}
+    listUrlTemplate: ${urls.xy.tusports}/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1100&a1020514p={page}&a1020514c=20
+    detailUrlTemplate: ${urls.xy.tusports}/info/{category}/{id}.htm
+    categoryCode: "1100"
+    categoryName: 武术校队
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 14
+
