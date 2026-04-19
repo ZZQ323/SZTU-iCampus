@@ -58,6 +58,57 @@ sources:
     enabled: true
     sort: 3
 
+  - id: gra-szgz
+    name: 研究生院思政工作
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/xsgz/szgz.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1031"
+    categoryName: 思政工作
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: gra-xsky
+    name: 研究生院学术科研
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/pygz/xsky1.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1022"
+    categoryName: 学术科研
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: gra-gjjl
+    name: 研究生院国际交流
+    channelId: college-gra
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.gra}
+    listUrl: ${urls.xy.gra}/pygz/gjjl1.htm
+    detailUrlTemplate: ${urls.xy.gra}/info/{category}/{id}.htm
+    categoryCode: "1023"
+    categoryName: 国际交流
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
   # ========================================================================
   #  中德智能制造学院（sgim.sztu.edu.cn）
   # ========================================================================
@@ -112,6 +163,40 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 3
+
+  - id: sgim-xshd
+    name: 中德学院学生活动
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/sshd/xshd1.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1105"
+    categoryName: 学生活动
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: sgim-xkjs
+    name: 中德学院学科竞赛
+    channelId: college-sgim
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sgim}
+    listUrl: ${urls.xy.sgim}/xywh2022/xkjs.htm
+    detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm
+    categoryCode: "1204"
+    categoryName: 学科竞赛
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   # ========================================================================
   #  人工智能学院（ai.sztu.edu.cn）
@@ -168,6 +253,57 @@ sources:
     enabled: true
     sort: 3
 
+  - id: ai-txfc
+    name: 人工智能学院团学风采
+    channelId: college-ai
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/dtfc/txfc.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
+    categoryCode: "1051"
+    categoryName: 团学风采
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: ai-xsxx
+    name: 人工智能学院学术信息
+    channelId: college-ai
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/kxyj1/xsxx.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
+    categoryCode: "1345"
+    categoryName: 学术信息
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: ai-gjhz
+    name: 人工智能学院国际合作
+    channelId: college-ai
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.ai}
+    listUrl: ${urls.xy.ai}/hzjl/gjhz.htm
+    detailUrlTemplate: ${urls.xy.ai}/info/{category}/{id}.htm
+    categoryCode: "1046"
+    categoryName: 国际合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
   # ========================================================================
   #  新材料与新能源学院（nmne.sztu.edu.cn）
   # ========================================================================
@@ -222,6 +358,57 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 3
+
+  - id: nmne-jzt
+    name: 新材料学院讲座通知
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/xwzx/jzt.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
+    categoryCode: "1151"
+    categoryName: 讲座通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: nmne-xsd
+    name: 新材料学院学术动态
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/xwzx/xsd.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
+    categoryCode: "1027"
+    categoryName: 学术动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: nmne-xqhz
+    name: 新材料学院校企合作动态
+    channelId: college-nmne
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.nmne}
+    listUrl: ${urls.xy.nmne}/xqh/xqhzdt.htm
+    detailUrlTemplate: ${urls.xy.nmne}/info/{category}/{id}.htm
+    categoryCode: "1180"
+    categoryName: 校企合作动态
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
 
   # ========================================================================
   #  城市交通与物流学院（utl.sztu.edu.cn）
@@ -278,6 +465,57 @@ sources:
     enabled: true
     sort: 3
 
+  - id: utl-rczp
+    name: 交通学院人才招聘
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/szdw1/rczp.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1287"
+    categoryName: 人才招聘
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: utl-txfc
+    name: 交通学院团学风采
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/xgzj/xstd/txfc.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1052"
+    categoryName: 团学风采
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: utl-xqhz
+    name: 交通学院校企合作
+    channelId: college-utl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.utl}
+    listUrl: ${urls.xy.utl}/kysx/xqhz.htm
+    detailUrlTemplate: ${urls.xy.utl}/info/{category}/{id}.htm
+    categoryCode: "1350"
+    categoryName: 校企合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
   # ========================================================================
   #  健康与环境工程学院（hsee.sztu.edu.cn）
   # ========================================================================
@@ -296,7 +534,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: hsee-tzgg
@@ -313,7 +551,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
 
   - id: hsee-djhd
@@ -332,6 +570,40 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 3
+
+  - id: hsee-kydt
+    name: 健康环境学院科研动态
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/kxyj/kydt.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
+    categoryCode: "1109"
+    categoryName: 科研动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: hsee-yqhz
+    name: 健康环境学院院企合作
+    channelId: college-hsee
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.hsee}
+    listUrl: ${urls.xy.hsee}/yqhz/yqhzdt.htm
+    detailUrlTemplate: ${urls.xy.hsee}/info/{category}/{id}.htm
+    categoryCode: "1154"
+    categoryName: 院企合作动态
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   # ========================================================================
   #  工程物理学院（cep.sztu.edu.cn）
@@ -388,6 +660,57 @@ sources:
     enabled: true
     sort: 3
 
+  - id: cep-zpxx
+    name: 工程物理学院招聘信息
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/tzgg1/zpxx.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1102"
+    categoryName: 招聘信息
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: cep-kycg
+    name: 工程物理学院科研成果
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/kxyj/kycg1.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1017"
+    categoryName: 科研成果
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: cep-xsjl
+    name: 工程物理学院学术交流活动
+    channelId: college-cep
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cep}
+    listUrl: ${urls.xy.cep}/hzjl/xsjlhd.htm
+    detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
+    categoryCode: "1019"
+    categoryName: 学术交流活动
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
   # ========================================================================
   #  创意设计学院（design.sztu.edu.cn）
   # ========================================================================
@@ -443,6 +766,40 @@ sources:
     enabled: true
     sort: 3
 
+  - id: design-shfw
+    name: 创意设计学院社会服务
+    channelId: college-design
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.design}
+    listUrl: ${urls.xy.design}/xydt/shfw.htm
+    detailUrlTemplate: ${urls.xy.design}/info/{category}/{id}.htm
+    categoryCode: "1025"
+    categoryName: 社会服务
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: design-xysh
+    name: 创意设计学院校园生活
+    channelId: college-design
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.design}
+    listUrl: ${urls.xy.design}/xydt/xysh.htm
+    detailUrlTemplate: ${urls.xy.design}/info/{category}/{id}.htm
+    categoryCode: "1026"
+    categoryName: 校园生活
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
   # ========================================================================
   #  商学院（bs.sztu.edu.cn）
   # ========================================================================
@@ -461,7 +818,7 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 60
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 1
 
   - id: bs-tzgg
@@ -478,8 +835,59 @@ sources:
     requiresAuth: false
     crawlIntervalMinutes: 30
     crawlPageCount: 1
-    enabled: false
+    enabled: true
     sort: 2
+
+  - id: bs-xsdt
+    name: 商学院学术动态
+    channelId: college-bs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/index/xsdt.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
+    categoryCode: "1619"
+    categoryName: 学术动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: bs-xysh
+    name: 商学院校园生活
+    channelId: college-bs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/index/xysh.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
+    categoryCode: "1025"
+    categoryName: 校园生活
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: bs-dqgz
+    name: 商学院党群工作
+    channelId: college-bs
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.bs}
+    listUrl: ${urls.xy.bs}/dqgz.htm
+    detailUrlTemplate: ${urls.xy.bs}/info/{category}/{id}.htm
+    categoryCode: "1543"
+    categoryName: 党群工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   # ========================================================================
   #  外国语学院（sfl.sztu.edu.cn）
@@ -519,6 +927,57 @@ sources:
     enabled: true
     sort: 2
 
+  - id: sfl-dqgz
+    name: 外国语学院党群工作
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/dqgz.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1067"
+    categoryName: 党群工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: sfl-txhd
+    name: 外国语学院团学活动
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/xshd/txhd.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1062"
+    categoryName: 团学活动
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: sfl-xqhz
+    name: 外国语学院校企合作
+    channelId: college-sfl
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.sfl}
+    listUrl: ${urls.xy.sfl}/jxky/xqhz.htm
+    detailUrlTemplate: ${urls.xy.sfl}/info/{category}/{id}.htm
+    categoryCode: "1058"
+    categoryName: 校企合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
   # ========================================================================
   #  集成电路与光电芯片学院（icoc.sztu.edu.cn）
   # ========================================================================
@@ -557,16 +1016,102 @@ sources:
     enabled: true
     sort: 2
 
+  - id: icoc-xscg
+    name: 集成电路学院科学研究
+    channelId: college-icoc
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/kxyj/xscg.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
+    categoryCode: "1035"
+    categoryName: 科学研究
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: icoc-xsdt
+    name: 集成电路学院学术动态
+    channelId: college-icoc
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/kxyj/xsdt.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
+    categoryCode: "1034"
+    categoryName: 学术动态
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: icoc-dtjs
+    name: 集成电路学院党团建设
+    channelId: college-icoc
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/dtjs.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
+    categoryCode: "1036"
+    categoryName: 党团建设
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: icoc-xqhz
+    name: 集成电路学院校企合作
+    channelId: college-icoc
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/hzjl/xqhz.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
+    categoryCode: "1040"
+    categoryName: 校企合作
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
+  - id: icoc-rczp
+    name: 集成电路学院人才招聘
+    channelId: college-icoc
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.icoc}
+    listUrl: ${urls.xy.icoc}/rczp.htm
+    detailUrlTemplate: ${urls.xy.icoc}/info/{category}/{id}.htm
+    categoryCode: "1045"
+    categoryName: 人才招聘
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 7
+
   # ========================================================================
   #  药学院/口腔医学院（cop.sztu.edu.cn）
   # ========================================================================
 
+  # cop 站点的学院新闻实际路径是 /index/yyyw.htm（URL 合集核对）
   - id: cop-xyxw
     name: 药学院新闻
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/index/xyxw.htm
+    listUrl: ${urls.xy.cop}/index/yyyw.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
     categoryCode: "1017"
     categoryName: 学院新闻
@@ -578,22 +1123,74 @@ sources:
     enabled: true
     sort: 1
 
-  - id: cop-tzgg
-    name: 药学院通知
+  # cop 通知是按 党群/教学/学工/科研/行政/竞赛/招生就业 7 个子分类分页，无汇总页
+  - id: cop-tzgg-dq
+    name: 药学院党群通知
     channelId: college-cop
     parserType: sztu-cms
     baseUrl: ${urls.xy.cop}
-    listUrl: ${urls.xy.cop}/index/tzgg.htm
+    listUrl: ${urls.xy.cop}/index/tzgg/dq.htm
     detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
     categoryCode: "1050"
-    categoryName: 通知公告
+    categoryName: 党群通知
     contentType: notice
     subContentType: general-notice
     requiresAuth: false
-    crawlIntervalMinutes: 30
+    crawlIntervalMinutes: 60
     crawlPageCount: 1
     enabled: true
     sort: 2
+
+  - id: cop-tzgg-jx
+    name: 药学院教学通知
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/index/tzgg/jx.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1050"
+    categoryName: 教学通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: cop-tzgg-xg
+    name: 药学院学工通知
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/index/tzgg/xg.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1050"
+    categoryName: 学工通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: cop-tzgg-ky
+    name: 药学院科研通知
+    channelId: college-cop
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.cop}
+    listUrl: ${urls.xy.cop}/index/tzgg/ky.htm
+    detailUrlTemplate: ${urls.xy.cop}/info/{category}/{id}.htm
+    categoryCode: "1050"
+    categoryName: 科研通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
 
   - id: cop-djhd
     name: 药学院党建活动
@@ -667,6 +1264,57 @@ sources:
     enabled: true
     sort: 3
 
+  - id: future-tzgg-ky
+    name: 未来技术学院科研通知
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/xw_hd/tzgg1/ky.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1134"
+    categoryName: 科研通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: future-tzgg-xg
+    name: 未来技术学院学工通知
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/xw_hd/tzgg1/xg.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1136"
+    categoryName: 学工通知
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 60
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: future-xshy
+    name: 未来技术学院学术会议
+    channelId: college-future
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.future}
+    listUrl: ${urls.xy.future}/xw_hd/xshy.htm
+    detailUrlTemplate: ${urls.xy.future}/info/{category}/{id}.htm
+    categoryCode: "1021"
+    categoryName: 学术会议
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
+
   # ========================================================================
   #  音乐学院（musicyyds.sztu.edu.cn）
   # ========================================================================
@@ -687,3 +1335,88 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 1
+
+  - id: music-djgz
+    name: 音乐学院党建工作
+    channelId: college-music
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/dwxg/djgz.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
+    categoryCode: "1090"
+    categoryName: 党建工作
+    contentType: news
+    subContentType: party
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 2
+
+  - id: music-txgz
+    name: 音乐学院团学工作
+    channelId: college-music
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/dwxg/txgz.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
+    categoryCode: "1091"
+    categoryName: 团学工作
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 3
+
+  - id: music-xsjz
+    name: 音乐学院学术讲座
+    channelId: college-music
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/xsjl/xsjz.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
+    categoryCode: "1093"
+    categoryName: 学术讲座
+    contentType: news
+    subContentType: academic
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 4
+
+  - id: music-hzjl
+    name: 音乐学院合作交流
+    channelId: college-music
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/xsjl/hzjl.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
+    categoryCode: "1098"
+    categoryName: 合作交流
+    contentType: news
+    subContentType: cooperation
+    requiresAuth: false
+    crawlIntervalMinutes: 120
+    crawlPageCount: 1
+    enabled: true
+    sort: 5
+
+  - id: music-zsxx
+    name: 音乐学院招生信息
+    channelId: college-music
+    parserType: sztu-cms
+    baseUrl: ${urls.xy.music}
+    listUrl: ${urls.xy.music}/zsxx.htm
+    detailUrlTemplate: ${urls.xy.music}/info/{category}/{id}.htm
+    categoryCode: "1100"
+    categoryName: 招生信息
+    contentType: notice
+    subContentType: admission
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 6
