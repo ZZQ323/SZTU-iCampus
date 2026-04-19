@@ -23,3 +23,11 @@ dependencies {
     implementation project(':module-base')
     implementation project(':module-common')
 }
+
+// 把命令行的 -Ddiag.* 系统属性传递到 test 的 forked JVM，
+// 让 OnlineCrawlDiagnostic 的 -Ddiag.filter=<regex> 真正生效。
+test {
+    System.getProperties().each { key, value ->
+        if (key.toString().startsWith('diag.')) systemProperty key.toString(), value.toString()
+    }
+}
