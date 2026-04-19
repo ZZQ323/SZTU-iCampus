@@ -628,7 +628,10 @@ class OnlineCrawlDiagnostic {
             if (!StringUtils.hasText(content.getAuthor())) issues.add("缺来源");
             if (!StringUtils.hasText(content.getPublishTime())) issues.add("缺日期");
             int contentLen = content.getContent() != null ? content.getContent().length() : 0;
-            if (contentLen < 50) issues.add("缺正文(len=" + contentLen + ")");
+            boolean hasAttach = content.getAttachments() != null && !content.getAttachments().isEmpty();
+            // 有附件时放宽正文判定：许多"预算/决算/PDF 公示"页面是 iframe 嵌入 PDF，
+            // 正文只有几十字是正常，附件本身就是内容主体。
+            if (contentLen < 50 && !hasAttach) issues.add("缺正文(len=" + contentLen + ")");
 
             String title = StringUtils.hasText(content.getTitle()) ? content.getTitle() : safeTitle(item);
             return new ArticleReport(idx, title, detailUrl,

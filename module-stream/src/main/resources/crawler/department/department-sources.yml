@@ -541,7 +541,8 @@ sources:
     categoryName: 通知公告
     contentType: notice
     subContentType: general-notice
-    requiresAuth: false
+    # 详情页实际指向 nbw.sztu.edu.cn WebVPN 网关，需登录态，公开诊断测不了
+    requiresAuth: true
     crawlIntervalMinutes: 120
     crawlPageCount: 1
     enabled: true

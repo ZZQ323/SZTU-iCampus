@@ -214,11 +214,25 @@ public class SztuGwtContentParser implements ParserStrategy {
                 if (StringUtils.hasText(t)) return t;
             }
         }
-        // 最后回退到 <title>
+        // 最后回退到 <title>。某些页面 Jsoup 的 doc.title() 会返回空串（head 结构异常），
+        // 补一层 selectFirst 兜底。
         String t = doc.title();
+        if (!StringUtils.hasText(t)) {
+            Element titleEl = doc.selectFirst("head > title, title");
+            if (titleEl != null) t = titleEl.text();
+        }
         if (StringUtils.hasText(t)) {
-            int i = t.lastIndexOf("-");
-            return i > 0 ? t.substring(0, i).trim() : t.trim();
+            // 从后往前砍尾部的"-部门名"（可能多层），只保留真正的标题
+            String cleaned = t.trim();
+            for (int i = 0; i < 3; i++) {
+                int idx = cleaned.lastIndexOf("-");
+                if (idx <= 0) break;
+                String tail = cleaned.substring(idx + 1).trim();
+                // 尾部是"xxx站""学院""部""中心""网"等站点名，砍掉
+                if (tail.length() > 30) break;
+                cleaned = cleaned.substring(0, idx).trim();
+            }
+            return cleaned;
         }
         return null;
     }
@@ -371,7 +385,12 @@ public class SztuGwtContentParser implements ParserStrategy {
         List<AttachmentInfo> list = new ArrayList<>();
         Elements elems = doc.select("ul.fujian li a, UL.fujian li a");
         if (elems.isEmpty()) {
-            elems = doc.select(".attachment a, a[href$=.pdf], a[href$=.doc], a[href$=.docx], a[href$=.xls], a[href$=.xlsx], a[href$=.zip]");
+            elems = doc.select(
+                    ".attachment a, " +
+                    "a[href$=.pdf], a[href$=.doc], a[href$=.docx], a[href$=.xls], a[href$=.xlsx], a[href$=.zip], " +
+                    // 博达 VSB 的附件下载 URL 格式（cwb-xxgk 等 iframe/PDF 页面用）
+                    "a[href*=DownloadAttachUrl], a[href*=download.jsp]"
+            );
         }
         for (Element a : elems) {
             String name = a.text().trim(), url = a.attr("href");

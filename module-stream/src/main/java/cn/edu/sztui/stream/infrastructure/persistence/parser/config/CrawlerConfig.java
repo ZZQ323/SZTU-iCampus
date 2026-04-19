@@ -79,6 +79,13 @@ public class CrawlerConfig {
         private Integer sort;
 
         /**
+         * 可选：分类白名单（逗号分隔的 categoryCode 列表）。
+         * 非空时，列表解析只保留 URL 中 category 在白名单内的 item。
+         * 用于类似 www-tyhd 列表页混合多 category 但只有部分可访问的场景。
+         */
+        private String categoryWhitelist;
+
+        /**
          * 扩展参数
          */
         private Map<String, String> extra;
