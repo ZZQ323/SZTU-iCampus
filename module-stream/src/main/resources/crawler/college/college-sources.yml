@@ -133,7 +133,8 @@ sources:
   - id: sgim-tzgg
     name: 中德学院通知
     channelId: college-sgim
-    parserType: sztu-gwt
+    # list2022.jsp 的 HTML 结构是博达 CMS 标准 div.item 布局，用 sztu-cms 即可。
+    parserType: sztu-cms
     baseUrl: ${urls.xy.sgim}
     listUrlTemplate: ${urls.xy.sgim}/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p={page}&a1020514c=20
     detailUrlTemplate: ${urls.xy.sgim}/info/{category}/{id}.htm

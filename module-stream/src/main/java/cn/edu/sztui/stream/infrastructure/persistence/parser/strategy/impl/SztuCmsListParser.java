@@ -158,18 +158,27 @@ public class SztuCmsListParser implements ParserStrategy {
         List<InfoItemMeta> items = new ArrayList<>();
         Set<String> seenIds = new HashSet<>();
 
-        // 特殊模板：cop 用 <div class="article-card" onclick="window.location.href='..'">
-        // 没有 <a href>，URL 藏在 JS。提取时先把 onclick 转成虚拟 anchor。
-        for (Element card : doc.select("div.article-card[onclick]")) {
+        // 特殊模板 B：博达 VSB 预加载组件（nmne-djdt 等）
+        // 结构：<div style="display:none"><a id="u_u9_{id}_a" href="../info/X/{id}.htm"></a>...</div>
+        //       <script>var u_u9_title=["t1","t2",...]; var u_u9_id=["1","2",...]</script>
+        // anchor 无文本，title 藏在 JS 数组。按下标配对还原。
+        extractVsbPreloaded(doc, sourceConfig, baseUrl, items, seenIds);
+
+        // 特殊模板 A：cop 的 JS 跳转卡片。两种容器（article-card 带图 / no-pic-article-item 纯文本）
+        // 都把 URL 藏在 onclick，标题 class 不同（text-box / h3.article-item-title / event-title）。
+        for (Element card : doc.select("div.article-card[onclick], div.no-pic-article-item[onclick]")) {
             String onclick = card.attr("onclick");
             Matcher m = Pattern.compile("href\\s*=\\s*['\"]([^'\"]+)['\"]").matcher(onclick);
             if (!m.find()) continue;
             String href = m.group(1);
             Element virtual = new Element("a").attr("href", href);
-            // 拷贝内部 title/日期节点
-            Element title = card.selectFirst("p.event-title, .article-text p:first-child");
+            Element title = card.selectFirst(
+                    "h3.article-item-title, div.text-box, p.event-title, .article-text p:first-child"
+            );
             if (title != null) virtual.appendChild(title.clone());
-            Element date = card.selectFirst("span.image-date, .image-date");
+            Element date = card.selectFirst(
+                    "span.image-date, .image-date, div.article-item-date, div.text-date"
+            );
             if (date != null) virtual.appendChild(date.clone());
             processAnchor(virtual, sourceConfig, baseUrl, items, seenIds);
         }
@@ -182,14 +191,17 @@ public class SztuCmsListParser implements ParserStrategy {
         // 6. div.newlistItem1 a[href] — 纪检监察室 (jjjc-jjyw/gzdt) 无图列表
         // 7. a.filterList_row[href] — 人工智能学院 (ai-tzgg) 表格式带正文预览布局
         // 8. div.space-y-4 > a[href] — 半导体微纳中心 (cmnf) Tailwind 卡片布局
-        // 9. div.noPictureList_list > a[href] — ai-xsxx 左日期 + info_plate 布局
-        // 10. div.content_main_newItem a[href] — jjjc-ljwh 廉洁文化扁平布局
+        // 9. div.noPictureList_list > a — ai-xsxx 左日期 + info_plate 布局（class 在父 div）
+        // 10. a.noPicturelist_list — xxjs-rgzn 序号式列表（class 在 anchor 本身，注意大小写不同）
+        // 11. div.content_main_newItem a[href] — jjjc-ljwh 廉洁文化扁平布局
+        // 12. div.news-item a[href] — 体艺学院 (tusports) 新闻卡片
         Elements allAnchors = doc.select(
                 "li a[href], div.soga11 a[href], div.item a[href], " +
                 "div.havePictureList_list > a[href], tr a[href], " +
                 "div.content-list a[href], div.list a[href], " +
                 "div.newlistItem1 a[href], a.filterList_row[href], div.space-y-4 > a[href], " +
-                "div.noPictureList_list > a[href], div.content_main_newItem a[href]"
+                "div.noPictureList_list > a[href], a.noPicturelist_list[href], " +
+                "div.content_main_newItem a[href], div.news-item a[href]"
         );
 
         for (Element anchor : allAnchors) {
@@ -197,6 +209,49 @@ public class SztuCmsListParser implements ParserStrategy {
         }
 
         return items;
+    }
+
+    /**
+     * 处理博达 VSB 预加载图片组件（如 nmne-djdt）。
+     * 组件把 anchors 塞在 display:none 容器里（无可见文本），title / id / picurl 靠 JS 数组按序渲染。
+     * 这里抽 JS 变量 u_uN_title + u_uN_id + 隐藏 anchor 的 href，合成虚拟 anchor 交给 processAnchor。
+     */
+    private void extractVsbPreloaded(Document doc, SourceConfig sourceConfig, String baseUrl,
+                                     List<InfoItemMeta> items, Set<String> seenIds) {
+        Elements hiddenAnchors = doc.select("div[style*=display:none] a[id~=^u_u\\d+_\\d+_a$][href]");
+        if (hiddenAnchors.isEmpty()) return;
+        // 按 prefix（u_uN_）分组
+        Map<String, List<Element>> byPrefix = new HashMap<>();
+        for (Element a : hiddenAnchors) {
+            String id = a.id();                          // e.g. "u_u9_4412_a"
+            String prefix = id.replaceAll("_\\d+_a$", "");  // "u_u9"
+            byPrefix.computeIfAbsent(prefix, k -> new ArrayList<>()).add(a);
+        }
+        String scriptText = doc.select("script").stream()
+                .map(Element::data).reduce("", (a, b) -> a + "\n" + b);
+        for (Map.Entry<String, List<Element>> e : byPrefix.entrySet()) {
+            String prefix = e.getKey();
+            Matcher tm = Pattern.compile(
+                    "var\\s+" + Pattern.quote(prefix) + "_title\\s*=\\s*\\[([^\\]]+)\\]").matcher(scriptText);
+            Matcher im = Pattern.compile(
+                    "var\\s+" + Pattern.quote(prefix) + "_id\\s*=\\s*\\[([^\\]]+)\\]").matcher(scriptText);
+            if (!tm.find() || !im.find()) continue;
+            String[] titles = tm.group(1).split("\\s*,\\s*");
+            String[] idsArr = im.group(1).split("\\s*,\\s*");
+            int n = Math.min(titles.length, idsArr.length);
+            for (int i = 0; i < n; i++) {
+                String title = titles[i].replaceAll("^\\s*\"|\"\\s*$", "").trim();
+                String itemId = idsArr[i].replaceAll("^\\s*\"|\"\\s*$", "").trim();
+                if (title.isEmpty() || itemId.isEmpty()) continue;
+                Element hidden = e.getValue().stream()
+                        .filter(a -> a.id().equals(prefix + "_" + itemId + "_a"))
+                        .findFirst().orElse(null);
+                if (hidden == null) continue;
+                Element virtual = new Element("a").attr("href", hidden.attr("href"));
+                virtual.appendText(title);
+                processAnchor(virtual, sourceConfig, baseUrl, items, seenIds);
+            }
+        }
     }
 
     /** 把一个 anchor（可能是真实 <a>，也可能是从 onclick 合成的虚拟节点）转成 InfoItemMeta。 */
@@ -228,6 +283,17 @@ public class SztuCmsListParser implements ParserStrategy {
 
         String categoryCode = ArticleUrlResolver.extractCategory(fullUrl);
         if (categoryCode == null) categoryCode = ArticleUrlResolver.extractCategory(href);
+
+        // 分类白名单过滤（仅 sourceConfig.categoryWhitelist 非空时生效）
+        // 用途：www-tyhd 列表混合 1041/1088/1087/1067/1015 五个分类，但只有 1041 可公开访问
+        String whitelist = sourceConfig.getCategoryWhitelist();
+        if (StringUtils.hasText(whitelist) && StringUtils.hasText(categoryCode)) {
+            boolean inWhitelist = false;
+            for (String allowed : whitelist.split(",")) {
+                if (allowed.trim().equals(categoryCode)) { inWhitelist = true; break; }
+            }
+            if (!inWhitelist) return;
+        }
 
         String publishDate = extractDate(anchor);
 

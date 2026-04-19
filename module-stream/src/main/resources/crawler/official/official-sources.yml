@@ -34,10 +34,9 @@ sources:
     categoryName: 体育活动
     contentType: news
     subContentType: student
-    # 未来哪天其他catagory不404了，我就去看看
-    # 不设 categoryCode — 本页混合了 1041/1088/1087/1067/1015 五个分类
-    #   且部分文章指向 tusports.sztu.edu.cn（跨域绝对URL）
-    #   SztuCmsListParser 从每篇文章的 href 中提取真实分类
+    # 本页混合了 1041/1088/1087/1067/1015 五个分类，但用户反馈只有 info/1041 可
+    # 公开访问，其他走 tusports.sztu.edu.cn 会 404。用白名单只保留 1041。
+    categoryWhitelist: "1041"
     requiresAuth: false
     crawlIntervalMinutes: 60
     # crawlPageCount: 1
