@@ -1,7 +1,7 @@
 === 全量在线诊断报告 ===
-诊断时间: 2026-04-19T18:28:43.734785558
+诊断时间: 2026-04-19T18:37:08.100088306
 公开源数量: 329
-耗时: 87447 ms (并发=8)
+耗时: 86671 ms (并发=8)
 
 ──── 医工研究院通知 (ime-tzgg, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://ime.sztu.edu.cn/tzgg1.htm
@@ -139,10 +139,7 @@
   [3] ⏭️  外链: 校际交流促发展，携手共进谱新篇——深圳理工大学曙光书院、先行书院（筹）到访深技大开展团学交流活动 | https://mp.weixin.qq.com/s/jQntm7zJp3FuVO75Sos0Cg
 
 ──── 未来技术学院新闻 (future-xwzx, parser=sztu-cms) ────
-  列表页 OK: 9 条  URL: https://futuretechnologyschool.sztu.edu.cn/xw_hd/xwzx.htm
-  [1] ⏭️  外链: 狂斩世界TOP100名校offer，我院新才学子用实力说话！ | https://mp.weixin.qq.com/s/JgXu6R5Oud1NUxJNYhw5KA
-  [2] ⏭️  外链: 煤基负极提速！刘清侠院士团队与贝特瑞产学研落地 | https://mp.weixin.qq.com/s/anvaPTSB1zy5vggHLTPK3A
-  [3] ⚠️  缺来源 | 访企拓岗简讯| 深圳市嘉尔兴科技有限公司 | https://futuretechnologyschool.sztu.edu.cn/info/1021/2378.htm  [T=div.contentBox h2… M=div.left div.info C=[id^=vsb_content]…]
+  ❌ 列表页 HTTP 503: https://futuretechnologyschool.sztu.edu.cn/xw_hd/xwzx.htm
 
 ──── 文娱活动 (www-wyhd, parser=sztu-cms) ────
   列表页 OK: 9 条  URL: https://www.sztu.edu.cn/hljd/xyhd/wyhd.htm
@@ -174,10 +171,7 @@
   [2] ✅ 关于公布2023-2024学年第一学期校历及上课时间的通知  [T=div.news_conent_t… M=div.news_conent_t… C=[id^=vsb_content]…]
 
 ──── 人工智能学院新闻 (ai-yxxw, parser=sztu-cms) ────
-  列表页 OK: 10 条  URL: https://ai.sztu.edu.cn/xwzx/yxxw1.htm
-  [1] ⚠️  缺来源, 缺日期 | 人工智能学院2026年润园青年学者论坛圆满落幕 | https://ai.sztu.edu.cn/info/1048/6782.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [2] ⚠️  缺来源, 缺日期 | 深技大时空智能研究中心成立，李清泉院士任首席科学顾问 | https://ai.sztu.edu.cn/info/1048/6780.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [3] ⚠️  缺来源, 缺日期 | 湾区昇腾算力应用创新研究院赴深圳技术大学开展生态人才建设—深耕昇腾全栈技术 培育异构计算新生力 | https://ai.sztu.edu.cn/info/1048/6770.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  ❌ 列表页 HTTP 503: https://ai.sztu.edu.cn/xwzx/yxxw1.htm
 
 ──── 音乐学院党建工作 (music-djgz, parser=sztu-cms) ────
   列表页 OK: 2 条  URL: https://musicyyds.sztu.edu.cn/dwxg/djgz.htm
@@ -227,10 +221,7 @@
   [3] ⏭️  外链: 我校城市交通与物流学院成功认证吉尼斯世界纪录 | https://mp.weixin.qq.com/s/pJzDzV87m9JyuKEMAB-lSA
 
 ──── 未来技术学院通知 (future-tzgg, parser=sztu-cms) ────
-  列表页 OK: 7 条  URL: https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/jw.htm
-  [1] ✅ 未来技术学院关于2023级新才特色班接收新生选拔申请的通知  [T=div.contentBox h2… M=div.left div.info C=[id^=vsb_content]…]
-  [2] ⚠️  缺来源 | 2022-2023学年第二学期任课教师课外辅导答疑安排 | https://futuretechnologyschool.sztu.edu.cn/info/1133/1541.htm  [T=div.contentBox h2… M=div.left div.info C=[id^=vsb_content]…]
-  [3] ⚠️  缺来源 | 2022-2023学年第一学期任课教师课外辅导答疑安排 | https://futuretechnologyschool.sztu.edu.cn/info/1133/1542.htm  [T=div.contentBox h2… M=div.left div.info C=[id^=vsb_content]…]
+  ❌ 列表页 HTTP 503: https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/jw.htm
 
 ──── 招生政策 (zs-zszc, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://zs.sztu.edu.cn/bkzn/zszc1.htm
@@ -322,10 +313,7 @@
   [3] ⚠️  缺来源 | 2024-2025学年中德智能制造学院校长奖、校长特别奖奖学金评定细则 | https://sgim.sztu.edu.cn/info/1045/4078.htm  [T=div.content > div… M=div.parameter C=[id^=vsb_content]…]
 
 ──── 人工智能学院通知 (ai-tzgg, parser=sztu-cms) ────
-  列表页 OK: 10 条  URL: https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm
-  [1] ⚠️  缺来源, 缺日期 | 关于举办“深技大OpenClaw智能体技术节”（简称“深技大·龙虾节”）系列主题活动的通知（第一、二期） | https://ai.sztu.edu.cn/info/1219/6760.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [2] ⚠️  缺来源, 缺日期 | 致全体同学的寒假温馨提示 | https://ai.sztu.edu.cn/info/1219/6722.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [3] ⚠️  缺来源, 缺日期 | 关于人工智能学院2024级本科生重修选课的说明 | https://ai.sztu.edu.cn/info/1221/6721.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  ❌ 列表页 HTTP 503: https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm
 
 ──── 就业工作动态 (jyzd-gzdt, parser=sztu-cms) ────
   列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1013&a1020514p=1&a1020514c=20
@@ -376,10 +364,7 @@
   [3] ⚠️  缺来源, 缺日期 | 喜报：我校男子篮球队参加2025年广东省第二十五届大学生篮球联赛（甲B组）夺得冠军、刷新队史成绩 | https://tusports.sztu.edu.cn/info/1045/1695.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
 
 ──── 未来技术学院党团风采 (future-dtfc, parser=sztu-cms) ────
-  列表页 OK: 9 条  URL: https://futuretechnologyschool.sztu.edu.cn/dtfc/dtfc.htm
-  [1] ⏭️  外链: 清明追思忆先辈·青春践行启新程 | 清明，我们上了一堂跨越时空的青春思政课 | https://mp.weixin.qq.com/s/6gcsn_126wBSj69lkTbT9A
-  [2] ⏭️  外链: 铭记初心实干为民·鉴往知来赓续奋斗|主题党日活动 | https://mp.weixin.qq.com/s/rB0XRAjhWI61DfS9m40r-A
-  [3] ✅ 未来技术学院召开2026年发展党员学生工作会议  [T=div.contentBox h2… M=div.left div.info C=[id^=vsb_content]…]
+  ❌ 列表页 HTTP 503: https://futuretechnologyschool.sztu.edu.cn/dtfc/dtfc.htm
 
 ──── 财务部工作动态 (cwb-gzdt, parser=sztu-cms) ────
   列表页 OK: 15 条  URL: https://cwb.sztu.edu.cn/gzdt.htm
@@ -1503,10 +1488,7 @@
   [3] ⚠️  缺来源, 缺日期 | 安全宣传 | https://sbc.sztu.edu.cn/info/1057/1988.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
 
 ──── 审计室动态 (sjs-gzdt, parser=sztu-cms) ────
-  列表页 OK: 10 条  URL: https://sjs.sztu.edu.cn/gzdt.htm
-  [1] ⚠️  缺来源, 缺日期 | 深圳市内部审计协会2026年会长办公会议在我校召开 | https://sjs.sztu.edu.cn/info/1003/1221.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [2] ⚠️  缺来源, 缺日期 | 审计室与计划财务部赴广州四所高校开展专项调研 | https://sjs.sztu.edu.cn/info/1003/1211.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [3] ⚠️  缺来源, 缺日期 | 审计室组织召开校医院专项审计沟通会 | https://sjs.sztu.edu.cn/info/1003/1192.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  ❌ 列表页 HTTP 503: https://sjs.sztu.edu.cn/gzdt.htm
 
 ──── 体艺学院极限飞盘校队 (tusports-jxfp, parser=sztu-cms) ────
   列表页 OK: 2 条  URL: https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1096&a1020514p=1&a1020514c=20
@@ -1625,10 +1607,7 @@
   [1] ⚠️  缺来源, 缺日期 | 中共中央组织部、人力资源社会保障部关于印发《事业单位工作人员处分规定》的通知 | https://jjjc.sztu.edu.cn/info/1011/1391.htm  [T=· M=· C=[id^=vsb_content]…]
 
 ──── 后勤部通知 (hq-tzgg, parser=sztu-cms) ────
-  列表页 OK: 15 条  URL: https://hq.sztu.edu.cn/zhxx/tzgg.htm
-  [1] ⚠️  缺来源, 缺日期 | 关于加强校园节能管理工作的通知 | https://hq.sztu.edu.cn/info/1037/2404.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
-  [2] ⚠️  缺来源, 缺日期 | 关于在B-2、B-4栋开展消防测试的通知 | https://hq.sztu.edu.cn/info/1037/2367.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
-  [3] ❌ 请求异常: ConnectException: null | https://nbw.sztu.edu.cn/info/1020/49495.htm
+  ❌ 列表页 HTTP 503: https://hq.sztu.edu.cn/zhxx/tzgg.htm
 
 ──── 交通学院青马工程 (utl-qmgc, parser=sztu-cms) ────
   列表页 OK: 2 条  URL: https://utl.sztu.edu.cn/xgzj/xstd/qmgc.htm
@@ -1916,32 +1895,32 @@
                汇  总
 ═══════════════════════════════════════
 源统计:
-  正常(有items): 329
+  正常(有items): 322
   空(无items):   0
-  失败(HTTP错误): 0
+  失败(HTTP错误): 7
   总计:           329
 
 文章统计:
-  完整(解析+字段齐全): 281/922
-  外链(短路不解析):   188
+  完整(解析+字段齐全): 279/901
+  外链(短路不解析):   184
   缺标题:   0
-  缺来源:   446
-  缺日期:   317
+  缺来源:   432
+  缺日期:   306
   缺正文:   5
   解析失败: 0
   详情HTTP错误: 4
-  请求异常: 1
+  请求异常: 0
 
 正文长度分布 (字符数):
   <50:     13
   50~200:  27
   200~500: 39
-  500~2k:  120
-  ≥2k:     530
+  500~2k:  117
+  ≥2k:     517
 
 模板指纹分布 (命中即按序采用，未列出的选择器=0 命中):
   标题选择器:
-    heuristic:nearest-heading                     × 218
+    heuristic:nearest-heading                     × 207
     div.con_title h2.title                        × 77
     h1.article-title                              × 54
     div.news_conent_two_title                     × 49
@@ -1952,15 +1931,15 @@
     div.detail-title h4                           × 28
     div.article_box h2                            × 28
     div.news_conent div[align=center] span[style*=font-weight] × 26
-    div.contentBox h2.title                       × 23
     div.c-tit h3                                  × 22
     div.content_t h3                              × 18
+    div.contentBox h2.title                       × 18
     div.article_section div.article_title         × 13
     div.tybt                                      × 11
     #article-content h1                           × 6
     div.detail-content h2.ft-18                   × 2
   元信息容器:
-    <none>                                        × 317
+    <none>                                        × 306
     p.info                                        × 77
     div.news_conent_two_js                        × 75
     div.ar_title h6                               × 45
@@ -1968,16 +1947,16 @@
     div.parameter                                 × 31
     div.detail-title h6                           × 28
     div.sub_box                                   × 28
-    div.left div.info                             × 23
     div.c-ifo                                     × 22
     div.content_t p                               × 18
+    div.left div.info                             × 18
     div.details_msg                               × 13
     div.newshow_timer                             × 11
     #article-content div.flex                     × 6
     div.sub-row                                   × 2
   正文选择器:
-    [id^=vsb_content] .v_news_content             × 530
-    .v_news_content                               × 199
+    [id^=vsb_content] .v_news_content             × 523
+    .v_news_content                               × 190
 
 ⚠️  未识别模板的源 (title 或 content 选择器为 null，需要补模板):
   - xxjs-yjcg
@@ -2006,8 +1985,14 @@
 ▶ LIST_NO_URL (YAML 未配 listUrl) — 0 个源
   (无)
 
-▶ LIST_HTTP_ERROR (列表页 HTTP 4xx/5xx) — 0 个源
-  (无)
+▶ LIST_HTTP_ERROR (列表页 HTTP 4xx/5xx) — 7 个源
+  - future-xwzx              https://futuretechnologyschool.sztu.edu.cn/xw_hd/xwzx.htm  [列表页 HTTP 503: https://futuretechnologyschool.sztu.edu.cn/xw_hd/xwzx.htm]
+  - ai-yxxw                  https://ai.sztu.edu.cn/xwzx/yxxw1.htm  [列表页 HTTP 503: https://ai.sztu.edu.cn/xwzx/yxxw1.htm]
+  - future-tzgg              https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/jw.htm  [列表页 HTTP 503: https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/jw.htm]
+  - ai-tzgg                  https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm  [列表页 HTTP 503: https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm]
+  - future-dtfc              https://futuretechnologyschool.sztu.edu.cn/dtfc/dtfc.htm  [列表页 HTTP 503: https://futuretechnologyschool.sztu.edu.cn/dtfc/dtfc.htm]
+  - sjs-gzdt                 https://sjs.sztu.edu.cn/gzdt.htm  [列表页 HTTP 503: https://sjs.sztu.edu.cn/gzdt.htm]
+  - hq-tzgg                  https://hq.sztu.edu.cn/zhxx/tzgg.htm  [列表页 HTTP 503: https://hq.sztu.edu.cn/zhxx/tzgg.htm]
 
 ▶ LIST_EMPTY (列表 200 但 parser 提取 0 条) — 0 个源
   (无)
@@ -2018,8 +2003,8 @@
   - tusports-pingpang        https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1040&a1020514p=1&a1020514c=20  [1/3 篇 HTTP 错误]
   - tusports-tyww            https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1052&a1020514p=1&a1020514c=20  [1/3 篇 HTTP 错误]
 
-▶ DETAIL_REQUEST_ERROR (抽查详情网络异常(ConnectException/超时)) — 1 个源
-  - hq-tzgg                  https://hq.sztu.edu.cn/zhxx/tzgg.htm  [1/3 篇请求异常]
+▶ DETAIL_REQUEST_ERROR (抽查详情网络异常(ConnectException/超时)) — 0 个源
+  (无)
 
 ▶ DETAIL_PARSE_FAIL (详情 parser 返回 success=false) — 0 个源
   (无)
@@ -2027,7 +2012,7 @@
 ▶ NO_TITLE_MOST (≥半数抽查缺标题) — 0 个源
   (无)
 
-▶ NO_DATE_MOST (≥半数抽查缺日期) — 123 个源
+▶ NO_DATE_MOST (≥半数抽查缺日期) — 119 个源
   - qsa-xwdt                 https://qsa.sztu.edu.cn/xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=1048&a1020514p=1&a1020514c=20
   - design-yxxw              https://design.sztu.edu.cn/xydt/yxxw.htm
   - cop-kydt                 https://cop.sztu.edu.cn/kydt/kydt.htm
@@ -2036,12 +2021,10 @@
   - tusports-zuqiu           https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1036&a1020514p=1&a1020514c=20
   - xxjs-yjcg                https://xxjs.sztu.edu.cn/yjcg.htm
   - tusports-tzgg            https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1042&a1020514p=1&a1020514c=20
-  - ai-yxxw                  https://ai.sztu.edu.cn/xwzx/yxxw1.htm
   - xxjs-rgzn                https://xxjs.sztu.edu.cn/yjfx/rgzn.htm
   - bs-tzgg                  https://bs.sztu.edu.cn/index/tzgg.htm
   - cop-jzxw                 https://cop.sztu.edu.cn/kydt/xsjz/jzxw.htm
   - tusports-jxdt            https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1043&a1020514p=1&a1020514c=20
-  - ai-tzgg                  https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm
   - fxcs-xw                  https://fxcszx.sztu.edu.cn/index/zxxw.htm
   - tusports-lanqiu          https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1037&a1020514p=1&a1020514c=20
   - design-tzgg              https://design.sztu.edu.cn/xydt/tzgg.htm
@@ -2105,7 +2088,6 @@
   - jjjc-gzdt                https://jjjc.sztu.edu.cn/gzdt.htm
   - cop-djhd                 https://cop.sztu.edu.cn/dqgz/djzj/djhd.htm
   - sbc-jsal                 https://sbc.sztu.edu.cn/aqxc/jsal.htm
-  - sjs-gzdt                 https://sjs.sztu.edu.cn/gzdt.htm
   - tusports-jxfp            https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1096&a1020514p=1&a1020514c=20
   - jjjc-ljwh                https://jjjc.sztu.edu.cn/ljwh1/ljwh.htm
   - cop-jzhb                 https://cop.sztu.edu.cn/kydt/xsjz/jzhb.htm
@@ -2118,7 +2100,6 @@
   - tusports-wushu           https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1100&a1020514p=1&a1020514c=20
   - cop-glzd                 https://cop.sztu.edu.cn/xsgz/glzd.htm
   - jjjc-gjflfg              https://jjjc.sztu.edu.cn/djfg/gjflfg.htm
-  - hq-tzgg                  https://hq.sztu.edu.cn/zhxx/tzgg.htm
   - hq-dtyw                  https://hq.sztu.edu.cn/zhxx/dtyw.htm
   - sjs-fwzn                 https://sjs.sztu.edu.cn/fwzn.htm
   - sjs-sjzcfg               https://sjs.sztu.edu.cn/zcfg/sjzcfg.htm
@@ -2152,7 +2133,7 @@
   - hq-zsxc                  https://hq.sztu.edu.cn/zhxx/zsxc.htm
   - hq-zcxx                  https://hq.sztu.edu.cn/djgz/zcxx.htm
 
-▶ NO_AUTHOR_MOST (≥半数抽查缺来源(页面本身常无作者)) — 179 个源
+▶ NO_AUTHOR_MOST (≥半数抽查缺来源(页面本身常无作者)) — 173 个源
   - ime-tzgg                 https://ime.sztu.edu.cn/tzgg1.htm
   - cmnf-tzgg                https://cmnf.sztu.edu.cn/xwzx/tzgg.htm
   - qsa-xwdt                 https://qsa.sztu.edu.cn/xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=1048&a1020514p=1&a1020514c=20
@@ -2162,15 +2143,12 @@
   - bs-xwdt                  https://bs.sztu.edu.cn/index/xwdt.htm
   - fxcs-tzgg                https://fxcszx.sztu.edu.cn/index/tzgg.htm
   - zs-zsdt                  https://zs.sztu.edu.cn/zsdt.htm
-  - future-xwzx              https://futuretechnologyschool.sztu.edu.cn/xw_hd/xwzx.htm
   - tusports-zuqiu           https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1036&a1020514p=1&a1020514c=20
   - xxjs-yjcg                https://xxjs.sztu.edu.cn/yjcg.htm
   - tusports-tzgg            https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1042&a1020514p=1&a1020514c=20
-  - ai-yxxw                  https://ai.sztu.edu.cn/xwzx/yxxw1.htm
   - gra-tzgg                 https://gra.sztu.edu.cn/index/tzgg.htm
   - ime-xwdt                 https://ime.sztu.edu.cn/xwdt.htm
   - xtw-txfc                 https://xtw.sztu.edu.cn/xwdt/txfc.htm
-  - future-tzgg              https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/jw.htm
   - zs-zszc                  https://zs.sztu.edu.cn/bkzn/zszc1.htm
   - cmnf-zxdt                https://cmnf.sztu.edu.cn/xwzx/zxdt.htm
   - hr-rszd                  https://hr.sztu.edu.cn/rszd.htm
@@ -2179,7 +2157,6 @@
   - cop-jzxw                 https://cop.sztu.edu.cn/kydt/xsjz/jzxw.htm
   - tusports-jxdt            https://tusports.sztu.edu.cn/dhlb.jsp?urltype=tree.TreeTempUrl&wbtreeid=1043&a1020514p=1&a1020514c=20
   - sgim-tzgg                https://sgim.sztu.edu.cn/list2022.jsp?urltype=tree.TreeTempUrl&wbtreeid=1045&a1020514p=1&a1020514c=20
-  - ai-tzgg                  https://ai.sztu.edu.cn/xwzx/tzgg1/qb.htm
   - fxcs-xw                  https://fxcszx.sztu.edu.cn/index/zxxw.htm
   - tusports-lanqiu          https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1037&a1020514p=1&a1020514c=20
   - design-tzgg              https://design.sztu.edu.cn/xydt/tzgg.htm
@@ -2283,7 +2260,6 @@
   - sgim-jyzd                https://sgim.sztu.edu.cn/zsjy2022/jyzd.htm
   - xtw-hjqk                 https://xtw.sztu.edu.cn/ztzl1/jdqn1/hjqk.htm
   - sbc-jsal                 https://sbc.sztu.edu.cn/aqxc/jsal.htm
-  - sjs-gzdt                 https://sjs.sztu.edu.cn/gzdt.htm
   - tusports-jxfp            https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1096&a1020514p=1&a1020514c=20
   - jjjc-ljwh                https://jjjc.sztu.edu.cn/ljwh1/ljwh.htm
   - cop-jzhb                 https://cop.sztu.edu.cn/kydt/xsjz/jzhb.htm
@@ -2299,7 +2275,6 @@
   - tusports-wushu           https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1100&a1020514p=1&a1020514c=20
   - cop-glzd                 https://cop.sztu.edu.cn/xsgz/glzd.htm
   - jjjc-gjflfg              https://jjjc.sztu.edu.cn/djfg/gjflfg.htm
-  - hq-tzgg                  https://hq.sztu.edu.cn/zhxx/tzgg.htm
   - hq-dtyw                  https://hq.sztu.edu.cn/zhxx/dtyw.htm
   - sjs-fwzn                 https://sjs.sztu.edu.cn/fwzn.htm
   - sjs-sjzcfg               https://sjs.sztu.edu.cn/zcfg/sjzcfg.htm
