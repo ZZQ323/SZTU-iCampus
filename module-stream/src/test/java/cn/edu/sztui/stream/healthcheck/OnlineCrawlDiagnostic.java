@@ -538,6 +538,25 @@ class OnlineCrawlDiagnostic {
                 .timeout(TIMEOUT)
                 .GET()
                 .build();
+        // 第一次失败或非 200 → 等 500ms 重试 1 次
+        // 动机：并发 8 线程诊断时，服务端偶发返回 404/503（curl 单发同 URL 是 200）
+        // 通过一次重试可消除抖动，区分"真 4xx"和"并发抖动"
+        IOException lastEx = null;
+        for (int attempt = 0; attempt < 2; attempt++) {
+            try {
+                HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
+                if (resp.statusCode() == 200 || attempt == 1) return resp;
+            } catch (IOException e) {
+                lastEx = e;
+                if (attempt == 1) throw e;
+            }
+            try { Thread.sleep(500); } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                throw ie;
+            }
+        }
+        if (lastEx != null) throw lastEx;
+        // 理论上不会到这里
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
