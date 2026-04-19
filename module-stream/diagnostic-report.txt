@@ -1,7 +1,7 @@
 === 全量在线诊断报告 ===
-诊断时间: 2026-04-19T17:07:50.085766203
+诊断时间: 2026-04-19T17:35:52.382799029
 公开源数量: 274
-耗时: 78029 ms (并发=8)
+耗时: 80162 ms (并发=8)
 
 ──── 医工研究院通知 (ime-tzgg, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://ime.sztu.edu.cn/tzgg1.htm
@@ -71,7 +71,7 @@
 ──── 科研部通知公告 (kyb-tzgg, parser=sztu-cms) ────
   列表页 OK: 12 条  URL: https://kyb.sztu.edu.cn/tzg/t.htm
   [1] ✅ 关于第十一届广东省哲学社会科学优秀成果奖评奖申报的公示  [T=div.detail-title h4 M=div.detail-title h6 C=[id^=vsb_content]…]
-  [2] ⚠️  解析失败: 访问被拒绝或需要登录 | 关于申报2025年度广东省社科联青年学术工作坊的通知 | https://kyb.sztu.edu.cn/info/1029/2616.htm
+  [2] ✅ 关于申报2025年度广东省社科联青年学术工作坊的通知  [T=div.detail-title h4 M=div.detail-title h6 C=[id^=vsb_content]…]
   [3] ✅ 关于申报2024年度教育部人文社会科学研究一般项目的通知  [T=div.detail-title h4 M=div.detail-title h6 C=[id^=vsb_content]…]
 
 ──── 药学院科研动态 (cop-kydt, parser=sztu-cms) ────
@@ -353,7 +353,7 @@
 
 ──── 创意设计学院通知 (design-tzgg, parser=sztu-cms) ────
   列表页 OK: 100 条  URL: https://design.sztu.edu.cn/xydt/tzgg.htm
-  [1] ⚠️  解析失败: 访问被拒绝或需要登录 | 关于2026年高校教师岗前培训的通知 | https://design.sztu.edu.cn/info/1027/2313.htm
+  [1] ⚠️  缺来源, 缺日期 | | 关于2026年高校教师岗前培训的通知 | https://design.sztu.edu.cn/info/1027/2313.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
   [2] ⚠️  缺来源, 缺日期 | | 关于开展美国乔治华盛顿大学研究生项目宣讲会的通知 | https://design.sztu.edu.cn/info/1027/2312.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
   [3] ⚠️  缺来源, 缺日期 | | 关于2026年上半年全国大学英语四、六级考试报名的通知 | https://design.sztu.edu.cn/info/1027/2311.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
 
@@ -1119,10 +1119,10 @@
   [3] ✅ 这里是SUTD！ 深圳技术大学-新加坡科技与设计大学“设计能源系统（DES)”暑期交流完美收官！  [T=div.news_conent d… M=div.news_conent_t… C=[id^=vsb_content]…]
 
 ──── 工程物理学院师生活动 (cep-sshd, parser=sztu-cms) ────
-  列表页 OK: 15 条  URL: https://cep.sztu.edu.cn/ssyd1/sshd/6.htm
-  [1] ⏭️  外链: 青春热血，永不落幕|第三届“工物杯”篮球赛圆满结束 | https://mp.weixin.qq.com/s/DgdJXN53Cc2bZXsggT3aLg
-  [2] ⏭️  外链: “瓶”水之交，绿意长存｜工程物理学院环保活动圆满落幕 | https://mp.weixin.qq.com/s/hnEnjM8fmJ7eyAxGDSqKcg
-  [3] ❌ 请求异常: ConnectException: null | https://nbw.sztu.edu.cn/info/1022/47690.htm
+  列表页 OK: 13 条  URL: https://cep.sztu.edu.cn/ssyd1/sshd/1.htm
+  [1] ✅ 11月研究生课余活动点滴  [T=div.con_title h2.… M=p.info C=[id^=vsb_content]…]
+  [2] ✅ 高交会、男生节、团支部风采大赛，带你走进精彩纷呈的11月  [T=div.con_title h2.… M=p.info C=[id^=vsb_content]…]
+  [3] ✅ 2020级新生参加社团嘉年华活动  [T=div.con_title h2.… M=p.info C=[id^=vsb_content]…]
 
 ──── 未来技术学院行政通知 (future-tzgg-xz, parser=sztu-cms) ────
   列表页 OK: 5 条  URL: https://futuretechnologyschool.sztu.edu.cn/xw_hd/tzgg1/xz.htm
@@ -1273,7 +1273,7 @@
 ──── 研究生院硕招通知公告 (gra-ssyjs-tzgg, parser=sztu-cms) ────
   列表页 OK: 16 条  URL: https://gra.sztu.edu.cn/zsxx/ssyjszs1/tzgg.htm
   [1] ⏭️  外链: 学籍管理 | http://ehall.szu.edu.cn/new/index.html
-  [2] ⚠️  解析失败: 访问被拒绝或需要登录 | 2026年深圳技术大学/深圳大学应用技术学院/深圳大学集成光电子工程中心/深圳大学未来能源与环境安全实验室第二批复试（调剂生）工作细则 | https://gra.sztu.edu.cn/info/1058/2848.htm
+  [2] ⚠️  缺来源 | 2026年深圳技术大学/深圳大学应用技术学院/深圳大学集成光电子工程中心/深圳大学未来能源与环境安全实验室第二批复试（调剂生）工作细则 | https://gra.sztu.edu.cn/info/1058/2848.htm  [T=section.n_detail … M=div.ar_title h6 C=[id^=vsb_content]…]
   [3] ⏭️  外链: 深圳技术大学2026年硕士研究生招生调剂通知 | https://mp.weixin.qq.com/s/Bo09rGpUZAcvJiWaCUMy4A
 
 ──── 未来技术学院活动培训 (future-jobs-hdpx, parser=sztu-cms) ────
@@ -1609,30 +1609,30 @@
   总计:           274
 
 文章统计:
-  完整(解析+字段齐全): 229/774
-  外链(短路不解析):   167
+  完整(解析+字段齐全): 233/774
+  外链(短路不解析):   165
   缺标题:   0
-  缺来源:   367
-  缺日期:   260
+  缺来源:   369
+  缺日期:   261
   缺正文:   5
-  解析失败: 3
+  解析失败: 0
   详情HTTP错误: 4
-  请求异常: 2
+  请求异常: 1
 
 正文长度分布 (字符数):
   <50:     8
   50~200:  17
   200~500: 29
-  500~2k:  101
-  ≥2k:     443
+  500~2k:  102
+  ≥2k:     448
 
 模板指纹分布 (命中即按序采用，未列出的选择器=0 命中):
   标题选择器:
-    heuristic:nearest-heading                     × 165
+    heuristic:nearest-heading                     × 166
     h1.article-title                              × 54
-    div.con_title h2.title                        × 45
+    div.con_title h2.title                        × 48
     div.news_conent_two_title                     × 45
-    section.n_detail div.ar_title h3              × 44
+    section.n_detail div.ar_title h3              × 45
     <none>                                        × 41
     div.cnt_tit h2                                × 33
     div.content > div.title                       × 31
@@ -1640,30 +1640,30 @@
     div.contentBox h2.title                       × 23
     div.c-tit h3                                  × 22
     div.content_t h3                              × 18
+    div.detail-title h4                           × 13
     div.article_box h2                            × 13
-    div.detail-title h4                           × 12
     div.tybt                                      × 11
     div.article_section div.article_title         × 7
     #article-content h1                           × 6
     div.detail-content h2.ft-18                   × 2
   元信息容器:
-    <none>                                        × 260
+    <none>                                        × 261
     div.news_conent_two_js                        × 71
-    p.info                                        × 45
-    div.ar_title h6                               × 44
+    p.info                                        × 48
+    div.ar_title h6                               × 45
     div.cnt_note                                  × 33
     div.parameter                                 × 31
     div.left div.info                             × 23
     div.c-ifo                                     × 22
     div.content_t p                               × 18
+    div.detail-title h6                           × 13
     div.sub_box                                   × 13
-    div.detail-title h6                           × 12
     div.newshow_timer                             × 11
     div.details_msg                               × 7
     #article-content div.flex                     × 6
     div.sub-row                                   × 2
   正文选择器:
-    [id^=vsb_content] .v_news_content             × 423
+    [id^=vsb_content] .v_news_content             × 429
     .v_news_content                               × 175
 
 ⚠️  未识别模板的源 (title 或 content 选择器为 null，需要补模板):
@@ -1703,14 +1703,11 @@
   - tusports-pingpang        https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1040&a1020514p=1&a1020514c=20  [1/3 篇 HTTP 错误]
   - tusports-tyww            https://tusports.sztu.edu.cn/xdxl.jsp?urltype=tree.TreeTempUrl&wbtreeid=1052&a1020514p=1&a1020514c=20  [1/3 篇 HTTP 错误]
 
-▶ DETAIL_REQUEST_ERROR (抽查详情网络异常(ConnectException/超时)) — 2 个源
-  - cep-sshd                 https://cep.sztu.edu.cn/ssyd1/sshd/6.htm  [1/1 篇请求异常]
+▶ DETAIL_REQUEST_ERROR (抽查详情网络异常(ConnectException/超时)) — 1 个源
   - hq-tzgg                  https://hq.sztu.edu.cn/zhxx/tzgg.htm  [1/3 篇请求异常]
 
-▶ DETAIL_PARSE_FAIL (详情 parser 返回 success=false) — 3 个源
-  - kyb-tzgg                 https://kyb.sztu.edu.cn/tzg/t.htm  [1/3 篇解析失败]
-  - design-tzgg              https://design.sztu.edu.cn/xydt/tzgg.htm  [1/3 篇解析失败]
-  - gra-ssyjs-tzgg           https://gra.sztu.edu.cn/zsxx/ssyjszs1/tzgg.htm  [1/1 篇解析失败]
+▶ DETAIL_PARSE_FAIL (详情 parser 返回 success=false) — 0 个源
+  (无)
 
 ▶ NO_TITLE_MOST (≥半数抽查缺标题) — 0 个源
   (无)
@@ -1816,7 +1813,7 @@
   - dds-djyl                 https://dds.sztu.edu.cn/djyl.htm
   - dds-xjzd                 https://dds.sztu.edu.cn/gzzd/xjzd.htm
 
-▶ NO_AUTHOR_MOST (≥半数抽查缺来源(页面本身常无作者)) — 146 个源
+▶ NO_AUTHOR_MOST (≥半数抽查缺来源(页面本身常无作者)) — 147 个源
   - ime-tzgg                 https://ime.sztu.edu.cn/tzgg1.htm
   - cmnf-tzgg                https://cmnf.sztu.edu.cn/xwzx/tzgg.htm
   - qsa-xwdt                 https://qsa.sztu.edu.cn/xwzx.jsp?urltype=tree.TreeTempUrl&wbtreeid=1048&a1020514p=1&a1020514c=20
@@ -1923,6 +1920,7 @@
   - utl-sjjx                 https://utl.sztu.edu.cn/rcpy/sjjx.htm
   - cop-zsjy                 https://cop.sztu.edu.cn/zsjy.htm
   - sgim-zsxc                https://sgim.sztu.edu.cn/zsjy2022/zsxc.htm
+  - gra-ssyjs-tzgg           https://gra.sztu.edu.cn/zsxx/ssyjszs1/tzgg.htm
   - future-jobs-hdpx         https://futuretechnologyschool.sztu.edu.cn/jobs/hdpx/1.htm
   - jjjc-jjyw                https://jjjc.sztu.edu.cn/jjyw.htm
   - gra-bsyjs-tzgg           https://gra.sztu.edu.cn/zsxx/bsyjszs/tzgg.htm

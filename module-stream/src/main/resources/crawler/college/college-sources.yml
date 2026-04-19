@@ -1773,7 +1773,8 @@ sources:
     channelId: college-cep
     parserType: sztu-cms
     baseUrl: ${urls.xy.cep}
-    listUrl: ${urls.xy.cep}/ssyd1/sshd/6.htm
+    # 早期页（/6.htm）多为 mp.weixin 外链；改用 /1.htm（旧内容但实际是站内文章）。
+    listUrl: ${urls.xy.cep}/ssyd1/sshd/1.htm
     detailUrlTemplate: ${urls.xy.cep}/info/{category}/{id}.htm
     categoryCode: "1022"
     categoryName: 师生活动
