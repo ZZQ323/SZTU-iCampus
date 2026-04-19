@@ -100,6 +100,50 @@ public class SztuGwtContentParser implements ParserStrategy {
         return ListParserResult.fail("请使用 SztuGwtListParser 解析列表");
     }
 
+    /** 模板指纹：每个字段在回退链里命中的第一个选择器（null 表示无命中）。 */
+    public record TemplateFingerprint(String titleSelector, String metaContainer, String contentSelector) {}
+
+    /** 探测页面命中的选择器，供 OnlineCrawlDiagnostic 等诊断工具做模板分布统计。 */
+    public TemplateFingerprint detectTemplate(Document doc) {
+        String titleSel = null;
+        for (String sel : TITLE_SELECTORS) {
+            Element el = doc.selectFirst(sel);
+            if (el != null) {
+                String text = el.ownText().trim();
+                if (!StringUtils.hasText(text)) text = el.text().trim();
+                if (StringUtils.hasText(text)) { titleSel = sel; break; }
+            }
+        }
+        if (titleSel == null) {
+            Element body = doc.selectFirst(".v_news_content");
+            if (body != null && findNearestHeading(body) != null) titleSel = "heuristic:nearest-heading";
+            else if (StringUtils.hasText(doc.title())) titleSel = "fallback:<title>";
+        }
+
+        String metaSel = null;
+        for (String sel : META_CONTAINERS) {
+            for (Element container : doc.select(sel)) {
+                if (extractByLabels(container, AUTHOR_LABELS) != null
+                        || extractByLabels(container, TIME_LABELS) != null) {
+                    metaSel = sel; break;
+                }
+            }
+            if (metaSel != null) break;
+        }
+
+        String contentSel = null;
+        for (String sel : new String[]{"[id^=vsb_content] .v_news_content", ".v_news_content", "[id^=vsb_content]"}) {
+            if (doc.selectFirst(sel) != null) { contentSel = sel; break; }
+        }
+        if (contentSel == null) {
+            for (String sel : new String[]{".wp_articlecontent", ".article-content", ".content-body", ".cnt_p", ".article_text", ".detail-content", "#content"}) {
+                if (doc.selectFirst(sel) != null) { contentSel = sel; break; }
+            }
+        }
+
+        return new TemplateFingerprint(titleSel, metaSel, contentSel);
+    }
+
     @Override
     public ContentParserResult parseContent(String html, SourceConfig sourceConfig, String itemId) {
         if (!StringUtils.hasText(html)) {
