@@ -233,7 +233,7 @@ public class SztuCmsListParser implements ParserStrategy {
 
         items.add(InfoItemMeta.builder()
                 .id(id)
-                .url(isExternal ? fullUrl : href)
+                .url(fullUrl)       // 统一存绝对 URL（方案 C：废弃 detailUrlTemplate 依赖）
                 .title(title.trim())
                 .categoryCode(categoryCode != null ? categoryCode : sourceConfig.getCategoryCode())
                 .categoryName(sourceConfig.getCategoryName())

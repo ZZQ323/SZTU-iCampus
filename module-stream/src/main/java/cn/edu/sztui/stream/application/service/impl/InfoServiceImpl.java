@@ -256,13 +256,14 @@ public class InfoServiceImpl implements InfoService {
             SmartSession smartSession = smartHttpClient.newSession(
                     SmartCookieConverter.jsonToSmartCookies(cookiesJson));
 
-            // ⭐ 优先使用元数据中的原始 URL，fallback 用 template 构建
-            String url = null;
-            if (StringUtils.hasText(originalUrl) && originalUrl.startsWith("http")) {
-                url = originalUrl;
-                log.debug("使用元数据原始 URL: {}", url);
+            // 方案 C：列表解析器已统一存绝对 URL，直接用元数据中的 url。
+            // 兼容：若历史缓存里是相对路径，尝试用 baseUrl resolve；仍不行才回退 template。
+            String url = originalUrl;
+            if (StringUtils.hasText(url) && !url.startsWith("http")) {
+                String resolved = ArticleUrlResolver.resolve(url, source.getBaseUrl());
+                if (resolved != null && resolved.startsWith("http")) url = resolved;
             }
-            if (url == null) {
+            if (!StringUtils.hasText(url) || !url.startsWith("http")) {
                 url = buildDetailUrl(source, id, categoryCode);
             }
             if (url == null) {
