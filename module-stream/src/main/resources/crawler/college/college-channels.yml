@@ -5,7 +5,7 @@ channels:
 
   - id: college-gra
     name: 研究生院
-    description: 新闻、通知、党群、思政、学术科研、国际交流
+    description: 新闻、通知、党群、思政、学术、国际交流、奖助、校园活动、专业学位、硕博招生、办事指南
     icon: mortarboard
     sourceOrg: college
     sort: 60
@@ -17,10 +17,18 @@ channels:
       - gra-szgz
       - gra-xsky
       - gra-gjjl
+      - gra-jzgz
+      - gra-xyhd
+      - gra-zyxw
+      - gra-ssyjs-tzgg
+      - gra-bsyjs-tzgg
+      - gra-jwlhpyzs
+      - gra-bszn
+      - gra-jyfg
 
   - id: college-sgim
     name: 中德智能制造学院
-    description: 新闻、通知、党建、学生活动、学科竞赛
+    description: 新闻、通知、党建、学生活动、学科竞赛、团建、学生工作、校园生活、学科建设、招生宣传、就业指导
     icon: setting
     sourceOrg: college
     sort: 61
@@ -31,10 +39,16 @@ channels:
       - sgim-ddjs
       - sgim-xshd
       - sgim-xkjs
+      - sgim-tjgz
+      - sgim-xsgz
+      - sgim-xysh
+      - sgim-xkjs2
+      - sgim-zsxc
+      - sgim-jyzd
 
   - id: college-ai
     name: 人工智能学院
-    description: 新闻、通知、党群、团学风采、学术信息、国际合作
+    description: 新闻、通知、党群、团学风采、学术信息、国际合作、诚聘英才、实习就业、研究生招生
     icon: cpu
     sourceOrg: college
     sort: 62
@@ -46,10 +60,13 @@ channels:
       - ai-txfc
       - ai-xsxx
       - ai-gjhz
+      - ai-cpyc
+      - ai-xssxjy
+      - ai-yjs-zsxx
 
   - id: college-nmne
     name: 新材料与新能源学院
-    description: 动态、通知、党建、讲座、学术动态、校企合作
+    description: 动态、通知、党建、讲座、学术动态、校企合作、学工新闻、国际交流、合作交流、科研动态
     icon: flashlight
     sourceOrg: college
     sort: 63
@@ -61,10 +78,14 @@ channels:
       - nmne-jzt
       - nmne-xsd
       - nmne-xqhz
+      - nmne-xgxw
+      - nmne-gjjldt
+      - nmne-hzj
+      - nmne-kxyj-xsdt
 
   - id: college-utl
     name: 城市交通与物流学院
-    description: 动态、通知、党建、人才招聘、团学风采、校企合作
+    description: 动态、通知、党建、招聘、团学、校企、专题学习、党务公告、实践教学、就业、规章、荣誉、青马、社会实践、活动、科研平台、科研团队
     icon: car
     sourceOrg: college
     sort: 64
@@ -76,10 +97,22 @@ channels:
       - utl-rczp
       - utl-txfc
       - utl-xqhz
+      - utl-ztxx
+      - utl-dwgg
+      - utl-djppjs
+      - utl-sjjx
+      - utl-xsjy
+      - utl-gzzd
+      - utl-xsfc-rydt
+      - utl-qmgc
+      - utl-shsj
+      - utl-xshd
+      - utl-kypt
+      - utl-kytd
 
   - id: college-hsee
     name: 健康与环境工程学院
-    description: 动态、通知、党建、科研动态、院企合作
+    description: 动态、通知、党建、科研、院企合作、校园活动、升学就业、荣誉获奖、招生宣传、学术讲座
     icon: leaf
     sourceOrg: college
     sort: 65
@@ -90,10 +123,15 @@ channels:
       - hsee-djhd
       - hsee-kydt
       - hsee-yqhz
+      - hsee-xyhd
+      - hsee-sxjy
+      - hsee-ryhj
+      - hsee-zsxc
+      - hsee-xsjz
 
   - id: college-cep
     name: 工程物理学院
-    description: 新闻、通知、党团、招聘、科研成果、学术交流
+    description: 新闻、通知、党团、招聘、科研成果、学术交流、国内外合作、师生活动、奖励荣誉、招生、就业、硕招
     icon: tower
     sourceOrg: college
     sort: 66
@@ -105,10 +143,16 @@ channels:
       - cep-zpxx
       - cep-kycg
       - cep-xsjl
+      - cep-gnwhz
+      - cep-sshd
+      - cep-jlry
+      - cep-bkszs
+      - cep-jyxx
+      - cep-ssszs
 
   - id: college-design
     name: 创意设计学院
-    description: 新闻、通知、党团、社会服务、校园生活
+    description: 新闻、通知、党团、社会服务、校园生活、学术新秀
     icon: palette
     sourceOrg: college
     sort: 67
@@ -119,10 +163,11 @@ channels:
       - design-dtgz
       - design-shfw
       - design-xysh
+      - design-xsxz
 
   - id: college-bs
     name: 商学院
-    description: 新闻、通知、学术动态、校园生活、党群
+    description: 新闻、通知、学术动态、校园生活、党群、招生、就业指导、职业发展、竞赛获奖
     icon: chart-bar
     sourceOrg: college
     sort: 68
@@ -133,10 +178,14 @@ channels:
       - bs-xsdt
       - bs-xysh
       - bs-dqgz
+      - bs-zs
+      - bs-jyzd
+      - bs-zyfz
+      - bs-jsjhj
 
   - id: college-sfl
     name: 外国语学院
-    description: 新闻、通知、党群、团学活动、校企合作
+    description: 新闻、通知、党群、团学活动、校企合作、学生获奖、规章制度、考试资讯、招聘、本科招生、研究生培养
     icon: translate
     sourceOrg: college
     sort: 69
@@ -147,10 +196,16 @@ channels:
       - sfl-dqgz
       - sfl-txhd
       - sfl-xqhz
+      - sfl-xshj
+      - sfl-gzzd
+      - sfl-kszx
+      - sfl-rczp
+      - sfl-bkszs
+      - sfl-yjspy
 
   - id: college-icoc
     name: 集成电路与光电芯片学院
-    description: 新闻、通知、科研、学术、党团、合作、招聘
+    description: 新闻、通知、科研、学术、党团、合作、招聘、校园生活、就业前景
     icon: cpu
     sourceOrg: college
     sort: 70
@@ -163,10 +218,12 @@ channels:
       - icoc-dtjs
       - icoc-xqhz
       - icoc-rczp
+      - icoc-xysh
+      - icoc-jyqj
 
   - id: college-cop
     name: 药学院/口腔医学院
-    description: 科研动态、讲座新闻、党建通知公告、党建活动、工会、国际/校企合作、荣誉团学、招生就业
+    description: 科研、讲座、党建通知、党建活动、工会、国际/校企合作、荣誉团学、招生就业、党纪学习、公示通知、学术动态、教学通知
     icon: medicine
     sourceOrg: college
     sort: 71
@@ -183,10 +240,14 @@ channels:
       - cop-rydt
       - cop-txfc
       - cop-zsjy
+      - cop-djxx
+      - cop-gstz
+      - cop-xsdt
+      - cop-bksjy-jxtz
 
   - id: college-future
     name: 未来技术学院
-    description: 新闻、教务通知、党团、科研通知、学工通知、学术会议
+    description: 新闻、教务/科研/学工/校园/行政通知、党团、学术会议、招聘、活动培训、创业成果
     icon: rocket
     sourceOrg: college
     sort: 72
@@ -198,10 +259,15 @@ channels:
       - future-tzgg-ky
       - future-tzgg-xg
       - future-xshy
+      - future-tzgg-xy
+      - future-tzgg-xz
+      - future-rczp-jxky
+      - future-jobs-hdpx
+      - future-jobs-rycg
 
   - id: college-music
     name: 音乐学院
-    description: 院务、党建、团学、学术讲座、合作交流、招生
+    description: 院务、党建、团学、学术讲座、合作交流、招生、精品课程、行业认知
     icon: sound
     sourceOrg: college
     sort: 73
@@ -213,6 +279,8 @@ channels:
       - music-xsjz
       - music-hzjl
       - music-zsxx
+      - music-jpkc
+      - music-xyrz
 
   - id: college-qsa
     name: 质量和标准学院
@@ -236,13 +304,38 @@ channels:
       - tusports-jxdt
       - tusports-jsry
 
-  - id: college-xxjs
-    name: 新一代信息技术研究院
-    description: 研究成果、人工智能方向
-    icon: research
+  - id: college-tusports-teams
+    name: 体艺学院 · 校队训练
+    description: 14 支校队：足球/篮球/排球/围棋/乒乓球/网球/羽毛球/体育舞蹈/定向越野/健身健美/排舞/极限飞盘/游泳/武术
+    icon: team
     sourceOrg: college
     sort: 76
     enabled: true
     sources:
+      - tusports-zuqiu
+      - tusports-lanqiu
+      - tusports-paiqiu
+      - tusports-weiqi
+      - tusports-pingpang
+      - tusports-wangqiu
+      - tusports-yumaoqiu
+      - tusports-tyww
+      - tusports-dxyy
+      - tusports-jianshen
+      - tusports-paiwu
+      - tusports-jxfp
+      - tusports-youyong
+      - tusports-wushu
+
+  - id: college-xxjs
+    name: 新一代信息技术研究院
+    description: 研究成果、人工智能、光电器件、集成电路
+    icon: research
+    sourceOrg: college
+    sort: 77
+    enabled: true
+    sources:
       - xxjs-yjcg
       - xxjs-rgzn
+      - xxjs-gdqjzzjsyzb
+      - xxjs-jcdlgjjs
