@@ -1,7 +1,7 @@
 === 全量在线诊断报告 ===
-诊断时间: 2026-04-19T10:18:21.191227550
+诊断时间: 2026-04-19T10:31:00.446084474
 公开源数量: 83
-耗时: 32922 ms (并发=8)
+耗时: 30961 ms (并发=8)
 
 ──── 中德学院新闻 (sgim-xyxw, parser=sztu-cms) ────
   列表页 OK: 6 条  URL: https://sgim.sztu.edu.cn/xyxw.htm
@@ -34,7 +34,10 @@
   [3] ✅ 环境设计赋能乡村振兴——创意设计学院师生赴河源市连平县开展实地调研教学活动  [T=div.c-tit h3 M=div.c-ifo C=[id^=vsb_content]…]
 
 ──── 集成电路学院新闻 (icoc-xyxw, parser=sztu-cms) ────
-  ❌ 列表页 HTTP 503: https://icoc.sztu.edu.cn/xwzx/xyxw.htm
+  列表页 OK: 11 条  URL: https://icoc.sztu.edu.cn/xwzx/xyxw.htm
+  [1] ⏭️  外链: 会议室预约 | http://10.1.20.39/
+  [2] ✅ 宁存政院长当选深圳光学光电子行业协会轮值会长  [T=div.content_t h3 M=div.content_t p C=[id^=vsb_content]…]
+  [3] ✅ 集成电路与光电芯片学院王戊副教授物理顶级期刊成果揭示原子结构调控热电输运新机制  [T=div.content_t h3 M=div.content_t p C=[id^=vsb_content]…]
 
 ──── 就业通知公告 (jyzd-tzgg, parser=sztu-cms) ────
   列表页 OK: 15 条  URL: https://jyzd.sztu.edu.cn/list-noPicture.jsp?urltype=tree.TreeTempUrl&wbtreeid=1002&a1020514p=1&a1020514c=20
@@ -93,7 +96,10 @@
   ❌ 列表页 HTTP 404: https://cop.sztu.edu.cn/index/xyxw.htm
 
 ──── 工程物理学院新闻 (cep-xwdt, parser=sztu-cms) ────
-  ❌ 列表页 HTTP 403: https://cep.sztu.edu.cn/tzgg1/xwdt/16.htm
+  列表页 OK: 15 条  URL: https://cep.sztu.edu.cn/tzgg1/xwdt/16.htm
+  [1] ⏭️  外链: 大学物理党支部赴全国样板党支部党支部——苏州⼤学材料与化学化⼯学部物理及分析化学教⼯党⽀部开展调研交流活动 | https://mp.weixin.qq.com/s/I-afBgqg1khizexHycqHLQ
+  [2] ⏭️  外链: 音筑新程·声犹在耳 | 第四届辰光音乐节圆满落幕！ | https://mp.weixin.qq.com/s/QM2RPXDNYnVZ8RANu0i-pQ
+  [3] ⏭️  外链: 校际交流促发展，携手共进谱新篇——深圳理工大学曙光书院、先行书院（筹）到访深技大开展团学交流活动 | https://mp.weixin.qq.com/s/jQntm7zJp3FuVO75Sos0Cg
 
 ──── 校团委通知公告 (xtw-tzgg, parser=sztu-cms) ────
   列表页 OK: 1 条  URL: https://xtw.sztu.edu.cn/tzyg/tzgg.htm
@@ -162,10 +168,7 @@
   ⚠️  列表解析无结果: https://cmnf.sztu.edu.cn/xwzx/zxdt.htm
 
 ──── 新材料学院通知 (nmne-tzgg, parser=sztu-cms) ────
-  列表页 OK: 12 条  URL: https://nmne.sztu.edu.cn/xwzx/tzgg.htm
-  [1] ⚠️  缺标题 | 关于新材料与新能源学院2024级本科生重修选课的说明 | https://nmne.sztu.edu.cn/info/1073/4422.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [2] ⚠️  缺标题 | 新材料与新能源学院2025-2026-2学期重修替代选课指引 | https://nmne.sztu.edu.cn/info/1073/4372.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
-  [3] ⚠️  缺标题 | 关于拟确定陈洋洋等56名同志为入党积极分子的公示 | https://nmne.sztu.edu.cn/info/1073/4362.htm  [T=· M=div.news_conent_t… C=[id^=vsb_content]…]
+  ❌ 列表页 HTTP 403: https://nmne.sztu.edu.cn/xwzx/tzgg.htm
 
 ──── 国际合作部境外交流 (intl-jwjl, parser=sztu-cms) ────
   列表页 OK: 7 条  URL: https://international.sztu.edu.cn/gjjl/jwjl.htm
@@ -215,7 +218,7 @@
   列表页 OK: 9 条  URL: https://www.sztu.edu.cn/hljd/xyhd/tyhd.htm
   [1] ❌ HTTP 404: https://tusports.sztu.edu.cn/info/1015/1914.htm
   [2] ✅ 深技大学子在广东省第十一届大学生运动会定向越野运动比赛中创造佳绩  [T=div.c-tit h3 M=div.c-ifo C=[id^=vsb_content]…]
-  [3] ❌ HTTP 404: https://tusports.sztu.edu.cn/info/1088/1792.htm
+  [3] ❌ HTTP 403: https://tusports.sztu.edu.cn/info/1088/1792.htm
 
 ──── 信息公告 (jw-xxg, parser=sztu-cms) ────
   列表页 OK: 10 条  URL: https://jw.sztu.edu.cn/xxg.htm
@@ -237,7 +240,7 @@
 
 ──── 创意设计学院通知 (design-tzgg, parser=sztu-cms) ────
   列表页 OK: 100 条  URL: https://design.sztu.edu.cn/xydt/tzgg.htm
-  [1] ❌ HTTP 403: https://design.sztu.edu.cn/info/1027/2313.htm
+  [1] ⚠️  解析失败: 访问被拒绝或需要登录 | 关于2026年高校教师岗前培训的通知 | https://design.sztu.edu.cn/info/1027/2313.htm
   [2] ⚠️  缺来源 | | 关于开展美国乔治华盛顿大学研究生项目宣讲会的通知 | https://design.sztu.edu.cn/info/1027/2312.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
   [3] ⚠️  缺来源 | | 关于2026年上半年全国大学英语四、六级考试报名的通知 | https://design.sztu.edu.cn/info/1027/2311.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
 
@@ -410,10 +413,7 @@
   [3] ⚠️  缺来源 | 审计室组织召开校医院专项审计沟通会 | https://sjs.sztu.edu.cn/info/1003/1192.htm  [T=heuristic:nearest… M=· C=.v_news_content]
 
 ──── 审计公告 (sjs-sjgg, parser=sztu-cms) ────
-  列表页 OK: 4 条  URL: https://sjs.sztu.edu.cn/sjgg.htm
-  [1] ⚠️  缺来源 | 关于开展2025年经济责任审计的公示 | https://sjs.sztu.edu.cn/info/1005/1171.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [2] ⚠️  缺来源 | 关于开展2024年经济责任审计的公示 | https://sjs.sztu.edu.cn/info/1005/1161.htm  [T=heuristic:nearest… M=· C=.v_news_content]
-  [3] ⚠️  缺来源 | 关于开展2023年经济责任审计的公示 | https://sjs.sztu.edu.cn/info/1005/1142.htm  [T=heuristic:nearest… M=· C=.v_news_content]
+  ❌ 列表页 HTTP 403: https://sjs.sztu.edu.cn/sjgg.htm
 
 ──── 后勤部通知 (hq-tzgg, parser=sztu-cms) ────
   列表页 OK: 15 条  URL: https://hq.sztu.edu.cn/zhxx/tzgg.htm
@@ -422,7 +422,10 @@
   [3] ❌ HTTP 404: https://hq.sztu.edu.cn/info/1020/49495.htm
 
 ──── 后勤部动态 (hq-dtyw, parser=sztu-cms) ────
-  ❌ 列表页 HTTP 403: https://hq.sztu.edu.cn/zhxx/dtyw.htm
+  列表页 OK: 15 条  URL: https://hq.sztu.edu.cn/zhxx/dtyw.htm
+  [1] ⚠️  缺来源 | 后勤部召开新学期部门工作会议 | https://hq.sztu.edu.cn/info/1038/2436.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
+  [2] ⚠️  缺来源 | 深圳技术大学开展元旦假期前校园安全大检查 | https://hq.sztu.edu.cn/info/1038/2424.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
+  [3] ⚠️  缺来源 | 戎装砺志书韶华，后勤保障筑后盾 | https://hq.sztu.edu.cn/info/1038/2388.htm  [T=heuristic:nearest… M=· C=[id^=vsb_content]…]
 
 ──── 信息中心新闻 (it-xwgg, parser=sztu-cms) ────
   列表页 OK: 10 条  URL: https://it.sztu.edu.cn/xwgg.htm
@@ -464,27 +467,27 @@
                汇  总
 ═══════════════════════════════════════
 源统计:
-  正常(有items): 71
+  正常(有items): 72
   空(无items):   6
-  失败(HTTP错误): 6
+  失败(HTTP错误): 5
   总计:           83
 
 文章统计:
-  完整(解析+字段齐全): 68/208
-  外链(短路不解析):   58
-  缺标题:   3
+  完整(解析+字段齐全): 70/211
+  外链(短路不解析):   62
+  缺标题:   0
   缺来源:   65
   缺正文:   3
-  解析失败: 1
-  详情HTTP错误: 7
+  解析失败: 2
+  详情HTTP错误: 6
   请求异常: 3
 
 正文长度分布 (字符数):
   <50:     3
   50~200:  1
-  200~500: 9
-  500~2k:  15
-  ≥2k:     111
+  200~500: 8
+  500~2k:  17
+  ≥2k:     109
 
 模板指纹分布 (命中即按序采用，未列出的选择器=0 命中):
   标题选择器:
@@ -497,15 +500,14 @@
     div.tybt                                      × 5
     section.n_detail div.ar_title h3              × 5
     div.contentBox h2.title                       × 5
+    div.content_t h3                              × 4
     #article-content h1                           × 3
-    <none>                                        × 3
-    div.content_t h3                              × 2
     div.detail-title h4                           × 2
     div.article_section div.article_title         × 1
     div.article_box h2                            × 1
   元信息容器:
     <none>                                        × 42
-    div.news_conent_two_js                        × 29
+    div.news_conent_two_js                        × 26
     div.c-ifo                                     × 19
     p.info                                        × 13
     div.parameter                                 × 6
@@ -513,15 +515,14 @@
     div.newshow_timer                             × 5
     div.ar_title h6                               × 5
     div.left div.info                             × 5
+    div.content_t p                               × 4
     #article-content div.flex                     × 3
-    div.content_t p                               × 2
     div.detail-title h6                           × 2
     div.sub_box                                   × 1
     div.details_msg                               × 1
   正文选择器:
-    [id^=vsb_content] .v_news_content             × 112
-    .v_news_content                               × 27
+    [id^=vsb_content] .v_news_content             × 114
+    .v_news_content                               × 24
 
-⚠️  未识别模板的源 (title 或 content 选择器为 null，需要补模板):
-  - nmne-tzgg
+✅ 所有源的 title + content 均被选择器回退链覆盖
 
