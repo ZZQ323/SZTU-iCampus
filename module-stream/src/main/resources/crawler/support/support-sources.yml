@@ -519,3 +519,75 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 5
+  # ========================================================================
+  #  第 2 轮补充（xtw 3 个团学组织/荣誉/风采 + it 1 个 FAQ）
+  # ========================================================================
+
+  - id: xtw-shetuan
+    name: 校团委社团
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/txzz1/st1.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1146"
+    categoryName: 社团
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: xtw-hjqk
+    name: 校团委获奖情况
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/ztzl1/jdqn1/hjqk.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1159"
+    categoryName: 获奖情况
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  - id: xtw-xzfc
+    name: 校团委学子风采
+    channelId: dept-xtw
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.xtw}
+    listUrl: ${urls.znbm.xtw}/ztzl1/jdqn1/xzfc.htm
+    detailUrlTemplate: ${urls.znbm.xtw}/info/{category}/{id}.htm
+    categoryCode: "1160"
+    categoryName: 学子风采
+    contentType: news
+    subContentType: student
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 12
+
+  - id: it-wtdy
+    name: 信息中心常见问题答疑
+    channelId: dept-it
+    parserType: sztu-cms
+    baseUrl: ${urls.znbm.it}
+    listUrl: ${urls.znbm.it}/wtdy1.htm
+    detailUrlTemplate: ${urls.znbm.it}/info/{category}/{id}.htm
+    categoryCode: "1032"
+    categoryName: 常见问题答疑
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: false
+    crawlIntervalMinutes: 240
+    crawlPageCount: 1
+    enabled: true
+    sort: 22
+

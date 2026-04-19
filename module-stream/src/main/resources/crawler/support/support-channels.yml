@@ -5,7 +5,7 @@ channels:
 
   - id: dept-xtw
     name: 校团委
-    description: 通知公告、团学风采、灯塔引领、科技创新、聚焦服务、主题团日、青马工程、社会实践、青年大学习
+    description: 通知公告、团学风采、灯塔引领、科技创新、聚焦服务、主题团日、青马工程、社会实践、青年大学习、社团、获奖情况、学子风采
     icon: flag
     sourceOrg: support
     sort: 23
@@ -20,10 +20,13 @@ channels:
       - xtw-qmgc
       - xtw-shsj
       - xtw-qndxx
+      - xtw-shetuan
+      - xtw-hjqk
+      - xtw-xzfc
 
   - id: dept-it
     name: 信息中心
-    description: 新闻公告、党建动态、科普新知、党建政策法规
+    description: 新闻公告、党建动态、科普新知、党建政策法规、常见问题答疑
     icon: desktop
     sourceOrg: support
     sort: 32
@@ -33,6 +36,7 @@ channels:
       - it-djdt
       - it-kpxz
       - it-zcfg
+      - it-wtdy
 
   - id: dept-dds
     name: 教学质量督导室
