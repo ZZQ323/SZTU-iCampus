@@ -1,5 +1,7 @@
 # 群团、教辅频道配置
-# sourceOrg: support
+# sourceOrg 分两类：
+#   - league: 校团委 + 信息中心 + 教学质量督导室（群团组织）
+#   - support: 分析测试中心 + 半导体微纳 + 医工研究院（教辅科研单位）
 
 channels:
 
@@ -7,7 +9,7 @@ channels:
     name: 校团委
     description: 通知公告、团学风采、灯塔引领、科技创新、聚焦服务、主题团日、青马工程、社会实践、青年大学习、社团、获奖情况、学子风采
     icon: flag
-    sourceOrg: support
+    sourceOrg: league
     sort: 23
     enabled: true
     sources:
@@ -28,7 +30,7 @@ channels:
     name: 信息中心
     description: 新闻公告、党建动态、科普新知、党建政策法规、常见问题答疑
     icon: desktop
-    sourceOrg: support
+    sourceOrg: league
     sort: 32
     enabled: true
     sources:
@@ -42,7 +44,7 @@ channels:
     name: 教学质量督导室
     description: 新闻通知、党建引领、省部级制度、校级制度
     icon: task
-    sourceOrg: support
+    sourceOrg: league
     sort: 33
     enabled: true
     sources:

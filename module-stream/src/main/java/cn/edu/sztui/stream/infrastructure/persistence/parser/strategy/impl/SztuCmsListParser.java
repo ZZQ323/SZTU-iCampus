@@ -377,8 +377,10 @@ public class SztuCmsListParser implements ParserStrategy {
             return titleAttr.trim();
         }
 
-        // 2. a 内的标题 heading（h3 常见；h5 用于 ai.filterList_row 格式）
-        Element heading = anchor.selectFirst("h3, h5");
+        // 2. a 内的标题 heading（h3/h4/h5/h6，不同模板用不同层级）
+        //    案例：ai.filterList_row 用 h5；it-xwgg 的 /xwgg.htm 用 h6。
+        //    不含 h1/h2 避免撞页面级大标题。
+        Element heading = anchor.selectFirst("h3, h4, h5, h6");
         if (heading != null && StringUtils.hasText(heading.text())) {
             return heading.text().trim();
         }
