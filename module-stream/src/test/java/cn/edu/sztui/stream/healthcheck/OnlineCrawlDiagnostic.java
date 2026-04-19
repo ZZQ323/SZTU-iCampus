@@ -371,6 +371,203 @@ class OnlineCrawlDiagnostic {
         Path reportPath = Path.of("diagnostic-report.txt");
         Files.writeString(reportPath, report.toString());
         System.out.println("报告已写入: " + reportPath.toAbsolutePath());
+
+        // ==================== 评估表 CSV ====================
+        Path csvPath = Path.of("url-audit.csv");
+        writeAuditCsv(publicSources, resultsById, csvPath);
+        System.out.println("评估表已写入: " + csvPath.toAbsolutePath());
+    }
+
+    /**
+     * 产出 url-audit.csv 评估表，每个源一行。
+     * 前 9 列由诊断预填（列表/详情状态、主要问题、建议行动），
+     * 后 2 列 userDecision / userNote 留给人工标注。
+     * 按"需要关注优先级"排序：列表失败 → 详情失败 → 字段缺失 → OK。
+     * <p>
+     * 使用闭环：本地跑诊断 → 打开 CSV 手工填 decision → 发给开发批量应用。
+     */
+    private void writeAuditCsv(List<SourceConfig> sources,
+                               Map<String, SourceReport> resultsById,
+                               Path path) {
+        List<String[]> rows = new ArrayList<>();
+        for (SourceConfig s : sources) {
+            SourceReport r = resultsById.get(s.getId());
+            if (r == null) continue;
+
+            // 1. 源信息
+            String id = s.getId();
+            String name = s.getName() != null ? s.getName() : "";
+            String cat = classifyByName(name);
+            String listUrl = r.listUrl() != null ? r.listUrl() : "";
+
+            // 2. 列表结果
+            String listStatus;
+            String listReason = "";
+            int itemsFound = r.itemCount();
+            switch (r.outcome()) {
+                case "ok"    -> listStatus = "OK";
+                case "empty" -> { listStatus = "LIST_EMPTY"; listReason = "200 但 parser 提取 0 条"; }
+                case "fail"  -> {
+                    listStatus = "LIST_FAIL";
+                    listReason = r.failReason() != null ? r.failReason() : "";
+                }
+                default      -> listStatus = "UNKNOWN";
+            }
+
+            // 3. 详情统计
+            int checked = 0, httpErr = 0, reqErr = 0, parseFail = 0, external = 0;
+            int noTitle = 0, noDate = 0, noAuthor = 0, noContent = 0, okCount = 0;
+            for (ArticleReport a : r.articles()) {
+                if ("external".equals(a.status())) { external++; continue; }
+                checked++;
+                switch (a.status()) {
+                    case "ok"            -> okCount++;
+                    case "http-error"    -> httpErr++;
+                    case "request-error" -> reqErr++;
+                    case "parse-fail"    -> parseFail++;
+                    case "incomplete"    -> {
+                        if (a.issues().contains("缺标题")) noTitle++;
+                        if (a.issues().contains("缺日期")) noDate++;
+                        if (a.issues().contains("缺来源")) noAuthor++;
+                        if (a.issues().stream().anyMatch(i -> i.startsWith("缺正文"))) noContent++;
+                    }
+                    default -> {}
+                }
+            }
+            String detailRatio = checked > 0
+                    ? String.format("%d/%d", okCount, checked)
+                    : (external > 0 ? String.format("外链 %d", external) : "-");
+
+            // 4. 主要问题 + 建议行动（按严重程度递减）
+            int threshold = Math.max(1, (checked + 1) / 2);
+            String primaryIssue;
+            String suggestedAction;
+            int priority;
+            if ("LIST_FAIL".equals(listStatus)) {
+                if (listReason.contains("无列表URL")) {
+                    primaryIssue = "LIST_NO_URL";
+                    suggestedAction = "补 listUrl 配置";
+                    priority = 1;
+                } else if (listReason.contains("404")) {
+                    primaryIssue = "LIST_HTTP_404";
+                    suggestedAction = "改 YAML listUrl 或 drop";
+                    priority = 2;
+                } else if (listReason.contains("503")) {
+                    primaryIssue = "LIST_HTTP_503";
+                    suggestedAction = "等服务端恢复后重跑";
+                    priority = 3;
+                } else {
+                    primaryIssue = "LIST_HTTP_ERROR";
+                    suggestedAction = "查服务端状态";
+                    priority = 2;
+                }
+            } else if ("LIST_EMPTY".equals(listStatus)) {
+                primaryIssue = "LIST_EMPTY";
+                suggestedAction = "补 list parser 变体 或 drop（JS 渲染/结构特殊）";
+                priority = 4;
+            } else if (checked > 0 && httpErr >= threshold) {
+                primaryIssue = "DETAIL_HTTP_ERROR_MOST";
+                suggestedAction = "文章 URL 拼接错 或 域名受限";
+                priority = 5;
+            } else if (checked > 0 && reqErr >= threshold) {
+                primaryIssue = "DETAIL_REQUEST_ERROR_MOST";
+                suggestedAction = "域名不可达（可能仅内网/WebVPN）";
+                priority = 5;
+            } else if (checked > 0 && parseFail >= threshold) {
+                primaryIssue = "DETAIL_PARSE_FAIL_MOST";
+                suggestedAction = "补 content parser 变体";
+                priority = 5;
+            } else if (checked > 0 && noTitle >= threshold) {
+                primaryIssue = "NO_TITLE_MOST";
+                suggestedAction = "补 content parser 的 title 选择器";
+                priority = 6;
+            } else if (checked > 0 && noContent >= threshold) {
+                primaryIssue = "NO_CONTENT_MOST";
+                suggestedAction = "补 content parser 的正文选择器";
+                priority = 6;
+            } else if (checked > 0 && httpErr > 0 || reqErr > 0 || parseFail > 0) {
+                primaryIssue = "DETAIL_PARTIAL_FAIL";
+                suggestedAction = "少量抽查失败，抽更多条再判断";
+                priority = 7;
+            } else if (checked > 0 && noDate >= threshold && noAuthor >= threshold) {
+                primaryIssue = "NO_DATE_AND_AUTHOR";
+                suggestedAction = "页面本身无字段，可忽略或用兜底";
+                priority = 8;
+            } else if (checked > 0 && noDate >= threshold) {
+                primaryIssue = "NO_DATE_MOST";
+                suggestedAction = "可忽略（多数页面无日期）或用列表 publishDate 兜底";
+                priority = 9;
+            } else if (checked > 0 && noAuthor >= threshold) {
+                primaryIssue = "NO_AUTHOR_MOST";
+                suggestedAction = "可忽略（页面本身常无作者）";
+                priority = 9;
+            } else if (checked == 0 && external > 0) {
+                primaryIssue = "OK_ALL_EXTERNAL";
+                suggestedAction = "全外链，短路处理正常";
+                priority = 10;
+            } else {
+                primaryIssue = "OK";
+                suggestedAction = "保留";
+                priority = 11;
+            }
+
+            rows.add(new String[]{
+                    String.valueOf(priority),    // 0 用于排序，不输出
+                    id,
+                    name,
+                    cat,
+                    listUrl,
+                    listStatus + (listReason.isEmpty() ? "" : " (" + listReason + ")"),
+                    String.valueOf(itemsFound),
+                    detailRatio,
+                    primaryIssue,
+                    suggestedAction,
+                    "",   // userDecision: keep / drop / fix-url:XXX / fix-parser / wait-server
+                    ""    // userNote
+            });
+        }
+
+        // 按优先级排序
+        rows.sort(Comparator.comparingInt(a -> Integer.parseInt(a[0])));
+
+        StringBuilder csv = new StringBuilder();
+        csv.append('\uFEFF');  // UTF-8 BOM，让 Excel 直接识别中文
+        csv.append("sourceId,name,category,listUrl,listStatus,itemsFound,detailOkRatio,primaryIssue,suggestedAction,userDecision,userNote\n");
+        for (String[] row : rows) {
+            for (int i = 1; i < row.length; i++) {
+                if (i > 1) csv.append(',');
+                csv.append(csvEscape(row[i]));
+            }
+            csv.append('\n');
+        }
+        try {
+            Files.writeString(path, csv.toString());
+        } catch (IOException e) {
+            System.err.println("写入 url-audit.csv 失败: " + e.getMessage());
+        }
+    }
+
+    private static String csvEscape(String v) {
+        if (v == null) return "";
+        if (v.contains(",") || v.contains("\"") || v.contains("\n") || v.contains("\r")) {
+            return "\"" + v.replace("\"", "\"\"") + "\"";
+        }
+        return v;
+    }
+
+    /** 按名称关键字归类到图 2 的子分类（新闻/党建/合作/科研/学生/通知/规章/招生/招聘）。 */
+    private static String classifyByName(String name) {
+        if (name == null) return "OTHER";
+        if (name.matches(".*(党建|党群|党的建设|党务|理论学习|廉洁|灯塔|青马|团日|团建|党政|统战|党团|思政).*")) return "党建";
+        if (name.matches(".*(招聘|诚聘).*")) return "招聘";
+        if (name.matches(".*(专升本|招生|奖助).*")) return "招生";
+        if (name.matches(".*(合作|国际|校企|成果转化|境外|来访|院企|交流|社会服务|媒体聚焦).*")) return "合作交流";
+        if (name.matches(".*(科研|学术|讲座|讲坛|学科建设|研究成果|科研资讯|测试服务|收费标准|科研成果|学术活动|学术讲座|讲座新闻|学术信息|学术交流|讲座通知|科学研究|科普|人工智能|大事记要).*")) return "科研学术";
+        if (name.matches(".*(团学|学子|校园活动|校园生活|学生活动|社会实践|荣誉殿堂|学科竞赛|学生资助|聚焦服务|青年大学习|科技创新|团学风采|工会活动|文娱活动|体育活动|竞赛荣誉|教学动态|就业指导).*")) return "学生工作";
+        if (name.matches(".*(规章|制度|政策法规|政策文件|政策规定|政策信息|服务指南|办事指南|培训通知|信息公开|人事制度|政策规章|审计公告|就业政策).*")) return "规章制度";
+        if (name.matches(".*(通知|公告).*")) return "通知公告";
+        if (name.matches(".*(新闻|动态|焦点|资讯|要闻|院务|风光).*")) return "新闻动态";
+        return "其他";
     }
 
     // ==================== 单源诊断 ====================
