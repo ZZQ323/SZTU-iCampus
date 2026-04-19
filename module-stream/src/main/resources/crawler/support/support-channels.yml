@@ -5,7 +5,7 @@ channels:
 
   - id: dept-xtw
     name: 校团委
-    description: 校团委通知公告、团学风采
+    description: 通知公告、团学风采、灯塔引领、科技创新、聚焦服务、主题团日、青马工程、社会实践、青年大学习
     icon: flag
     sourceOrg: support
     sort: 23
@@ -13,10 +13,17 @@ channels:
     sources:
       - xtw-tzgg
       - xtw-txfc
+      - xtw-dtyl
+      - xtw-kjcx
+      - xtw-jjfw
+      - xtw-zttr
+      - xtw-qmgc
+      - xtw-shsj
+      - xtw-qndxx
 
   - id: dept-it
     name: 信息中心
-    description: 信息中心 新闻公告、党建动态
+    description: 新闻公告、党建动态、科普新知、党建政策法规
     icon: desktop
     sourceOrg: support
     sort: 32
@@ -24,10 +31,12 @@ channels:
     sources:
       - it-xwgg
       - it-djdt
+      - it-kpxz
+      - it-zcfg
 
   - id: dept-dds
     name: 教学质量督导室
-    description: 教学质量督导室 新闻通知、党建引领
+    description: 新闻通知、党建引领、省部级制度、校级制度
     icon: task
     sourceOrg: support
     sort: 33
@@ -35,10 +44,12 @@ channels:
     sources:
       - dds-xwtz
       - dds-djyl
+      - dds-sbjzd
+      - dds-xjzd
 
   - id: lab-fxcs
     name: 分析测试中心
-    description: 分析测试中心通知公告、新闻
+    description: 通知公告、新闻、培训通知、收费标准、测试服务
     icon: precision-monitor
     sourceOrg: support
     sort: 40
@@ -46,6 +57,9 @@ channels:
     sources:
       - fxcs-tzgg
       - fxcs-xw
+      - fxcs-pxtz
+      - fxcs-sfbz
+      - fxcs-csfw
 
   - id: lab-cmnf
     name: 半导体微纳加工中心
@@ -60,7 +74,7 @@ channels:
 
   - id: lab-ime
     name: 医工交叉创新研究院
-    description: 医工交叉创新研究院通知、新闻
+    description: 通知公告、新闻动态、科研动态、行业动态、人才招聘
     icon: hospital
     sourceOrg: support
     sort: 42
@@ -68,3 +82,6 @@ channels:
     sources:
       - ime-tzgg
       - ime-xwdt
+      - ime-kydt
+      - ime-xydt
+      - ime-rczp
