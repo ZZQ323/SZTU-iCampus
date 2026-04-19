@@ -3,7 +3,8 @@ package cn.edu.sztui.stream.infrastructure.persistence.parser.config;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -23,6 +24,12 @@ import java.util.stream.Collectors;
 public class CrawlerConfigLoader {
 
     private static final Pattern PLACEHOLDER = Pattern.compile("\\$\\{([^}]+)}");
+
+    private static final String URLS_PATTERN = "classpath:crawler/*/*-urls.yml";
+    private static final String CHANNELS_PATTERN = "classpath:crawler/*/*-channels.yml";
+    private static final String SOURCES_PATTERN = "classpath:crawler/*/*-sources.yml";
+
+    private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
     @Getter
     private Map<String, ChannelConfig> channelMap = new HashMap<>();
@@ -50,25 +57,42 @@ public class CrawlerConfigLoader {
 
     // ==================== URL 变量加载 ====================
 
-    private void loadUrls() {
+    private Resource[] scan(String pattern) {
         try {
-            ClassPathResource resource = new ClassPathResource("crawler/archived/urls.yml");
-            if (!resource.exists()) {
-                log.info("urls.yml 不存在，跳过 URL 变量加载");
-                return;
-            }
+            Resource[] resources = resolver.getResources(pattern);
+            Arrays.sort(resources, Comparator.comparing(r -> {
+                try {
+                    return r.getURL().toString();
+                } catch (Exception e) {
+                    return "";
+                }
+            }));
+            return resources;
+        } catch (Exception e) {
+            log.error("扫描资源失败: {}", pattern, e);
+            return new Resource[0];
+        }
+    }
 
-            Yaml yaml = new Yaml();
+    private void loadUrls() {
+        Resource[] resources = scan(URLS_PATTERN);
+        if (resources.length == 0) {
+            log.warn("未找到任何 *-urls.yml，跳过 URL 变量加载");
+            return;
+        }
+        Yaml yaml = new Yaml();
+        for (Resource resource : resources) {
             try (InputStream is = resource.getInputStream()) {
                 Map<String, Object> root = yaml.load(is);
                 if (root != null) {
                     flattenMap("", root, urlVars);
                 }
+                log.debug("加载 URL 文件: {}", resource.getFilename());
+            } catch (Exception e) {
+                log.error("加载 URL 文件失败: {}", resource.getFilename(), e);
             }
-            log.info("加载 URL 变量: {} 个", urlVars.size());
-        } catch (Exception e) {
-            log.error("加载 urls.yml 失败", e);
         }
+        log.info("加载 URL 变量: {} 个（来自 {} 个文件）", urlVars.size(), resources.length);
     }
 
     @SuppressWarnings("unchecked")
@@ -108,61 +132,69 @@ public class CrawlerConfigLoader {
     // ==================== 配置加载 ====================
 
     private void loadChannels() {
-        try {
-            ClassPathResource resource = new ClassPathResource("crawler/archived/channels.yml");
-            if (!resource.exists()) {
-                log.warn("channels.yml 不存在，跳过加载");
-                return;
-            }
-
-            LoaderOptions options = new LoaderOptions();
-            Yaml yaml = new Yaml(new Constructor(ChannelsRoot.class, options));
-
+        Resource[] resources = scan(CHANNELS_PATTERN);
+        if (resources.length == 0) {
+            log.warn("未找到任何 *-channels.yml，跳过频道加载");
+            return;
+        }
+        LoaderOptions options = new LoaderOptions();
+        for (Resource resource : resources) {
             try (InputStream is = resource.getInputStream()) {
+                Yaml yaml = new Yaml(new Constructor(ChannelsRoot.class, options));
                 ChannelsRoot root = yaml.load(is);
                 if (root != null && root.getChannels() != null) {
                     for (ChannelConfig channel : root.getChannels()) {
                         if (channel.getEnabled() == null || channel.getEnabled()) {
-                            channelMap.put(channel.getId(), channel);
-                            log.debug("加载频道: {} - {}", channel.getId(), channel.getName());
+                            ChannelConfig previous = channelMap.put(channel.getId(), channel);
+                            if (previous != null) {
+                                log.warn("频道 id 冲突被覆盖: {} (来自 {})", channel.getId(), resource.getFilename());
+                            } else {
+                                log.debug("加载频道: {} - {} (来自 {})",
+                                        channel.getId(), channel.getName(), resource.getFilename());
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                log.error("加载频道文件失败: {}", resource.getFilename(), e);
             }
-        } catch (Exception e) {
-            log.error("加载 channels.yml 失败", e);
         }
     }
 
     private void loadSources() {
-        try {
-            ClassPathResource resource = new ClassPathResource("crawler/archived/sources.yml");
-            if (!resource.exists()) {
-                log.warn("sources.yml 不存在，跳过加载");
-                return;
-            }
+        Resource[] resources = scan(SOURCES_PATTERN);
+        if (resources.length == 0) {
+            log.warn("未找到任何 *-sources.yml，跳过数据源加载");
+            return;
+        }
+        LoaderOptions options = new LoaderOptions();
+        for (Resource resource : resources) {
+            try {
+                String yamlContent;
+                try (InputStream is = resource.getInputStream()) {
+                    yamlContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                }
+                yamlContent = resolvePlaceholders(yamlContent);
 
-            String yamlContent;
-            try (InputStream is = resource.getInputStream()) {
-                yamlContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            }
-            yamlContent = resolvePlaceholders(yamlContent);
+                Yaml yaml = new Yaml(new Constructor(SourcesRoot.class, options));
+                SourcesRoot root = yaml.load(yamlContent);
 
-            LoaderOptions options = new LoaderOptions();
-            Yaml yaml = new Yaml(new Constructor(SourcesRoot.class, options));
-            SourcesRoot root = yaml.load(yamlContent);
-
-            if (root != null && root.getSources() != null) {
-                for (SourceConfig source : root.getSources()) {
-                    if (source.isEnabled()) {
-                        sourceMap.put(source.getId(), source);
-                        log.debug("加载数据源: {} - {} (parser: {})",
-                                source.getId(), source.getName(), source.getParserType());
+                if (root != null && root.getSources() != null) {
+                    for (SourceConfig source : root.getSources()) {
+                        if (source.isEnabled()) {
+                            SourceConfig previous = sourceMap.put(source.getId(), source);
+                            if (previous != null) {
+                                log.warn("数据源 id 冲突被覆盖: {} (来自 {})", source.getId(), resource.getFilename());
+                            } else {
+                                log.debug("加载数据源: {} - {} (parser: {}, 来自 {})",
+                                        source.getId(), source.getName(), source.getParserType(), resource.getFilename());
+                            }
+                        }
                     }
                 }
+            } catch (Exception e) {
+                log.error("加载数据源文件失败: {}", resource.getFilename(), e);
             }
-        } catch (Exception e) {
-            log.error("加载 sources.yml 失败", e);
         }
     }
 
