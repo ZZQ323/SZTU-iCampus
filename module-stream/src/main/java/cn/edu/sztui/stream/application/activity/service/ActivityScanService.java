@@ -165,6 +165,18 @@ public class ActivityScanService {
         return out;
     }
 
+    /**
+     * 给 ArticleSavedEvent 监听器用的入口：按默认策略处理单篇文章（走规则预筛 + LLM 缓存 + 索引）。
+     * 不返回 ScanResultVo，失败只 log 不抛异常（事件循环要健壮）。
+     */
+    public void autoProcess(ListParserResult.InfoItemMeta meta) {
+        try {
+            processOne(meta, false, false);
+        } catch (Exception e) {
+            log.warn("[activity-scan] autoProcess failed: id={}, err={}", meta.getId(), e.getMessage());
+        }
+    }
+
     private ScanResultVo processOne(ListParserResult.InfoItemMeta meta, boolean force, boolean bypassPreFilter) {
         ScanResultVo row = new ScanResultVo();
         row.setArticleId(meta.getId());

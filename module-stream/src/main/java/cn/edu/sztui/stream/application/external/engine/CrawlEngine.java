@@ -66,6 +66,9 @@ public class CrawlEngine {
     @Resource
     private StreamPushService streamPushService;
 
+    @Resource
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
     /**
      * 后台初始化线程池（阶段 2 用）
      */
@@ -124,6 +127,7 @@ public class CrawlEngine {
 
             enrichItemsWithSourceMeta(newItems, source);
             infoCacheUtil.saveMetaBatch(channelId, newItems);
+            publishArticleSavedEvents(newItems);
 
             String newLatestId = computeLatestId(newItems, cachedLatestId);
             infoCacheUtil.setLatestId(channelId, newLatestId);
@@ -194,6 +198,7 @@ public class CrawlEngine {
             List<ListParserResult.InfoItemMeta> firstPageItems = firstResult.getItems();
             enrichItemsWithSourceMeta(firstPageItems, source);
             infoCacheUtil.saveMetaBatch(channelId, firstPageItems);
+            publishArticleSavedEvents(firstPageItems);
 
             String latestId = computeLatestId(firstPageItems, "0");
             infoCacheUtil.setLatestId(channelId, latestId);
@@ -230,6 +235,7 @@ public class CrawlEngine {
                         if (!remaining.isEmpty()) {
                             enrichItemsWithSourceMeta(remaining, source);
                             infoCacheUtil.saveMetaBatch(channelId, remaining);
+                            publishArticleSavedEvents(remaining);
 
                             // 更新 latestId（可能有更大的 ID）
                             String newLatest = computeLatestId(remaining, finalLatestId);
@@ -542,6 +548,22 @@ public class CrawlEngine {
         }
 
         return String.valueOf(max);
+    }
+
+    /**
+     * 逐条发布 ArticleSavedEvent。监听器（如 ActivityAutoScanListener）会按 @ConditionalOnProperty
+     * 决定是否处理；默认情况下什么都不做，开启后（ai.activity.auto-process=true）才消费。
+     */
+    private void publishArticleSavedEvents(List<ListParserResult.InfoItemMeta> items) {
+        if (items == null || items.isEmpty() || eventPublisher == null) return;
+        for (ListParserResult.InfoItemMeta meta : items) {
+            try {
+                eventPublisher.publishEvent(
+                        new cn.edu.sztui.stream.application.external.event.ArticleSavedEvent(this, meta));
+            } catch (Exception e) {
+                log.warn("publishArticleSavedEvent 失败: id={}, err={}", meta.getId(), e.getMessage());
+            }
+        }
     }
 
     private void broadcastNewContent(String channelId, List<ListParserResult.InfoItemMeta> newItems, String latestId) {

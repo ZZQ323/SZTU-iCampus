@@ -45,6 +45,9 @@ public class ActivityAdminController {
     @Resource
     private cn.edu.sztui.stream.application.activity.service.ActivityReportService reportService;
 
+    @Resource
+    private cn.edu.sztui.stream.application.activity.service.ActivityIndexService indexService;
+
     @Value("${ai.activity.default-channels:announcement}")
     private List<String> defaultChannels;
 
@@ -157,6 +160,28 @@ public class ActivityAdminController {
                 "total", reportService.count(),
                 "items", reportService.list(limit)
         ));
+    }
+
+    // ==================== Admin hide ====================
+
+    @PostMapping("/hide")
+    @Operation(summary = "管理员从索引里隐藏某条活动", description = "详情不删，查询排除。适合处理'LLM 误判但索引已写'的情况。")
+    public Result adminHide(@RequestParam String articleId) {
+        indexService.adminHide(articleId);
+        return Result.ok();
+    }
+
+    @PostMapping("/unhide")
+    @Operation(summary = "管理员恢复被隐藏的活动")
+    public Result adminUnhide(@RequestParam String articleId) {
+        indexService.adminUnhide(articleId);
+        return Result.ok();
+    }
+
+    @GetMapping("/hidden")
+    @Operation(summary = "已隐藏的活动 ID 列表")
+    public Result adminHiddenList() {
+        return Result.ok(indexService.listAdminHidden());
     }
 
     // ==================== 请求体 ====================

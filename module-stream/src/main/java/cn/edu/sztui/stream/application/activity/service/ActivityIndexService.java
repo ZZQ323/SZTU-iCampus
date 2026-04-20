@@ -38,6 +38,8 @@ public class ActivityIndexService {
     static final String KEY_TIMELINE = "icampus:cache:activity:timeline";
     static final String KEY_PENDING = "icampus:cache:activity:pending";
     static final String KEY_DETAIL_PREFIX = "icampus:cache:activity:detail:";
+    /** 管理员隐藏的活动 articleId 集合，查询时从 timeline/pending 结果里排除 */
+    static final String KEY_ADMIN_HIDDEN = "icampus:cache:activity:admin-hidden";
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -102,7 +104,38 @@ public class ActivityIndexService {
     public IndexStats stats() {
         Long tlSize = redisTemplate.opsForZSet().zCard(KEY_TIMELINE);
         Long pdSize = redisTemplate.opsForSet().size(KEY_PENDING);
-        return new IndexStats(tlSize == null ? 0 : tlSize, pdSize == null ? 0 : pdSize);
+        Long hdSize = redisTemplate.opsForSet().size(KEY_ADMIN_HIDDEN);
+        return new IndexStats(
+                tlSize == null ? 0 : tlSize,
+                pdSize == null ? 0 : pdSize,
+                hdSize == null ? 0 : hdSize);
+    }
+
+    // ==================== 管理员隐藏 ====================
+
+    /** 管理员把某条活动从前端查询结果中隐藏（不删详情，方便未来恢复）*/
+    public void adminHide(String articleId) {
+        if (articleId == null || articleId.isBlank()) return;
+        redisTemplate.opsForSet().add(KEY_ADMIN_HIDDEN, articleId);
+        log.info("[ActivityIndex] admin hide: {}", articleId);
+    }
+
+    public void adminUnhide(String articleId) {
+        redisTemplate.opsForSet().remove(KEY_ADMIN_HIDDEN, articleId);
+        log.info("[ActivityIndex] admin unhide: {}", articleId);
+    }
+
+    public List<String> listAdminHidden() {
+        Set<Object> members = redisTemplate.opsForSet().members(KEY_ADMIN_HIDDEN);
+        if (members == null) return List.of();
+        List<String> out = new ArrayList<>(members.size());
+        for (Object o : members) out.add(o.toString());
+        return out;
+    }
+
+    private boolean isAdminHidden(String articleId) {
+        Boolean b = redisTemplate.opsForSet().isMember(KEY_ADMIN_HIDDEN, articleId);
+        return Boolean.TRUE.equals(b);
     }
 
     // ==================== 查询 ====================
@@ -145,10 +178,18 @@ public class ActivityIndexService {
     // ==================== 辅助 ====================
 
     private List<ActivityIndexItem> loadDetails(List<String> articleIds) {
+        // 一次性读出管理员隐藏集合，本次调用内复用，避免 O(N) Redis 往返
+        Set<Object> hiddenMembers = redisTemplate.opsForSet().members(KEY_ADMIN_HIDDEN);
+        Set<String> hidden = new java.util.HashSet<>();
+        if (hiddenMembers != null) {
+            for (Object o : hiddenMembers) hidden.add(o.toString());
+        }
+
         List<ActivityIndexItem> out = new ArrayList<>(articleIds.size());
         Set<String> seen = new LinkedHashSet<>();
         for (String id : articleIds) {
             if (!seen.add(id)) continue;
+            if (hidden.contains(id)) continue;            // 管理员黑名单过滤
             Object val = cacheUtil.get(KEY_DETAIL_PREFIX + id);
             if (val == null) continue;
             ActivityIndexItem item = JSON.parseObject(val.toString(), ActivityIndexItem.class);
@@ -159,5 +200,5 @@ public class ActivityIndexService {
 
     // ==================== DTO ====================
 
-    public record IndexStats(long timelineSize, long pendingSize) {}
+    public record IndexStats(long timelineSize, long pendingSize, long adminHiddenSize) {}
 }
