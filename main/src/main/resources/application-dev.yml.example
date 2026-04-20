@@ -3,11 +3,12 @@
 # 使用方法：
 #   1. 复制本文件为 application-dev.yml（去掉 .example 后缀）
 #   2. 填入真实的 DashScope API Key
-#   3. 启动时设置 --spring.profiles.active=dev （或 SPRING_PROFILES_ACTIVE=dev）
+#   3. 启动时设置 --spring.profiles.active=dev（或 SPRING_PROFILES_ACTIVE=dev）
 #
 # ⚠️ application-dev.yml 已在 .gitignore 中，不要提交真实 key。
+#
+# 这里用的是"扁平变量"写法，和 application.yml 里的 ${DASHSCOPE_API_KEY:} 占位符对应。
+# 也可以写成嵌套的 ai.dashscope.api-key: sk-xxx，效果一样。
 
-ai:
-  dashscope:
-    # DashScope API Key（控制台：https://bailian.console.aliyun.com/）
-    api-key: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# DashScope API Key（控制台：https://bailian.console.aliyun.com/）
+DASHSCOPE_API_KEY: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
