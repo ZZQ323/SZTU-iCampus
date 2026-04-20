@@ -53,6 +53,9 @@ public class ActivityScanService {
     @Resource
     private CacheUtil cacheUtil;
 
+    @Resource
+    private ActivityIndexService indexService;
+
     @Value("${ai.activity.content-max-chars:4000}")
     private int contentMaxChars;
 
@@ -158,6 +161,8 @@ public class ActivityScanService {
                     row.setAiResult(vo);
                     row.setFromCache(true);
                     row.setCalledAi(false);
+                    // 缓存命中也顺便刷一次索引（幂等）——之前索引被清或未写过时能自愈
+                    indexService.upsert(meta, vo);
                     scanLog.info("hit-cache: [{}] isActivity={} conf={} title={}",
                             meta.getId(), vo.isActivity(), vo.getConfidence(), vo.getTitle());
                     return row;
@@ -181,11 +186,12 @@ public class ActivityScanService {
             return row;
         }
 
-        // 5. 解析 + 缓存
+        // 5. 解析 + 缓存 + 索引
         try {
             ActivityExtractionVo vo = JSON.parseObject(chat.getContent(), ActivityExtractionVo.class);
             row.setAiResult(vo);
             cacheUtil.set(cacheKey, JSON.toJSONString(vo), CACHE_TTL_SECONDS);
+            indexService.upsert(meta, vo);
             scanLog.info("ai-ok: [{}] isActivity={} conf={} title={} ({}ms, {} tokens)",
                     meta.getId(), vo.isActivity(), vo.getConfidence(),
                     vo.getTitle(), chat.getDurationMs(),

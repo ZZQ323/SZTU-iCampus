@@ -109,16 +109,29 @@
 | `/info/v1/category-tree` | GET | 分类树 |
 | `/info/v1/unread` | GET | 未读计数 |
 
-### 教务 `/academic`
+### 教务 `/academic` / `/acdm`
 | 端点 | 方法 | 说明 |
 |------|------|------|
-| `/academic/v1/schedule` | GET | 课表查询 |
+| `/acdm/v1/schedule` | POST | 课表查询（前端叫 /academic，实际 /acdm）|
+| `/acdm/v1/refresh/cookies` | GET | 教务系统 cookie 续期 |
+
+### 校历 `/calendar`（公开）
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/calendar/v1/years` | GET | 学年列表（从学校页面 ul 解析，Redis 7d 缓存）|
+| `/calendar/v1/{year}` | GET | 某学年的春秋两学期图（图 URL 走 /proxy/image）|
 
 ### 代理 `/proxy`
 | 端点 | 方法 | 说明 |
 |------|------|------|
-| `/proxy/image` | GET | 代理学校图片（域名白名单） |
-| `/proxy/attachment` | GET | 代理附件下载 |
+| `/proxy/image` | GET | 代理学校图片（**公开**，已在 CookieAuthFilter 白名单）|
+| `/proxy/attachment` | GET | 代理附件下载（需要 cookie）|
+
+### 活动抽取 `/admin/activity`（需认证，Step A 调试用）
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/admin/activity/scan-recent` | POST | 手动扫描最近 N 篇，返回 JSON 行 |
+| `/admin/activity/scan-export` | GET | 扫描并导出 CSV（Excel 可打开）|
 
 ### WebSocket `/ws`
 ```
@@ -177,6 +190,127 @@ YAML 驱动（按来源组织拆分，`crawler/{fixed,official,department,suppor
 - **阶段 1（同步）**：爬第 1 页，立即存 Redis + 标记 initialized → 用户零等待
 - **阶段 2（异步）**：后台线程池爬剩余页，每 3 页一批并发，批间 500ms → 无感补全
 
+## 启动时的爬虫初始化策略
+
+`SourceInitTask` 在应用启动后根据 `crawler.force-reinit` 决定行为：
+
+| 配置 | 行为 |
+|---|---|
+| `false`（默认）| **增量**：跳过已 `initialized=true` 的源，只爬没初始化过的。重启 < 1 秒，不打扰学校。|
+| `true` | **全量**：清所有 initialized 标记 + 清 feed timeline ZSET，所有 329 个源重爬。|
+
+**命令行覆盖**：`java -jar ... --crawler.force-reinit=true`。用完记得改回来（或不加），否则每次重启都全量爬。
+
+## 活动抽取（LLM 驱动，Step A 调试阶段）
+
+### 架构
+
+```
+admin 手动触发 (/admin/activity/scan-recent)
+   │
+   ▼
+取频道 N 篇 (InfoCacheUtil.getList，公文通在 info:announcement:timeline)
+   │
+   ▼
+规则预筛 (ActivityPreFilter)
+   │  白名单: 讲座/讲坛/沙龙/比赛/大赛/校赛/辩论赛/决赛/交换项目/训练营/工作坊/招募/微专业/...
+   │  黑名单: 工作研讨会/考核报告/博士后/开题/结题/经费预算/谈话调研/预通知/公示/...
+   │
+   ├── bypassPreFilter=true → 绕过此处直接送 LLM（做对照实验用）
+   │
+   ▼
+Redis cache: activity:extract:{articleId}:{cacheVersion}:{model}
+   │  命中直接返回；缓存 30 天
+   │
+   ▼
+DashScope Client (stream=false, enable_thinking=false, response_format=json_object)
+   │  系统 prompt 定义活动/非活动边界 + 严格 JSON schema
+   │
+   ▼
+ActivityExtractionVo (activity/confidence/type/title/startAt/endAt/location/registration/summary)
+```
+
+### 关键配置
+
+位于 `main/src/main/resources/application.yml`：
+```yaml
+ai:
+  dashscope:
+    api-key: ${DASHSCOPE_API_KEY:}     # 真值在 application-dev.yml（gitignore）或环境变量
+    model: qwen-turbo                   # 轻量抽取任务足够；可切 qwen-plus / deepseek-v3.2
+  activity:
+    enabled: false                      # 总开关
+    default-channels: [announcement]    # 默认扫公文通
+    max-scan-count: 200                 # 单次扫描硬上限，防手滑
+    content-max-chars: 4000             # 正文截断，控 token
+    cache-version: v1                   # prompt/schema 改动时 bump 让旧缓存失效
+```
+
+`application-dev.yml.example` 是模板，真实 Key 写在 `application-dev.yml`（已 gitignore）。启动加 `--spring.profiles.active=dev` 才会加载。
+
+### 对照实验方法（毕设论文素材）
+
+**调用姿势**：
+```
+GET /admin/activity/scan-export?channels=announcement&limit=200
+    &force=true&bypassPreFilter=true
+```
+- `bypassPreFilter=true`：绕过规则，让 LLM 看所有文章
+- `force=true`：忽略缓存
+- 结果 CSV 每行含 `passedPreFilter`（规则判）+ `isActivity/confidence`（LLM 判），两者并列
+
+**人工标注**：Excel 最后一列（列名 `isActivity`）手填 0/1 作为 ground truth。
+
+**指标公式**（论文表格必用）：
+
+混淆矩阵 2×2：
+| | 人工=是 | 人工=否 |
+|---|---|---|
+| 系统=是 | TP (真阳性) | FP (假阳性)|
+| 系统=否 | FN (假阴性)| TN (真阴性)|
+
+- **Precision** = TP / (TP + FP)  "判为活动的里面，真是活动的比例"
+- **Recall** = TP / (TP + FN)      "所有真活动里，系统抓到了多少"
+- **F1** = 2·P·R / (P+R)            "P 和 R 的调和平均，综合指标"
+- **Accuracy** = (TP + TN) / N     "全部判对的比例"
+
+### 两轮规则迭代结果（N=114，正负比 39:75）
+
+| 管线 | Round 1 P/R/F1 | Round 2 P/R/F1 | 说明 |
+|---|---|---|---|
+| 规则预筛 | 0.579 / 0.282 / **0.379** | 0.923 / 0.923 / **0.923** | 白名单扩充 + 黑名单加专有词 |
+| 纯 LLM（bypass）| 1.000 / 0.436 / **0.607** | 0.905 / 0.487 / **0.633** | 零样本保守；漏交换项目/训练营 |
+| 规则 AND LLM（原默认）| 1.000 / 0.154 / **0.267** | 0.905 / 0.487 / **0.633** | 串联丢召回 |
+| **规则 OR LLM** | 0.733 / 0.564 / **0.638** | 0.923 / 0.923 / **0.923** | 并联最佳 |
+
+**关键发现**：
+1. 规则迭代成效巨大（F1 0.379 → 0.923）
+2. Round 2 之后 LLM 独立贡献 = 0（规则已覆盖 LLM 发现的所有活动）
+3. LLM 的 confidence 在 qwen-turbo 上**两极化**（要么 0.95 要么 0.1），阈值筛选无意义
+4. **过拟合警告**：规则词库是基于这 114 条迭代出的，真实 test set 上预期下降。论文里老老实实写 dev vs test。
+
+### 规则词库（ActivityPreFilter）
+
+**白名单**（标题含就放行）：
+- 讲座类：讲座/讲坛/沙龙/论坛/研讨会/报告会/分享会/读书会
+- 比赛类：比赛/竞赛/大赛/校赛/决赛/初赛/复赛/辩论赛
+- 招聘类：招聘会/宣讲会/面试会/招新/招募
+- 活动类：活动预告/欢迎参加/欢迎报名/邀请函/开放日/训练营/工作坊/研修班/交换项目/暑期项目/微专业
+- 文体类：开学典礼/毕业典礼/音乐会/晚会/运动会/观影/展览/演出/文化节/艺术节
+- 通用：报名
+
+**黑名单**（标题含就强拒，优先级高于白名单）：
+- 行政：规定/管理办法/工作规程/规章制度/实施细则/实施方案/公示/通报/表彰/任命/人事/公告
+- 学术例行：工作研讨会/考核报告/开题/结题/出站/博士后/经费预算/项目申报/申报材料
+- 调研：谈话调研/预通知/征求意见
+
+### 剩余待做（Step B）
+
+- **B1**：活动索引 Service（Redis ZSET by startAt）+ `/activity/v1/list` 查询端点
+- **B2**：前端 `calendar.vue` 重构（月历 + 下方活动列表 + 详情弹窗）
+- **B3**：前端"报告错误"按钮 + Redis 记录（论文"人机协同"一节）
+- **B?**：独立测试集验证（50 条未参与调优的文章）→ 对抗过拟合的论据
+
 ## Redis Key 约定
 
 | Key 模式 | TTL | 用途 |
@@ -186,6 +320,11 @@ YAML 驱动（按来源组织拆分，`crawler/{fixed,official,department,suppor
 | `icampus:cache:info:detail:{sourceId}:{id}` | 无 | 文章详情缓存 |
 | `icampus:cache:info:source:{sourceId}:system` | 无 | 爬虫状态（lastCrawlTime, initialized） |
 | `icampus:cache:info:active-source-user` | 无 | 当前爬虫使用的 Cookie 来源用户 |
+| `icampus:cache:calendar:years` | 7 天 | 校历学年列表（从学校 ul 爬来） |
+| `icampus:cache:calendar:{year}` | 30 天 | 某学年的春秋学期图 |
+| `icampus:cache:activity:extract:{id}:{v}:{model}` | 30 天 | 活动抽取 AI 结果 |
+| `feed:timeline` | 无 | 全局 feed ZSET（跨频道聚合，**不含公文通**） |
+| `info:{channelId}:timeline` | 无 | 每频道 timeline ZSET（公文通用这个）|
 | `stream:announcement` / `stream:schedule` / `stream:calendar` | 自动裁剪 | Redis Stream（保留 1000 条） |
 
 ## Header 约定
@@ -214,35 +353,19 @@ YAML 驱动（按来源组织拆分，`crawler/{fixed,official,department,suppor
 - Spring WebSocket
 - SnakeYAML（爬虫配置加载）
 
-## 项目进度（2026-04-17 更新）
+## 项目进度（2026-04-20 更新）
 
 ### 数据接入统计
 
 | 维度 | 数量 |
 |------|------|
-| 数据源（sources.yml） | 92 个（88 启用 + 4 禁用） |
-| 频道（channels.yml） | 37 个 |
-| 需登录源（公文通） | 5 个 |
-| 公开源 | 87 个 |
-| 学院 | 14 个 |
-| 职能部门 | 14 个 |
-| 教辅科研单位 | 3 个 |
-| 群团组织 | 2 个 |
-| 党建工作源 | 21 个 |
-| 下载的 HTML 样本（infos/downloaded_pages） | 636 个 |
-
-### 分类覆盖
-
-| contentType | subContentType | 源数量 |
-|---|---|---|
-| notice | general-notice | 30 |
-| news | general-news | 26 |
-| news | party | 21 |
-| news | cooperation | 5 |
-| news | student | 4 |
-| news | academic | 3 |
-| notice | employment | 1 |
-| notice | admission | 1 |
+| 数据源（sources.yml） | 335 个 |
+| 频道（channels.yml） | 41 个 |
+| 需登录源（公文通） | 6 个 |
+| 公开源 | 329 个 |
+| sourceOrg 分类 | 7 类（fixed/official/department/support/league/audit/college）|
+| 下载的 HTML 样本（infos/downloaded_pages） | 636+ 个 |
+| 校历样本 | `infos/school/*.htm`（2024-2025、2025-2026）|
 
 ### 已完成的核心功能
 
@@ -250,13 +373,18 @@ YAML 驱动（按来源组织拆分，`crawler/{fixed,official,department,suppor
 2. **SmartHttpClient**：6 种重定向处理器，替代 Playwright
 3. **Cookie 池 + 活跃度感知**：在线用户优先，自动切换
 4. **公文通爬取**：5 个分类（教务/科研/行政/学工/校园），10 秒快速轮询（仅在线时）
-5. **全校 CMS 爬取**：sztu-cms + sztu-gwt 两种解析器，覆盖 87 个公开源
-6. **WebSocket 推送**：Redis Pub/Sub + Stream，统一 Handler
+5. **全校 CMS 爬取**：sztu-cms + sztu-gwt 两种解析器，覆盖 329 个公开源
+6. **WebSocket 推送**：Redis Pub/Sub + Stream，统一 Handler，payload 带 sourceId 便于前端按订阅过滤
 7. **课表查询**：教务系统 Cookie 初始化 + 课表 HTML 解析
 8. **信息流三维筛选**：sourceOrg / contentType / subContentType
-9. **前端 HTML 预处理**：normalizeHtml 注入 inline style（绕过 rich-text :deep 限制）
-10. **上下篇导航**：基于列表缓存的前端导航（不依赖后端解析）
-11. **详情页原始 URL**：优先使用 meta.url 而非 template 构建（解决跨域 404）
+9. **Feed API 多 sourceId 白名单**：`/info/v1/feed?sourceIds=a,b,c` 支持订阅视图
+10. **校历功能**：`/calendar/v1/*` 两端点，爬 sztu.edu.cn/xxgk/xxxl，走 /proxy/image
+11. **图片代理放行**：`/proxy/image` 加入 PUBLIC_PATHS（`<image>` 标签不带 header）+ Cookie 可选（公开资源无需 cookie）
+12. **启动初始化可控**：`crawler.force-reinit` 开关，默认增量模式避免重启打扰学校
+13. **活动抽取 Step A（含 A/B 对照）**：规则预筛 + LLM + Redis 缓存 + CSV 导出；规则词库两轮迭代 F1 0.379 → 0.923
+14. **详情页原始 URL**：优先使用 meta.url 而非 template 构建（解决跨域 404）
+15. **前端 HTML 预处理**：normalizeHtml 注入 inline style（绕过 rich-text :deep 限制）
+16. **上下篇导航**：基于列表缓存的前端导航（不依赖后端解析）
 
 ### 未接入的学校单位
 
