@@ -55,9 +55,11 @@ public class ActivityAdminController {
                 ? defaultChannels : req.getChannels();
         int limit = req.getLimit() == null ? 10 : req.getLimit();
         boolean force = Boolean.TRUE.equals(req.getForce());
+        boolean bypass = Boolean.TRUE.equals(req.getBypassPreFilter());
 
-        log.info("[ActivityAdmin] scan-recent channels={} limit={} force={}", channels, limit, force);
-        List<ScanResultVo> rows = scanService.scan(channels, limit, force);
+        log.info("[ActivityAdmin] scan-recent channels={} limit={} force={} bypassPreFilter={}",
+                channels, limit, force, bypass);
+        List<ScanResultVo> rows = scanService.scan(channels, limit, force, bypass);
         return Result.ok(rows);
     }
 
@@ -70,15 +72,17 @@ public class ActivityAdminController {
             @RequestParam(required = false) String channels,
             @RequestParam(required = false, defaultValue = "10") Integer limit,
             @RequestParam(required = false, defaultValue = "false") Boolean force,
+            @RequestParam(required = false, defaultValue = "false") Boolean bypassPreFilter,
             HttpServletResponse response) throws IOException {
 
         List<String> chList = (channels == null || channels.isBlank())
                 ? defaultChannels : List.of(channels.split(","));
-        log.info("[ActivityAdmin] scan-export channels={} limit={} force={}", chList, limit, force);
+        log.info("[ActivityAdmin] scan-export channels={} limit={} force={} bypassPreFilter={}",
+                chList, limit, force, bypassPreFilter);
 
         List<ScanResultVo> rows;
         try {
-            rows = scanService.scan(chList, limit, force);
+            rows = scanService.scan(chList, limit, force, bypassPreFilter);
         } catch (Exception e) {
             log.error("scan failed", e);
             rows = Collections.emptyList();
@@ -151,5 +155,10 @@ public class ActivityAdminController {
         private Integer limit;
         /** true = 忽略缓存强制重跑 */
         private Boolean force;
+        /**
+         * true = 绕开规则预筛，所有文章都送 LLM（做"规则 vs 纯 LLM"对照实验用）。
+         * 请注意会消耗更多 token —— 相当于把规则丢掉 80% 的"噪声文章"也送一遍 LLM。
+         */
+        private Boolean bypassPreFilter;
     }
 }
