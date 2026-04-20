@@ -1,0 +1,13 @@
+# application-dev.yml（本地开发配置模板）
+#
+# 使用方法：
+#   1. 复制本文件为 application-dev.yml（去掉 .example 后缀）
+#   2. 填入真实的 DashScope API Key
+#   3. 启动时设置 --spring.profiles.active=dev （或 SPRING_PROFILES_ACTIVE=dev）
+#
+# ⚠️ application-dev.yml 已在 .gitignore 中，不要提交真实 key。
+
+ai:
+  dashscope:
+    # DashScope API Key（控制台：https://bailian.console.aliyun.com/）
+    api-key: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
