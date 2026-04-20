@@ -99,15 +99,17 @@ public class InfoController {
             @RequestParam(required = false) String contentType,
             @Parameter(description = "内容细分类（general-news/party/cooperation/academic/student/general-notice/admission/employment）")
             @RequestParam(required = false) String subContentType,
+            @Parameter(description = "订阅模式：逗号分隔的 sourceId 白名单，非空时只返回这些 source 的文章")
+            @RequestParam(required = false) String sourceIds,
             @Parameter(description = "页码")
             @RequestParam(defaultValue = "1") Integer page,
             @Parameter(description = "每页数量")
             @RequestParam(defaultValue = "20") Integer pageSize) {
 
-        log.info("用户 {} 获取 Feed: sourceOrg={}, channel={}, type={}, subType={}, page={}",
-                UserContext.getContext().getUserId(), sourceOrg, channelId, contentType, subContentType, page);
+        log.info("用户 {} 获取 Feed: sourceOrg={}, channel={}, type={}, subType={}, sourceIds={}, page={}",
+                UserContext.getContext().getUserId(), sourceOrg, channelId, contentType, subContentType, sourceIds, page);
 
-        InfoService.InfoListResult result = infoService.getFeed(sourceOrg, channelId, contentType, subContentType, page, pageSize);
+        InfoService.InfoListResult result = infoService.getFeed(sourceOrg, channelId, contentType, subContentType, sourceIds, page, pageSize);
         return Result.ok(result);
     }
 

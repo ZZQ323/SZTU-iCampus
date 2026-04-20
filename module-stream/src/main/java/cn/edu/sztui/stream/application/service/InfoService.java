@@ -43,8 +43,12 @@ public interface InfoService {
 
     /**
      * 全局 Feed 查询（跨频道聚合，支持多维筛选）
+     *
+     * @param sourceIds 订阅模式：逗号分隔的 sourceId 列表；非空时只返回这些 source 的文章，
+     *                  与 sourceOrg/channelId 等筛选维度叠加（AND）生效
      */
-    InfoListResult getFeed(String sourceOrg, String channelId, String contentType, String subContentType, int page, int pageSize);
+    InfoListResult getFeed(String sourceOrg, String channelId, String contentType, String subContentType,
+                           String sourceIds, int page, int pageSize);
 
     /**
      * 搜索信息
