@@ -551,7 +551,12 @@ public class CrawlEngine {
         data.put("latestId", latestId);
         data.put("ids", newItems.stream().map(ListParserResult.InfoItemMeta::getId).toList());
         if (!newItems.isEmpty()) {
-            data.put("latestTitle", newItems.get(0).getTitle());
+            ListParserResult.InfoItemMeta head = newItems.get(0);
+            data.put("latestTitle", head.getTitle());
+            // 单次爬取的 items 全部来自同一 source（enrichItemsWithSourceMeta 保证），
+            // 带 sourceId/sourceOrgName 供前端做订阅过滤 + toast 显示
+            data.put("sourceId", head.getSourceId());
+            data.put("sourceOrgName", head.getSourceOrgName());
         }
         streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
     }
