@@ -57,6 +57,7 @@ public class CookieAuthFilter extends OncePerRequestFilter {
             "/auth/v1/session/init",
             "/notice/list",
             "/calendar/**",
+            "/activity/v1/**",
             "/proxy/image",
             "/ws"
     );
