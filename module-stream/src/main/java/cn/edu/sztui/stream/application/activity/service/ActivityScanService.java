@@ -93,6 +93,18 @@ public class ActivityScanService {
     // ==================== 主流程 ====================
 
     public List<ScanResultVo> scan(List<String> channelIds, int limit, boolean force) {
+        return scan(channelIds, limit, force, false);
+    }
+
+    /**
+     * 扫描并抽取活动信息。
+     *
+     * @param channelIds       要扫描的频道 ID
+     * @param limit            每频道取最近 N 篇
+     * @param force            忽略缓存强制重跑
+     * @param bypassPreFilter  为 true 时绕开规则预筛，所有文章都送 LLM（用于做"规则 vs 纯 LLM"对照实验）
+     */
+    public List<ScanResultVo> scan(List<String> channelIds, int limit, boolean force, boolean bypassPreFilter) {
         if (limit <= 0) limit = 10;
         if (limit > maxScanCount) limit = maxScanCount;
 
@@ -101,15 +113,16 @@ public class ActivityScanService {
             // 用 per-channel timeline（info:{channelId}:timeline），覆盖包含公文通在内的所有频道；
             // 全局 feed:timeline 不一定有公文通（Step A 测过就是 0 条）。
             List<ListParserResult.InfoItemMeta> items = infoCacheUtil.getList(channelId, 1, limit);
-            scanLog.info("channel={}: 取到 {} 条最近文章", channelId, items.size());
+            scanLog.info("channel={} limit={} bypassPreFilter={}: 取到 {} 条最近文章",
+                    channelId, limit, bypassPreFilter, items.size());
             for (ListParserResult.InfoItemMeta item : items) {
-                out.add(processOne(item, force));
+                out.add(processOne(item, force, bypassPreFilter));
             }
         }
         return out;
     }
 
-    private ScanResultVo processOne(ListParserResult.InfoItemMeta meta, boolean force) {
+    private ScanResultVo processOne(ListParserResult.InfoItemMeta meta, boolean force, boolean bypassPreFilter) {
         ScanResultVo row = new ScanResultVo();
         row.setArticleId(meta.getId());
         row.setChannelId(meta.getChannelId());
@@ -121,14 +134,15 @@ public class ActivityScanService {
         // 1. 拉取正文（优先缓存）
         String content = loadArticleText(meta);
 
-        // 2. 规则预筛
+        // 2. 规则预筛（无论是否 bypass 都跑一次，结果保留用于对照实验）
         String reason = preFilter.judge(meta.getTitle(), content);
         row.setPassedPreFilter(reason != null);
         row.setPreFilterReason(reason);
-        if (reason == null) {
+        if (reason == null && !bypassPreFilter) {
             scanLog.info("skip(no-match): [{}] {} ", meta.getId(), meta.getTitle());
             return row;
         }
+        // bypass 模式下 prefilter 失败的文章继续走 LLM，论文对照数据靠这里产生
 
         // 3. 缓存
         String cacheKey = buildCacheKey(meta.getId());
