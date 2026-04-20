@@ -5,6 +5,7 @@ import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfi
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -18,12 +19,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 数据源初始化任务
  * <p>
  * 两种触发方式：
- * 1. 应用启动后：立即初始化所有不需要登录的公开源（学校官网、学院等）
+ * 1. 应用启动后：初始化所有不需要登录的公开源（学校官网、学院等）
  * 2. 用户登录后：初始化需要登录的源（公文通等）
  * <p>
- * ⭐ 每次启动都强制重新初始化：
- * - 公开源：立即执行
- * - 需登录源（公文通）：清除 initialized 标记，等用户登录后由事件触发执行
+ * ⭐ 增量 vs 强制重爬：
+ * - 默认：只初始化 {@code initialized=false} 的源（重启不重爬，省带宽 + 对学校友好）
+ * - 开关 {@code crawler.force-reinit=true}（yml 或命令行 --crawler.force-reinit=true）：
+ *   清除所有源的 initialized 标记 + 清空 feed timeline，重新全量爬取。
+ *   仅在爬虫 parser 升级 / 数据 schema 变更 / 想强制刷新时使用。
  */
 @Slf4j
 @Component
@@ -38,16 +41,18 @@ public class SourceInitTask {
     @Resource
     private InfoCacheUtil infoCacheUtil;
 
+    /** 是否强制清除 initialized 标记 + 清空 feed 重爬。默认 false（只补爬未初始化的源） */
+    @Value("${crawler.force-reinit:false}")
+    private boolean forceReinit;
+
     private final AtomicBoolean publicInitializing = new AtomicBoolean(false);
     private final AtomicBoolean authInitializing = new AtomicBoolean(false);
 
     /**
-     * 应用启动后，立即初始化所有公开源 + 清除需登录源的 initialized 标记
+     * 应用启动后初始化公开源。
      * <p>
-     * ⭐ 每次启动都强制重新初始化所有源：
-     * - 公开源：清除标记后立即爬取
-     * - 需登录源（公文通等）：只清除标记，等用户登录后由 triggerAuthSourceInit 执行
-     *   AnnouncementFastScheduler 也会在检测到 cookie 后自动触发增量爬取
+     * 默认增量：只爬 {@code initialized=false} 的源，重启不会重复扫学校。<br>
+     * {@code crawler.force-reinit=true} 时：清 initialized + 清 feed timeline + 全量重爬。
      */
     @Async
     @EventListener(ApplicationReadyEvent.class)
@@ -69,30 +74,34 @@ public class SourceInitTask {
                 }
             }
 
-            // ⭐ 强制清除所有源的 initialized 标记（公开源 + 需登录源）
-            for (CrawlerConfig.SourceConfig source : publicSources) {
-                infoCacheUtil.clearSourceInitialized(source.getId());
+            if (forceReinit) {
+                for (CrawlerConfig.SourceConfig source : publicSources) {
+                    infoCacheUtil.clearSourceInitialized(source.getId());
+                }
+                for (CrawlerConfig.SourceConfig source : authSources) {
+                    infoCacheUtil.clearSourceInitialized(source.getId());
+                }
+                infoCacheUtil.clearFeedTimeline();
+                log.warn("[force-reinit] 已清除所有 initialized 标记 + 全局 feed timeline: 公开 {} 个, 需登录 {} 个",
+                        publicSources.size(), authSources.size());
+            } else {
+                log.info("启动初始化（增量模式）: 已初始化的源跳过，如需全量重爬请加 --crawler.force-reinit=true");
             }
-            for (CrawlerConfig.SourceConfig source : authSources) {
-                infoCacheUtil.clearSourceInitialized(source.getId());
-            }
-            log.info("已清除所有数据源 initialized 标记: 公开 {} 个, 需登录 {} 个",
-                    publicSources.size(), authSources.size());
-
-            // ⭐ 清除全局 feed timeline（旧缓存可能包含已更名/拆分的频道数据）
-            infoCacheUtil.clearFeedTimeline();
 
             if (publicSources.isEmpty()) {
                 log.info("无公开数据源需要初始化");
                 return;
             }
 
-            // 立即初始化公开源
-            log.info("开始初始化 {} 个公开数据源...", publicSources.size());
             int initCount = 0;
+            int skipCount = 0;
             int failCount = 0;
 
             for (CrawlerConfig.SourceConfig source : publicSources) {
+                if (!forceReinit && infoCacheUtil.isSourceInitialized(source.getId())) {
+                    skipCount++;
+                    continue;
+                }
                 try {
                     crawlEngine.initSource(source.getId(), null);
                     initCount++;
@@ -102,7 +111,8 @@ public class SourceInitTask {
                 }
             }
 
-            log.info("公开数据源初始化完成: 成功 {} 个, 失败 {} 个", initCount, failCount);
+            log.info("公开数据源初始化完成: 初始化 {} 个, 已跳过 {} 个, 失败 {} 个",
+                    initCount, skipCount, failCount);
 
         } finally {
             publicInitializing.set(false);

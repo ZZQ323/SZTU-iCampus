@@ -159,6 +159,12 @@ smart-http:
   # User-Agent
   user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0"
 
+crawler:
+  # 启动时是否强制重爬所有源（默认 false：增量模式，只爬 initialized=false 的源）
+  # 需要全量重跑时在命令行加：--crawler.force-reinit=true
+  # 或临时改成 true 启动一次、再改回 false
+  force-reinit: false
+
 sztu:
   constant:
     projectOrBrandName: ${program.name}
