@@ -42,6 +42,9 @@ public class ActivityAdminController {
     @Resource
     private ActivityScanService scanService;
 
+    @Resource
+    private cn.edu.sztui.stream.application.activity.service.ActivityReportService reportService;
+
     @Value("${ai.activity.default-channels:announcement}")
     private List<String> defaultChannels;
 
@@ -143,6 +146,17 @@ public class ActivityAdminController {
         String escaped = s.replace("\"", "\"\"").replace("\r", " ").replace("\n", " ");
         if (escaped.contains(",") || escaped.contains("\"")) return "\"" + escaped + "\"";
         return escaped;
+    }
+
+    // ==================== User feedback (reports) ====================
+
+    @GetMapping("/reports")
+    @Operation(summary = "查看用户报告的活动识别错误", description = "论文'人机协同'章节数据源")
+    public Result listReports(@RequestParam(defaultValue = "100") Integer limit) {
+        return Result.ok(java.util.Map.of(
+                "total", reportService.count(),
+                "items", reportService.list(limit)
+        ));
     }
 
     // ==================== 请求体 ====================

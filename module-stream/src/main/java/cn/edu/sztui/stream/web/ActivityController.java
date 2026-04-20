@@ -1,13 +1,20 @@
 package cn.edu.sztui.stream.web;
 
+import cn.edu.sztui.common.util.auth.UserContext;
+import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.result.Result;
 import cn.edu.sztui.stream.application.activity.service.ActivityIndexService;
+import cn.edu.sztui.stream.application.activity.service.ActivityReportService;
 import cn.edu.sztui.stream.application.activity.service.ActivityTimeParser;
+import cn.edu.sztui.stream.application.activity.vo.ActivityReportVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 管理员侧的"扫描抽取"在 {@link ActivityAdminController}，那里才是写入索引的源头。
  * 本控制器只读。
  */
+@Slf4j
 @Tag(name = "活动日历·查询")
 @RestController
 @RequestMapping("/activity")
@@ -28,6 +36,9 @@ public class ActivityController {
 
     @Resource
     private ActivityIndexService indexService;
+
+    @Resource
+    private ActivityReportService reportService;
 
     @Operation(summary = "即将到来的活动", description = "按时间升序返回未来的活动；includePast 可回溯历史")
     @GetMapping("/v1/upcoming")
@@ -66,6 +77,19 @@ public class ActivityController {
     @GetMapping("/v1/stats")
     public Result stats() {
         return Result.ok(indexService.stats());
+    }
+
+    @Operation(summary = "用户报告活动识别错误",
+            description = "前端长按/点击活动卡上的报告按钮后调用。论文'人机协同闭环'数据素材。")
+    @PostMapping("/v1/report")
+    public Result report(@RequestBody ActivityReportVo body) {
+        // 附上可选的 userId（CookieAuthFilter 已将其放入 UserContext）
+        TokenMessage ctx = UserContext.getContext();
+        if (ctx != null && ctx.getUserId() != null) {
+            body.setUserId(ctx.getUserId());
+        }
+        reportService.save(body);
+        return Result.ok();
     }
 
     private int clampLimit(Integer limit) {
