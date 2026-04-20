@@ -177,7 +177,9 @@ ai:
   activity:
     enabled: false                  # 总开关；Step A 默认关，通过 /admin 手动触发
     default-channels:
-      - announcement                # 活动大概率在公文通，默认只扫这一个
+      - announcement                # 活动预告主场（F1=0.95）
+      - job                         # 招聘会/宣讲会（F1=0.83）
+      # 其他频道多为事后报道，扫出来多为 FP，不纳入默认
     max-scan-count: 200             # 单次扫描硬上限，防手滑（对照实验 100-200 通常够用）
     content-max-chars: 4000         # 正文超长截断，控成本
     cache-version: v3               # prompt / schema 改动时 bump，让旧缓存自然失效
