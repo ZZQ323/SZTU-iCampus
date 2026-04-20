@@ -4,12 +4,9 @@ import cn.edu.sztui.common.util.auth.UserContext;
 import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
-import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
-import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -52,9 +49,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/proxy")
 @Tag(name = "资源代理", description = "代理访问需要学校 Cookie 的图片和附件")
 public class ProxyController {
-
-    @Resource
-    private SmartHttpClient smartHttpClient;
 
     /** 文件扩展名 → Content-Type 映射 */
     private static final Map<String, String> MIME_MAP = new ConcurrentHashMap<>();
@@ -207,27 +201,24 @@ public class ProxyController {
      * Cookies 从请求 header（UserContext）获取，不从 Redis 读取。
      */
     private byte[] fetchResource(String url) {
-        // 1. 从 UserContext 获取前端通过 header 传来的 Cookie
+        // 1. 从 UserContext 获取前端通过 header 传来的 Cookie（可能为空）
+        //    小程序 <image> 标签和 rich-text 不会附加自定义 header，所以 Cookie 可能缺失。
+        //    学校公开资源（如 /__local/ 下的校历图）不需要 Cookie，仅在有 Cookie 时附带。
         TokenMessage ctx = UserContext.getContext();
         String cookiesJson = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
-        if (!StringUtils.hasText(cookiesJson)) {
-            log.warn("用户无有效 Cookie");
-            return null;
-        }
 
         try {
-            List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
-            SmartSession smartSession = smartHttpClient.newSession(cookies);
-
-            // 2. 构建 Cookie 字符串
             String host = URI.create(url).getHost();
             StringBuilder cookieHeader = new StringBuilder();
-            for (SmartCookie c : cookies) {
-                // 匹配域名的 Cookie
-                if (host.contains(c.getDomain()) || c.getDomain().contains(host)
-                        || ".sztu.edu.cn".equals(c.getDomain())) {
-                    if (cookieHeader.length() > 0) cookieHeader.append("; ");
-                    cookieHeader.append(c.getName()).append("=").append(c.getValue());
+
+            if (StringUtils.hasText(cookiesJson)) {
+                List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
+                for (SmartCookie c : cookies) {
+                    if (host.contains(c.getDomain()) || c.getDomain().contains(host)
+                            || ".sztu.edu.cn".equals(c.getDomain())) {
+                        if (cookieHeader.length() > 0) cookieHeader.append("; ");
+                        cookieHeader.append(c.getName()).append("=").append(c.getValue());
+                    }
                 }
             }
 
@@ -235,8 +226,9 @@ public class ProxyController {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 HttpGet httpGet = new HttpGet(url);
 
-                // ⭐ 设置关键请求头
-                httpGet.setHeader("Cookie", cookieHeader.toString());
+                if (cookieHeader.length() > 0) {
+                    httpGet.setHeader("Cookie", cookieHeader.toString());
+                }
                 httpGet.setHeader("Host", host);
                 httpGet.setHeader("Referer", extractOrigin(url) + "/");
                 httpGet.setHeader("User-Agent",
