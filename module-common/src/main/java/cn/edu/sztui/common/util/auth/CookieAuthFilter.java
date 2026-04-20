@@ -48,11 +48,16 @@ public class CookieAuthFilter extends OncePerRequestFilter {
 
     /**
      * 公开接口，cookie 可选
+     *
+     * /proxy/image 必须公开：小程序 <image> 标签和 rich-text 无法附加自定义 header，
+     * 不放行的话所有图片代理请求都会被 filter 直接 401 拦截。域名白名单在
+     * ProxyController 内部，安全仍可控。
      */
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/auth/v1/session/init",
             "/notice/list",
             "/calendar/**",
+            "/proxy/image",
             "/ws"
     );
 
