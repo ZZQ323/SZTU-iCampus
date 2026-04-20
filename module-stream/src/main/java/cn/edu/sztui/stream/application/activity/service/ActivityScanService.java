@@ -98,8 +98,9 @@ public class ActivityScanService {
 
         List<ScanResultVo> out = new ArrayList<>();
         for (String channelId : channelIds) {
-            List<ListParserResult.InfoItemMeta> items =
-                    infoCacheUtil.getFeedList("", channelId, "", "", null, 1, limit);
+            // 用 per-channel timeline（info:{channelId}:timeline），覆盖包含公文通在内的所有频道；
+            // 全局 feed:timeline 不一定有公文通（Step A 测过就是 0 条）。
+            List<ListParserResult.InfoItemMeta> items = infoCacheUtil.getList(channelId, 1, limit);
             scanLog.info("channel={}: 取到 {} 条最近文章", channelId, items.size());
             for (ListParserResult.InfoItemMeta item : items) {
                 out.add(processOne(item, force));
