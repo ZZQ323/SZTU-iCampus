@@ -51,6 +51,38 @@ class ActivityPreFilterTest {
         ));
     }
 
+    // ==================== 迭代扩充后的正例（从 FN 来） ====================
+
+    @Test
+    void exchange_program_passes() {
+        assertTrue(f.accepts("关于2026年秋季学期德国某大学交换项目报名的通知", ""));
+    }
+
+    @Test
+    void training_camp_passes() {
+        assertTrue(f.accepts("关于举办2026年深圳技术大学创新创业师资能力提升训练营的通知", ""));
+    }
+
+    @Test
+    void recruit_passes() {
+        assertTrue(f.accepts("关于2026年人工智能学院开源社区成员招募的通知", ""));
+    }
+
+    @Test
+    void workshop_passes() {
+        assertTrue(f.accepts("关于举办信息素养赋能工作坊（第一期）的通知", ""));
+    }
+
+    @Test
+    void grand_competition_passes() {
+        assertTrue(f.accepts("关于举办第十六届全国大学生电子商务创新创业挑战赛校赛遴选的通知", ""));
+    }
+
+    @Test
+    void micro_major_admission_passes() {
+        assertTrue(f.accepts("2026年第一届AI+供应链微专业招生通知", ""));
+    }
+
     // ==================== 负例：应当拒绝 ====================
 
     @Test
@@ -64,6 +96,30 @@ class ActivityPreFilterTest {
                 "关于人事任命的公示",
                 "张三同志自2026年4月28日起担任..."
         ));
+    }
+
+    // ==================== 迭代扩充后的负例（从 FP 来） ====================
+
+    @Test
+    void work_seminar_rejected_despite_seminar_keyword() {
+        // "教学工作研讨会" 是内部会议不是活动，blacklist 里的"工作研讨会"比 whitelist "研讨会" 优先
+        assertFalse(f.accepts("关于召开教学工作研讨会的通知", ""));
+    }
+
+    @Test
+    void postdoc_review_rejected() {
+        // 博士后考核报告会 = 学术例行，不是活动
+        assertFalse(f.accepts("关于人工智能学院博士后出站考核报告会的通知", ""));
+    }
+
+    @Test
+    void budget_application_rejected() {
+        assertFalse(f.accepts("关于组织申报2026年度科技创新竞赛经费预算的通知", ""));
+    }
+
+    @Test
+    void pre_notification_rejected() {
+        assertFalse(f.accepts("关于开展谈话调研有关工作的预通知", "将于2026年4月28日开展..."));
     }
 
     @Test
