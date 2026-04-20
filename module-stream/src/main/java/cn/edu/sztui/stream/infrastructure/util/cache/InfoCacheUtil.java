@@ -164,10 +164,14 @@ public class InfoCacheUtil {
      * 从全局 feed 读取并过滤。
      * 先读取较多条目（overFetch），Java 内存过滤后截取分页。
      * 适合几千条量级的全局 timeline。
+     *
+     * @param sourceIds 逗号分隔的 sourceId 白名单；非空时只保留这些 source 的 item
      */
     public List<ListParserResult.InfoItemMeta> getFeedList(
             String sourceOrg, String channelId, String contentType, String subContentType,
-            int page, int pageSize) {
+            String sourceIds, int page, int pageSize) {
+
+        Set<String> sourceIdSet = parseCsvToSet(sourceIds);
 
         String feedTimelineKey = generateKey(FEED_TIMELINE);
 
@@ -193,6 +197,7 @@ public class InfoCacheUtil {
             if (StringUtils.hasText(channelId) && !channelId.equals(item.getChannelId())) continue;
             if (StringUtils.hasText(contentType) && !contentType.equals(item.getContentType())) continue;
             if (StringUtils.hasText(subContentType) && !subContentType.equals(item.getSubContentType())) continue;
+            if (sourceIdSet != null && !sourceIdSet.contains(item.getSourceId())) continue;
 
             filtered.add(item);
         }
@@ -209,16 +214,28 @@ public class InfoCacheUtil {
     /**
      * 获取全局 feed 的总条目数（过滤后）
      */
-    public long getFeedCount(String sourceOrg, String channelId, String contentType, String subContentType) {
+    public long getFeedCount(String sourceOrg, String channelId, String contentType, String subContentType,
+                             String sourceIds) {
         // 简化实现：无过滤时直接返回 timeline 大小
         if (!StringUtils.hasText(sourceOrg) && !StringUtils.hasText(channelId)
-                && !StringUtils.hasText(contentType) && !StringUtils.hasText(subContentType)) {
+                && !StringUtils.hasText(contentType) && !StringUtils.hasText(subContentType)
+                && !StringUtils.hasText(sourceIds)) {
             String feedTimelineKey = generateKey(FEED_TIMELINE);
             Long size = redisTemplate.opsForZSet().zCard(feedTimelineKey);
             return size != null ? size : 0;
         }
         // 有过滤时需要全量扫描（量不大，可接受）
-        return getFeedList(sourceOrg, channelId, contentType, subContentType, 1, 5000).size();
+        return getFeedList(sourceOrg, channelId, contentType, subContentType, sourceIds, 1, 5000).size();
+    }
+
+    private static Set<String> parseCsvToSet(String csv) {
+        if (!StringUtils.hasText(csv)) return null;
+        Set<String> set = new HashSet<>();
+        for (String s : csv.split(",")) {
+            String trimmed = s.trim();
+            if (!trimmed.isEmpty()) set.add(trimmed);
+        }
+        return set.isEmpty() ? null : set;
     }
 
     // ==================== 频道列表查询 ====================
