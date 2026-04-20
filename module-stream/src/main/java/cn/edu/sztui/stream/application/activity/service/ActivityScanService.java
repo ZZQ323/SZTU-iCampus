@@ -106,7 +106,11 @@ public class ActivityScanService {
      */
     public List<ScanResultVo> scan(List<String> channelIds, int limit, boolean force, boolean bypassPreFilter) {
         if (limit <= 0) limit = 10;
-        if (limit > maxScanCount) limit = maxScanCount;
+        if (limit > maxScanCount) {
+            scanLog.warn("请求 limit={} 超过 ai.activity.max-scan-count={} 上限，已截断；如需更大调 yml",
+                    limit, maxScanCount);
+            limit = maxScanCount;
+        }
 
         List<ScanResultVo> out = new ArrayList<>();
         for (String channelId : channelIds) {
