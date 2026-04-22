@@ -108,21 +108,6 @@ sources:
     enabled: true
     sort: 10
 
-  - id: acdm-ysly
-    name: 已收留言
-    channelId: acdm-notice
-    parserType: acdm-inbox
-    baseUrl: ${urls.acdm}
-    listUrlTemplate: ${urls.acdm}/ggly/ysly_query
-    detailUrlTemplate: ${urls.acdm}/ggly/gglyShow.do?ggid={id}
-    contentType: notice
-    subContentType: general-notice
-    requiresAuth: true
-    crawlIntervalMinutes: 1
-    crawlPageCount: 1
-    enabled: true
-    sort: 11
-
   - id: acdm-xxtz
     name: 消息通知
     channelId: acdm-message
