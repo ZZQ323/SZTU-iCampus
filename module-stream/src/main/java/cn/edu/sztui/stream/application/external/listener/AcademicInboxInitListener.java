@@ -45,8 +45,9 @@ public class AcademicInboxInitListener {
         log.info("收到教务会话就绪事件: userId={}", userId);
 
         List<CrawlerConfig.SourceConfig> sources = configLoader.getEnabledSources();
-        int initCount = 0;
+        int okCount = 0;
         int failCount = 0;
+        int authExpiredCount = 0;
 
         for (CrawlerConfig.SourceConfig source : sources) {
             if (!"acdm-inbox".equals(source.getParserType())) {
@@ -54,15 +55,28 @@ public class AcademicInboxInitListener {
             }
 
             try {
-                crawlEngine.initSource(source.getId(), userId);
-                initCount++;
+                // 用 crawlIncremental 而非 initSource：
+                // initSource 有"已初始化就早退"的守卫，会被之前运行遗留的 initialized=true 标记短路；
+                // crawlIncremental 语义上也更合适 —— 每次 cookies 新就绪时重新拉一次首页即可。
+                cn.edu.sztui.stream.application.external.engine.CrawlResult result =
+                        crawlEngine.crawlIncremental(source.getId(), userId);
+                if (result.isAuthError()) {
+                    authExpiredCount++;
+                    log.warn("教务内网首次爬取登录页响应: source={}, userId={}", source.getId(), userId);
+                } else if (result.isSuccess()) {
+                    okCount++;
+                    log.info("教务内网首次爬取完成: source={}, 新增 {} 条", source.getId(), result.getNewCount());
+                } else {
+                    failCount++;
+                    log.warn("教务内网首次爬取失败: source={}, error={}", source.getId(), result.getErrorMessage());
+                }
             } catch (Exception e) {
-                log.error("教务内网源初始化失败: {}, error={}", source.getId(), e.getMessage());
                 failCount++;
+                log.error("教务内网源初始化异常: {}, error={}", source.getId(), e.getMessage());
             }
         }
 
-        log.info("教务内网数据源初始化完成: userId={}, 初始化 {} 个, 失败 {} 个",
-                userId, initCount, failCount);
+        log.info("教务内网数据源初始化完成: userId={}, 成功 {} 个, 登录页 {} 个, 失败 {} 个",
+                userId, okCount, authExpiredCount, failCount);
     }
 }
