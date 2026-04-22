@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>强智科技 - 教务管理系统登录</title>
+</head>
+<body>
+<div class="login-wrap">
+    <form id="loginForm" action="/jsxsd/xk/LoginToXk" method="post">
+        <div class="form-row">
+            <label>账号</label>
+            <input type="text" id="userAccount" name="userAccount" autocomplete="off"/>
+        </div>
+        <div class="form-row">
+            <label>密码</label>
+            <input type="password" id="userPassword" name="userPassword"/>
+        </div>
+        <div class="form-row">
+            <button type="submit">登录</button>
+        </div>
+    </form>
+</div>
+<script>
+    // 若 session 失效，父窗口通常会 redirect 回 loginHome
+    if (top !== self) { top.location.href = "/jsxsd/"; }
+</script>
+</body>
+</html>
