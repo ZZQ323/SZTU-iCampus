@@ -86,62 +86,26 @@ public class CrawlEngine {
 
     // ==================== 增量爬取 ====================
     public CrawlResult crawlIncremental(String sourceId) {
+        return crawlIncremental(sourceId, null);
+    }
+
+    /**
+     * 增量爬取，可指定 userId 定向使用该用户的 cookies。
+     * <p>
+     * 用于教务内网等"特定用户的 session"语义的场景（acdm-* 需要调用 {@code /acdm/v1/init}
+     * 的那个用户的 jwxt cookies），而非通用的 cookie 池轮换。
+     */
+    public CrawlResult crawlIncremental(String sourceId, String userId) {
         CrawlerConfig.SourceConfig source = configLoader.getSource(sourceId);
         if (source == null) {
             return CrawlResult.fail(sourceId, "未找到数据源配置: " + sourceId);
         }
 
         try {
-            CookieSourceManager.CookieSessionPair pair = resolveSessionPair(source);
-            SmartSession session = pair.getSession();
-
-            String listUrl = buildListUrl(source, 1);
-            SmartResponse response = fetchPage(listUrl, session, source.isRequiresAuth());
-            if (!response.isSuccess()) {
-                int status = response.getStatusCode();
-                // 认证失败检测：401/403 或重定向到登录页
-                if (source.isRequiresAuth() && (status == 401 || status == 403)) {
-                    return CrawlResult.authFail(sourceId, pair.getUserId(),
-                            "Cookie 认证失败: HTTP " + status);
-                }
-                return CrawlResult.fail(sourceId, "HTTP 请求失败: " + status);
-            }
-
-            ListParserResult result = parserFactory.parseList(
-                    source.getParserType(), response.getBody(), source, 1);
-
-            if (result == null || result.getItems() == null || result.getItems().isEmpty()) {
-                syncCookiesIfChanged(pair);
-                return CrawlResult.empty(sourceId);
-            }
-
-            String channelId = source.getChannelId();
-            String cachedLatestId = infoCacheUtil.getLatestId(channelId);
-            List<ListParserResult.InfoItemMeta> newItems = filterNewItems(result.getItems(), cachedLatestId);
-
-            if (newItems.isEmpty()) {
-                infoCacheUtil.updateLastCrawlTime(sourceId);
-                syncCookiesIfChanged(pair);
-                return CrawlResult.empty(sourceId);
-            }
-
-            enrichItemsWithSourceMeta(newItems, source);
-            infoCacheUtil.saveMetaBatch(channelId, newItems);
-            publishArticleSavedEvents(newItems);
-
-            String newLatestId = computeLatestId(newItems, cachedLatestId);
-            infoCacheUtil.setLatestId(channelId, newLatestId);
-            infoCacheUtil.updateLastCrawlTime(sourceId);
-
-            broadcastNewContent(channelId, newItems, newLatestId);
-
-            // 爬取完成后检测 cookie 变化
-            syncCookiesIfChanged(pair);
-
-            List<String> ids = newItems.stream().map(ListParserResult.InfoItemMeta::getId).toList();
-            log.info("增量爬取完成: source={}, 新增 {} 条", sourceId, newItems.size());
-            return CrawlResult.success(sourceId, newItems.size(), ids, newLatestId);
-
+            CookieSourceManager.CookieSessionPair pair = userId != null
+                    ? resolveSessionPair(source, userId)
+                    : resolveSessionPair(source);
+            return doCrawlIncremental(source, pair);
         } catch (CookieSourceManager.NoCookieAvailableException e) {
             log.debug("增量爬取跳过（无 Cookie）: source={}", sourceId);
             return CrawlResult.fail(sourceId, e.getMessage());
@@ -149,6 +113,65 @@ public class CrawlEngine {
             log.error("增量爬取失败: source={}, error={}", sourceId, e.getMessage(), e);
             return CrawlResult.fail(sourceId, e.getMessage());
         }
+    }
+
+    private CrawlResult doCrawlIncremental(CrawlerConfig.SourceConfig source,
+                                           CookieSourceManager.CookieSessionPair pair) {
+        String sourceId = source.getId();
+        SmartSession session = pair.getSession();
+
+        String listUrl = buildListUrl(source, 1);
+        SmartResponse response = fetchPage(listUrl, session, source.isRequiresAuth());
+        if (!response.isSuccess()) {
+            int status = response.getStatusCode();
+            // 认证失败检测：401/403 或重定向到登录页
+            if (source.isRequiresAuth() && (status == 401 || status == 403)) {
+                return CrawlResult.authFail(sourceId, pair.getUserId(),
+                        "Cookie 认证失败: HTTP " + status);
+            }
+            return CrawlResult.fail(sourceId, "HTTP 请求失败: " + status);
+        }
+
+        ListParserResult result = parserFactory.parseList(
+                source.getParserType(), response.getBody(), source, 1);
+
+        // ⭐ 解析器级别的认证失败（返回的是登录页 HTML 而非正常列表）
+        if (result != null && result.isAuthExpired()) {
+            return CrawlResult.authFail(sourceId, pair.getUserId(),
+                    result.getErrorMessage() != null ? result.getErrorMessage() : "解析器检测到登录页");
+        }
+
+        if (result == null || result.getItems() == null || result.getItems().isEmpty()) {
+            syncCookiesIfChanged(pair);
+            return CrawlResult.empty(sourceId);
+        }
+
+        String channelId = source.getChannelId();
+        String cachedLatestId = infoCacheUtil.getLatestId(channelId);
+        List<ListParserResult.InfoItemMeta> newItems = filterNewItems(result.getItems(), cachedLatestId);
+
+        if (newItems.isEmpty()) {
+            infoCacheUtil.updateLastCrawlTime(sourceId);
+            syncCookiesIfChanged(pair);
+            return CrawlResult.empty(sourceId);
+        }
+
+        enrichItemsWithSourceMeta(newItems, source);
+        infoCacheUtil.saveMetaBatch(channelId, newItems);
+        publishArticleSavedEvents(newItems);
+
+        String newLatestId = computeLatestId(newItems, cachedLatestId);
+        infoCacheUtil.setLatestId(channelId, newLatestId);
+        infoCacheUtil.updateLastCrawlTime(sourceId);
+
+        broadcastNewContent(channelId, newItems, newLatestId);
+
+        // 爬取完成后检测 cookie 变化
+        syncCookiesIfChanged(pair);
+
+        List<String> ids = newItems.stream().map(ListParserResult.InfoItemMeta::getId).toList();
+        log.info("增量爬取完成: source={}, 新增 {} 条", sourceId, newItems.size());
+        return CrawlResult.success(sourceId, newItems.size(), ids, newLatestId);
     }
 
     // ==================== ⭐ 两阶段初始化 ====================
