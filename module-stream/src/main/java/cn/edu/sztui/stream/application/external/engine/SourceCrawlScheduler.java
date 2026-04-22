@@ -58,6 +58,13 @@ public class SourceCrawlScheduler {
         int skippedCount = 0;
 
         for (CrawlerConfig.SourceConfig source : sources) {
+            // ⭐ 教务内网（acdm-inbox）由 AcademicInboxFastScheduler 专属处理：
+            //   它需要 jwxt 子域专属 cookies（CookieSourceManager 的通用 cookie 池选人逻辑不适用），
+            //   失败时要走 initInternal 自愈而非 markInvalid（后者会错误地把整个用户标为失效，牵连公文通）。
+            if ("acdm-inbox".equals(source.getParserType())) {
+                continue;
+            }
+
             if (!shouldCrawlNow(source)) {
                 skippedCount++;
                 continue;
