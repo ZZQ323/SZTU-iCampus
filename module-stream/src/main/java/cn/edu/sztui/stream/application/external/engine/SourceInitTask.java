@@ -123,7 +123,11 @@ public class SourceInitTask {
      * 用户登录后，初始化需要登录的源（requiresAuth=true）
      * <p>
      * 由 UserLoginEventListener 调用。
-     * 这些源需要用户的 Cookie 才能访问（如公文通）。
+     * 这些源需要用户的网关 Cookie 才能访问（如公文通）。
+     * <p>
+     * ⭐ 显式跳过 {@code parserType=acdm-inbox} 的源：教务内网依赖 jwxt 子域专属 cookies，
+     * 登录时这些 cookies 还没拿到（前端紧接着调 /acdm/v1/init 才获取）。
+     * 由 {@code AcademicInboxInitListener} 在 {@code AcademicSessionReadyEvent} 到达时接手。
      */
     public void triggerAuthSourceInit(String userId) {
         if (!authInitializing.compareAndSet(false, true)) {
@@ -138,6 +142,11 @@ public class SourceInitTask {
 
             for (CrawlerConfig.SourceConfig source : sources) {
                 if (!source.isRequiresAuth()) {
+                    continue;
+                }
+
+                if ("acdm-inbox".equals(source.getParserType())) {
+                    // 由 AcademicSessionReadyEvent 驱动，跳过
                     continue;
                 }
 

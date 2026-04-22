@@ -18,15 +18,14 @@ channels:
       - gwt-xiaoyuan
 
   - id: acdm-notice
-    name: 公告留言
-    description: 教务系统内的已收公告 + 已收留言
+    name: 已收公告
+    description: 教务系统内的已收公告
     icon: mail
     sourceOrg: fixed
     sort: 2
     enabled: true
     sources:
       - acdm-ysgg
-      - acdm-ysly
 
   - id: acdm-message
     name: 消息通知

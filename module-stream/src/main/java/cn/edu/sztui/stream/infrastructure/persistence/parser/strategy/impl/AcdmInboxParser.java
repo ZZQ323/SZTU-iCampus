@@ -66,6 +66,17 @@ public class AcdmInboxParser implements ParserStrategy {
         if (!StringUtils.hasText(html)) return ListParserResult.fail("HTML 内容为空");
 
         String fixed = fixWebVpnEncoding(html);
+
+        // 认证态判断：jsxsd session 过期后会返回登录页（内容没有列表结构）。
+        // 调度器据此触发自愈（reactive initInternal），避免把"登录页 0 条"误作"当前无公告"。
+        if (isJsxsdLoginPage(fixed)) {
+            ListParserResult result = new ListParserResult();
+            result.setSuccess(false);
+            result.setAuthExpired(true);
+            result.setErrorMessage("jsxsd 登录页响应");
+            return result;
+        }
+
         Document doc = Jsoup.parse(fixed);
 
         // 尝试多种定位器
@@ -165,6 +176,29 @@ public class AcdmInboxParser implements ParserStrategy {
     static String fixWebVpnEncoding(String html) {
         if (html == null) return "";
         return html.replace("&s380", "\"");
+    }
+
+    /**
+     * 判断 jsxsd 响应是否为登录页。
+     * <p>
+     * jsxsd session 过期后，原本的列表端点（如 /ggly/ysgg_query）会被服务端 302/forward 到登录页，
+     * body 里会出现典型的登录 form 标记。任一命中即判定。
+     * <ul>
+     *   <li><code>/jsxsd/xk/LoginToXk</code> / <code>loginHome</code> 路径</li>
+     *   <li><code>id="userAccount"</code> 登录表单输入</li>
+     *   <li>title 含"登录"</li>
+     * </ul>
+     */
+    static boolean isJsxsdLoginPage(String html) {
+        if (html == null || html.isEmpty()) return false;
+        String lower = html.toLowerCase();
+        if (lower.contains("/jsxsd/xk/logintoxk")) return true;
+        if (lower.contains("loginhome")) return true;
+        if (lower.contains("id=\"useraccount\"") || lower.contains("id='useraccount'")) return true;
+        if (lower.contains("name=\"useraccount\"") || lower.contains("name='useraccount'")) return true;
+        // <title>登录</title> / <title>强智科技 - 教务管理系统登录</title>
+        if (lower.matches("(?s).*<title[^>]*>[^<]*登录[^<]*</title>.*")) return true;
+        return false;
     }
 
     static String extractId(String href, String onclick) {

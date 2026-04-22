@@ -4,6 +4,7 @@ import cn.edu.sztui.base.application.dto.query.CrouseTableQuery;
 import cn.edu.sztui.base.application.service.AcademicService;
 import cn.edu.sztui.base.application.vo.CourseTableVo;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
+import cn.edu.sztui.base.domain.event.AcademicSessionReadyEvent;
 import cn.edu.sztui.base.infrastructure.util.cache.AuthSessionCacheUtil;
 import cn.edu.sztui.base.infrastructure.util.parser.CrouseParser;
 import cn.edu.sztui.common.util.auth.UserContext;
@@ -20,6 +21,7 @@ import cn.edu.sztui.common.util.smarthttp.service.SmartSession;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -48,6 +50,9 @@ public class AcademicServiceImpl implements AcademicService {
     @Resource
     private CrouseParser crouseParser;
 
+    @Resource
+    private ApplicationEventPublisher eventPublisher;
+
     private static final String UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0";
 
     // ==================== 初始化教务系统 ====================
@@ -66,13 +71,40 @@ public class AcademicServiceImpl implements AcademicService {
             );
         }
 
+        String updatedJson = initInternal(userId, cookiesJson);
+        if (updatedJson == null) {
+            throw new BusinessException(
+                    SysReturnCode.BASE_PROXY.getCode(),
+                    "教务系统初始化失败",
+                    ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
+            );
+        }
+
+        // 通知下游：jwxt cookies 已就绪，可以开始爬 acdm-* 数据源
+        if (StringUtils.hasText(userId)) {
+            eventPublisher.publishEvent(new AcademicSessionReadyEvent(this, userId));
+        }
+
+        LoginResultsVo ret = new LoginResultsVo();
+        ret.setLogined(true);
+        ret.setCookiesJson(updatedJson);
+        ret.setUserId(userId);
+        return ret;
+    }
+
+    @Override
+    public String initInternal(String userId, String cookiesJson) {
+        if (!StringUtils.hasText(cookiesJson)) {
+            log.warn("initInternal: 空 cookies, userId={}", userId);
+            return null;
+        }
+
         log.info("用户 {} 初始化教务系统会话", userId);
 
-        // 1. 用前端传来的网关 cookies 构建 session
+        // 1. 用传入的网关 cookies 构建 session
         List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
         SmartSession session = smartHttpClient.newSession(cookies);
 
-        LoginResultsVo ret = new LoginResultsVo();
         try {
             // 2. 访问教务系统入口，SmartHttpClient 自动跟随重定向链
             //    302 → 302 → ... → 最终落地教务主页
@@ -89,37 +121,23 @@ public class AcademicServiceImpl implements AcademicService {
             log.info("教务系统重定向完成: finalUrl={}, redirects={}",
                     response.getFinalUrl(), response.getRedirectCount());
 
-            // 3. 检查最终落地页面
             String finalUrl = response.getFinalUrl();
             if (finalUrl != null && finalUrl.contains(AcdmSwitchPort)) {
                 log.info("检测到选课期间");
             }
-
-            ret.setLogined(true);
-
-        } catch (BusinessException e) {
-            throw e;
         } catch (Exception e) {
             log.error("教务系统初始化失败: userId={}, error={}", userId, e.getMessage(), e);
-            throw new BusinessException(
-                    SysReturnCode.BASE_PROXY.getCode(),
-                    "教务系统初始化失败：" + e.getMessage(),
-                    ResultCodeEnum.INTERNAL_SERVER_ERROR.getCode()
-            );
+            return null;
         }
 
-        // 4. 保存更新后的 cookies 到 Redis（供爬虫引擎使用）
+        // 3. 保存更新后的 cookies 到 Redis（供爬虫引擎使用）
         List<SmartCookie> updatedCookies = session.getCookies();
         if (StringUtils.hasText(userId)) {
             authSessionCacheUtil.saveOrUpdateSessionCookie(userId, updatedCookies);
         }
 
-        // 5. 返回更新后的 cookies 给前端
-        ret.setCookiesJson(JSON.toJSONString(updatedCookies));
-        ret.setUserId(userId);
-
         log.info("用户 {} 教务系统 Cookie 已更新，共 {} 个", userId, updatedCookies.size());
-        return ret;
+        return JSON.toJSONString(updatedCookies);
     }
 
     // ==================== 获取课表 ====================

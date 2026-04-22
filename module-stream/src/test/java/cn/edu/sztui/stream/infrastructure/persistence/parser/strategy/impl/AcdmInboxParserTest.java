@@ -119,6 +119,36 @@ class AcdmInboxParserTest {
     }
 
     @Test
+    void parseList_login_page_flags_auth_expired() throws IOException {
+        String html = loadSample("inbox-login-page.htm");
+        ListParserResult result = parser.parseList(html, mockSource(), 1);
+
+        assertFalse(result.isSuccess(), "登录页应判失败");
+        assertTrue(result.isAuthExpired(), "登录页应置 authExpired=true");
+        assertNull(result.getItems(), "登录页不应解出 items");
+    }
+
+    @Test
+    void isJsxsdLoginPage_true_for_common_markers() {
+        assertTrue(AcdmInboxParser.isJsxsdLoginPage(
+                "<html><body><form action='/jsxsd/xk/LoginToXk'></form></body></html>"));
+        assertTrue(AcdmInboxParser.isJsxsdLoginPage(
+                "<input id=\"userAccount\" name=\"userAccount\"/>"));
+        assertTrue(AcdmInboxParser.isJsxsdLoginPage(
+                "<html><head><title>教务管理系统登录</title></head></html>"));
+        assertTrue(AcdmInboxParser.isJsxsdLoginPage(
+                "<html><body><a href='/jsxsd/loginHome'>去登录</a></body></html>"));
+    }
+
+    @Test
+    void isJsxsdLoginPage_false_for_normal_list_page() {
+        assertFalse(AcdmInboxParser.isJsxsdLoginPage(
+                "<html><body><table><tr><td><a class='title'>关于开课</a></td></tr></table></body></html>"));
+        assertFalse(AcdmInboxParser.isJsxsdLoginPage(""));
+        assertFalse(AcdmInboxParser.isJsxsdLoginPage(null));
+    }
+
+    @Test
     void parseList_with_title_anchor_extracts_item() {
         // 手工模拟强智列表页的典型结构（.title 锚点 + ggid query）
         String html = "<html><body>" +

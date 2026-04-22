@@ -43,6 +43,14 @@ public class ListParserResult {
     private String sourceId;
 
     /**
+     * 认证态过期标志
+     * <p>
+     * 解析器检测到响应是"登录页"（而非正常列表）时置 true，调度器据此触发 session 自愈。
+     * 目前仅 acdm-inbox 解析器使用；其他解析器默认 false。
+     */
+    private boolean authExpired;
+
+    /**
      * 通用信息条目元数据
      * <p>
      * 适用于公告、新闻、通知等各种信息类型

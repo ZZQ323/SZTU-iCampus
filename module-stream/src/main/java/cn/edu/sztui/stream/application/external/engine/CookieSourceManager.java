@@ -117,6 +117,40 @@ public class CookieSourceManager {
         return getAvailableUserId() != null;
     }
 
+    /**
+     * 返回当前在线且 Redis session 里有 jwxt 子域 cookies 的用户列表。
+     * <p>
+     * 用于教务内网（acdm-*）轮询：只能用"调用过 /acdm/v1/init 的用户"的 cookies，
+     * 不能复用公文通的通用 cookie 池逻辑。一个 userId 没出现在这里 = 没 init 过或 session 已被清。
+     */
+    public List<String> getOnlineUsersWithAcdmCookies() {
+        List<String> result = new ArrayList<>();
+        for (String userId : wsSessionRegistry.getOnlineUserIds()) {
+            if (!isValid(userId)) continue;
+            ProxySession proxy = authSessionCacheUtil.getSession(userId);
+            if (proxy == null || !StringUtils.hasText(proxy.getCookiesJson())) continue;
+            List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(proxy.getCookiesJson());
+            if (hasAcdmCookie(cookies)) {
+                result.add(userId);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 判断 cookie 列表里是否有 jwxt 子域的 cookie（即该用户跑过教务 init）。
+     */
+    public static boolean hasAcdmCookie(List<SmartCookie> cookies) {
+        if (cookies == null) return false;
+        for (SmartCookie c : cookies) {
+            String d = c.getDomain();
+            if (d != null && d.toLowerCase().contains("jwxt-sztu-edu-cn")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean isValid(String userId) {
         if (!StringUtils.hasText(userId)) return false;
         if (!authSessionCacheUtil.hasSession(userId)) return false;
