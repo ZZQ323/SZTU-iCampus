@@ -97,6 +97,11 @@ public class AcademicInboxFastScheduler {
         if (!result.isAuthError()) {
             if (result.getNewCount() > 0) {
                 log.info("教务内网爬取: {} → {} 条新内容", source.getId(), result.getNewCount());
+            } else if (result.isSuccess()) {
+                log.debug("教务内网爬取无新内容: source={}, userId={}", source.getId(), userId);
+            } else {
+                log.warn("教务内网爬取失败: source={}, userId={}, error={}",
+                        source.getId(), userId, result.getErrorMessage());
             }
             return;
         }
