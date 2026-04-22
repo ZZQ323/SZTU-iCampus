@@ -1,10 +1,11 @@
-# 公文通频道配置（固定频道，始终显示，不可退订）
+# 教务内网频道组（需登录，不可退订）
+# sourceOrg=fixed 的频道共享"公文通组"展示位置（SOURCE_ORG_TREE 里 label="教务内网"）
 
 channels:
 
   - id: announcement
     name: 公文通
-    description: 学校公文通公告信息
+    description: 学校公文通公告信息（WebVPN 内网）
     icon: notice
     sourceOrg: fixed
     sort: 1
@@ -15,3 +16,24 @@ channels:
       - gwt-xingzheng
       - gwt-xuegong
       - gwt-xiaoyuan
+
+  - id: acdm-notice
+    name: 公告留言
+    description: 教务系统内的已收公告 + 已收留言
+    icon: mail
+    sourceOrg: fixed
+    sort: 2
+    enabled: true
+    sources:
+      - acdm-ysgg
+      - acdm-ysly
+
+  - id: acdm-message
+    name: 消息通知
+    description: 教务系统消息通知（无详情页）
+    icon: bell
+    sourceOrg: fixed
+    sort: 3
+    enabled: true
+    sources:
+      - acdm-xxtz

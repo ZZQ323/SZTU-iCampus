@@ -88,3 +88,53 @@ sources:
     crawlPageCount: 1
     enabled: true
     sort: 5
+
+  # ==================== 教务内网（强智教务 /jsxsd） ====================
+  # 三个入口都挂在同一套教务 cookie 下；调度间隔 1 分钟（消息变动不频繁）。
+  # listUrl 直接请求 Frame7/8/15 里的 data-url（不是父页 xsMain.htmlx）。
+
+  - id: acdm-ysgg
+    name: 已收公告
+    channelId: acdm-notice
+    parserType: acdm-inbox
+    baseUrl: ${urls.acdm}
+    listUrlTemplate: ${urls.acdm}/ggly/ysgg_query
+    detailUrlTemplate: ${urls.acdm}/ggly/gglyShow.do?ggid={id}
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    crawlPageCount: 1
+    enabled: true
+    sort: 10
+
+  - id: acdm-ysly
+    name: 已收留言
+    channelId: acdm-notice
+    parserType: acdm-inbox
+    baseUrl: ${urls.acdm}
+    listUrlTemplate: ${urls.acdm}/ggly/ysly_query
+    detailUrlTemplate: ${urls.acdm}/ggly/gglyShow.do?ggid={id}
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    crawlPageCount: 1
+    enabled: true
+    sort: 11
+
+  - id: acdm-xxtz
+    name: 消息通知
+    channelId: acdm-message
+    parserType: acdm-inbox
+    baseUrl: ${urls.acdm}
+    listUrlTemplate: ${urls.acdm}/ggly/xxtz_query
+    # 没有详情页：点击时 detail 页会显示"此消息无详情"的空态
+    detailUrlTemplate: ""
+    contentType: notice
+    subContentType: general-notice
+    requiresAuth: true
+    crawlIntervalMinutes: 1
+    crawlPageCount: 1
+    enabled: true
+    sort: 12

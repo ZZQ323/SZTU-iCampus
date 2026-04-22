@@ -10,3 +10,9 @@ urls:
   # 公文通（WebVPN 内网入口）
   # ========================
   gwt: https://nbw-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118
+
+  # ========================
+  # 教务系统（强智教务，通过 WebVPN 的 jwxt 入口）
+  # Frame7/8/15 的 src 都挂在 /jsxsd 子路径下。
+  # ========================
+  acdm: https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/jsxsd
