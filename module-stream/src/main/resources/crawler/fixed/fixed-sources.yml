@@ -99,7 +99,8 @@ sources:
     parserType: acdm-inbox
     baseUrl: ${urls.acdm}
     listUrlTemplate: ${urls.acdm}/ggly/ysgg_query
-    detailUrlTemplate: ${urls.acdm}/ggly/gglyShow.do?ggid={id}
+    # HAR 确认：浏览器"查看"点进去是 /ggly/ggly_show?ggid=XXX（下划线，无 .do 后缀）
+    detailUrlTemplate: ${urls.acdm}/ggly/ggly_show?ggid={id}
     contentType: notice
     subContentType: general-notice
     requiresAuth: true

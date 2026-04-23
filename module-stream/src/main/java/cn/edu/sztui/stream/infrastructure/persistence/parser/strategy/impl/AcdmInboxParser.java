@@ -52,14 +52,13 @@ public class AcdmInboxParser implements ParserStrategy {
     // ==================== 列表 ====================
 
     /**
-     * 列表页解析。用户提供的选择器提示是 <code>.title</code>，用一组回退定位器以免
-     * 单一选择器不稳：
-     *   1. {@code a.title}
-     *   2. {@code .title}
-     *   3. {@code table.gridtable td:nth-child(2) a}（强智系统的表格式列表）
-     * <p>
-     * 每行必有：title、id（articleId）、url（相对或绝对）
-     * 可选：publishDate、author（从同一行其他 cell 取）
+     * 列表页解析。jsxsd 三个入口都把数据放在 {@code <table id="dataList">} 里，
+     * 但**列数不同**，按列数分派：
+     * <ul>
+     *   <li>7 列 = 已收公告 / 已收留言：序号 / 标题 / 状态 / 类别 / 发送人 / 发送时间 /
+     *       操作（"查看"链接含 <code>openWindow('...?ggid=XXX')</code>）</li>
+     *   <li>4 列 = 消息通知：序号 / 业务名称 / 消息内容 / 推送时间（没有 id，合成一个）</li>
+     * </ul>
      */
     @Override
     public ListParserResult parseList(String html, SourceConfig sourceConfig, int page) {
@@ -78,47 +77,21 @@ public class AcdmInboxParser implements ParserStrategy {
         }
 
         Document doc = Jsoup.parse(fixed);
-
-        // 尝试多种定位器
-        Elements anchors = doc.select("a.title");
-        if (anchors.isEmpty()) anchors = doc.select(".title");
-        if (anchors.isEmpty()) anchors = doc.select("table.gridtable td:nth-child(2) a, table.Nsb_r_list td a");
+        Elements rows = doc.select("table#dataList tr");
 
         List<InfoItemMeta> items = new ArrayList<>();
-        for (Element a : anchors) {
-            String title = a.text().trim();
-            if (!StringUtils.hasText(title)) continue;
-
-            String href = a.attr("href").trim();
-            String onclick = a.attr("onclick").trim();
-
-            String id = extractId(href, onclick);
-            if (!StringUtils.hasText(id)) continue;
-
-            String absUrl = href.startsWith("http")
-                    ? href
-                    : resolveUrl(sourceConfig, href.isEmpty() ? onclick : href, id);
-
-            InfoItemMeta meta = InfoItemMeta.builder()
-                    .id(id)
-                    .title(title)
-                    .url(absUrl)
-                    .build();
-
-            // 尝试从同一行 tr 取发布时间、作者等辅助字段
-            Element row = a.closest("tr");
-            if (row != null) {
-                Elements tds = row.select("td");
-                for (Element td : tds) {
-                    String txt = td.text().trim();
-                    if (isDateLike(txt)) {
-                        meta.setPublishDate(txt);
-                        break;
-                    }
-                }
+        for (Element row : rows) {
+            Elements tds = row.children();
+            // 跳过表头（tr 只有 <th>），以及任何只有 0-1 个 cell 的异常行
+            if (tds.isEmpty()) continue;
+            boolean anyTd = false;
+            for (Element c : tds) {
+                if ("td".equalsIgnoreCase(c.tagName())) { anyTd = true; break; }
             }
+            if (!anyTd) continue;
 
-            items.add(meta);
+            InfoItemMeta meta = parseRow(tds);
+            if (meta != null) items.add(meta);
         }
 
         ListParserResult result = new ListParserResult();
@@ -126,6 +99,73 @@ public class AcdmInboxParser implements ParserStrategy {
         result.setItems(items);
         result.setCurrentPage(page);
         return result;
+    }
+
+    /** 根据 td 数量分派到 ggly（7 列）或 xxtz（4 列）解析器 */
+    private InfoItemMeta parseRow(Elements tds) {
+        // 只取 td，不含可能混入的空白节点
+        List<Element> cells = new ArrayList<>();
+        for (Element e : tds) if ("td".equalsIgnoreCase(e.tagName())) cells.add(e);
+
+        if (cells.size() >= 6) return parseGglyRow(cells);
+        if (cells.size() == 4) return parseXxtzRow(cells);
+        return null;
+    }
+
+    /**
+     * 已收公告 / 已收留言行解析。
+     * 列：[0]序号 [1]标题 [2]状态(已读/未读) [3]类别 [4]发送人 [5]发送时间 [6]操作(&lt;a&gt;)
+     */
+    private InfoItemMeta parseGglyRow(List<Element> cells) {
+        String title = cellText(cells, 1);
+        if (!StringUtils.hasText(title)) return null;
+
+        String status = cellText(cells, 2);
+        String category = cellText(cells, 3);
+        String author = cellText(cells, 4);
+        String publishTime = cellText(cells, 5);
+
+        // 最后一个 td 里的 a[href=javascript:openWindow('...?ggid=XXX',...)] 抠 ggid
+        String id = "";
+        Element last = cells.get(cells.size() - 1);
+        Element a = last.selectFirst("a[href]");
+        if (a != null) {
+            id = extractId(a.attr("href"), a.attr("onclick"));
+        }
+        if (!StringUtils.hasText(id)) return null; // 没 id 丢弃
+
+        return InfoItemMeta.builder()
+                .id(id)
+                .title(title)
+                .author(author)
+                .publishDate(publishTime)
+                .categoryName(category)
+                .summary(status) // 借 summary 字段透出 已读/未读
+                .build();
+    }
+
+    /**
+     * 消息通知行解析（无详情页）。
+     * 列：[0]序号 [1]业务名称 [2]消息内容 [3]推送时间 —— 学校没给 id，合成一个稳定 hash
+     */
+    private InfoItemMeta parseXxtzRow(List<Element> cells) {
+        String bizName = cellText(cells, 1);
+        String content = cellText(cells, 2);
+        String publishTime = cellText(cells, 3);
+
+        String title = StringUtils.hasText(bizName) && StringUtils.hasText(content)
+                ? bizName + "：" + content
+                : (StringUtils.hasText(content) ? content : bizName);
+        if (!StringUtils.hasText(title)) return null;
+
+        String id = synthesizeXxtzId(bizName, content, publishTime);
+
+        return InfoItemMeta.builder()
+                .id(id)
+                .title(title)
+                .publishDate(publishTime)
+                .categoryName(bizName)
+                .build();
     }
 
     // ==================== 详情 ====================
@@ -199,6 +239,32 @@ public class AcdmInboxParser implements ParserStrategy {
         // <title>登录</title> / <title>强智科技 - 教务管理系统登录</title>
         if (lower.matches("(?s).*<title[^>]*>[^<]*登录[^<]*</title>.*")) return true;
         return false;
+    }
+
+    /** 安全取第 idx 个 cell 的 text（越界返回空） */
+    static String cellText(List<Element> cells, int idx) {
+        if (idx < 0 || idx >= cells.size()) return "";
+        Element e = cells.get(idx);
+        return e == null ? "" : e.text().trim();
+    }
+
+    /**
+     * 消息通知无 id，用 (业务名称 + 消息内容 + 推送时间) 的 MD5 合成稳定 id。
+     * 同一条 xxtz 每次爬取都会生成相同 id，天然支持去重。
+     */
+    static String synthesizeXxtzId(String bizName, String content, String publishTime) {
+        String raw = (bizName == null ? "" : bizName) + "|"
+                + (content == null ? "" : content) + "|"
+                + (publishTime == null ? "" : publishTime);
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(raw.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) sb.append(String.format("%02x", b));
+            return "xxtz-" + sb.substring(0, 16);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            return "xxtz-" + Integer.toHexString(raw.hashCode());
+        }
     }
 
     static String extractId(String href, String onclick) {

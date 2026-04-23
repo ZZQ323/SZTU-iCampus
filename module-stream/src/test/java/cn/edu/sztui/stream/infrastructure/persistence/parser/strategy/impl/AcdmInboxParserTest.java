@@ -149,25 +149,66 @@ class AcdmInboxParserTest {
     }
 
     @Test
-    void parseList_with_title_anchor_extracts_item() {
-        // 手工模拟强智列表页的典型结构（.title 锚点 + ggid query）
-        String html = "<html><body>" +
-                "<table class='Nsb_r_list'>" +
-                "  <tr>" +
-                "    <td>1</td>" +
-                "    <td><a class='title' href='/ggly/gglyShow.do?ggid=111' onclick='readgg(\"111\")'>关于春季开课的通知</a></td>" +
-                "    <td>2026-03-16 11:23</td>" +
-                "  </tr>" +
-                "</table></body></html>";
+    void parseList_ysgg_real_sample_extracts_items() throws IOException {
+        String html = loadSample("inbox-ysgg-list.htm");
+        ListParserResult result = parser.parseList(html, mockSource(), 1);
 
+        assertTrue(result.isSuccess());
+        assertFalse(result.getItems().isEmpty(), "已收公告应解出条目");
+
+        var first = result.getItems().get(0);
+        // 样本第一条："关于创意设计学院学院部分课程停开的通知（2025.3.16）"
+        assertTrue(first.getTitle().contains("课程停开"),
+                "第一条标题应含'课程停开'，实际：" + first.getTitle());
+        // ggid 来自 openWindow('/jsxsd/ggly/ggly_show?ggid=85C3BF0E...')
+        assertEquals("85C3BF0E183440729B1270EB60CA2AAF", first.getId(),
+                "第一条 id 应从 openWindow 的 ggid 参数提取");
+        assertEquals("彭凯风", first.getAuthor());
+        assertTrue(first.getPublishDate().contains("2026-03-16"));
+        assertEquals("学生公告", first.getCategoryName());
+    }
+
+    @Test
+    void parseList_ysgg_every_item_has_id() throws IOException {
+        String html = loadSample("inbox-ysgg-list.htm");
         ListParserResult result = parser.parseList(html, mockSource(), 1);
         assertTrue(result.isSuccess());
-        assertEquals(1, result.getItems().size());
+        for (var item : result.getItems()) {
+            assertNotNull(item.getId());
+            assertFalse(item.getId().isEmpty(), "无 id 的条目应被丢弃而不是留下空 id");
+            assertNotNull(item.getTitle());
+            assertFalse(item.getTitle().isEmpty());
+        }
+    }
 
-        var item = result.getItems().get(0);
-        assertEquals("111", item.getId());
-        assertTrue(item.getTitle().contains("春季开课"));
-        assertTrue(item.getPublishDate().contains("2026-03-16"));
+    @Test
+    void parseList_xxtz_real_sample_extracts_items_with_synthesized_ids() throws IOException {
+        String html = loadSample("inbox-xxtz-list.htm");
+        ListParserResult result = parser.parseList(html, mockSource(), 1);
+
+        assertTrue(result.isSuccess());
+        assertFalse(result.getItems().isEmpty(), "消息通知应解出条目");
+
+        var first = result.getItems().get(0);
+        // 标题 = 业务名称：消息内容
+        assertTrue(first.getTitle().startsWith("教师调课申请"),
+                "xxtz 标题应含业务名称前缀，实际：" + first.getTitle());
+        assertTrue(first.getTitle().contains("调课申请"));
+        // 合成 id：前缀 + 16 hex chars
+        assertTrue(first.getId().startsWith("xxtz-"), "xxtz id 应以 'xxtz-' 开头");
+        assertTrue(first.getId().length() >= 10);
+        assertTrue(first.getPublishDate().contains("2024"));
+    }
+
+    @Test
+    void synthesizeXxtzId_is_stable() {
+        // 同样输入 → 同样输出（支持去重）
+        String a = AcdmInboxParser.synthesizeXxtzId("调课", "老师 A 调课已通过", "2024-12-25 10:53:19");
+        String b = AcdmInboxParser.synthesizeXxtzId("调课", "老师 A 调课已通过", "2024-12-25 10:53:19");
+        assertEquals(a, b);
+        // 不同输入 → 不同输出
+        String c = AcdmInboxParser.synthesizeXxtzId("调课", "老师 B 调课已通过", "2024-12-25 10:53:19");
+        assertNotEquals(a, c);
     }
 
     // ==================== fixture ====================

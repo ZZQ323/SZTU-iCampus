@@ -1,0 +1,403 @@
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
+
+
+
+
+<head id="headerid1">
+	<base target='_self'>
+	<title>已收公告</title>
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">
+	<meta http-equiv="keywords" content="湖南强智科技教务系统">
+	<meta http-equiv="description" content="湖南强智科技教务系统">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" /><script src=/sf-webproxy/api/vpn-config></script><script src=/sf-webproxy/resource/web_proxy.js?v=1.4.11></script><script src=/sf-webproxy/resource/postMessage.js></script>
+<script type="text/javascript" src="/jsxsd/js/jquery-min.js" language="javascript" ></script>
+<script type="text/javascript" src="/jsxsd/js/common.js" language="javascript" ></script>
+<script type="text/javascript" src="/jsxsd/js/iepngfix_tilebg.js" language="javascript" ></script>
+
+<script type="text/javascript" src="/jsxsd/js/jquery.autocomplete.min.js" language="javascript" ></script>
+<script type="text/javascript" src="/jsxsd/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/jsxsd/assets/plugins/layui/laydate.js"></script>
+<script src="/jsxsd/assets/plugins/layui/layui.all.js"></script>
+<script type="text/javascript" src="/jsxsd/assets/plugins/pagination/pagination.js" language="javascript" ></script>
+<link href="/jsxsd/framework/images/common.css" rel="stylesheet" type="text/css" />
+<link href="/jsxsd/framework/images/blue.css" rel="stylesheet" type="text/css" id="link_theme" />
+<link href="/jsxsd/framework/images/workstation.css" rel="stylesheet" type="text/css" />
+<link href="/jsxsd/css/easyui.css" rel="stylesheet" type="text/css" />
+<link href="/jsxsd/css/jquery.autocomplete.css" rel="stylesheet" type="text/css" />
+
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/css/modules/reset-table-style.css"/>
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/css/common.css"/>
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/css/ui.css"/>
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/plugins/layui/layui.css">
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/plugins/layui/laydate.css"/>
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/plugins/pagination/pagination.css"/>
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/css/modules/timetable-inquire.css" />
+<link rel="stylesheet" type="text/css" href="/jsxsd/assets/css/modules/query-condition-div.css" />
+</head>
+<style type="text/css">
+	.loading-mask {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.5);
+		z-index: 9999;
+		display: none;
+	}
+	.loading-content {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: #333;
+		text-align: center;
+		background-color: #fff;
+		padding-top: 16px;
+		padding: 20px;
+		border-radius: 2px;
+	}
+
+	.spinner {
+		margin: 20px auto;
+		width: 40px;
+		height: 40px;
+		border: 4px solid #f3f3f3;
+		border-radius: 50%;
+		border-top: 4px solid #3498db;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+</style>
+<iframe id="notSession" name="notSession" style="display: none;" src=""></iframe>
+<input type="hidden" name="shouyedizhi" id="shouyedizhi" value="/jsxsd"/>
+<div class="loading-mask" id="loadingMask-dc" style="display:none">
+	<div class="loading-content">
+		<div class="spinner"></div>
+		<h3>数据导出中，请稍候...</h3>
+	</div>
+</div>
+<div class="loading-mask" id="loadingMask-dr" style="display:none">
+	<div class="loading-content">
+		<div class="spinner"></div>
+		<h3>数据导入中，请稍候...</h3>
+	</div>
+</div>
+<script type="text/javascript">
+jQuery(document).ready(function(){
+	window.setInterval(function(){
+		 document.getElementById("notSession").src = "/jsxsd/framework/blankPage.jsp";
+	 }, 1000 * 60 * 10);
+
+
+});
+
+
+</script>
+
+
+<body>
+ 
+<div class="Nsb_pw">
+
+	
+		
+
+
+
+
+
+
+
+ 
+	
+
+	
+
+	<div class="Nsb_layout_r">
+		<div class="Nsb_layout_r title">已收公告</div>
+
+		<form action="" name="Form1" id="Form1" method="post">
+		<table id="dataList" width="100%" border="0" cellspacing="0" cellpadding="0" class="layui-table">
+			<tr>
+				<th class="layui-table-col-special" scope="col" style="width:40px">序号</th>
+				<th class="layui-table-col-special" scope="col">标题</th>
+				<th class="layui-table-col-special" scope="col" style="width:100px">状态</th>
+				<th class="layui-table-col-special" scope="col" style="width:100px">类别</th>
+				
+					<th class="layui-table-col-special" scope="col" style="width:70px">发送人</th>
+				
+				<th class="layui-table-col-special" scope="col" style="width:130px">发送时间</th>
+				<th class="layui-table-col-special" scope="col" style="width:40px">操作</th>
+			</tr>
+			
+				<tr>
+					<td>1</td>
+					<td align="left">关于创意设计学院学院部分课程停开的通知（2025.3.16）</td>
+					<td align="center">已读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">彭凯风</td>
+					
+					<td align="center">2026-03-16 11:23:54</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=85C3BF0E183440729B1270EB60CA2AAF',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>2</td>
+					<td align="left">创意设计学院学院部分课程停开的通知（2026.3.13）</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">彭凯风</td>
+					
+					<td align="center">2026-03-13 10:34:11</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=DD173C03B8E546F58A09700DF6815155',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>3</td>
+					<td align="left">健康与环境工程学院部分课程拟取消开课的通知</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">张清莹</td>
+					
+					<td align="center">2026-03-12 17:20:44</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=0664DD647FE8406C91200A3062AD2C8B',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>4</td>
+					<td align="left">药学院/口腔学院2025-2026-2学期部分课程拟取消开课的通知</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">刘偲</td>
+					
+					<td align="center">2026-03-12 15:56:57</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=1E4E36826BFC4612BA5EE3F641DFB165',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>5</td>
+					<td align="left">深圳技术大学学生免修课程申请表（语言考试类）</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">莫晓婷</td>
+					
+					<td align="center">2026-03-12 11:29:14</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=2649FED7C4D3415691D873FA4A902095',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>6</td>
+					<td align="left">城市交通与物流学院部分课程拟取消开课的通知</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">邓培培</td>
+					
+					<td align="center">2026-03-10 20:09:37</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=68FD61A89407440C9569055AA6C44600',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>7</td>
+					<td align="left">关于体育与艺术学院部分课程停开的通知</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">张宇</td>
+					
+					<td align="center">2026-03-09 15:31:13</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=AF6769010105449F9420A4B096BE22A2',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>8</td>
+					<td align="left">健康与环境工程学院2025-2026-2学期重修替代选课指引（新增《程序设计基础》）</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">张清莹</td>
+					
+					<td align="center">2026-03-06 14:39:10</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=26186744B9874BED8356815D05797D72',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>9</td>
+					<td align="left">2025-2026学年关于《大学英语》&amp;《初级德语》系列课程变动说明及重修选课指引 </td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">尹彦芬</td>
+					
+					<td align="center">2026-03-06 10:36:38</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=FF19B17FECC1426F9B0559C24D310D4B',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>10</td>
+					<td align="left">人工智能学院2025-2026-2学期重修替代选课指引</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">彭雷</td>
+					
+					<td align="center">2026-03-05 15:17:56</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=EEAC1D3BFFAF46FCBF25F62253D6F267',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>11</td>
+					<td align="left">健康与环境工程学院2025-2026-2学期重修替代选课指引</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">张清莹</td>
+					
+					<td align="center">2026-03-04 17:43:52</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=B7ABFE600EAC48FE8882A403F923E691',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>12</td>
+					<td align="left">深圳技术大学课程免修的规定（试行）</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">袁艺玮</td>
+					
+					<td align="center">2026-03-03 15:09:10</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=B73CF9C11ECE44139ACE182716D3AC31',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>13</td>
+					<td align="left">深圳技术大学课程免听的规定（试行）</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">袁艺玮</td>
+					
+					<td align="center">2026-03-03 15:07:51</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=4D4F043D6AAA47D8A95F80A2CB7ED076',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>14</td>
+					<td align="left">《深圳技术大学课外研学学分认定和转换实施办法》</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">莫晓婷</td>
+					
+					<td align="center">2026-03-01 11:17:06</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=5E8BE9AA03BF457F9A57826756FE1F4D',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>15</td>
+					<td align="left">2025-2026学年关于《大学英语》、《初级德语》系列课程的学分变动说明及重修选课指引</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">梁洁</td>
+					
+					<td align="center">2026-01-23 17:46:11</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=D805C70AC23A42D2A18F4323AD60647F',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>16</td>
+					<td align="left">关于发布《口腔学院2025-2026-2学期重修补修替代选课指引》的通知</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">徐志学</td>
+					
+					<td align="center">2026-01-20 11:35:44</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=6E733CF4856A445B9EE29C5A35197F9F',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>17</td>
+					<td align="left">中德智能制造学院2025-2026-2学期重修替代选课指引</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">李宝梅</td>
+					
+					<td align="center">2026-01-18 17:24:59</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=F627FD37BC0F4F90BAF1A1DFD30A1786',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>18</td>
+					<td align="left">关于发布《外国语学院2025-2026学年第二学期重修替代选课指引》的通知</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">尹彦芬</td>
+					
+					<td align="center">2026-01-16 16:49:04</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=7EC9101FD6BC4F28B750FF58973A3F92',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>19</td>
+					<td align="left">商学院2025-2026学年第二学期重修选课替代方案公示</td>
+					<td align="center">未读</td>
+					<td align="center">学生公告</td>
+					
+						<td align="center">李雪琪</td>
+					
+					<td align="center">2026-01-16 12:04:07</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=CC6B3A6EB03940A69AA8A52DF8D485EA',900,450);">查看</a></td>
+				</tr>
+			
+				<tr>
+					<td>20</td>
+					<td align="left">创意设计学院2025-2026-2学期重修替代选课指引</td>
+					<td align="center">未读</td>
+					<td align="center">学生教师公告</td>
+					
+						<td align="center">彭凯风</td>
+					
+					<td align="center">2026-01-16 12:00:31</td>
+					<td align="center"><a href="javascript:openWindow('/jsxsd/ggly/ggly_show?ggid=76B2B28A0DB145E39601D8FEBA8764E8',900,450);">查看</a></td>
+				</tr>
+			
+			
+		</table>
+		<div class="rt edu-pagination paginationDom" style="margin-right: 22px;"></div>
+<input type="hidden" name="pageIndex" id="pageIndex" value="1"/><script type="text/javascript">  $(".paginationDom").createPage({      pageNum: 4,      current: 1,      total:63,      each:20,      userlanguage:0,      pagehtml:"<font style='color:#272727;'>1页</font>/4页",      pagehtml1:"&nbsp;&nbsp;&nbsp;&nbsp;总63条&nbsp;&nbsp;&nbsp;&nbsp;",      pagehtml2:"<span style='color:#272727;'>20条</span>/页",      backfun: function(e) {           pagination(e.current)      }});</script>
+	</form>
+	</div>
+</div>
+<br />
+ 
+</body>
+</html>
