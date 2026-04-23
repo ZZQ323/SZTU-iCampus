@@ -617,6 +617,9 @@ public class CrawlEngine {
 
         for (ListParserResult.InfoItemMeta item : items) {
             item.setSourceId(source.getId());
+            // ⭐ channelId 必须设置：前端 handleItemClick 和后端 findSourceForDetail 都依赖它
+            // 少了会导致 detail 请求被错误路由（例如 acdm-* 被路由成 gwt-jiaowu → 404）
+            item.setChannelId(source.getChannelId());
             item.setContentType(source.getContentType());
             item.setSubContentType(source.getSubContentType());
             item.setSourceOrg(sourceOrg);
