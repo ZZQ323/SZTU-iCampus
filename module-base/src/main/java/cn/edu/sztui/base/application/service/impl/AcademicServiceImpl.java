@@ -122,7 +122,15 @@ public class AcademicServiceImpl implements AcademicService {
                     response.getFinalUrl(), response.getRedirectCount());
 
             String finalUrl = response.getFinalUrl();
-            if (finalUrl != null && finalUrl.contains(AcdmSwitchPort)) {
+            // ⭐ 校验最终落地：如果重定向链被 WebVPN 打回 IDP 登录页，说明根域会话已死。
+            // 这种情况下 session 里积累的只是匿名预登录 cookies，写回 Redis 反而污染原数据。
+            // 只有确实落到 /jsxsd/ 才算成功。
+            if (finalUrl == null || !finalUrl.contains("/jsxsd/")) {
+                log.warn("教务初始化最终未落地 jsxsd, finalUrl={} —— webvpn 根会话可能已过期，保留原 cookies 不覆盖",
+                        finalUrl);
+                return null;
+            }
+            if (finalUrl.contains(AcdmSwitchPort)) {
                 log.info("检测到选课期间");
             }
         } catch (Exception e) {
