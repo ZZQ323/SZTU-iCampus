@@ -71,6 +71,26 @@ public class AcademicServiceImpl implements AcademicService {
             );
         }
 
+        // ⭐ 短路：前端传来的 cookies 里已经有 jwxt 子域 cookies → 之前已 init 过且仍有效
+        // 跑过的 SSO 链是"一次性"的：第二次跑会带上 jsxsd 专属 cookies 干扰 IDP 路由，
+        // 反而落到 /idp/AuthnEngine 失败。已初始化就直接复用。
+        // 真正失效的场景由 AcademicInboxFastScheduler 自愈 + 用户"刷新会话"两层兜底。
+        List<SmartCookie> incoming = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
+        boolean alreadyInitialized = incoming.stream().anyMatch(c ->
+                c.getDomain() != null && c.getDomain().toLowerCase().contains("jwxt-sztu-edu-cn"));
+        if (alreadyInitialized) {
+            log.info("用户 {} 已持有 jwxt 子域 cookies，跳过教务初始化", userId);
+            // 仍然发事件，让 listener 跑一次 acdm 拉取（用户主动调 init 多半是想看新内容）
+            if (StringUtils.hasText(userId)) {
+                eventPublisher.publishEvent(new AcademicSessionReadyEvent(this, userId));
+            }
+            LoginResultsVo ret = new LoginResultsVo();
+            ret.setLogined(true);
+            ret.setCookiesJson(cookiesJson);
+            ret.setUserId(userId);
+            return ret;
+        }
+
         String updatedJson = initInternal(userId, cookiesJson);
         if (updatedJson == null) {
             throw new BusinessException(
