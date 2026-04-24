@@ -108,15 +108,24 @@ public class AuthSessionCacheUtil {
     }
 
     /**
-     * 登出绑定（保留 Cookie，只更新状态）
+     * 登出绑定：**清空 cookies** + 翻 schoolLoggedIn=false。
+     * <p>
+     * 为什么清：学校 logout 端点会让 TWFID / IDP SESSION 等关键 cookie 在学校服务端失效。
+     * 如果 Redis 里保留旧 cookiesJson，下次 relogin 时，WebVPN 反代看到陈旧的 TWFID 会
+     * 走"已登录"分支，跳过 re-issue TWFID 的步骤，导致登录返回的 cookie 里缺少 TWFID/
+     * SESSION —— 进而 `/acdm/v1/refresh/cookies` 走 SSO 链被打回 /idp/AuthnEngine，
+     * 课表/附件全挂。
+     * <p>
+     * 这是 2026-04-25 "退出重登立刻挂" 的根因（对照 trace 070728 成功 vs 070907 失败）。
      */
     public void sessionLogoutBind(String userId) {
         ProxySession session = getSession(userId);
         if (session == null) return;
+        session.setCookiesJson(null);
         session.setLastUpdateTime(System.currentTimeMillis());
         session.setSchoolLoggedIn(false);
         saveSession(userId, session);
-        log.info("userId={} 已登出学校后端", userId);
+        log.info("userId={} 已登出学校后端（cookies 已清空）", userId);
     }
 
     /**
