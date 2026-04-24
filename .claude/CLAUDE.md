@@ -61,6 +61,19 @@
 - **及时更新本知识库**：用户强调过的设计原则、架构决策、踩坑记录、约束、约定，必须立刻写进 `.claude/CLAUDE.md`，不要只依赖会话上下文（会被压缩/清空）。
 - **开发分支**：所有改动推到用户指定的 `claude/*` 分支，不直接碰 `main` / `release/*`。
 
+### 10. 调试失败请求的通用姿势
+
+学校一整套服务（WebVPN / IDP / 教务 / 博达 CMS）都是黑盒，出问题常见反应是"log 里一行 warn + 一个非标 status"。**log 摘要 + 瞎猜**是主要时间浪费来源（414 坑、AuthnEngine 坑都是这样跑了一两天）。
+
+**规则**：写"可能失败的学校请求"时必须落盘现场：
+
+- 失败响应（非 2xx、伪 200 登录页、重定向终态异常等）**完整写入本地文件**，不要只 log 前 N 字节
+- 多跳 SSO 链：每一跳都独立落盘一个 html，配合 `index.txt` 记 hop# / status / URL / cookies 变化
+- 目录约定：`infos/runtime-trace/<module>/<timestamp>_<userId>/`，如 `infos/runtime-trace/academic-init/20260425-063815_user202200202104/`
+- 下游如 ProxyController 的 `tmp/proxy-errors/` 也走相同路径，`tmp/` 前缀表示运行时产物，由用户触发后 commit/分享
+
+**流程**：出 bug → 开诊断开关 → 复现 → AI 翻本地文件 → 精准打击。**严禁"根据 log 一行摘要拍脑袋修"**。
+
 ## 学校服务的本质
 
 学校服务按 Cookie 需求分三类：
