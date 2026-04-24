@@ -171,7 +171,7 @@ crawler:
 # 正常运行不要打开，IO 成本非零且会在仓库目录里生成一堆 html 文件。
 acdm:
   trace:
-    enabled: false
+    enabled: true
     dir: infos/runtime-trace/academic-init
 
 # ==================== AI（活动抽取） ====================
