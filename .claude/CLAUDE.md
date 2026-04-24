@@ -86,6 +86,25 @@
 - 公开信息（学院 CMS）：30-120 分钟周期轮询
 - 有新内容时通过 WebSocket 推送给所有订阅者
 
+### ⚠️ 硬性规则：WS payload 必须带完整 items，不是只 id 列表
+
+**论文核心论点是"流式推送"**，必须做到位。历史上 `CrawlEngine.broadcastNewContent` 只把 `ids: List<String>` 塞进 payload，逼前端按 id 再 HTTP 拉 —— 这让 WS 退化成"信号枪"，前端还是在轮询。**这是反模式**。
+
+**正确形态**：
+```java
+// broadcastNewContent 内
+data.put("items", newItems);  // ⭐ 完整 InfoItemMeta 列表
+data.put("ids", ...);          // 保留，向后兼容
+data.put("latestId", latestId);
+```
+
+**禁止**：
+- ❌ 只推 id 让前端回查
+- ❌ 因为"payload 大"就砍字段 —— 一条 WS 消息最多 1MB，InfoItemMeta 约 500B，一次推 10 条 <= 5KB，毫无压力
+- ❌ 因为前端"已经在 fetch 了"就不改 payload —— 两边都要改才是真推式
+
+**AI 修改提示**：这节是下游前端反模式的根源。如果下一个 session 想"精简 payload"或"只带 id 降 token"，**必须回头读这节**。
+
 ## API 端点
 
 ### 认证 `/auth`

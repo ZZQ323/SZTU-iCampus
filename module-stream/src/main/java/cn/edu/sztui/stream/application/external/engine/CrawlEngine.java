@@ -590,11 +590,38 @@ public class CrawlEngine {
     }
 
     private void broadcastNewContent(String channelId, List<ListParserResult.InfoItemMeta> newItems, String latestId) {
+        Map<String, Object> data = buildBroadcastPayload(channelId, newItems, latestId);
+        if (!newItems.isEmpty()) {
+            // 论文证据 1：流式推送可见日志，便于演示和答辩
+            ListParserResult.InfoItemMeta head = newItems.get(0);
+            log.info("WS broadcast: channel={}, items={}, first='{}', sourceId={}",
+                    channelId, newItems.size(), head.getTitle(), head.getSourceId());
+        }
+        streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
+    }
+
+    /**
+     * 构造 WS NEW_ANNOUNCEMENTS payload。
+     * <p>
+     * <b>⭐ 流式推送硬规则（见 backend CLAUDE.md "WS payload 必须带完整 items"）</b>：
+     * <ul>
+     *   <li>{@code items} 必须是完整 {@link ListParserResult.InfoItemMeta} 列表</li>
+     *   <li>前端直接 unshift 进 channelLists，<b>不允许再 HTTP fetch</b></li>
+     *   <li>{@code ids/latestId/latestTitle/sourceId} 保留作向后兼容 + toast 便利字段</li>
+     * </ul>
+     * <p>
+     * package-private 暴露用于单测验证流式契约。
+     */
+    static Map<String, Object> buildBroadcastPayload(String channelId,
+                                                      List<ListParserResult.InfoItemMeta> newItems,
+                                                      String latestId) {
         Map<String, Object> data = new HashMap<>();
         data.put("channelId", channelId);
         data.put("count", newItems.size());
         data.put("latestId", latestId);
         data.put("ids", newItems.stream().map(ListParserResult.InfoItemMeta::getId).toList());
+        // ⭐ 核心字段：完整 items
+        data.put("items", newItems);
         if (!newItems.isEmpty()) {
             ListParserResult.InfoItemMeta head = newItems.get(0);
             data.put("latestTitle", head.getTitle());
@@ -603,7 +630,7 @@ public class CrawlEngine {
             data.put("sourceId", head.getSourceId());
             data.put("sourceOrgName", head.getSourceOrgName());
         }
-        streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
+        return data;
     }
 
     /**
