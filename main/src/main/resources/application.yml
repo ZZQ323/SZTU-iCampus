@@ -175,7 +175,7 @@ ai:
     model: qwen-turbo              # 便宜优先；活动抽取轻量足够，要换 plus/deepseek 改这里
     timeout-seconds: 30
   activity:
-    enabled: false                  # 总开关；Step A 默认关，通过 /admin 手动触发；开则自动送检
+    enabled: true                  # 总开关；Step A 默认关，通过 /admin 手动触发；开则自动送检
     default-channels:
       - announcement                # 活动预告主场（F1=0.95）
       - job                         # 招聘会/宣讲会（F1=0.83）
