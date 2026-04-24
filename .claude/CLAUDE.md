@@ -50,6 +50,19 @@
 ### 6. refresh 优先于 init
 大多数"会话过期"场景只需要调 `/auth/v1/session/refresh`（像浏览器按 F5），不需要 `/auth/v1/session/init`（清缓存重来）。有 cookie 就 refresh，没 cookie 才 init。
 
+### 6.1 logout 必须清 cookies，不要保留
+
+`AuthSessionCacheUtil.sessionLogoutBind(userId)` 要**清空 `cookiesJson`**，不只是翻 `schoolLoggedIn=false`。
+
+**为什么**：学校 logout 端点让 TWFID / IDP SESSION 在**学校服务端失效**。如果 Redis 保留旧 cookiesJson，下次 relogin：
+- WebVPN 反代看到陈旧的 TWFID → 走"已登录"分支 → **跳过 re-issue TWFID**
+- 登录流程最终 cookies 里缺 TWFID + SESSION（相比 fresh-backend 场景少 2 个关键 cookie）
+- `/acdm/v1/refresh/cookies` 的 SSO 链跑到 `/idp/AuthnEngine` 返回 200 登录表单 → 课表/附件全挂
+
+对照证据在 `infos/runtime-trace/academic-init/` 下 2026-04-25 的两组 trace：`20260425-070728`（成功，cookies-before 有 6 个）vs `20260425-070907`（失败，cookies-before 只有 4 个，缺 TWFID + SESSION）。对应 commit: `39278f68`。
+
+**教训**：原先"登出后保留 cookies 便于离线"的出发点是好的（cookie 缓存），但学校 logout 后 cookies 已失效，保留只会污染下次登录。
+
 ### 7. 所有返回 cookies 的接口都要设 X-Set-Cookies header
 `/auth/v1/status` 内部调了 `doRefreshCookies()` 拿到了新鲜 cookies，必须通过 `X-Set-Cookies` response header 返回给前端。否则前端 cookies 不会被刷新，导致后续请求用过期 cookies。
 
