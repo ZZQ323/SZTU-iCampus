@@ -254,8 +254,7 @@ public class ProxyController {
                 List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
                 totalCookies = cookies.size();
                 for (SmartCookie c : cookies) {
-                    if (host.contains(c.getDomain()) || c.getDomain().contains(host)
-                            || ".sztu.edu.cn".equals(c.getDomain())) {
+                    if (isCookieApplicable(host, c.getDomain())) {
                         if (cookieHeader.length() > 0) cookieHeader.append("; ");
                         cookieHeader.append(c.getName()).append("=").append(c.getValue());
                         matchedCookies++;
@@ -284,8 +283,19 @@ public class ProxyController {
                 String location = locationHeader != null ? locationHeader.getValue() : null;
 
                 if (status != 200) {
-                    log.warn("fetchResource 上游非 200: status={} content-type={} location={} url={}",
-                            status, ct, location, url);
+                    // 学校的 VWebServer / 博达 CMS 经常用非标错误码（414 代表 session 问题、
+                    // 200+HTML 代表未登录等）。把 body 前 500 字节摘一段出来，下次复现时有据可查。
+                    String preview = "(no body)";
+                    try {
+                        byte[] errBody = EntityUtils.toByteArray(response.getEntity());
+                        if (errBody != null && errBody.length > 0) {
+                            int n = Math.min(errBody.length, 500);
+                            preview = new String(errBody, 0, n, StandardCharsets.UTF_8)
+                                    .replaceAll("\\s+", " ");
+                        }
+                    } catch (Exception ignore) { /* body 读失败就算了 */ }
+                    log.warn("fetchResource 上游非 200: status={} content-type={} location={} bodyPreview[0..500]={} url={}",
+                            status, ct, location, preview, url);
                     return null;
                 }
                 byte[] body = EntityUtils.toByteArray(response.getEntity());
@@ -308,6 +318,30 @@ public class ProxyController {
             log.error("fetchResource 异常: url={}, error={}", url, e.getMessage(), e);
             return null;
         }
+    }
+
+    /**
+     * cookie 是否适用于当前请求 host。
+     * <p>
+     * 学校那套 WebVPN 特别：一个请求（比如下载 nbw-...webvpn.sztu.edu.cn 的附件）经常需要
+     * auth.sztu.edu.cn / webvpn.sztu.edu.cn / jwxt-...webvpn.sztu.edu.cn 等等多个不同 domain
+     * 写的 cookie 凑齐一个"网关+子站"完整 session。
+     * <p>
+     * 之前的"host.contains(domain) || domain.contains(host)"太严，只发得出恰好同 host 的 cookie，
+     * 结果学校回 414（它的非标错误码，大概率意思是"session 不够"）。
+     * <p>
+     * 放宽规则：任何域名后缀是 sztu.edu.cn 的 cookie 都挂上去，凑齐 WebVPN 期望的那几个 IDP/会话
+     * token，交给学校自己按 name 挑。安全暴露面可控——{@link #isAllowedDomain} 已把 target host
+     * 白名单到 *.sztu.edu.cn，泄露范围不会跨出校内。
+     */
+    private static boolean isCookieApplicable(String host, String cookieDomain) {
+        if (host == null || cookieDomain == null) return false;
+        String dn = cookieDomain.startsWith(".") ? cookieDomain.substring(1) : cookieDomain;
+        if (host.equalsIgnoreCase(dn)) return true;
+        if (host.toLowerCase().endsWith("." + dn.toLowerCase())) return true;
+        // WebVPN 场景放宽：只要 cookie domain 是 sztu.edu.cn 家族且请求也在 sztu.edu.cn 家族，发出去
+        return dn.toLowerCase().endsWith("sztu.edu.cn")
+                && host.toLowerCase().endsWith("sztu.edu.cn");
     }
 
     // ==================== 工具方法 ====================
