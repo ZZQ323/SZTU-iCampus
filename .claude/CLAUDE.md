@@ -144,7 +144,17 @@ data.put("latestId", latestId);
 | 端点 | 方法 | 说明 |
 |------|------|------|
 | `/proxy/image` | GET | 代理学校图片（**公开**，已在 CookieAuthFilter 白名单）|
-| `/proxy/attachment` | GET | 代理附件下载（需要 cookie）|
+| `/proxy/attachment` | GET | 代理附件下载（需要 cookie，通过 X-School-Cookies header 传入）|
+
+### ⚠️ 附件代理必须防"伪 200 登录页"
+
+`uni.downloadFile` 在小程序端不走 axios 拦截器 → 前端无论如何都必须把 URL 改写到 `/proxy/attachment` 并通过 `header` 字段手动附加 `X-School-Cookies`（见前端 `src/utils/attachment.ts`）。
+
+**后端坑**：WebVPN / 博达 CMS 在 cookie 无效时不返回 401/302，而是返回 **200 + 登录表单 HTML**。如果 `ProxyController.fetchResource` 只按 status==200 判，就会把登录页 HTML 当附件回给小程序，`openDocument` 拿到垃圾打不开，两边日志里没人报错。
+
+**已加的兜底**：`looksLikeLoginHtml(body, contentType)` 取前 2KB 嗅探：content-type 是 html 且正文含 `<html|<!doctype` 且匹配关键字（`login`, `signin`, `authn`, `请登录`, `统一身份认证` 等）→ 视为失败 → 返回 null → `/proxy/attachment` 返回 404 → 前端据此给用户"登录过期"提示。
+
+不要改回"只判 status"——学校就是不给我们正规 401。
 
 ### 活动抽取 `/admin/activity`（需认证，Step A 调试用）
 | 端点 | 方法 | 说明 |
