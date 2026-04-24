@@ -65,9 +65,25 @@ public class AuthSessionCacheUtil {
 
     /**
      * 保存或更新 cookies
+     * <p>
+     * ⚠️ 持久化前**过滤掉已过期的 cookie**。学校的 VWebServer 看到过期 cookie（比如过期的
+     * `_idp_authn_lc_key`）会直接 414（Request-URI Too Large，非标）拒绝。从源头干净，
+     * 比在发送链每层都过滤干净得多。2026-04-25 trace 对比 cookies-before.json 里确实
+     * 看到 `expired=true` 的 cookie 被照样发出去。
      */
     public boolean saveOrUpdateSessionCookie(String userId, List<SmartCookie> cookies) {
         if (!StringUtils.hasText(userId) || CollectionUtils.isEmpty(cookies)) {
+            return false;
+        }
+        List<SmartCookie> valid = cookies.stream()
+                .filter(c -> !c.isExpired())
+                .collect(java.util.stream.Collectors.toList());
+        int dropped = cookies.size() - valid.size();
+        if (dropped > 0) {
+            log.info("saveOrUpdateSessionCookie: 过滤掉 {} 个过期 cookie, userId={}", dropped, userId);
+        }
+        if (valid.isEmpty()) {
+            log.warn("saveOrUpdateSessionCookie: 过滤后 0 cookie，放弃写入 userId={}", userId);
             return false;
         }
         ProxySession session = getSession(userId);
@@ -78,7 +94,7 @@ public class AuthSessionCacheUtil {
             session.setUserIds(new ArrayList<>());
             session.setSchoolLoggedIn(false);
         }
-        session.setCookiesJson(JSON.toJSONString(cookies));
+        session.setCookiesJson(JSON.toJSONString(valid));
         session.setLastUpdateTime(System.currentTimeMillis());
         saveSession(userId, session);
         log.info("保存代理会话 cookie: userId={}", userId);
@@ -158,6 +174,18 @@ public class AuthSessionCacheUtil {
      * <p>
      * 5 分钟内不重复更新同一用户，避免每次请求都写 Redis。
      * 由 CookieAccessEventListener 异步调用。
+     * <p>
+     * ⚠️ 反竞态：若本次请求携带的 cookie 数量 < Redis 里已有的，**拒绝覆盖**。
+     * <p>
+     * 根因场景：academic init 刚通过 SSO 链给 Redis 写了一份"丰满"的 cookie（含 TWFID /
+     * IDP SESSION / 教务子域 JSESSIONID 等 6+ 条），紧接着一个并发的普通 HTTP 请求用
+     * 前端 X-School-Cookies 里较"瘦"的 cookie（只有 4-5 条）触发了 CookieAccessEvent，
+     * 如果让它无脑写，就会**缩减 Redis 里的 cookie**，覆盖掉刚建立好的完整会话，
+     * 导致附件/课表瞬间挂。2026-04-25 trace 对比实证了这一点。
+     * <p>
+     * 防御：拒绝"瘦 cookie 覆盖肥 cookie"。前端的 cookie 本来就是副本，没必要回写 Redis；
+     * 真正权威的 cookie 由 auth 流程（login / refresh / academic init）显式调
+     * saveOrUpdateSessionCookie 写入。CookieAccessEvent 只负责"兜底增量"，不负责"替换"。
      */
     private static final long REFRESH_THROTTLE_MS = 5 * 60 * 1000;
 
@@ -167,10 +195,32 @@ public class AuthSessionCacheUtil {
         if (session != null) {
             long elapsed = System.currentTimeMillis() - session.getLastUpdateTime();
             if (elapsed < REFRESH_THROTTLE_MS) return;
+
+            // 反竞态：Redis 现有 cookie 数 > 请求 header 里的，说明请求携带的是"瘦"快照，
+            // 多半是前端 WS COOKIE_UPDATE 尚未落地的陈旧副本，或 multi-tab 不同步。不覆盖。
+            String existingJson = session.getCookiesJson();
+            if (StringUtils.hasText(existingJson)) {
+                int existingCount = countCookies(existingJson);
+                int incomingCount = countCookies(cookiesJson);
+                if (existingCount > incomingCount) {
+                    log.info("refreshIfNeeded 跳过缩减: userId={} redis={}条 incoming={}条",
+                            userId, existingCount, incomingCount);
+                    return;
+                }
+            }
         }
         List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
         saveOrUpdateSessionCookie(userId, cookies);
         log.info("刷新用户 {} 的 Cookie 池（来自用户请求）", userId);
+    }
+
+    /** 粗略数一下 cookies JSON 数组里有多少个 cookie（忽略结构细节，只用作缩减判定）。 */
+    private static int countCookies(String cookiesJson) {
+        try {
+            return SmartCookieConverter.jsonToSmartCookies(cookiesJson).size();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     // ==================== 清理 ====================
