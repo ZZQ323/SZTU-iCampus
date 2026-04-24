@@ -156,6 +156,14 @@ data.put("latestId", latestId);
 
 不要改回"只判 status"——学校就是不给我们正规 401。
 
+### 坑：ProxyController 不能用 HttpClients.createDefault()
+
+学校 WebVPN（`*-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118`）用的是学校内签 TLS 证书，**不在 JVM 默认 CA truststore**。用 `HttpClients.createDefault()` 访问必然抛 `PKIX path building failed: unable to find valid certification path to requested target`，前端表现为"下载失败"但两边看不到具体原因（TLS 握手在 application 层之前就失败了）。
+
+**做法**：`ProxyController.init()` 用 `SSLContextBuilder.loadTrustMaterial((chain,authType)->true)` + `NoopHostnameVerifier.INSTANCE` 构造 trust-all HttpClient 并复用，和 `SmartHttpClientImpl` 同款策略。反正 `isAllowedDomain` 已经白名单到 `*.sztu.edu.cn`，trust-all 只在白名单域内危险，不会被滥用。
+
+**不要**去导学校证书进 JVM truststore：部署环境会跑成一团乱——docker 镜像、Gradle JVM、生产 JRE 各有一份 truststore，全都要同步。
+
 ### 活动抽取 `/admin/activity`（需认证，Step A 调试用）
 | 端点 | 方法 | 说明 |
 |------|------|------|

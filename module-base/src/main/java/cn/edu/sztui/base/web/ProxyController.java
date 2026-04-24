@@ -12,13 +12,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.annotation.PostConstruct;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -50,6 +57,35 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/proxy")
 @Tag(name = "资源代理", description = "代理访问需要学校 Cookie 的图片和附件")
 public class ProxyController {
+
+    /**
+     * 复用的 trust-all HttpClient。
+     * <p>
+     * 学校 WebVPN（jwxt/nbw 等 *-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118）使用学校内签证书，
+     * 不在 JVM 默认 CA truststore 里，用 {@code HttpClients.createDefault()} 会直接抛
+     * {@code PKIX path building failed}。这里沿用 SmartHttpClientImpl 的 TrustAll + NoopHostname
+     * 策略——反正 {@link #isAllowedDomain} 已经白名单到 *.sztu.edu.cn，安全暴露面可控。
+     */
+    private CloseableHttpClient httpClient;
+
+    @PostConstruct
+    public void init() throws Exception {
+        var sslContext = SSLContextBuilder.create()
+                .loadTrustMaterial(null, (chain, authType) -> true)
+                .build();
+        var sslSocketFactory = SSLConnectionSocketFactoryBuilder.create()
+                .setSslContext(sslContext)
+                .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                .build();
+        PoolingHttpClientConnectionManager connManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setMaxConnTotal(20)
+                .setMaxConnPerRoute(10)
+                .setSSLSocketFactory(sslSocketFactory)
+                .build();
+        this.httpClient = HttpClients.custom()
+                .setConnectionManager(connManager)
+                .build();
+    }
 
     /** 文件扩展名 → Content-Type 映射 */
     private static final Map<String, String> MIME_MAP = new ConcurrentHashMap<>();
@@ -223,35 +259,33 @@ public class ProxyController {
                 }
             }
 
-            // 3. 用原始 HttpClient 请求（SmartHttpClient 可能不返回二进制）
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                HttpGet httpGet = new HttpGet(url);
+            // 3. 用 trust-all 复用 HttpClient 请求（SmartHttpClient 可能不返回二进制）
+            HttpGet httpGet = new HttpGet(url);
 
-                if (cookieHeader.length() > 0) {
-                    httpGet.setHeader("Cookie", cookieHeader.toString());
-                }
-                httpGet.setHeader("Host", host);
-                httpGet.setHeader("Referer", extractOrigin(url) + "/");
-                httpGet.setHeader("User-Agent",
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-
-                return httpClient.execute(httpGet, response -> {
-                    int status = response.getCode();
-                    if (status != 200) {
-                        log.warn("资源请求失败: url={}, status={}", url, status);
-                        return null;
-                    }
-                    byte[] body = EntityUtils.toByteArray(response.getEntity());
-                    // WebVPN / 博达 CMS 常见的"伪 200 HTML 登录页"：
-                    // 无 cookie 或 cookie 过期时，服务端返回 200 + 登录表单 HTML，而不是 401/302。
-                    // 嗅探 body 前 1KB，若是 HTML 且匹配登录关键字，视同失败，让前端感知登录过期。
-                    if (looksLikeLoginHtml(body, response.getFirstHeader("Content-Type"))) {
-                        log.warn("资源返回 HTML 登录页，疑似 cookie 过期: url={}", url);
-                        return null;
-                    }
-                    return body;
-                });
+            if (cookieHeader.length() > 0) {
+                httpGet.setHeader("Cookie", cookieHeader.toString());
             }
+            httpGet.setHeader("Host", host);
+            httpGet.setHeader("Referer", extractOrigin(url) + "/");
+            httpGet.setHeader("User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+
+            return httpClient.execute(httpGet, response -> {
+                int status = response.getCode();
+                if (status != 200) {
+                    log.warn("资源请求失败: url={}, status={}", url, status);
+                    return null;
+                }
+                byte[] body = EntityUtils.toByteArray(response.getEntity());
+                // WebVPN / 博达 CMS 常见的"伪 200 HTML 登录页"：
+                // 无 cookie 或 cookie 过期时，服务端返回 200 + 登录表单 HTML，而不是 401/302。
+                // 嗅探 body 前 1KB，若是 HTML 且匹配登录关键字，视同失败，让前端感知登录过期。
+                if (looksLikeLoginHtml(body, response.getFirstHeader("Content-Type"))) {
+                    log.warn("资源返回 HTML 登录页，疑似 cookie 过期: url={}", url);
+                    return null;
+                }
+                return body;
+            });
 
         } catch (Exception e) {
             log.error("请求资源异常: url={}, error={}", url, e.getMessage());
