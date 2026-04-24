@@ -247,17 +247,23 @@ public class ProxyController {
         try {
             String host = URI.create(url).getHost();
             StringBuilder cookieHeader = new StringBuilder();
+            int totalCookies = 0;
+            int matchedCookies = 0;
 
             if (StringUtils.hasText(cookiesJson)) {
                 List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
+                totalCookies = cookies.size();
                 for (SmartCookie c : cookies) {
                     if (host.contains(c.getDomain()) || c.getDomain().contains(host)
                             || ".sztu.edu.cn".equals(c.getDomain())) {
                         if (cookieHeader.length() > 0) cookieHeader.append("; ");
                         cookieHeader.append(c.getName()).append("=").append(c.getValue());
+                        matchedCookies++;
                     }
                 }
             }
+            log.info("fetchResource -> host={} cookies(total/matched)={}/{} url={}",
+                    host, totalCookies, matchedCookies, url);
 
             // 3. 用 trust-all 复用 HttpClient 请求（SmartHttpClient 可能不返回二进制）
             HttpGet httpGet = new HttpGet(url);
@@ -272,23 +278,34 @@ public class ProxyController {
 
             return httpClient.execute(httpGet, response -> {
                 int status = response.getCode();
+                Header ctHeader = response.getFirstHeader("Content-Type");
+                String ct = ctHeader != null ? ctHeader.getValue() : "(none)";
+                Header locationHeader = response.getFirstHeader("Location");
+                String location = locationHeader != null ? locationHeader.getValue() : null;
+
                 if (status != 200) {
-                    log.warn("资源请求失败: url={}, status={}", url, status);
+                    log.warn("fetchResource 上游非 200: status={} content-type={} location={} url={}",
+                            status, ct, location, url);
                     return null;
                 }
                 byte[] body = EntityUtils.toByteArray(response.getEntity());
                 // WebVPN / 博达 CMS 常见的"伪 200 HTML 登录页"：
                 // 无 cookie 或 cookie 过期时，服务端返回 200 + 登录表单 HTML，而不是 401/302。
                 // 嗅探 body 前 1KB，若是 HTML 且匹配登录关键字，视同失败，让前端感知登录过期。
-                if (looksLikeLoginHtml(body, response.getFirstHeader("Content-Type"))) {
-                    log.warn("资源返回 HTML 登录页，疑似 cookie 过期: url={}", url);
+                if (looksLikeLoginHtml(body, ctHeader)) {
+                    int n = Math.min(body.length, 200);
+                    String preview = new String(body, 0, n, StandardCharsets.UTF_8).replaceAll("\\s+", " ");
+                    log.warn("fetchResource 命中登录页嗅探: content-type={} body[0..{}]={} url={}",
+                            ct, n, preview, url);
                     return null;
                 }
+                log.info("fetchResource 成功: status=200 content-type={} size={}KB url={}",
+                        ct, body.length / 1024, url);
                 return body;
             });
 
         } catch (Exception e) {
-            log.error("请求资源异常: url={}, error={}", url, e.getMessage());
+            log.error("fetchResource 异常: url={}, error={}", url, e.getMessage(), e);
             return null;
         }
     }
