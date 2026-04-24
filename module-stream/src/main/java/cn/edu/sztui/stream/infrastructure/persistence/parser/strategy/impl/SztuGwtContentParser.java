@@ -450,7 +450,18 @@ public class SztuGwtContentParser implements ParserStrategy {
     }
 
     private String extractId(String url) { if (url == null) return null; Matcher m = ID_PATTERN.matcher(url); return m.find() ? m.group(1) : null; }
-    private String inferType(String url, String name) { String l = (url + " " + name).toLowerCase(); if (l.contains(".pdf")) return "pdf"; if (l.contains(".doc")) return "word"; if (l.contains(".xls")) return "excel"; if (l.contains(".ppt")) return "ppt"; if (l.contains(".zip") || l.contains(".rar")) return "archive"; return "file"; }
+    private String inferType(String url, String name) {
+        String l = (url + " " + name).toLowerCase();
+        if (l.contains(".pdf")) return "pdf";
+        if (l.contains(".doc")) return "word";
+        if (l.contains(".xls")) return "excel";
+        if (l.contains(".ppt")) return "ppt";
+        if (l.contains(".zip") || l.contains(".rar") || l.contains(".7z")) return "archive";
+        // 图片走前端的 previewImage（无 cookie 路径，依赖 /proxy/image 兜底）
+        if (l.contains(".jpg") || l.contains(".jpeg") || l.contains(".png")
+                || l.contains(".gif") || l.contains(".webp") || l.contains(".bmp")) return "image";
+        return "file";
+    }
     // 只在 title 含典型错误关键字，或页面含 VSB 错误容器 .prompt_up/.prompt_down 时判为错误页。
     // 不再扫 body text 找"请登录"——正文里常常提到"请登录 XX 系统"是招生/选课通知，不是登录墙。
     private boolean isErrorPage(Document doc) {

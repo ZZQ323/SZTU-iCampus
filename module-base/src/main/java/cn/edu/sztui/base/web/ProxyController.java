@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -240,7 +241,15 @@ public class ProxyController {
                         log.warn("资源请求失败: url={}, status={}", url, status);
                         return null;
                     }
-                    return EntityUtils.toByteArray(response.getEntity());
+                    byte[] body = EntityUtils.toByteArray(response.getEntity());
+                    // WebVPN / 博达 CMS 常见的"伪 200 HTML 登录页"：
+                    // 无 cookie 或 cookie 过期时，服务端返回 200 + 登录表单 HTML，而不是 401/302。
+                    // 嗅探 body 前 1KB，若是 HTML 且匹配登录关键字，视同失败，让前端感知登录过期。
+                    if (looksLikeLoginHtml(body, response.getFirstHeader("Content-Type"))) {
+                        log.warn("资源返回 HTML 登录页，疑似 cookie 过期: url={}", url);
+                        return null;
+                    }
+                    return body;
                 });
             }
 
@@ -251,6 +260,30 @@ public class ProxyController {
     }
 
     // ==================== 工具方法 ====================
+
+    /**
+     * 嗅探响应体是否为"伪 200 登录页"。WebVPN / 博达 CMS 在 cookie 无效时，
+     * 常常返回 200 + 登录表单 HTML，这里取前 2KB 按关键字识别，避免把垃圾 HTML
+     * 当附件交给前端导致 openDocument 打开失败且看不到原因。
+     */
+    private boolean looksLikeLoginHtml(byte[] body, Header contentType) {
+        if (body == null || body.length == 0) return false;
+        // 真二进制（PDF/Office/Zip）首字节通常非 HTML；简单启发式：只检查 text/html 或无 CT 的响应
+        if (contentType != null) {
+            String ct = contentType.getValue();
+            if (ct != null && !ct.toLowerCase().contains("html")) return false;
+        }
+        int n = Math.min(body.length, 2048);
+        String head = new String(body, 0, n, StandardCharsets.UTF_8).toLowerCase();
+        if (!head.contains("<html") && !head.contains("<!doctype")) return false;
+        // 登录墙典型关键字（中文需先 UTF-8 decode）
+        return head.contains("login")
+                || head.contains("signin")
+                || head.contains("authn")
+                || head.contains("请登录")
+                || head.contains("登录页")
+                || head.contains("统一身份认证");
+    }
 
     /**
      * 安全检查：只允许代理学校域名
