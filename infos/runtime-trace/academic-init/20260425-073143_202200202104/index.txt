@@ -1,9 +1,0 @@
-hop	method	status	URL	bodyLen	newCookies	nextLocation
-1	GET	302	https://jwxt-sztu-edu-cn.webvpn.sztu.edu.cn:8118/	0	[]	https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/
-2	GET	302	https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/	0	[]	https://jwxt-sztu-edu-cn.webvpn.sztu.edu.cn:8118/Logon.do?method=logonSSOszjsdx
-3	GET	302	https://jwxt-sztu-edu-cn.webvpn.sztu.edu.cn:8118/Logon.do?method=logonSSOszjsdx	0	[]	https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/Logon.do?method=logonSSOszjsdx
-4	GET	302	https://jwxt-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/Logon.do?method=logonSSOszjsdx	0	[]	https://auth-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/idp/oauth2/authorize?redirect_uri=https%3A%2F%2Fjwxt.sztu.edu.cn%2FLogon.do%3Fmethod%3DlogonSSOszjsdx&state=1111&client_id=jiaowu&response_type=code
-5	GET	302	https://auth-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/idp/oauth2/authorize?redirect_uri=https%3A%2F%2Fjwxt.sztu.edu.cn%2FLogon.do%3Fmethod%3DlogonSSOszjsdx&state=1111&client_id=jiaowu&response_type=code	0	[]	https://auth-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/idp/AuthnEngine
-6	GET	200	https://auth-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/idp/AuthnEngine	3804	[]	
-
-finalUrl=https://auth-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/idp/AuthnEngine
