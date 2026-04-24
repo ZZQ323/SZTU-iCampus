@@ -2,11 +2,9 @@ server:
   port: 8080
   tomcat:
     connection-timeout: 10000
-
 program:
   name: sztu
   code: 10001
-
 ##服务监控
 management:
   endpoints:
@@ -64,7 +62,16 @@ spring:
         thread-name-prefix: schedule-task-
 
 
-# 日志配置 (可选，用于调试)
+# ==================== 教务 SSO 链诊断 ====================
+# 出问题时打开（启动加 --acdm.trace.enabled=true），AcademicServiceImpl.init 会改走
+# 手动一跳一执行模式，每跳 dump HTML + 记 cookies 变化到 acdm.trace.dir/<时间戳>_<userId>/。
+# 正常运行不要打开，IO 成本非零且会在仓库目录里生成一堆 html 文件。
+acdm:
+  trace:
+    enabled: false
+    dir: infos/runtime-trace/academic-init
+
+# ==================== 日志配置 (可选，用于调试) ====================
 logging:
   level:
     cn.edu.sztui.common.util.smarthttp: INFO
@@ -162,14 +169,7 @@ crawler:
   # 或临时改成 true 启动一次、再改回 false
   force-reinit: false
 
-# ==================== 教务 SSO 链诊断 ====================
-# 出问题时打开（启动加 --acdm.trace.enabled=true），AcademicServiceImpl.init 会改走
-# 手动一跳一执行模式，每跳 dump HTML + 记 cookies 变化到 acdm.trace.dir/<时间戳>_<userId>/。
-# 正常运行不要打开，IO 成本非零且会在仓库目录里生成一堆 html 文件。
-acdm:
-  trace:
-    enabled: true
-    dir: infos/runtime-trace/academic-init
+
 
 # ==================== AI（活动抽取） ====================
 # 真实 API Key 不在这里，写在 application-dev.yml（git 已忽略），
