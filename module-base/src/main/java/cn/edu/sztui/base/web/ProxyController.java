@@ -283,19 +283,25 @@ public class ProxyController {
                 String location = locationHeader != null ? locationHeader.getValue() : null;
 
                 if (status != 200) {
-                    // 学校的 VWebServer / 博达 CMS 经常用非标错误码（414 代表 session 问题、
-                    // 200+HTML 代表未登录等）。把 body 前 500 字节摘一段出来，下次复现时有据可查。
-                    String preview = "(no body)";
+                    // 学校的 VWebServer / 博达 CMS 常用非标错误码（414 代表 session 问题、
+                    // 200+HTML 代表未登录等）。**把完整响应体落盘**到 tmp/proxy-errors/，
+                    // 这样下次复现直接打开 HTML 就能看到学校的真实错误内容，不用猜。
+                    // 教训：log 只 500 字节时，调试浪费时间，因为关键信息经常在后半段。
+                    byte[] errBody = null;
                     try {
-                        byte[] errBody = EntityUtils.toByteArray(response.getEntity());
-                        if (errBody != null && errBody.length > 0) {
-                            int n = Math.min(errBody.length, 500);
-                            preview = new String(errBody, 0, n, StandardCharsets.UTF_8)
-                                    .replaceAll("\\s+", " ");
-                        }
+                        errBody = EntityUtils.toByteArray(response.getEntity());
                     } catch (Exception ignore) { /* body 读失败就算了 */ }
-                    log.warn("fetchResource 上游非 200: status={} content-type={} location={} bodyPreview[0..500]={} url={}",
-                            status, ct, location, preview, url);
+
+                    String dumpPath = dumpErrorBody(status, url, errBody, ctHeader);
+                    String preview = "(no body)";
+                    if (errBody != null && errBody.length > 0) {
+                        int n = Math.min(errBody.length, 500);
+                        preview = new String(errBody, 0, n, StandardCharsets.UTF_8)
+                                .replaceAll("\\s+", " ");
+                    }
+                    log.warn("fetchResource 上游非 200: status={} content-type={} location={} bodyBytes={} dump={} bodyPreview[0..500]={} url={}",
+                            status, ct, location,
+                            errBody != null ? errBody.length : 0, dumpPath, preview, url);
                     return null;
                 }
                 byte[] body = EntityUtils.toByteArray(response.getEntity());
@@ -345,6 +351,39 @@ public class ProxyController {
     }
 
     // ==================== 工具方法 ====================
+
+    /**
+     * 把非 200 的响应体完整写到本地 tmp/proxy-errors/ 下，以便离线打开看清学校
+     * 的错误页到底说了什么。learned the hard way —— log 摘要 500 字节远不够用。
+     * <p>
+     * 返回落盘文件的绝对路径（供 log 打印）；写盘失败返回 "(dump failed)"。
+     */
+    private String dumpErrorBody(int status, String url, byte[] body, Header contentType) {
+        try {
+            java.nio.file.Path dir = java.nio.file.Paths.get("tmp", "proxy-errors");
+            java.nio.file.Files.createDirectories(dir);
+
+            // 文件名：yyyyMMdd-HHmmss.SSS_<status>_<url-tail-safe>.html
+            String ts = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss.SSS").format(new java.util.Date());
+            String tail = url == null ? "unknown" :
+                    url.replaceAll(".*[?/&]([^?&/=]+)=?([^&?]*)$", "$1-$2")
+                       .replaceAll("[^A-Za-z0-9_.-]", "_");
+            if (tail.length() > 60) tail = tail.substring(0, 60);
+            String ext = (contentType != null && contentType.getValue() != null
+                    && contentType.getValue().toLowerCase().contains("html")) ? ".html" : ".bin";
+            java.nio.file.Path f = dir.resolve(ts + "_" + status + "_" + tail + ext);
+
+            if (body != null && body.length > 0) {
+                java.nio.file.Files.write(f, body);
+            } else {
+                java.nio.file.Files.write(f, ("(empty body, status=" + status + ")").getBytes(StandardCharsets.UTF_8));
+            }
+            return f.toAbsolutePath().toString();
+        } catch (Exception e) {
+            log.warn("dumpErrorBody 落盘失败: {}", e.getMessage());
+            return "(dump failed)";
+        }
+    }
 
     /**
      * 嗅探响应体是否为"伪 200 登录页"。WebVPN / 博达 CMS 在 cookie 无效时，
