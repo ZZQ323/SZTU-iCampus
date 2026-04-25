@@ -251,18 +251,26 @@ public class ProxyController {
             int matchedCookies = 0;
 
             if (StringUtils.hasText(cookiesJson)) {
-                List<SmartCookie> cookies = SmartCookieConverter.jsonToSmartCookies(cookiesJson);
+                // 关键：过滤掉前端发来的死 cookie。前端可能因为 merge 历史积压
+                // 还带着 expired / 空值 cookie，发给学校 → 414。统一在出口干净。
+                List<SmartCookie> cookies = SmartCookieConverter.filterAlive(
+                        SmartCookieConverter.jsonToSmartCookies(cookiesJson));
                 totalCookies = cookies.size();
+                StringBuilder sentNames = new StringBuilder();
                 for (SmartCookie c : cookies) {
                     if (isCookieApplicable(host, c.getDomain())) {
                         if (cookieHeader.length() > 0) cookieHeader.append("; ");
                         cookieHeader.append(c.getName()).append("=").append(c.getValue());
                         matchedCookies++;
+                        if (sentNames.length() > 0) sentNames.append(",");
+                        sentNames.append(c.getName());
                     }
                 }
+                log.info("fetchResource -> host={} cookies(alive total/matched)={}/{} sent=[{}] url={}",
+                        host, totalCookies, matchedCookies, sentNames, url);
+            } else {
+                log.info("fetchResource -> host={} cookies(total/matched)=0/0 url={}", host, url);
             }
-            log.info("fetchResource -> host={} cookies(total/matched)={}/{} url={}",
-                    host, totalCookies, matchedCookies, url);
 
             // 3. 用 trust-all 复用 HttpClient 请求（SmartHttpClient 可能不返回二进制）
             HttpGet httpGet = new HttpGet(url);

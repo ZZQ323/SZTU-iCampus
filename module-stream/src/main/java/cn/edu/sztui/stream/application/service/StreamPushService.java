@@ -91,12 +91,23 @@ public class StreamPushService {
     // ==================== Cookie 更新推送 ====================
 
     public void pushCookieUpdate(String userId, String cookiesJson) {
+        // 诊断 log：把推送的 cookie name 列表打出来，前端 console 也会有对应
+        // [WS COOKIE_UPDATE] 行，端到端可对照
+        try {
+            var arr = com.alibaba.fastjson2.JSON.parseArray(cookiesJson);
+            String names = arr.stream()
+                    .map(o -> ((com.alibaba.fastjson2.JSONObject) o).getString("name"))
+                    .filter(java.util.Objects::nonNull)
+                    .collect(java.util.stream.Collectors.joining(","));
+            log.info("[WS push COOKIE_UPDATE] userId={} count={} names=[{}]",
+                    userId, arr.size(), names);
+        } catch (Exception ignore) { /* log 失败不影响推送 */ }
+
         WsMessage<Map<String, String>> message = WsMessage.toUser(
                 StreamKeys.TYPE_COOKIE_UPDATE,
                 Map.of("cookiesJson", cookiesJson),
                 userId);
         streamPublisher.publishSchedule(message);
-        log.info("已推送 Cookie 更新 - user: {}", userId);
     }
 
     // ==================== 日历/活动推送 ====================

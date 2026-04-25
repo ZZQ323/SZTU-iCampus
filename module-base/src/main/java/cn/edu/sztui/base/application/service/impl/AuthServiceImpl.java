@@ -16,6 +16,7 @@ import cn.edu.sztui.common.util.bean.TokenMessage;
 import cn.edu.sztui.common.util.enums.ResultCodeEnum;
 import cn.edu.sztui.common.util.enums.SysReturnCode;
 import cn.edu.sztui.common.util.exception.BusinessException;
+import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartCookie;
 import cn.edu.sztui.common.util.smarthttp.service.SmartHttpClient;
 import cn.edu.sztui.common.util.smarthttp.dto.SmartResponse;
@@ -371,7 +372,15 @@ public class AuthServiceImpl implements AuthService {
             authSessionCacheUtil.sessionLoginBind(userId, userId, smartSession.getCookies());
 
             // ============ 第五步：返回 cookies 给前端 ============
-            ret.setCookiesJson(JSON.toJSONString(smartSession.getCookies()));
+            // 过滤死 cookie（expired / 空值）—— 它们是浏览器要从 jar 删的，
+            // 我们不能反向喂给前端，否则下次出去带着死 cookie 被学校 414。
+            var aliveCookies = SmartCookieConverter.filterAlive(smartSession.getCookies());
+            ret.setCookiesJson(JSON.toJSONString(aliveCookies));
+            String aliveNames = aliveCookies.stream()
+                    .map(c -> c.getName())
+                    .collect(java.util.stream.Collectors.joining(","));
+            log.info("[loginFrame ←] userId={} session 总数={} 输出 alive={} names=[{}]",
+                    userId, smartSession.getCookies().size(), aliveCookies.size(), aliveNames);
 
             // ============ 第六步：发布登录成功事件 ============
             eventPublisher.publishEvent(new UserLoginEvent(
@@ -615,8 +624,14 @@ public class AuthServiceImpl implements AuthService {
                 log.warn("未知的最终页面 URL: {}", finalUrl);
             }
 
-            // 返回 cookies 给前端
-            ret.setCookiesJson(JSON.toJSONString(smartSession.getCookies()));
+            // 返回 cookies 给前端 —— 过滤死 cookie，对齐浏览器语义
+            var aliveCookies2 = SmartCookieConverter.filterAlive(smartSession.getCookies());
+            ret.setCookiesJson(JSON.toJSONString(aliveCookies2));
+            String aliveNames2 = aliveCookies2.stream()
+                    .map(c -> c.getName())
+                    .collect(java.util.stream.Collectors.joining(","));
+            log.info("[doRefreshCookies ←] userId={} session 总数={} 输出 alive={} names=[{}]",
+                    ret.getUserId(), smartSession.getCookies().size(), aliveCookies2.size(), aliveNames2);
 
             // 保存到 Redis（供爬虫引擎使用，仅当有 userId 且非错误页面时）
             // ⭐ 已登录时上面已用 sessionLoginBind 保存，这里仅处理未登录但有 cookie 的情况

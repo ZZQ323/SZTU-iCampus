@@ -21,6 +21,31 @@ public class SmartCookieConverter {
     private SmartCookieConverter() {
     }
 
+    /**
+     * 过滤掉"死 cookie"（浏览器语义：要从 jar 删掉的那些）：
+     *   · {@link SmartCookie#isExpired()} 已过期
+     *   · value 为 null / 空字符串
+     * 凡是要把 cookies 序列化出去（X-Set-Cookies header / WS COOKIE_UPDATE 推送 /
+     * Redis 落盘）都先走这个过滤，避免把死 cookie 喂回前端 / 学校，触发 414。
+     */
+    public static List<SmartCookie> filterAlive(List<SmartCookie> cookies) {
+        if (cookies == null) return List.of();
+        return cookies.stream()
+                .filter(c -> c != null
+                        && c.getName() != null && !c.getName().isEmpty()
+                        && c.getValue() != null && !c.getValue().isEmpty()
+                        && !c.isExpired())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 序列化一组 cookies 为 JSON（已先过滤死 cookie）。所有需要把 cookies 发往
+     * 前端 / 学校的位置都走这个，统一行为。
+     */
+    public static String aliveCookiesToJson(List<SmartCookie> cookies) {
+        return JSON.toJSONString(filterAlive(cookies));
+    }
+
     // ==================== SmartCookie <-> CookieDTO ====================
 
     public static SmartCookie fromDTO(CookieDTO dto) {
