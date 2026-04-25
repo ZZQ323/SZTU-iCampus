@@ -374,7 +374,9 @@ public class CrawlEngine {
         if (cookiesChanged(pair.getOriginalCookies(), currentCookies)) {
             String userId = pair.getUserId();
             authSessionCacheUtil.saveOrUpdateSessionCookie(userId, currentCookies);
-            String newJson = SmartCookieConverter.smartCookiesToJson(currentCookies);
+            // 推给前端的 cookies 必须先过滤掉 expired / 空值 —— 否则前端 merge 时
+            // 会把死 cookie 留下来，下次 HTTP 请求带着死 cookie 被学校 414 拒。
+            String newJson = SmartCookieConverter.aliveCookiesToJson(currentCookies);
             streamPushService.pushCookieUpdate(userId, newJson);
             log.info("爬取过程中 Cookie 变化，已同步: userId={}", userId);
         }
