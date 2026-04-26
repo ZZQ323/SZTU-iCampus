@@ -133,14 +133,10 @@ public class AuthServiceImpl implements AuthService {
         LoginResultsVo result = doRefreshCookies(userId, session);
         result.setUserId(userId);
 
-        if (!result.isLogined()) {
-            throw new BusinessException(
-                    SysReturnCode.BASE_PROXY.getCode(),
-                    "会话已过期，请重新登录",
-                    ResultCodeEnum.BAD_REQUEST.getCode()
-            );
-        }
-
+        // ⚠️ 不抛错：landing 在 ActionAuthChain（登录表单）是 logged-out 状态，**不是**异常。
+        // 前端按 result.logined 字段判断；result 里已经带上 loginTypes，前端可以直接用。
+        // 之前抛 BusinessException 把 result 整个丢弃，前端拿不到 loginTypes，登录页只能
+        // fallback 到默认 ['SMS']，导致用户看到的登录方式不全（"为什么只有短信，没有密码？"）。
         return result;
     }
 
