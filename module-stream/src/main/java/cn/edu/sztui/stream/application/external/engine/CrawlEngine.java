@@ -15,6 +15,7 @@ import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParser
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ParserFactory;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
 import cn.edu.sztui.stream.infrastructure.util.stream.StreamKeys;
+import cn.edu.sztui.stream.infrastructure.websocket.registry.WsSessionRegistry;
 import cn.edu.sztui.stream.infrastructure.util.stream.StreamPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +66,9 @@ public class CrawlEngine {
 
     @Resource
     private StreamPushService streamPushService;
+
+    @Resource
+    private WsSessionRegistry wsSessionRegistry;
 
     @Resource
     private org.springframework.context.ApplicationEventPublisher eventPublisher;
@@ -365,14 +369,37 @@ public class CrawlEngine {
     }
 
     /**
-     * 爬取后检测 cookie 变化，有变化则更新 Redis 并推送给用户
+     * 爬取后检测 cookie 变化，有变化则更新 Redis 并推送给用户。
+     * <p>
+     * **硬守卫**（2026-04-25）：保存 + 推送之前必须确认这个 userId 还满足
+     * "在线 + schoolLoggedIn + Redis 有 session"。否则发生过的真实 race：
+     * <ol>
+     *   <li>用户登出 → Redis 清空 + schoolLoggedIn=false</li>
+     *   <li>in-flight 爬虫携带的 SmartSession 内存里还活着，跑完拿到一组新 cookies</li>
+     *   <li>这里没守卫 → saveOrUpdateSessionCookie 把 cookies **复活** 写回 Redis</li>
+     *   <li>pushCookieUpdate 把 cookies 推给前端（如果 WS 还在断连同步窗口里），
+     *       前端 merge → cookies 也复活</li>
+     *   <li>用户名义已登出，但实际后台爬虫还在借他 cookies，cookie 寿命被延长</li>
+     * </ol>
+     * 守卫断绝这条路径。
      */
     private void syncCookiesIfChanged(CookieSourceManager.CookieSessionPair pair) {
         if (pair.getUserId() == null || pair.getOriginalCookies() == null) return;
+        String userId = pair.getUserId();
+
+        // 守卫：登出 / 离线 / Redis session 已被清 → 不写不推
+        if (!wsSessionRegistry.isOnline(userId)) {
+            log.debug("syncCookiesIfChanged 跳过: userId={} 不在线", userId);
+            return;
+        }
+        if (!authSessionCacheUtil.hasSession(userId)
+                || !authSessionCacheUtil.isSchoolLoggedIn(userId)) {
+            log.debug("syncCookiesIfChanged 跳过: userId={} 已登出 / session 已清", userId);
+            return;
+        }
 
         List<SmartCookie> currentCookies = pair.getSession().getCookies();
         if (cookiesChanged(pair.getOriginalCookies(), currentCookies)) {
-            String userId = pair.getUserId();
             authSessionCacheUtil.saveOrUpdateSessionCookie(userId, currentCookies);
             // 推给前端的 cookies 必须先过滤掉 expired / 空值 —— 否则前端 merge 时
             // 会把死 cookie 留下来，下次 HTTP 请求带着死 cookie 被学校 414 拒。

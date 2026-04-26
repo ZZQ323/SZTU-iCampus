@@ -50,6 +50,37 @@
 ### 6. refresh 优先于 init
 大多数"会话过期"场景只需要调 `/auth/v1/session/refresh`（像浏览器按 F5），不需要 `/auth/v1/session/init`（清缓存重来）。有 cookie 就 refresh，没 cookie 才 init。
 
+### 6.0 ⚠️ 爬虫使用 cookies 的**硬规则** —— 不可违反
+
+**任何 user 的 cookies 被后端"借去爬 / 写回 Redis / 推 WS"**，必须**同时**满足：
+
+1. **WS 在线** —— `wsSessionRegistry.isOnline(userId)`
+2. **schoolLoggedIn = true** —— `authSessionCacheUtil.isSchoolLoggedIn(userId)`
+3. **Redis 还有 cookies** —— ProxySession 存在且 cookiesJson 非空
+
+三者**缺一不可**。否则 = 用户已经退出 / 关掉小程序，但后端还在偷偷拿他的 cookies 去访问学校：cookies 寿命被人为延长，IP 行为异常，学校随时可能封号。
+
+**违反此规则的具体表现（已修复但要警惕复活）**：
+
+- ❌ `CookieSourceManager.findValidFromAllSessions` —— 找 Redis 里任何
+  schoolLoggedIn=true 的用户用，无视在线状态。**已删除**，不要再加回来。
+- ❌ `CrawlEngine.syncCookiesIfChanged` 不查 logged-in / online 就把 cookies
+  写回 Redis + 推 WS。**已加守卫**，要保留。
+- ❌ `refreshIfNeeded`（CookieAccessEvent 兜底）schoolLoggedIn=false 时仍
+  写 Redis。**已加守卫**。
+- ❌ 前端 `ws.ts COOKIE_UPDATE` 不查 isSchoolLoggedIn 就 merge。**已加守卫**。
+- ❌ logout 不主动断 WS，留出"已登出但 WS 还连着"的同步窗口。**已通过
+  UserLogoutEvent + WsSessionRegistry.kickUser 修复**。
+
+**logout 时正确动作**（前后端协同）：
+| 主体 | 动作 |
+|---|---|
+| 前端 `userStore.logoutSchool` | 1) 先断 WS 2) 调 logout API 3) reset UI 状态（**保留 localStorage cookies**，浏览器语义） |
+| 后端 `AuthServiceImpl.logout` | 1) 访问学校 logout URL 2) `sessionLogoutBind` 清 Redis cookiesJson + schoolLoggedIn=false 3) publish UserLogoutEvent |
+| 后端 `UserLogoutEventListener` | 1) `wsSessionRegistry.kickUser` 主动踢 2) `infoCacheUtil.clearActiveSource` 如果命中 |
+
+记住：**cookies 的所有权归前端**。后端 Redis 只是给爬虫用的临时缓存。前端登出 = 后端立刻不再为这个用户做事。
+
 ### 6.1 logout 必须清 cookies，不要保留
 
 `AuthSessionCacheUtil.sessionLogoutBind(userId)` 要**清空 `cookiesJson`**，不只是翻 `schoolLoggedIn=false`。

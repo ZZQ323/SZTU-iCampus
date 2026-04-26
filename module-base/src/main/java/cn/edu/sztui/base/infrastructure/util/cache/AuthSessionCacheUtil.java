@@ -193,6 +193,13 @@ public class AuthSessionCacheUtil {
         if (!StringUtils.hasText(userId) || !StringUtils.hasText(cookiesJson)) return;
         ProxySession session = getSession(userId);
         if (session != null) {
+            // **硬规则**：用户已登出 / session 标记 schoolLoggedIn=false 后，所有靠 user
+            // 顺手 HTTP 请求触发的 cookie pool 兜底刷新都必须停。否则登出后零星请求会把
+            // cookies 复活回 Redis，违反"登出 = 立刻不能继续被借 cookies"的约定。
+            if (!session.isSchoolLoggedIn()) {
+                log.debug("refreshIfNeeded 跳过: userId={} 已登出", userId);
+                return;
+            }
             long elapsed = System.currentTimeMillis() - session.getLastUpdateTime();
             if (elapsed < REFRESH_THROTTLE_MS) return;
 
