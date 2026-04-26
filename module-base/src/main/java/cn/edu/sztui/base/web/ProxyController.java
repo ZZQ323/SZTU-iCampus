@@ -245,7 +245,9 @@ public class ProxyController {
         String cookiesJson = (ctx != null) ? ctx.getSchoolCookiesJson() : null;
 
         try {
-            String host = URI.create(url).getHost();
+            URI uri = URI.create(url);
+            String host = uri.getHost();
+            String requestPath = uri.getRawPath() == null || uri.getRawPath().isEmpty() ? "/" : uri.getRawPath();
             StringBuilder cookieHeader = new StringBuilder();
             int totalCookies = 0;
             int matchedCookies = 0;
@@ -258,7 +260,7 @@ public class ProxyController {
                 totalCookies = cookies.size();
                 StringBuilder sentNames = new StringBuilder();
                 for (SmartCookie c : cookies) {
-                    if (isCookieApplicable(host, c.getDomain())) {
+                    if (isCookieApplicable(host, c.getDomain(), c.getPath(), requestPath)) {
                         if (cookieHeader.length() > 0) cookieHeader.append("; ");
                         cookieHeader.append(c.getName()).append("=").append(c.getValue());
                         matchedCookies++;
@@ -266,8 +268,8 @@ public class ProxyController {
                         sentNames.append(c.getName());
                     }
                 }
-                log.info("fetchResource -> host={} cookies(alive total/matched)={}/{} sent=[{}] url={}",
-                        host, totalCookies, matchedCookies, sentNames, url);
+                log.info("fetchResource -> host={} path={} cookies(alive total/matched)={}/{} sent=[{}] url={}",
+                        host, requestPath, totalCookies, matchedCookies, sentNames, url);
             } else {
                 log.info("fetchResource -> host={} cookies(total/matched)=0/0 url={}", host, url);
             }
@@ -335,27 +337,35 @@ public class ProxyController {
     }
 
     /**
-     * cookie 是否适用于当前请求 host。
+     * cookie 是否适用于当前请求 (host, path) —— **严格 RFC 6265**。
      * <p>
-     * 学校那套 WebVPN 特别：一个请求（比如下载 nbw-...webvpn.sztu.edu.cn 的附件）经常需要
-     * auth.sztu.edu.cn / webvpn.sztu.edu.cn / jwxt-...webvpn.sztu.edu.cn 等等多个不同 domain
-     * 写的 cookie 凑齐一个"网关+子站"完整 session。
+     * 浏览器只把 (domain, path) 三元组匹配的 cookie 发出去，**绝不会**把整个 jar
+     * 一股脑塞 Cookie 头。学校 VWebServer 对 cookie 头格式异常很敏感：
+     * 把 host-only 的 `SESSION @ auth-sztu-edu-cn-s` 错发给 nbw 子域 → 414。
      * <p>
-     * 之前的"host.contains(domain) || domain.contains(host)"太严，只发得出恰好同 host 的 cookie，
-     * 结果学校回 414（它的非标错误码，大概率意思是"session 不够"）。
+     * 规则：
+     * <ul>
+     *   <li>cookie.domain 以 . 开头：去掉点（HAR 里学校的 cookie 都不带点，但 RFC 6265 要兼容）</li>
+     *   <li>host == domain（host-only cookie）OR host.endsWith("." + domain)（domain cookie）</li>
+     *   <li>请求 path 以 cookie.path 开头（path 默认 "/" 时永远匹配）</li>
+     * </ul>
      * <p>
-     * 放宽规则：任何域名后缀是 sztu.edu.cn 的 cookie 都挂上去，凑齐 WebVPN 期望的那几个 IDP/会话
-     * token，交给学校自己按 name 挑。安全暴露面可控——{@link #isAllowedDomain} 已把 target host
-     * 白名单到 *.sztu.edu.cn，泄露范围不会跨出校内。
+     * 之前有"两边都 sztu.edu.cn 就放行"的兜底——是错的，**已删除**。它把
+     * `SESSION @ auth-s` 错发给 nbw，把 `JSESSIONID @ home-s/bmportal` 错发给
+     * `nbw/system/_content/`，这是几天来 414 的根因。
      */
-    private static boolean isCookieApplicable(String host, String cookieDomain) {
+    private static boolean isCookieApplicable(String host, String cookieDomain, String cookiePath, String requestPath) {
         if (host == null || cookieDomain == null) return false;
         String dn = cookieDomain.startsWith(".") ? cookieDomain.substring(1) : cookieDomain;
-        if (host.equalsIgnoreCase(dn)) return true;
-        if (host.toLowerCase().endsWith("." + dn.toLowerCase())) return true;
-        // WebVPN 场景放宽：只要 cookie domain 是 sztu.edu.cn 家族且请求也在 sztu.edu.cn 家族，发出去
-        return dn.toLowerCase().endsWith("sztu.edu.cn")
-                && host.toLowerCase().endsWith("sztu.edu.cn");
+        boolean domainOk =
+                host.equalsIgnoreCase(dn) ||
+                host.toLowerCase().endsWith("." + dn.toLowerCase());
+        if (!domainOk) return false;
+
+        // path 默认 "/"
+        String cp = (cookiePath == null || cookiePath.isEmpty()) ? "/" : cookiePath;
+        String rp = (requestPath == null || requestPath.isEmpty()) ? "/" : requestPath;
+        return rp.startsWith(cp);
     }
 
     // ==================== 工具方法 ====================

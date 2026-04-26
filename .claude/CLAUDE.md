@@ -50,6 +50,22 @@
 ### 6. refresh 优先于 init
 大多数"会话过期"场景只需要调 `/auth/v1/session/refresh`（像浏览器按 F5），不需要 `/auth/v1/session/init`（清缓存重来）。有 cookie 就 refresh，没 cookie 才 init。
 
+### 5.5 ⚠️ Cookie 转发**严格按 RFC 6265**，不准放宽
+
+`ProxyController.fetchResource` 把前端 `X-School-Cookies` 塞 `Cookie:` 头转发学校时，**严格按浏览器规则筛**：
+
+| 规则 | 含义 |
+|---|---|
+| **domain match** | host == cookie.domain（host-only）OR host.endsWith("." + domain)（domain cookie） |
+| **path match** | request.path.startsWith(cookie.path)（默认 "/" 永远匹配） |
+| 不命中 | **绝不发** |
+
+**禁止"WebVPN 兜底"**——曾经写过"两边都 sztu.edu.cn 就放行"的版本，把 host-only 的 `SESSION @ auth-sztu-edu-cn-s` 错发给 `nbw-sztu-edu-cn-s`，把 `JSESSIONID @ home-s/bmportal` 错发给 `nbw/system/_content/...`。学校的 VWebServer 看到不属于自己的 IDP cookie 头**直接 414**——这是 2026-04-25 几天死磕的 414 根因。
+
+**HAR 实证**（`infos/down_logOut_down.txt`）：浏览器发请求时，cookie jar 按 (domain, path) 严格过滤后只发匹配子集。我们必须照做。
+
+判定函数：`ProxyController.isCookieApplicable(host, cookieDomain, cookiePath, requestPath)`。**不要再加任何兜底**。
+
 ### 6.0 ⚠️ 爬虫使用 cookies 的**硬规则** —— 不可违反
 
 **任何 user 的 cookies 被后端"借去爬 / 写回 Redis / 推 WS"**，必须**同时**满足：
