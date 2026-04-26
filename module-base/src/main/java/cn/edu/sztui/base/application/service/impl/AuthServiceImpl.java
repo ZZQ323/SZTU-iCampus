@@ -5,6 +5,7 @@ import cn.edu.sztui.base.application.service.AuthService;
 import cn.edu.sztui.base.application.vo.LoginResultsVo;
 import cn.edu.sztui.base.application.vo.LoginStatusVo;
 import cn.edu.sztui.base.domain.event.UserLoginEvent;
+import cn.edu.sztui.base.domain.event.UserLogoutEvent;
 import cn.edu.sztui.base.domain.model.login.LoginType;
 import cn.edu.sztui.base.infrastructure.persistence.convertor.CharacterConverter;
 import cn.edu.sztui.base.infrastructure.util.parser.URLPraser;
@@ -416,8 +417,13 @@ public class AuthServiceImpl implements AuthService {
             // 访问登出 URL
             smartHttpClient.get(logoutSubmitURL, smartSession);
 
-            // ⭐ 只调用 sessionLogoutBind，不再调用 invalidateStatusCache
+            // ⭐ 清 Redis cookies + schoolLoggedIn=false（cookies 由前端拥有，
+            // 后端的 Redis 缓存只是给爬虫用的；登出 = 不再为这个用户做事）
             authSessionCacheUtil.sessionLogoutBind(userId);
+
+            // 主动告诉下游（module-stream）：这个 user 从此刻起不能再被借 cookies。
+            // 下游会踢 WS 连接 + 清 active source 标记（避免 in-flight 爬虫复活 cookies）
+            eventPublisher.publishEvent(new UserLogoutEvent(this, userId));
 
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);
@@ -425,8 +431,9 @@ public class AuthServiceImpl implements AuthService {
 
         } catch (Exception e) {
             log.error("登出失败: {}", e.getMessage());
-            // 即使失败也清除本地会话
+            // 即使失败也清除本地会话 + 踢 WS（最重要的是保证 cookies 不被借用）
             authSessionCacheUtil.sessionLogoutBind(userId);
+            eventPublisher.publishEvent(new UserLogoutEvent(this, userId));
 
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);

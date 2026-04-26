@@ -17,7 +17,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Cookie 来源管理器
@@ -73,16 +72,26 @@ public class CookieSourceManager {
 
     /**
      * 获取可用的 Cookie 来源用户。
-     * 优先级：当前活跃用户（在线+有效）→ 在线用户 → Redis 所有 session
+     * <p>
+     * **硬规则**（2026-04-25 重写）：能被借去爬的 cookies，**必须同时满足**：
+     *   1. WS 在线（{@code wsSessionRegistry.isOnline}）
+     *   2. schoolLoggedIn = true
+     *   3. Redis 有 cookies
+     * 三者缺一不可。否则用户登出 / 关掉小程序后，cookies 还会被后端默默借去爬学校，
+     * 学校会议这条 IP 一直在动 → 风险敞口（封号、cookie 寿命被人为延长）。
+     * <p>
+     * 旧版有第三层"兜底"逻辑（findValidFromAllSessions），无视在线状态找
+     * Redis 里任意 schoolLoggedIn=true 的用户用 —— 那是逆天设计，已删除。
+     * 找不到合适用户就返回 null，调用方（scheduler）整轮跳过即可。
      */
     public String getAvailableUserId() {
-        // 1. 当前活跃用户如果在线且有效，直接复用
+        // 1. 当前活跃用户如果在线且有效，直接复用（快速路径）
         String active = infoCacheUtil.getActiveSourceUserId();
         if (StringUtils.hasText(active) && wsSessionRegistry.isOnline(active) && isValid(active)) {
             return active;
         }
 
-        // 2. 优先从 WS 在线用户中找
+        // 2. 从 WS 在线用户中找一个 valid 的
         for (String onlineUser : wsSessionRegistry.getOnlineUserIds()) {
             if (isValid(onlineUser)) {
                 infoCacheUtil.setActiveSourceUserId(onlineUser);
@@ -91,14 +100,7 @@ public class CookieSourceManager {
             }
         }
 
-        // 3. 退而求其次：Redis 中所有 session（可能已离线但 cookie 还没过期）
-        String found = findValidFromAllSessions();
-        if (found != null) {
-            infoCacheUtil.setActiveSourceUserId(found);
-            log.info("切换到离线用户 Cookie（无在线用户可用）: {}", found);
-            return found;
-        }
-
+        // 没有任何在线 + valid 的用户 → 不爬。**绝不能借离线用户的 cookies**。
         infoCacheUtil.clearActiveSource();
         return null;
     }
@@ -151,25 +153,16 @@ public class CookieSourceManager {
         return false;
     }
 
+    /**
+     * 检验 userId 是否能被借去爬：必须有 session 数据（cookies 还在）+ schoolLoggedIn=true。
+     * 在线状态由调用方在调用此方法之前的位置自行检查。
+     */
     private boolean isValid(String userId) {
         if (!StringUtils.hasText(userId)) return false;
         if (!authSessionCacheUtil.hasSession(userId)) return false;
+        ProxySession s = authSessionCacheUtil.getSession(userId);
+        if (s == null || !StringUtils.hasText(s.getCookiesJson())) return false;
         return authSessionCacheUtil.isSchoolLoggedIn(userId);
-    }
-
-    /**
-     * 从 Redis 所有 ProxySession 中找一个有效的（不限是否在线）
-     */
-    private String findValidFromAllSessions() {
-        Map<String, ProxySession> allSessions = authSessionCacheUtil.getAllSessions();
-        if (allSessions == null || allSessions.isEmpty()) return null;
-
-        for (Map.Entry<String, ProxySession> entry : allSessions.entrySet()) {
-            if (entry.getValue().isSchoolLoggedIn() && isValid(entry.getKey())) {
-                return entry.getKey();
-            }
-        }
-        return null;
     }
 
     /**

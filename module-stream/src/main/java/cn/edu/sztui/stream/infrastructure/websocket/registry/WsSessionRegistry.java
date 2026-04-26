@@ -73,6 +73,24 @@ public class WsSessionRegistry {
     }
 
     /**
+     * 主动踢用户的 WS 连接（用于 logout）。
+     * 关掉 socket 后客户端会感知断开，自然触发 unregister。
+     * <p>
+     * 重要：logout 必须主动断 WS，否则后端 in-flight 爬虫推过来的 cookie 会落进
+     * 已登出但 WS 还连着的前端 → 本地 cookies 复活 → 学校以为还登着 → 风险敞口。
+     */
+    public void kickUser(String userId) {
+        WebSocketSession session = userSessions.get(userId);
+        if (session == null) return;
+        try {
+            if (session.isOpen()) session.close();
+            log.info("WS 主动踢断: userId={}, sessionId={}", userId, session.getId());
+        } catch (Exception e) {
+            log.warn("WS 踢断异常: userId={}, error={}", userId, e.getMessage());
+        }
+    }
+
+    /**
      * 注销连接（从所有 topic 中移除）
      */
     public void unregister(WebSocketSession session) {
