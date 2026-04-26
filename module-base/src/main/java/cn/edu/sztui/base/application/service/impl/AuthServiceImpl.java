@@ -376,12 +376,20 @@ public class AuthServiceImpl implements AuthService {
             // 过滤死 cookie（expired / 空值）—— 它们是浏览器要从 jar 删的，
             // 我们不能反向喂给前端，否则下次出去带着死 cookie 被学校 414。
             var aliveCookies = SmartCookieConverter.filterAlive(smartSession.getCookies());
-            ret.setCookiesJson(JSON.toJSONString(aliveCookies));
+            String cookiesJsonOut = JSON.toJSONString(aliveCookies);
+            ret.setCookiesJson(cookiesJsonOut);
             String aliveNames = aliveCookies.stream()
                     .map(c -> c.getName())
                     .collect(java.util.stream.Collectors.joining(","));
             log.info("[loginFrame ←] userId={} session 总数={} 输出 alive={} names=[{}]",
                     userId, smartSession.getCookies().size(), aliveCookies.size(), aliveNames);
+            // 诊断：直接把序列化后的 cookiesJson 打出来，对照前端 [cookie-merge] incoming raw
+            // 看是否在序列化层就丢了 cookie。
+            log.info("[loginFrame ← cookiesJson] length={} content={}",
+                    cookiesJsonOut.length(),
+                    cookiesJsonOut.length() > 2000
+                            ? cookiesJsonOut.substring(0, 2000) + "...(truncated)"
+                            : cookiesJsonOut);
 
             // ============ 第六步：发布登录成功事件 ============
             eventPublisher.publishEvent(new UserLoginEvent(
