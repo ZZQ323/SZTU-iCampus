@@ -145,21 +145,6 @@ public class AuthSessionCacheUtil {
     }
 
     /**
-     * 登出绑定（更新 Cookie 和状态）
-     */
-    public void sessionLogoutBind(String userId, List<SmartCookie> newCookies) {
-        ProxySession session = getSession(userId);
-        if (session == null) return;
-        if (!CollectionUtils.isEmpty(newCookies)) {
-            session.setCookiesJson(JSON.toJSONString(newCookies));
-        }
-        session.setLastUpdateTime(System.currentTimeMillis());
-        session.setSchoolLoggedIn(false);
-        saveSession(userId, session);
-        log.info("userId={} 已登出学校后端（已更新Cookie）", userId);
-    }
-
-    /**
      * 判断是否已登录学校后端
      */
     public boolean isSchoolLoggedIn(String userId) {

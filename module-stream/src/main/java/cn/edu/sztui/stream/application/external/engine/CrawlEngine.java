@@ -387,19 +387,29 @@ public class CrawlEngine {
         if (pair.getUserId() == null || pair.getOriginalCookies() == null) return;
         String userId = pair.getUserId();
 
+        // 入口诊断：把每次调用都打出来，统计 changed=true 的频率。
+        // 观察一段时间，若 changed 永远是 false，就直接禁用整条
+        // saveOrUpdateSessionCookie + pushCookieUpdate 路径，少一类 cookie 复活路径。
+        int origCount = pair.getOriginalCookies().size();
+        List<SmartCookie> currentCookies = pair.getSession().getCookies();
+        int currCount = currentCookies.size();
+        boolean changed = cookiesChanged(pair.getOriginalCookies(), currentCookies);
+        boolean online = wsSessionRegistry.isOnline(userId);
+        boolean loggedIn = authSessionCacheUtil.isSchoolLoggedIn(userId);
+        log.info("[syncCookies] userId={} orig={} curr={} changed={} online={} loggedIn={}",
+                userId, origCount, currCount, changed, online, loggedIn);
+
         // 守卫：登出 / 离线 / Redis session 已被清 → 不写不推
-        if (!wsSessionRegistry.isOnline(userId)) {
+        if (!online) {
             log.debug("syncCookiesIfChanged 跳过: userId={} 不在线", userId);
             return;
         }
-        if (!authSessionCacheUtil.hasSession(userId)
-                || !authSessionCacheUtil.isSchoolLoggedIn(userId)) {
+        if (!authSessionCacheUtil.hasSession(userId) || !loggedIn) {
             log.debug("syncCookiesIfChanged 跳过: userId={} 已登出 / session 已清", userId);
             return;
         }
 
-        List<SmartCookie> currentCookies = pair.getSession().getCookies();
-        if (cookiesChanged(pair.getOriginalCookies(), currentCookies)) {
+        if (changed) {
             authSessionCacheUtil.saveOrUpdateSessionCookie(userId, currentCookies);
             // 推给前端的 cookies 必须先过滤掉 expired / 空值 —— 否则前端 merge 时
             // 会把死 cookie 留下来，下次 HTTP 请求带着死 cookie 被学校 414 拒。
