@@ -612,11 +612,22 @@ public class AuthServiceImpl implements AuthService {
                 log.info("检测到登录方式（gatewaySecond）: {}", detectedTypes);
 
             } else {
-                // ⭐ 检测 WebVPN 门户页面 = session 已过期
+                // ⭐ 检测 WebVPN 门户页面 = 学校服务端 session 已过期
                 if (finalUrl.contains("/por/") || finalUrl.contains("webvpn.sztu.edu.cn/por")) {
                     log.warn("检测到 WebVPN 门户页面，会话已过期: {}", finalUrl);
                     ret.setSessionInvalid(true);
                     ret.setLoginTypes(Arrays.asList(LoginType.SMS, LoginType.PASSWORD));
+
+                    // 硬规则：检测到"已登出 / 已过期" → 必须立刻清 Redis cookies +
+                    // schoolLoggedIn=false + 踢 WS + 清 active source。和 isErrorPage
+                    // 分支处理对齐。否则 cookies 会在 Redis 留 3 天 TTL，期间：
+                    //   · refreshIfNeeded 仍认为活着，被前端瘦快照反复同步
+                    //   · 用户重连 WS 后爬虫立刻借这批尸体 cookies 去访问学校
+                    //   · IP 行为异常 / 封号风险 / 污染下次重登（IDP 路由错乱）
+                    if (userId != null) {
+                        authSessionCacheUtil.sessionLogoutBind(userId);
+                        eventPublisher.publishEvent(new UserLogoutEvent(this, userId));
+                    }
                 } else if (body != null) {
                     // 未知状态，尝试从响应体判断
                     // ⭐ 检查是否是真正的登录表单页面（而不是错误页面）
