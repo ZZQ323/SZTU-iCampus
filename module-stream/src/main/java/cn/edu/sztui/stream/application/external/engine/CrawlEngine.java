@@ -383,40 +383,35 @@ public class CrawlEngine {
      * </ol>
      * 守卫断绝这条路径。
      */
+    /**
+     * 爬取后只**观测**前后 cookie 变化，**不再写回 Redis、不再推 WS**（2026-04-30 用户决策）。
+     * <p>
+     * 为什么禁用整条回写：
+     * <ul>
+     *   <li>这条路径反复成为"已登出 / 已过期 cookie 复活"的源头：爬虫拿到的"新"
+     *       cookies 写回 Redis + 推 WS COOKIE_UPDATE 给前端 → 前端 merge 进 localStorage
+     *       → 用户名义已退出，cookies 寿命被人为延长。</li>
+     *   <li>历次都是靠"加守卫"修补（schoolLoggedIn 检查、在线检查、CAS 比较等），
+     *       但并发覆盖窗口始终关不死。</li>
+     *   <li>cookies 应当只在用户主动操作（登录 / 重置）时被写。爬取过程中即便学校
+     *       下发了新 cookies，最多影响这次爬取的有效性，让它静默失败、下一轮重试就好。</li>
+     * </ul>
+     * 诊断 log 保留——若长期观察 changed=true 的频率为 0，下次可以连同
+     * cookiesChanged + 这整个方法一起删掉，并清理 StreamPushService.pushCookieUpdate
+     * 与前端 ws.ts 里的 COOKIE_UPDATE handler。
+     */
     private void syncCookiesIfChanged(CookieSourceManager.CookieSessionPair pair) {
         if (pair.getUserId() == null || pair.getOriginalCookies() == null) return;
         String userId = pair.getUserId();
 
-        // 入口诊断：把每次调用都打出来，统计 changed=true 的频率。
-        // 观察一段时间，若 changed 永远是 false，就直接禁用整条
-        // saveOrUpdateSessionCookie + pushCookieUpdate 路径，少一类 cookie 复活路径。
         int origCount = pair.getOriginalCookies().size();
         List<SmartCookie> currentCookies = pair.getSession().getCookies();
         int currCount = currentCookies.size();
         boolean changed = cookiesChanged(pair.getOriginalCookies(), currentCookies);
         boolean online = wsSessionRegistry.isOnline(userId);
         boolean loggedIn = authSessionCacheUtil.isSchoolLoggedIn(userId);
-        log.info("[syncCookies] userId={} orig={} curr={} changed={} online={} loggedIn={}",
+        log.info("[syncCookies] userId={} orig={} curr={} changed={} online={} loggedIn={} (writeback DISABLED)",
                 userId, origCount, currCount, changed, online, loggedIn);
-
-        // 守卫：登出 / 离线 / Redis session 已被清 → 不写不推
-        if (!online) {
-            log.debug("syncCookiesIfChanged 跳过: userId={} 不在线", userId);
-            return;
-        }
-        if (!authSessionCacheUtil.hasSession(userId) || !loggedIn) {
-            log.debug("syncCookiesIfChanged 跳过: userId={} 已登出 / session 已清", userId);
-            return;
-        }
-
-        if (changed) {
-            authSessionCacheUtil.saveOrUpdateSessionCookie(userId, currentCookies);
-            // 推给前端的 cookies 必须先过滤掉 expired / 空值 —— 否则前端 merge 时
-            // 会把死 cookie 留下来，下次 HTTP 请求带着死 cookie 被学校 414 拒。
-            String newJson = SmartCookieConverter.aliveCookiesToJson(currentCookies);
-            streamPushService.pushCookieUpdate(userId, newJson);
-            log.info("爬取过程中 Cookie 变化，已同步: userId={}", userId);
-        }
     }
 
     /**
