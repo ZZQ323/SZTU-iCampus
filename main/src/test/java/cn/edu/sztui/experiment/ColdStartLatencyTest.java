@@ -1,5 +1,6 @@
-package cn.edu.sztui.stream.healthcheck;
+package cn.edu.sztui.experiment;
 
+import cn.edu.sztui.base.BaseMain;
 import cn.edu.sztui.stream.application.external.engine.CrawlEngine;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig.SourceConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
@@ -7,7 +8,6 @@ import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
@@ -38,14 +38,11 @@ import java.util.stream.Collectors;
  *   <li>{@code -Dexp31.dryrun=true}   不真打学校，只列采样源</li>
  * </ul>
  * <p>
- * 运行：{@code ./gradlew :module-stream:test --tests ColdStartLatencyTest --info}
+ * 运行：{@code ./gradlew :main:test --tests ColdStartLatencyTest --info}
  */
-@SpringBootTest(classes = ColdStartLatencyTest.TestApp.class)
+@SpringBootTest(classes = BaseMain.class)
 @Tag("experiment")
 class ColdStartLatencyTest {
-
-    @SpringBootApplication(scanBasePackages = "cn.edu.sztui")
-    static class TestApp {}
 
     @Resource private CrawlEngine crawlEngine;
     @Resource private CrawlerConfigLoader configLoader;
@@ -59,18 +56,16 @@ class ColdStartLatencyTest {
 
         List<SourceConfig> all = configLoader.getEnabledSources();
 
-        // 按 channelId 大致猜测 group（与 1.1 保持一致：用 channelId 前缀 / 已知特殊值）
         Map<String, List<SourceConfig>> byGroup = new TreeMap<>();
         for (SourceConfig s : all) {
-            if (s.isRequiresAuth()) continue;          // 跳过需登录源（cookie 依赖）
+            if (s.isRequiresAuth()) continue;
             if (!"sztu-cms".equals(s.getParserType())
-                    && !"sztu-gwt".equals(s.getParserType())) continue;  // 跳过特殊解析器
+                    && !"sztu-gwt".equals(s.getParserType())) continue;
             String g = guessGroup(s.getChannelId());
             byGroup.computeIfAbsent(g, k -> new ArrayList<>()).add(s);
         }
 
-        // 在每个 group 里随机抽 samplesPerGroup 个
-        Random rnd = new Random(20260430L);  // 固定种子，跑多次结果一致
+        Random rnd = new Random(20260430L);
         List<SourceConfig> picked = new ArrayList<>();
         for (var e : byGroup.entrySet()) {
             List<SourceConfig> list = new ArrayList<>(e.getValue());
@@ -96,7 +91,7 @@ class ColdStartLatencyTest {
         if (dryRun) return;
 
         Map<String, List<Long>> byGroupMs = new TreeMap<>();
-        List<long[]> records = new ArrayList<>();   // [latencyMs, success(0/1)]
+        List<long[]> records = new ArrayList<>();
         int failCount = 0;
 
         for (SourceConfig src : picked) {
@@ -124,7 +119,6 @@ class ColdStartLatencyTest {
             }
         }
 
-        // 全局分布
         List<Long> all_ok_ms = records.stream()
                 .filter(r -> r[1] == 1)
                 .map(r -> r[0])
@@ -172,7 +166,6 @@ class ColdStartLatencyTest {
         return sorted.get(Math.max(0, Math.min(idx, sorted.size() - 1)));
     }
 
-    /** 按 channelId 前缀粗判 group。这套规则与 1.1 实验保持一致（1.1 用 YAML 路径，更准）。 */
     private static String guessGroup(String channelId) {
         if (channelId == null) return "unknown";
         if (channelId.startsWith("college-")) return "college";

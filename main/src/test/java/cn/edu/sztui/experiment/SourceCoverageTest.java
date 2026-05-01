@@ -1,12 +1,12 @@
-package cn.edu.sztui.stream.healthcheck;
+package cn.edu.sztui.experiment;
 
+import cn.edu.sztui.base.BaseMain;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfig.SourceConfig;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.config.CrawlerConfigLoader;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.yaml.snakeyaml.Yaml;
@@ -30,15 +30,12 @@ import java.util.*;
  *   <li>从未爬过的源列表（debug 用）</li>
  * </ul>
  * <p>
- * 运行：{@code ./gradlew :module-stream:test --tests SourceCoverageTest --info}
- * 需要 Redis 已被 module-stream 跑起来填充过数据。
+ * 运行：{@code ./gradlew :main:test --tests SourceCoverageTest --info}
+ * 需要 Redis 已被 module-stream 跑起来填充过数据 + application-dev.yml 配置好。
  */
-@SpringBootTest(classes = SourceCoverageTest.TestApp.class)
+@SpringBootTest(classes = BaseMain.class)
 @Tag("experiment")
 class SourceCoverageTest {
-
-    @SpringBootApplication(scanBasePackages = "cn.edu.sztui")
-    static class TestApp {}
 
     private static final long DAY_MS = 24L * 60 * 60 * 1000;
 
@@ -56,7 +53,6 @@ class SourceCoverageTest {
         Yaml yaml = new Yaml();
         for (org.springframework.core.io.Resource res : files) {
             String path = res.getURL().getPath();
-            // 形如 .../crawler/college/college-sources.yml
             String group = "unknown";
             int idx = path.lastIndexOf("/crawler/");
             if (idx >= 0) {
@@ -89,9 +85,7 @@ class SourceCoverageTest {
         long t7d = now - 7 * DAY_MS;
         long t30d = now - 30 * DAY_MS;
 
-        // group → counters
         Map<String, int[]> stats = new TreeMap<>();
-        // counters: [total, ever, 30d, 7d, 1d, initialized]
         List<String> neverList = new ArrayList<>();
 
         for (SourceConfig src : sources) {
@@ -110,7 +104,6 @@ class SourceCoverageTest {
             if (infoCacheUtil.isSourceInitialized(src.getId())) c[5]++;
         }
 
-        // 汇总打印
         StringBuilder out = new StringBuilder();
         out.append("\n").append("=".repeat(80)).append("\n");
         out.append("实验 1.1  数据源活跃覆盖率（基于 Redis lastCrawlTime）\n");
