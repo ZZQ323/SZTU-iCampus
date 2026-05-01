@@ -552,21 +552,75 @@ ai:
 2. **Spring Event 自动化**：爬虫新文章自动触发 AI（目前只有手动 admin 触发）
 3. 反馈数据累积到一定规模后做**反馈驱动的 prompt 迭代**（论文可扩展章节）
 
-## Redis Key 约定
+## ⚠️ 硬规则：所有 Redis 读写**必须**走 `CacheUtil`
 
-| Key 模式 | TTL | 用途 |
-|---------|-----|------|
-| `icampus:proxy-session:{userId}` | 7 天 | ProxySession（cookies + 元数据） |
-| `icampus:cache:info:list:{sourceId}` | 无 | 信息列表缓存 |
-| `icampus:cache:info:detail:{sourceId}:{id}` | 无 | 文章详情缓存 |
-| `icampus:cache:info:source:{sourceId}:system` | 无 | 爬虫状态（lastCrawlTime, initialized） |
-| `icampus:cache:info:active-source-user` | 无 | 当前爬虫使用的 Cookie 来源用户 |
-| `icampus:cache:calendar:years` | 7 天 | 校历学年列表（从学校 ul 爬来） |
-| `icampus:cache:calendar:{year}` | 30 天 | 某学年的春秋学期图 |
-| `icampus:cache:activity:extract:{id}:{v}:{model}` | 30 天 | 活动抽取 AI 结果 |
-| `feed:timeline` | 无 | 全局 feed ZSET（跨频道聚合，**不含公文通**） |
-| `info:{channelId}:timeline` | 无 | 每频道 timeline ZSET（公文通用这个）|
-| `stream:announcement` / `stream:schedule` / `stream:calendar` | 自动裁剪 | Redis Stream（保留 1000 条） |
+历史上有过四种前缀风格混在一个库里（双前缀 / 单前缀 / 无前缀 / 半前缀），导致写入 / 读取必须配套同款"姿势"才能命中，迁移时容易留 381 个孤儿 key（参考 commit `a299571`/`cb0d4ad`/`37ebd6b`）。
+
+**现在的统一规则**：
+
+1. **唯一入口**：`cn.edu.sztui.common.cache.util.CacheUtil`。它内部对所有传入 `key` 做且仅做一次 `redisKeyGenerator.generate("cache:" + key)`，最终落 `dev:sztu:cache:<rawKey>`。
+2. **传给 cacheUtil 的 key 必须是 raw**：如 `info:{ch}:meta`、`activity:timeline`，**不要** 预先用 `redisKeyGenerator.generate(...)` 或 `"cache:" +` 加前缀。会双前缀。
+3. **禁止直接调用** `redisTemplate.opsFor*` / `cacheService.*` / `redisKeyGenerator.generate(...)` 写 Redis 业务数据。这些都绕过了归一化前缀。
+4. **唯一例外**：`StreamPublisher` / `StreamConsumer` / `RedisStreamConfig` 用 `stringRedisTemplate.opsForStream()` 直接持有原始 streamKey（如 `stream:announcement`）—— 这是 Spring Data Redis SDK 的 listener 兼容要求，**显式例外**，不要试图加前缀。
+5. **CacheService 是 CacheUtil 的内部 backing**，不要在业务代码里直接 `@Resource CacheService`。它的 ZSet API 还有 bug（`zSSet` 用了 `opsForSet` 且 score 硬编码 2.0），没修；新 ZSet/Set/List 操作都在 CacheUtil 里直接走 RedisTemplate。
+
+如何判断是否合规：
+- 任何业务文件 `grep -E "redisTemplate\.opsFor|cacheService\." <file>` 应只匹配到 Stream 三件套
+- 任何业务文件 `grep -E "redisKeyGenerator\." <file>` 应不命中（utility 类内部除外）
+
+CacheUtil API 概览（不全列）：
+- String：`set / get / del / hasKey / expire / keys`
+- Hash：`hset / hget / hmget / hmset / hdel / hHasKey`
+- ZSet：`zAdd / zRem / zCard / zRange / zReverseRange / zRangeByScore`（含 offset+count 重载）/ `zScore`
+- Set：`sAdd / sRem / sMembers / sIsMember / sCard`
+- List：`lLeftPush / lRightPush / lRange / lTrim / lSize`
+
+## Redis Key 约定（统一前缀 `dev:sztu:cache:` 之后）
+
+下表中"**raw key**"列是业务代码传给 cacheUtil 的字符串，"**Redis 实际**"列是 cacheUtil 自动加 `dev:sztu:cache:` 后落盘的形式。
+
+| raw key（业务代码用） | Redis 实际 | TTL | 类型 | 用途 |
+|---|---|---|---|---|
+| `icampus:proxy-session:{userId}` | `dev:sztu:cache:icampus:proxy-session:{userId}` | 3 天 | String | ProxySession（cookies + 元数据） |
+| `info:{channelId}:meta` | `dev:sztu:cache:info:{channelId}:meta` | 无 | Hash | 频道文章元数据（articleId → JSON） |
+| `info:{channelId}:timeline` | `dev:sztu:cache:info:{channelId}:timeline` | 无 | ZSET | 频道时间线（score=articleId）|
+| `info:{channelId}:category:{code}` | `dev:sztu:cache:info:{channelId}:category:{code}` | 无 | ZSET | 分类索引 |
+| `info:{channelId}:latest_id` | `dev:sztu:cache:info:{channelId}:latest_id` | 无 | String | 频道最新 ID |
+| `info:{channelId}:content:{id}` | `dev:sztu:cache:info:{channelId}:content:{id}` | 24 小时 | String | 文章详情缓存 |
+| `info:{channelId}:system` | `dev:sztu:cache:info:{channelId}:system` | 无 | Hash | 频道状态（initialized, activeSourceUserId）|
+| `info:{channelId}:hot-access` | `dev:sztu:cache:info:{channelId}:hot-access` | 无 | ZSET | 热点访问记录（用于冷数据淘汰）|
+| `info:source:{sourceId}:system` | `dev:sztu:cache:info:source:{sourceId}:system` | 无 | Hash | 源级状态（initialized, lastCrawlTime）|
+| `info:global:system` | `dev:sztu:cache:info:global:system` | 无 | Hash | 全局活跃 cookie 源 userId |
+| `info:user:{userId}:read:{channelId}` | `dev:sztu:cache:info:user:{userId}:read:{channelId}` | 无 | String | 用户已读位置 |
+| `feed:timeline` | `dev:sztu:cache:feed:timeline` | 无 | ZSET | 全局聚合 timeline（不含公文通）|
+| `feed:meta:{channelId}:{id}` | `dev:sztu:cache:feed:meta:{channelId}:{id}` | 无 | String | 全局 feed 元数据 |
+| `activity:timeline` | `dev:sztu:cache:activity:timeline` | 无 | ZSET | 活动索引（score=epochMillis）|
+| `activity:pending` | `dev:sztu:cache:activity:pending` | 无 | Set | 时间待定的活动 |
+| `activity:detail:{id}` | `dev:sztu:cache:activity:detail:{id}` | 无 | String | 活动详情 JSON |
+| `activity:admin-hidden` | `dev:sztu:cache:activity:admin-hidden` | 无 | Set | 管理员隐藏的活动 |
+| `activity:reports` | `dev:sztu:cache:activity:reports` | 无 | List | 用户反馈（保 1000 条 LTRIM）|
+| `activity:extract:{id}:{v}:{model}` | `dev:sztu:cache:activity:extract:{id}:{v}:{model}` | 30 天 | String | LLM 抽取结果缓存 |
+| `calendar:years` | `dev:sztu:cache:calendar:years` | 7 天 | String | 校历学年列表 |
+| `calendar:{year}` | `dev:sztu:cache:calendar:{year}` | 30 天 | String | 某学年图片 URL |
+| `stream:announcement` / `stream:schedule` / `stream:calendar` | **同名（无前缀）** | 自动裁剪 | Stream | Redis Stream（**显式例外**，SDK 兼容）|
+
+### 重构后旧 key 的清理（manual ops）
+
+`a299571` 起的"全走 cacheUtil"重构让以下旧 key 全部成为孤儿（无 TTL，永驻）。**部署后请用户手动跑一次清理**：
+
+```bash
+# 1. 双前缀 Hash（InfoCacheUtil 旧版生成的 381 个）
+redis-cli --scan --pattern 'dev:sztu:cache:dev:sztu:cache:info:*' | xargs redis-cli del
+
+# 2. ActivityIndexService 旧版直写 root 的 timeline / pending / hidden
+redis-cli del icampus:cache:activity:timeline icampus:cache:activity:pending icampus:cache:activity:admin-hidden
+
+# 3. ActivityIndexService 旧版的 detail（多了一层 icampus:cache: ）
+redis-cli --scan --pattern 'dev:sztu:cache:icampus:cache:activity:detail:*' | xargs redis-cli del
+
+# 4. ActivityReportService 旧版（少了一层 cache:）
+redis-cli del 'dev:sztu:icampus:cache:activity:reports'
+```
 
 ## Header 约定
 
