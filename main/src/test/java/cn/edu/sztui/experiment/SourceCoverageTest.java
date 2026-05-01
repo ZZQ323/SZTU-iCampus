@@ -52,6 +52,26 @@ class SourceCoverageTest {
     @Resource private RedisKeyGenerator redisKeyGenerator;
     @Resource private RedisTemplate<String, Object> redisTemplate;
 
+    /**
+     * 复刻 InfoCacheUtil 的写者链路：
+     * <ul>
+     *   <li>ZSET timeline：{@code redisKeyGenerator.generate("cache:info:{ch}:timeline")} →
+     *       直接走 redisTemplate.opsForZSet（单前缀，如 dev:sztu:cache:info:{ch}:timeline）</li>
+     *   <li>Hash meta：{@code redisKeyGenerator.generate("cache:info:{ch}:meta")} 的结果再被
+     *       cacheUtil.hset 内部 {@code redisKeyGenerator.generate("cache:" + key)} 包一层 →
+     *       最终是双前缀（dev:sztu:cache:dev:sztu:cache:info:{ch}:meta）。</li>
+     * </ul>
+     * 这是当前生产代码的实际行为（双前缀的 369 个 key 之谜），不是 bug 痕迹，是活的写入路径。
+     */
+    private String timelineKey(String channelId) {
+        return redisKeyGenerator.generate("cache:info:" + channelId + ":timeline");
+    }
+
+    private String metaKeyDoubled(String channelId) {
+        String inner = redisKeyGenerator.generate("cache:info:" + channelId + ":meta");
+        return redisKeyGenerator.generate("cache:" + inner);
+    }
+
     /** 通过 YAML 路径推 group：crawler/{group}/{group}-sources.yml */
     private Map<String, String> loadSourceGroupMap() throws Exception {
         Map<String, String> map = new HashMap<>();
@@ -121,16 +141,28 @@ class SourceCoverageTest {
         // 列出所有频道，扫每个 info:{ch}:timeline 的所有 ID，然后批量读 meta hash
         List<ChannelConfig> channels = configLoader.getChannels();
         long totalItems = 0;
+
+        // ==== 调试：打印第一个频道的 key 形态，便于失配时定位 ====
+        if (!channels.isEmpty()) {
+            String chId0 = channels.get(0).getId();
+            String tl0 = timelineKey(chId0);
+            String meta0 = metaKeyDoubled(chId0);
+            Long zCard = redisTemplate.opsForZSet().zCard(tl0);
+            Long hLen  = redisTemplate.opsForHash().size(meta0);
+            System.out.printf("[debug] sample channel=%s%n  timelineKey=%s zCard=%s%n  metaKey   =%s hLen=%s%n",
+                    chId0, tl0, zCard, meta0, hLen);
+        }
+
         for (ChannelConfig ch : channels) {
             String chId = ch.getId();
-            String tlKey = redisKeyGenerator.generate("info:" + chId + ":timeline");
-            String metaKey = redisKeyGenerator.generate("info:" + chId + ":meta");
+            String tlKey = timelineKey(chId);
+            String metaKey = metaKeyDoubled(chId);
 
             Set<Object> ids = redisTemplate.opsForZSet().reverseRange(tlKey, 0, -1);
             if (ids == null || ids.isEmpty()) continue;
 
             for (Object idObj : ids) {
-                Object metaJson = cacheUtil.hget(metaKey, idObj.toString());
+                Object metaJson = redisTemplate.opsForHash().get(metaKey, idObj.toString());
                 if (metaJson == null) continue;
                 InfoItemMeta meta;
                 try {
