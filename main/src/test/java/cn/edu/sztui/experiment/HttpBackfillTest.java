@@ -1,6 +1,7 @@
 package cn.edu.sztui.experiment;
 
 import cn.edu.sztui.base.BaseMain;
+import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.stream.application.service.StreamPushService;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult.InfoItemMeta;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
@@ -70,6 +71,9 @@ class HttpBackfillTest {
     @Resource
     private StreamPushService streamPushService;
 
+    @Resource
+    private CacheUtil cacheUtil;
+
     private static final String CHANNEL = "announcement";
 
     @Test
@@ -92,6 +96,7 @@ class HttpBackfillTest {
         // 用 currentTimeMillis * 1000 + i 作为 ID，确保比所有现有 ID 都大
         long base = System.currentTimeMillis() * 1000L;
         List<String> publishedIds = new ArrayList<>(count);
+        try {
         for (int i = 0; i < count; i++) {
             String id = String.valueOf(base + i);
             InfoItemMeta meta = InfoItemMeta.builder()
@@ -196,6 +201,38 @@ class HttpBackfillTest {
         }
         out.append("=".repeat(80)).append("\n");
         System.out.println(out);
+        } finally {
+            // ==================== 8. 清理：删掉所有测试数据，避免污染前端信息流 ====================
+            cleanup(publishedIds);
+        }
+    }
+
+    /**
+     * 清理本测试写入 Redis 的所有数据。
+     * <p>
+     * {@link InfoCacheUtil#saveMeta} 写到 4 处：
+     * <ul>
+     *   <li>Hash {@code info:announcement:meta} → field=articleId</li>
+     *   <li>ZSET {@code info:announcement:timeline} → member=articleId</li>
+     *   <li>ZSET {@code feed:timeline} → member="announcement:" + articleId</li>
+     *   <li>String {@code feed:meta:announcement:{id}}</li>
+     * </ul>
+     * 全部清掉，前端信息流恢复原状。category ZSET 没写（构造 meta 时未设 categoryCode）。
+     */
+    private void cleanup(List<String> publishedIds) {
+        if (publishedIds == null || publishedIds.isEmpty()) return;
+        int n = publishedIds.size();
+        for (String id : publishedIds) {
+            try {
+                cacheUtil.hdel("info:" + CHANNEL + ":meta", id);
+                cacheUtil.zRem("info:" + CHANNEL + ":timeline", id);
+                cacheUtil.zRem("feed:timeline", CHANNEL + ":" + id);
+                cacheUtil.del("feed:meta:" + CHANNEL + ":" + id);
+            } catch (Exception e) {
+                System.err.println("[exp22 cleanup] failed for id=" + id + ": " + e.getMessage());
+            }
+        }
+        System.out.println("[exp22 cleanup] removed " + n + " test entries from Redis");
     }
 
     private static long parseLongSafe(String s) {
