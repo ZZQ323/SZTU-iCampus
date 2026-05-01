@@ -50,8 +50,8 @@ class ColdStartLatencyTest {
 
     @Test
     void coldStartLatencyDistribution() {
-        int samplesPerGroup = Integer.getInteger("exp31.samples", 2);
-        int repeats = Integer.getInteger("exp31.repeats", 1);
+        int samplesPerGroup = Integer.getInteger("exp31.samples", 5);
+        int repeats = Integer.getInteger("exp31.repeats", 10);
         boolean dryRun = Boolean.parseBoolean(System.getProperty("exp31.dryrun", "false"));
 
         List<SourceConfig> all = configLoader.getEnabledSources();
