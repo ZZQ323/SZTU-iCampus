@@ -158,7 +158,7 @@ public class CrawlEngine {
 
         String channelId = source.getChannelId();
         String cachedLatestId = infoCacheUtil.getLatestId(channelId);
-        List<ListParserResult.InfoItemMeta> newItems = filterNewItems(result.getItems(), cachedLatestId);
+        List<ListParserResult.InfoItemMeta> newItems = filterNewItems(result.getItems(), cachedLatestId, channelId);
 
         if (newItems.isEmpty()) {
             infoCacheUtil.updateLastCrawlTime(sourceId);
@@ -564,29 +564,47 @@ public class CrawlEngine {
         return allItems;
     }
 
+    /**
+     * 过滤出"真正新增"的 item。
+     * <p>
+     * 双策略：
+     * <ul>
+     *   <li><b>数字 ID 快路径</b>：cachedLatestId 是数字 → 用 ID 数值比较（O(1) per item，0 redis）。
+     *       适用于公文通、博达 CMS 这类自增 ID 频道。</li>
+     *   <li><b>非数字 ID 兜底</b>：cachedLatestId 缺失或非数字（如 acdm-message 的
+     *       {@code xxtz-<hash>}、acdm-notice 的 UUID 风格 ggid）→ 退化为
+     *       {@code infoCacheUtil.hasMeta(channelId, id)} 精确去重（每条 1 redis HEXISTS）。
+     *       这避免了"非数字 ID 频道每轮全部 20 条都被当成新增"的 bug，
+     *       该 bug 会导致教务系统每 60s 被无谓地推送 20 条已存在内容到 WS。</li>
+     * </ul>
+     */
     private List<ListParserResult.InfoItemMeta> filterNewItems(
-            List<ListParserResult.InfoItemMeta> items, String cachedLatestId) {
+            List<ListParserResult.InfoItemMeta> items, String cachedLatestId, String channelId) {
 
-        if (!StringUtils.hasText(cachedLatestId) || "0".equals(cachedLatestId)) {
-            return items;
+        // 判断是否能走数字 ID 快路径
+        Long numericThreshold = null;
+        if (StringUtils.hasText(cachedLatestId) && !"0".equals(cachedLatestId)) {
+            try {
+                numericThreshold = Long.parseLong(cachedLatestId);
+            } catch (NumberFormatException ignored) {
+                // 非数字 latestId → 后面走 hasMeta 兜底
+            }
         }
 
-        long threshold;
-        try {
-            threshold = Long.parseLong(cachedLatestId);
-        } catch (NumberFormatException e) {
-            // 非数字 ID（如 wx_xxx），无法比较，返回全部
-            return items;
-        }
-
+        final Long t = numericThreshold;
         return items.stream()
                 .filter(item -> {
-                    try {
-                        return Long.parseLong(item.getId()) > threshold;
-                    } catch (NumberFormatException e) {
-                        // 非数字 ID 的条目始终视为"新"
-                        return true;
+                    String id = item.getId();
+                    if (t != null) {
+                        // 数字 latestId 已知：item id 也是数字时直接比较；非数字时走 hasMeta
+                        try {
+                            return Long.parseLong(id) > t;
+                        } catch (NumberFormatException e) {
+                            return !infoCacheUtil.hasMeta(channelId, id);
+                        }
                     }
+                    // 没有 latestId 兜底（首次初始化 / 非数字 ID 频道）：用 hasMeta 精确去重
+                    return !infoCacheUtil.hasMeta(channelId, id);
                 })
                 .collect(Collectors.toList());
     }
