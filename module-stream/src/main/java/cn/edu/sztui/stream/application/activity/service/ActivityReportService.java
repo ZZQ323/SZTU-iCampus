@@ -1,11 +1,10 @@
 package cn.edu.sztui.stream.application.activity.service;
 
-import cn.edu.sztui.common.cache.redis.RedisKeyGenerator;
+import cn.edu.sztui.common.cache.util.CacheUtil;
 import cn.edu.sztui.stream.application.activity.vo.ActivityReportVo;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -16,9 +15,12 @@ import java.util.Set;
 /**
  * 用户活动纠错反馈的收集与读取。
  * <p>
+ * <b>所有 Redis 读写均经 {@link CacheUtil}</b>（项目硬规则）。
  * 数据结构：
  * <ul>
- *   <li>{@code icampus:cache:activity:reports} —— LIST，LPUSH 新反馈；保持 1000 条以内 (LTRIM)</li>
+ *   <li>raw key {@code activity:reports} → cacheUtil 加前缀后落
+ *       {@code dev:sztu:cache:activity:reports} —— LIST，LPUSH 新反馈，
+ *       LTRIM 保留 1000 条</li>
  *   <li>每条 JSON：{@link ActivityReportVo}</li>
  * </ul>
  */
@@ -26,7 +28,7 @@ import java.util.Set;
 @Service
 public class ActivityReportService {
 
-    private static final String LIST_KEY = "icampus:cache:activity:reports";
+    private static final String LIST_KEY = "activity:reports";
     /** 保留最近 1000 条反馈，再老的自动淘汰 */
     private static final long MAX_REPORTS = 1000;
 
@@ -40,10 +42,7 @@ public class ActivityReportService {
     );
 
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Resource
-    private RedisKeyGenerator redisKeyGenerator;
+    private CacheUtil cacheUtil;
 
     public void save(ActivityReportVo report) {
         if (report == null || !StringUtils.hasText(report.getArticleId())) {
@@ -56,9 +55,8 @@ public class ActivityReportService {
             report.setReportedAt(System.currentTimeMillis());
         }
 
-        String fullKey = redisKeyGenerator.generate(LIST_KEY);
-        redisTemplate.opsForList().leftPush(fullKey, JSON.toJSONString(report));
-        redisTemplate.opsForList().trim(fullKey, 0, MAX_REPORTS - 1);
+        cacheUtil.lLeftPush(LIST_KEY, JSON.toJSONString(report));
+        cacheUtil.lTrim(LIST_KEY, 0, MAX_REPORTS - 1);
 
         log.info("[ActivityReport] received: articleId={} reason={} userId={}",
                 report.getArticleId(), report.getReason(), report.getUserId());
@@ -68,8 +66,7 @@ public class ActivityReportService {
         if (limit <= 0) limit = 100;
         if (limit > (int) MAX_REPORTS) limit = (int) MAX_REPORTS;
 
-        String fullKey = redisKeyGenerator.generate(LIST_KEY);
-        List<Object> raw = redisTemplate.opsForList().range(fullKey, 0, limit - 1);
+        List<Object> raw = cacheUtil.lRange(LIST_KEY, 0, limit - 1);
         if (raw == null || raw.isEmpty()) return List.of();
 
         List<ActivityReportVo> out = new ArrayList<>(raw.size());
@@ -81,8 +78,7 @@ public class ActivityReportService {
     }
 
     public long count() {
-        String fullKey = redisKeyGenerator.generate(LIST_KEY);
-        Long n = redisTemplate.opsForList().size(fullKey);
+        Long n = cacheUtil.lSize(LIST_KEY);
         return n == null ? 0 : n;
     }
 }
