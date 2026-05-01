@@ -71,6 +71,9 @@ public class CrawlEngine {
     private WsSessionRegistry wsSessionRegistry;
 
     @Resource
+    private CookiePoolMetrics cookiePoolMetrics;
+
+    @Resource
     private org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     /**
@@ -130,6 +133,7 @@ public class CrawlEngine {
             int status = response.getStatusCode();
             // 认证失败检测：401/403 或重定向到登录页
             if (source.isRequiresAuth() && (status == 401 || status == 403)) {
+                cookiePoolMetrics.recordAuthFail(pair.getUserId(), "HTTP " + status);
                 return CrawlResult.authFail(sourceId, pair.getUserId(),
                         "Cookie 认证失败: HTTP " + status);
             }
@@ -141,6 +145,8 @@ public class CrawlEngine {
 
         // ⭐ 解析器级别的认证失败（返回的是登录页 HTML 而非正常列表）
         if (result != null && result.isAuthExpired()) {
+            cookiePoolMetrics.recordAuthFail(pair.getUserId(),
+                    result.getErrorMessage() != null ? result.getErrorMessage() : "parser-login-page");
             return CrawlResult.authFail(sourceId, pair.getUserId(),
                     result.getErrorMessage() != null ? result.getErrorMessage() : "解析器检测到登录页");
         }

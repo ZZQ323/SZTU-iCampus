@@ -40,6 +40,9 @@ public class CookieSourceManager {
     @Resource
     private WsSessionRegistry wsSessionRegistry;
 
+    @Resource
+    private CookiePoolMetrics cookiePoolMetrics;
+
     /**
      * 获取一个可用的 SmartSession（带学校 Cookie）
      */
@@ -67,6 +70,8 @@ public class CookieSourceManager {
         // 保存原始 cookies 快照，用于爬取后比对变化
         List<SmartCookie> originalSnapshot = new ArrayList<>(cookies);
         SmartSession session = smartHttpClient.newSession(cookies);
+        // 实验 3.4：记录一次真借（这里才是 cookie 真的被取走用，不是仅检查存在性）
+        cookiePoolMetrics.recordBorrow(userId);
         return new CookieSessionPair(userId, session, originalSnapshot);
     }
 
@@ -112,6 +117,7 @@ public class CookieSourceManager {
         String newSource = getAvailableUserId();
         if (newSource != null && !newSource.equals(invalidUserId)) {
             log.info("Cookie 来源切换: {} → {}", invalidUserId, newSource);
+            cookiePoolMetrics.recordSwitch(invalidUserId, newSource, "markInvalidAndSwitch");
         }
     }
 
