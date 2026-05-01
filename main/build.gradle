@@ -11,4 +11,7 @@ dependencies {
     implementation project(':module-common')
     implementation project(':module-base')
     implementation project(':module-stream')
+
+    // 实验测试用（PushLatencyTest 需要 WS 客户端）
+    testImplementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
