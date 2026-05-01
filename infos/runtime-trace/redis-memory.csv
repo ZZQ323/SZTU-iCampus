@@ -1,0 +1,4 @@
+timestamp,used_memory_bytes,used_memory_peak_bytes,used_memory_rss_bytes,mem_fragmentation_ratio,db_size,used_memory_human,used_memory_peak_human
+2026-05-01T02:14:58.191695500Z,9006737,11155312,9006515,1.00,5567,8.59M,10.64M
+2026-05-01T03:00:00.012871500Z,9138558,11155312,9138304,1.00,5567,8.72M,10.64M
+2026-05-01T04:00:00.008308100Z,9374570,11155312,9374316,1.00,5567,8.94M,10.64M

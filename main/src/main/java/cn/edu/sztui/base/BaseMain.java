@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BaseMain
 {
     public static void main(String[] args) {
+
         try {
             SpringApplication.run(BaseMain.class, args);
             log.info("启动完成!");
