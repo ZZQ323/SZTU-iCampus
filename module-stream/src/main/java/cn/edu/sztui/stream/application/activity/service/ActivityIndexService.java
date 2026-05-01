@@ -7,8 +7,6 @@ import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParser
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -24,25 +22,31 @@ import java.util.Set;
  * <p>
  * 这个服务职责单一：写 + 查。判定 / 规则筛选 / LLM 调用都在 {@code ActivityScanService} 里。
  * <p>
- * Redis keys:
+ * <b>所有 Redis 读写均经 {@link CacheUtil}</b>（项目硬规则）。
+ * KEY_* 常量为 raw 形式，cacheUtil 内部统一加 {@code dev:sztu:cache:} 前缀，最终落盘形如：
  * <ul>
- *   <li>{@code icampus:cache:activity:timeline} — ZSET score=epochMillis member=articleId</li>
- *   <li>{@code icampus:cache:activity:pending}  — SET  member=articleId（时间待定）</li>
- *   <li>{@code icampus:cache:activity:detail:{id}} — STRING JSON 活动详情</li>
+ *   <li>{@code dev:sztu:cache:activity:timeline} — ZSET score=epochMillis member=articleId</li>
+ *   <li>{@code dev:sztu:cache:activity:pending}  — SET  member=articleId（时间待定）</li>
+ *   <li>{@code dev:sztu:cache:activity:detail:{id}} — STRING JSON 活动详情</li>
+ *   <li>{@code dev:sztu:cache:activity:admin-hidden} — SET  member=articleId（管理员隐藏）</li>
  * </ul>
+ * <p>
+ * <b>历史 key 迁移注意</b>：早期实现把 timeline/pending/admin-hidden 用 {@code redisTemplate}
+ * 直写到 root（无前缀），detail 走 cacheUtil 双层 {@code icampus:cache:activity:detail:*}。
+ * 切换到本实现后，老 key 全部孤儿化，需手动清。命令在仓库根 README 或 CLAUDE.md。
  */
 @Slf4j
 @Service
 public class ActivityIndexService {
 
-    static final String KEY_TIMELINE = "icampus:cache:activity:timeline";
-    static final String KEY_PENDING = "icampus:cache:activity:pending";
-    static final String KEY_DETAIL_PREFIX = "icampus:cache:activity:detail:";
-    /** 管理员隐藏的活动 articleId 集合，查询时从 timeline/pending 结果里排除 */
-    static final String KEY_ADMIN_HIDDEN = "icampus:cache:activity:admin-hidden";
-
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    /** raw key，cacheUtil 内部加 dev:sztu:cache: 前缀。最终：dev:sztu:cache:activity:timeline */
+    static final String KEY_TIMELINE = "activity:timeline";
+    /** dev:sztu:cache:activity:pending */
+    static final String KEY_PENDING = "activity:pending";
+    /** dev:sztu:cache:activity:detail:{id} */
+    static final String KEY_DETAIL_PREFIX = "activity:detail:";
+    /** dev:sztu:cache:activity:admin-hidden */
+    static final String KEY_ADMIN_HIDDEN = "activity:admin-hidden";
 
     @Resource
     private CacheUtil cacheUtil;
@@ -82,29 +86,29 @@ public class ActivityIndexService {
         cacheUtil.set(KEY_DETAIL_PREFIX + meta.getId(), JSON.toJSONString(item));
 
         if (epoch != null) {
-            redisTemplate.opsForZSet().add(KEY_TIMELINE, meta.getId(), epoch);
-            redisTemplate.opsForSet().remove(KEY_PENDING, meta.getId());
+            cacheUtil.zAdd(KEY_TIMELINE, meta.getId(), epoch);
+            cacheUtil.sRem(KEY_PENDING, meta.getId());
             log.debug("[ActivityIndex] upsert timeline: id={} epoch={} title={}",
                     meta.getId(), epoch, item.getTitle());
         } else {
-            redisTemplate.opsForSet().add(KEY_PENDING, meta.getId());
-            redisTemplate.opsForZSet().remove(KEY_TIMELINE, meta.getId());
+            cacheUtil.sAdd(KEY_PENDING, meta.getId());
+            cacheUtil.zRem(KEY_TIMELINE, meta.getId());
             log.debug("[ActivityIndex] upsert pending (unparseable time): id={} startAt={}",
                     meta.getId(), ai.getStartAt());
         }
     }
 
     public void remove(String articleId) {
-        redisTemplate.opsForZSet().remove(KEY_TIMELINE, articleId);
-        redisTemplate.opsForSet().remove(KEY_PENDING, articleId);
+        cacheUtil.zRem(KEY_TIMELINE, articleId);
+        cacheUtil.sRem(KEY_PENDING, articleId);
         cacheUtil.del(KEY_DETAIL_PREFIX + articleId);
     }
 
     /** 调试用：返回当前索引大小 */
     public IndexStats stats() {
-        Long tlSize = redisTemplate.opsForZSet().zCard(KEY_TIMELINE);
-        Long pdSize = redisTemplate.opsForSet().size(KEY_PENDING);
-        Long hdSize = redisTemplate.opsForSet().size(KEY_ADMIN_HIDDEN);
+        Long tlSize = cacheUtil.zCard(KEY_TIMELINE);
+        Long pdSize = cacheUtil.sCard(KEY_PENDING);
+        Long hdSize = cacheUtil.sCard(KEY_ADMIN_HIDDEN);
         return new IndexStats(
                 tlSize == null ? 0 : tlSize,
                 pdSize == null ? 0 : pdSize,
@@ -116,17 +120,17 @@ public class ActivityIndexService {
     /** 管理员把某条活动从前端查询结果中隐藏（不删详情，方便未来恢复）*/
     public void adminHide(String articleId) {
         if (articleId == null || articleId.isBlank()) return;
-        redisTemplate.opsForSet().add(KEY_ADMIN_HIDDEN, articleId);
+        cacheUtil.sAdd(KEY_ADMIN_HIDDEN, articleId);
         log.info("[ActivityIndex] admin hide: {}", articleId);
     }
 
     public void adminUnhide(String articleId) {
-        redisTemplate.opsForSet().remove(KEY_ADMIN_HIDDEN, articleId);
+        cacheUtil.sRem(KEY_ADMIN_HIDDEN, articleId);
         log.info("[ActivityIndex] admin unhide: {}", articleId);
     }
 
     public List<String> listAdminHidden() {
-        Set<Object> members = redisTemplate.opsForSet().members(KEY_ADMIN_HIDDEN);
+        Set<Object> members = cacheUtil.sMembers(KEY_ADMIN_HIDDEN);
         if (members == null) return List.of();
         List<String> out = new ArrayList<>(members.size());
         for (Object o : members) out.add(o.toString());
@@ -134,7 +138,7 @@ public class ActivityIndexService {
     }
 
     private boolean isAdminHidden(String articleId) {
-        Boolean b = redisTemplate.opsForSet().isMember(KEY_ADMIN_HIDDEN, articleId);
+        Boolean b = cacheUtil.sIsMember(KEY_ADMIN_HIDDEN, articleId);
         return Boolean.TRUE.equals(b);
     }
 
@@ -144,8 +148,7 @@ public class ActivityIndexService {
      * 时间范围查询。range 闭区间 [fromMs, toMs]，按时间升序返回前 max 条。
      */
     public List<ActivityIndexItem> queryByRange(long fromMs, long toMs, int maxResults) {
-        Set<Object> ids = redisTemplate.opsForZSet()
-                .rangeByScore(KEY_TIMELINE, fromMs, toMs, 0, Math.max(1, maxResults));
+        Set<Object> ids = cacheUtil.zRangeByScore(KEY_TIMELINE, fromMs, toMs, 0, Math.max(1, maxResults));
         if (ids == null || ids.isEmpty()) return List.of();
         List<String> idList = new ArrayList<>(ids.size());
         for (Object o : ids) idList.add(o.toString());
@@ -164,7 +167,7 @@ public class ActivityIndexService {
 
     /** 时间待定的活动（没有可解析的 startAt） */
     public List<ActivityIndexItem> queryPending(int limit) {
-        Set<Object> members = redisTemplate.opsForSet().members(KEY_PENDING);
+        Set<Object> members = cacheUtil.sMembers(KEY_PENDING);
         if (members == null || members.isEmpty()) return List.of();
         // Set 无序，我们按 articleId 倒序（文章 id 自增 ≈ 发布时间逆序）
         List<String> sorted = members.stream()
@@ -179,7 +182,7 @@ public class ActivityIndexService {
 
     private List<ActivityIndexItem> loadDetails(List<String> articleIds) {
         // 一次性读出管理员隐藏集合，本次调用内复用，避免 O(N) Redis 往返
-        Set<Object> hiddenMembers = redisTemplate.opsForSet().members(KEY_ADMIN_HIDDEN);
+        Set<Object> hiddenMembers = cacheUtil.sMembers(KEY_ADMIN_HIDDEN);
         Set<String> hidden = new java.util.HashSet<>();
         if (hiddenMembers != null) {
             for (Object o : hiddenMembers) hidden.add(o.toString());
