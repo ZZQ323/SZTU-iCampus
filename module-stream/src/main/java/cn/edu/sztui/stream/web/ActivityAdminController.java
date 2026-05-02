@@ -48,6 +48,9 @@ public class ActivityAdminController {
     @Resource
     private cn.edu.sztui.stream.application.activity.service.ActivityIndexService indexService;
 
+    @Resource
+    private cn.edu.sztui.stream.application.activity.service.ActivityBackfillService backfillService;
+
     @Value("${ai.activity.default-channels:announcement}")
     private List<String> defaultChannels;
 
@@ -185,6 +188,42 @@ public class ActivityAdminController {
     }
 
     // ==================== 请求体 ====================
+
+    // ==================== Backfill（全量补扫）====================
+
+    /**
+     * 全量补扫：把指定频道（或 default-channels）下 Redis 里所有现存文章都走一遍 LLM 抽取流程。
+     * <p>
+     * 区别于 {@code /scan-recent}（只扫最近 N 条，受 ai.activity.max-scan-count=200 限制），
+     * 此接口分页扫整个 timeline，无上限。
+     * <p>
+     * <b>同步阻塞</b>—— N 大时调用方需要长时间等待。下次实现 jobId 异步化。
+     * <p>
+     * 已扫过的文章命中 LLM 30 天缓存，<b>不烧 token</b>；要重判请 bump
+     * {@code ai.activity.cache-version}（如 v3 → v4）。
+     */
+    @PostMapping("/backfill")
+    @Operation(summary = "全量补扫现有文章入活动索引")
+    public Result backfill(@RequestBody(required = false) BackfillRequest req) {
+        List<String> channels = (req == null || req.getChannels() == null || req.getChannels().isEmpty())
+                ? null : req.getChannels();
+        log.info("[ActivityAdmin] backfill channels={}", channels == null ? "default" : channels);
+        var snapshot = backfillService.backfill(channels);
+        return Result.ok(snapshot);
+    }
+
+    /** 查询 backfill 当前进度（运行时调用，非阻塞）*/
+    @GetMapping("/backfill-status")
+    @Operation(summary = "查看 backfill 进度")
+    public Result backfillStatus() {
+        return Result.ok(backfillService.currentProgress());
+    }
+
+    @Data
+    public static class BackfillRequest {
+        /** 频道 ID 列表；为空使用 ai.activity.default-channels（announcement / job）*/
+        private List<String> channels;
+    }
 
     @Data
     public static class ScanRequest {
