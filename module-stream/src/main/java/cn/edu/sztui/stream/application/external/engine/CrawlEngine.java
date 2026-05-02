@@ -375,49 +375,94 @@ public class CrawlEngine {
     }
 
     /**
-     * 爬取后检测 cookie 变化，有变化则更新 Redis 并推送给用户。
+     * 爬取后检测 cookie 变化，有变化且**3-tier 硬规则全部通过**时，写回 Redis +
+     * 推 WS COOKIE_UPDATE 给前端。日志里打出具体新增/删除/值变化的 cookie 名字+域。
      * <p>
-     * **硬守卫**（2026-04-25）：保存 + 推送之前必须确认这个 userId 还满足
-     * "在线 + schoolLoggedIn + Redis 有 session"。否则发生过的真实 race：
+     * <b>3-tier 硬规则</b>（CLAUDE.md §6.0，缺一不可）：
      * <ol>
-     *   <li>用户登出 → Redis 清空 + schoolLoggedIn=false</li>
-     *   <li>in-flight 爬虫携带的 SmartSession 内存里还活着，跑完拿到一组新 cookies</li>
-     *   <li>这里没守卫 → saveOrUpdateSessionCookie 把 cookies **复活** 写回 Redis</li>
-     *   <li>pushCookieUpdate 把 cookies 推给前端（如果 WS 还在断连同步窗口里），
-     *       前端 merge → cookies 也复活</li>
-     *   <li>用户名义已登出，但实际后台爬虫还在借他 cookies，cookie 寿命被延长</li>
+     *   <li>{@code wsSessionRegistry.isOnline(userId)} —— WS 在线</li>
+     *   <li>{@code authSessionCacheUtil.isSchoolLoggedIn(userId)} —— Redis schoolLoggedIn=true</li>
+     *   <li>本次有 cookie 变化 —— 没变就不动</li>
      * </ol>
-     * 守卫断绝这条路径。
-     */
-    /**
-     * 爬取后只**观测**前后 cookie 变化，**不再写回 Redis、不再推 WS**（2026-04-30 用户决策）。
+     * 全过 → 写 + 推；否则只 log 不动。
      * <p>
-     * 为什么禁用整条回写：
-     * <ul>
-     *   <li>这条路径反复成为"已登出 / 已过期 cookie 复活"的源头：爬虫拿到的"新"
-     *       cookies 写回 Redis + 推 WS COOKIE_UPDATE 给前端 → 前端 merge 进 localStorage
-     *       → 用户名义已退出，cookies 寿命被人为延长。</li>
-     *   <li>历次都是靠"加守卫"修补（schoolLoggedIn 检查、在线检查、CAS 比较等），
-     *       但并发覆盖窗口始终关不死。</li>
-     *   <li>cookies 应当只在用户主动操作（登录 / 重置）时被写。爬取过程中即便学校
-     *       下发了新 cookies，最多影响这次爬取的有效性，让它静默失败、下一轮重试就好。</li>
-     * </ul>
-     * 诊断 log 保留——若长期观察 changed=true 的频率为 0，下次可以连同
-     * cookiesChanged + 这整个方法一起删掉，并清理 StreamPushService.pushCookieUpdate
-     * 与前端 ws.ts 里的 COOKIE_UPDATE handler。
+     * <b>历史</b>：2026-04-30 因为 race（登出后 in-flight 爬虫复活 cookies）禁用过整条
+     * 写回，期间只观测 log。2026-05-02 SmartHttpClient cookie store bug 修了之后，
+     * cookies 变化变得频繁（每次轮询 8→9）且都是合法的 SESSION 轮换。3-tier 硬规则
+     * 把 race 路径堵死，重新启用回写。
+     * <p>
+     * <b>诊断输出</b>（grep `[syncCookies]`）：
+     * <pre>
+     * [syncCookies] userId=X 8→9 added=[SESSION@auth-...] removed=[] changed=[] (writeback ok)
+     * [syncCookies] userId=X 8→8 added=[] removed=[] changed=[SESSION@auth-...] (writeback ok)
+     * [syncCookies] userId=X skipped (online=false)
+     * </pre>
      */
     private void syncCookiesIfChanged(CookieSourceManager.CookieSessionPair pair) {
         if (pair.getUserId() == null || pair.getOriginalCookies() == null) return;
         String userId = pair.getUserId();
 
         List<SmartCookie> currentCookies = pair.getSession().getCookies();
-        boolean changed = cookiesChanged(pair.getOriginalCookies(), currentCookies);
-        if (!changed) return;  // 静默：没变就不打 log（之前每次轮询都打 INFO，刷屏）
+        var diff = computeCookieDiff(pair.getOriginalCookies(), currentCookies);
+        if (diff.isUnchanged()) return;
 
         boolean online = wsSessionRegistry.isOnline(userId);
         boolean loggedIn = authSessionCacheUtil.isSchoolLoggedIn(userId);
-        log.info("[syncCookies] userId={} orig={} curr={} changed=true online={} loggedIn={} (writeback DISABLED)",
-                userId, pair.getOriginalCookies().size(), currentCookies.size(), online, loggedIn);
+        if (!online || !loggedIn) {
+            // 守卫触发：cookies 变化但用户已离线或登出 → 不写回（防 cookie 复活）
+            log.info("[syncCookies] userId={} skipped (online={} loggedIn={}) {}→{} added={} removed={} changed={}",
+                    userId, online, loggedIn,
+                    pair.getOriginalCookies().size(), currentCookies.size(),
+                    diff.added, diff.removed, diff.changed);
+            return;
+        }
+
+        // 3-tier 全过 → 写回 Redis + 推 WS
+        try {
+            authSessionCacheUtil.saveOrUpdateSessionCookie(userId, currentCookies);
+            String cookiesJson = com.alibaba.fastjson2.JSON.toJSONString(
+                    cn.edu.sztui.common.util.smarthttp.SmartCookieConverter.filterAlive(currentCookies));
+            streamPushService.pushCookieUpdate(userId, cookiesJson);
+            log.info("[syncCookies] userId={} {}→{} added={} removed={} changed={} (writeback ok)",
+                    userId, pair.getOriginalCookies().size(), currentCookies.size(),
+                    diff.added, diff.removed, diff.changed);
+        } catch (Exception e) {
+            log.warn("[syncCookies] userId={} writeback FAILED: {}", userId, e.getMessage());
+        }
+    }
+
+    /** Cookie 集合差分结果 */
+    private static class CookieDiff {
+        final List<String> added = new ArrayList<>();
+        final List<String> removed = new ArrayList<>();
+        final List<String> changed = new ArrayList<>();
+        boolean isUnchanged() { return added.isEmpty() && removed.isEmpty() && changed.isEmpty(); }
+    }
+
+    /** 按 name+domain 算前后差分；name+domain 同但 value 不同记为 changed */
+    private static CookieDiff computeCookieDiff(List<SmartCookie> before, List<SmartCookie> after) {
+        CookieDiff d = new CookieDiff();
+        java.util.Map<String, SmartCookie> bMap = new java.util.LinkedHashMap<>();
+        java.util.Map<String, SmartCookie> aMap = new java.util.LinkedHashMap<>();
+        for (SmartCookie c : before) bMap.put(cookieKey(c), c);
+        for (SmartCookie c : after)  aMap.put(cookieKey(c), c);
+        for (var e : aMap.entrySet()) {
+            String k = e.getKey();
+            SmartCookie b = bMap.get(k);
+            if (b == null) {
+                d.added.add(k);
+            } else if (!java.util.Objects.equals(b.getValue(), e.getValue().getValue())) {
+                d.changed.add(k);
+            }
+        }
+        for (String k : bMap.keySet()) {
+            if (!aMap.containsKey(k)) d.removed.add(k);
+        }
+        return d;
+    }
+
+    private static String cookieKey(SmartCookie c) {
+        return c.getName() + "@" + (c.getDomain() == null ? "?" : c.getDomain());
     }
 
     /**
