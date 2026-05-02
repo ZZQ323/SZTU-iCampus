@@ -1,5 +1,7 @@
 package cn.edu.sztui.stream.application.activity.service;
 
+import cn.edu.sztui.stream.application.service.InfoService;
+import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult.InfoItemMeta;
 import cn.edu.sztui.stream.infrastructure.util.cache.InfoCacheUtil;
 import jakarta.annotation.Resource;
@@ -51,8 +53,26 @@ public class ActivityBackfillService {
     @Resource
     private InfoCacheUtil infoCacheUtil;
 
+    @Resource
+    private InfoService infoService;
+
     @Value("${ai.activity.default-channels:announcement,job}")
     private List<String> defaultChannels;
+
+    /**
+     * 是否在 backfill 时为没有详情缓存的文章主动拉学校。
+     * <p>
+     * 背景：activity scan 走 ScanService.loadArticleText 取正文，缓存 miss 时
+     * 只回退到 meta.summary（列表页解析的摘要，<200 字，常缺时间地点）→ LLM
+     * 抽不出 startAt → 文章进 pending。{@code true} 时本服务先调
+     * {@link InfoService#getDetail} 触发详情拉取（内部已有 cache miss → 学校 GET
+     * → 入 24h cache 的逻辑），保证 LLM 拿到完整正文。
+     * <p>
+     * 默认开。代价是 backfill 首次跑会对学校发 N 次 GET（每条文章 1 次详情）；
+     * 这只在显式触发 backfill 时发生。
+     */
+    @Value("${ai.activity.backfill-fetch-detail:true}")
+    private boolean fetchDetailOnMiss;
 
     /** 简单的串行守卫：避免启动自动 + admin 手动同时跑 */
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -107,6 +127,8 @@ public class ActivityBackfillService {
             for (InfoItemMeta meta : items) {
                 progress.totalSeen.incrementAndGet();
                 try {
+                    // 关键：scan 之前先确保详情缓存已就位，否则 LLM 只看到 summary，抽不出时间
+                    ensureDetailCached(meta);
                     scanService.autoProcess(meta);
                     progress.processed.incrementAndGet();
                 } catch (Exception e) {
@@ -126,6 +148,30 @@ public class ActivityBackfillService {
             try { Thread.sleep(200); } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt(); break;
             }
+        }
+    }
+
+    /**
+     * 确保详情已落 24h 缓存，否则 LLM 看不到正文（只能用 summary）。
+     * <p>
+     * cache 命中：0 redis 调用之外的开销。
+     * miss：触发 {@link InfoService#getDetail}，会对学校发 1 次详情页 GET，
+     * 解析后入 cache。这是 backfill 唯一对学校友好性的妥协点。
+     */
+    private void ensureDetailCached(InfoItemMeta meta) {
+        if (!fetchDetailOnMiss) return;
+        if (meta.getChannelId() == null || meta.getId() == null) return;
+
+        ContentParserResult cached = infoCacheUtil.getContent(meta.getChannelId(), meta.getId());
+        if (cached != null && cached.getContent() != null) {
+            return;  // 已有
+        }
+        try {
+            // 用 categoryCode = null 让 InfoService 内部按 meta.url 解析，避免 URL 重建错配
+            infoService.getDetail(meta.getChannelId(), meta.getId(), null);
+        } catch (Exception e) {
+            log.debug("[activity-backfill] ensureDetailCached miss + fetch failed: id={} err={}",
+                    meta.getId(), e.getMessage());
         }
     }
 
