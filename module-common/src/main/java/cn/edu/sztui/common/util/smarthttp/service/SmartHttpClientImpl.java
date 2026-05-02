@@ -88,10 +88,20 @@ public class SmartHttpClientImpl implements SmartHttpClient {
                 .setSSLSocketFactory(sslSocketFactory)
                 .build();
         
-        // 3. 创建 HttpClient（禁用内置重定向）
+        // 3. 创建 HttpClient（禁用内置重定向 + 禁用内置 cookie store）
+        // ⭐ disableCookieManagement() 是 2026-05-02 排查"backend 只收到 1 个 cookie
+        // 而浏览器同等请求收到 3-6 个"的根因。Apache HttpClient 5 默认自带 cookie store，
+        // 它会按 RFC 6265 严格规则过滤、消化 set-cookie 头。host-only cookies（domain
+        // 字段缺失或不带前导点的，比如学校发的 SESSION @ auth-sztu-edu-cn-s）被其内部
+        // 处理后，不再出现在 response.getHeaders("Set-Cookie") 里 —— 我们自己的
+        // SmartSession 解析就丢了。学校 IDP 多域 SSO 链关键 cookie 几乎都是 host-only，
+        // 全部丢失 → backend 只剩 1 个 domain cookie (_idp_authn_lc_key_) → 重登挂。
+        // 禁用 Apache 内置 cookie store 后，所有 set-cookie 头原样到我们手里，由
+        // SmartSessionImpl.parseAndAddCookies 全权解析。
         this.httpClient = HttpClients.custom()
                 .setConnectionManager(connManager)
-                .disableRedirectHandling()  // ⭐ 关键：禁用内置重定向
+                .disableRedirectHandling()         // ⭐ 关键：禁用内置重定向（自己的重定向链）
+                .disableCookieManagement()         // ⭐ 关键：禁用内置 cookie store（自己的 SmartSession）
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setConnectTimeout(Timeout.ofSeconds(defaultTimeoutSeconds))
                         .setResponseTimeout(Timeout.ofSeconds(defaultTimeoutSeconds))
