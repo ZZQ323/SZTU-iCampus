@@ -169,8 +169,6 @@ crawler:
   # 或临时改成 true 启动一次、再改回 false
   force-reinit: false
 
-
-
 # ==================== AI（活动抽取） ====================
 # 真实 API Key 不在这里，写在 application-dev.yml（git 已忽略），
 # 或走环境变量 DASHSCOPE_API_KEY
@@ -182,6 +180,7 @@ ai:
     timeout-seconds: 30
   activity:
     enabled: true                  # 总开关；Step A 默认关，通过 /admin 手动触发；开则自动送检
+    scan-on-startup: true
     default-channels:
       - announcement                # 活动预告主场（F1=0.95）
       - job                         # 招聘会/宣讲会（F1=0.83）
