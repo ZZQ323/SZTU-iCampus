@@ -187,7 +187,7 @@ ai:
       # 其他频道多为事后报道，扫出来多为 FP，不纳入默认
     max-scan-count: 200             # 单次扫描硬上限，防手滑（对照实验 100-200 通常够用）
     content-max-chars: 4000         # 正文超长截断，控成本
-    cache-version: v3               # prompt / schema 改动时 bump，让旧缓存自然失效
+    cache-version: v4               # prompt / schema 改动时 bump，让旧缓存自然失效
                                     # v1: zero-shot 初版
                                     # v2: 广义活动定义 + 时间字段指令
                                     # v3: few-shot 3 正例 + 2 反例（当前）
