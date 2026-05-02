@@ -167,7 +167,7 @@ crawler:
   # 启动时是否强制重爬所有源（默认 false：增量模式，只爬 initialized=false 的源）
   # 需要全量重跑时在命令行加：--crawler.force-reinit=true
   # 或临时改成 true 启动一次、再改回 false
-  force-reinit: true
+  force-reinit: false
 
 # ==================== AI（活动抽取） ====================
 # 真实 API Key 不在这里，写在 application-dev.yml（git 已忽略），
