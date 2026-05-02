@@ -87,6 +87,7 @@ public class AuthSessionCacheUtil {
             return false;
         }
         ProxySession session = getSession(userId);
+        List<String> beforeNames = sessionCookieNames(session);
         if (session == null) {
             session = new ProxySession();
             session.setUserId(userId);
@@ -97,7 +98,7 @@ public class AuthSessionCacheUtil {
         session.setCookiesJson(JSON.toJSONString(valid));
         session.setLastUpdateTime(System.currentTimeMillis());
         saveSession(userId, session);
-        log.info("保存代理会话 cookie: userId={}", userId);
+        logDelta("saveOrUpdate", userId, beforeNames, valid);
         return true;
     }
 
@@ -106,6 +107,7 @@ public class AuthSessionCacheUtil {
      */
     public boolean sessionLoginBind(String userId, String studentId, List<SmartCookie> newCookies) {
         ProxySession session = getSession(userId);
+        List<String> beforeNames = sessionCookieNames(session);
         if (session == null) {
             session = new ProxySession();
             session.setUserId(userId);
@@ -119,7 +121,7 @@ public class AuthSessionCacheUtil {
         session.setLastUpdateTime(System.currentTimeMillis());
         session.setSchoolLoggedIn(true);
         saveSession(userId, session);
-        log.info("用户 {} 绑定到 userId={}", studentId, userId);
+        logDelta("loginBind", userId, beforeNames, newCookies);
         return true;
     }
 
@@ -137,11 +139,12 @@ public class AuthSessionCacheUtil {
     public void sessionLogoutBind(String userId) {
         ProxySession session = getSession(userId);
         if (session == null) return;
+        List<String> beforeNames = sessionCookieNames(session);
         session.setCookiesJson(null);
         session.setLastUpdateTime(System.currentTimeMillis());
         session.setSchoolLoggedIn(false);
         saveSession(userId, session);
-        log.info("userId={} 已登出学校后端（cookies 已清空）", userId);
+        logDelta("logoutBind", userId, beforeNames, java.util.Collections.emptyList());
     }
 
     /**
@@ -255,6 +258,52 @@ public class AuthSessionCacheUtil {
 
     private void saveSession(String userId, ProxySession session) {
         cacheUtil.set(PROXY_SESSION_PREFIX + userId, JSON.toJSONString(session), TTL_SECONDS);
+    }
+
+    /**
+     * 抽取 ProxySession 当前 cookie 列表的 name+domain 概要，用于 delta log。
+     * 每条形如 "TWFID@webvpn.sztu.edu.cn"。
+     */
+    private static List<String> sessionCookieNames(ProxySession session) {
+        if (session == null || !StringUtils.hasText(session.getCookiesJson())) {
+            return java.util.Collections.emptyList();
+        }
+        try {
+            List<SmartCookie> cs = JSON.parseArray(session.getCookiesJson(), SmartCookie.class);
+            return cs.stream()
+                    .map(c -> c.getName() + "@" + (c.getDomain() == null ? "?" : c.getDomain()))
+                    .sorted()
+                    .collect(java.util.stream.Collectors.toList());
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+    }
+
+    private static List<String> cookieNames(List<SmartCookie> cookies) {
+        if (cookies == null) return java.util.Collections.emptyList();
+        return cookies.stream()
+                .map(c -> c.getName() + "@" + (c.getDomain() == null ? "?" : c.getDomain()))
+                .sorted()
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * 打印 ProxySession cookie 集合的前后差分。
+     * 输出形式（grep "ProxySession Δ" 得完整时间线）：
+     * <pre>
+     * [ProxySession Δ] op=loginBind userId=202200202104 5→6 +[JSESSIONID@jwxt-...] -[]
+     * </pre>
+     */
+    private static void logDelta(String op, String userId, List<String> before, List<SmartCookie> after) {
+        List<String> afterNames = cookieNames(after);
+        java.util.Set<String> bSet = new java.util.LinkedHashSet<>(before);
+        java.util.Set<String> aSet = new java.util.LinkedHashSet<>(afterNames);
+        List<String> added = new java.util.ArrayList<>(aSet);
+        added.removeAll(bSet);
+        List<String> removed = new java.util.ArrayList<>(bSet);
+        removed.removeAll(aSet);
+        log.info("[ProxySession Δ] op={} userId={} {}→{} +{} -{}",
+                op, userId, before.size(), afterNames.size(), added, removed);
     }
 
     /**
