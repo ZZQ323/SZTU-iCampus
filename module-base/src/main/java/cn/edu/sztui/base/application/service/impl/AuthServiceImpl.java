@@ -582,19 +582,33 @@ public class AuthServiceImpl implements AuthService {
             log.info("🍪 doRefreshCookies 开始时有 {} 个 Cookie", smartSession.getCookies().size());
             authFlowTracer.dumpHop(traceDir, 1, "doRefresh-pre", smartSession, null);
 
-            // ⭐ 根据是否有 Cookie 选择入口 URL：
-            //   有 Cookie → gatewayStartURL（正常刷新路径）
-            //   无 Cookie → thdportal_login（绕过 /por/ 页面的 JS 重定向）
-            // /por/ 页面依赖浏览器 JS 执行重定向，SmartHttpClient 处理不了，
-            // 会导致 0 Cookie 被收集。thdportal_login 是服务器端重定向，可以正常工作。
+            // ⭐ 选择入口 URL 的真实判据：是否有"WebVPN 真登录态" cookies。
+            //
+            // 旧判断 `cookies.isEmpty()` 是错的 —— reset+init 后前端只剩 1 个
+            // _idp_authn_lc_key_ 这种"刚预登录"的 cookie，根本没登录。但 isEmpty()=false
+            // 让它走 gatewayStartURL → /por/ JS 重定向页 → SmartHttpClient 不会跑 JS →
+            // 卡在门户页 → backend 误判"会话过期"。
+            //
+            // 真登录态的标志是 TWFID（WebVPN 网关 cookie）和 webvpn:8118 子域的 SESSION
+            // 至少有一个；只有这种情况下走 gatewayStartURL 才安全（学校认得你 → 直接给登录态）。
+            // 否则一律走 thdportal_login（服务器端重定向，无依赖浏览器 JS）。
+            boolean hasRealLoginState = smartSession.getCookies().stream().anyMatch(c -> {
+                String name = c.getName();
+                String dom  = c.getDomain() == null ? "" : c.getDomain().toLowerCase();
+                return "TWFID".equals(name)
+                        || ("SESSION".equals(name) && dom.contains("webvpn.sztu.edu.cn"));
+            });
+
             String entryUrl;
-            if (smartSession.getCookies().isEmpty()) {
+            if (!hasRealLoginState) {
                 String redirectUri = "https://home-sztu-edu-cn-s.webvpn.sztu.edu.cn:8118/bmportal";
                 entryUrl = "https://webvpn.sztu.edu.cn/public/thdportal_login?redirect_uri=" +
                         java.net.URLEncoder.encode(redirectUri, java.nio.charset.StandardCharsets.UTF_8);
-                log.info("无 Cookie，使用 thdportal_login 入口绕过 /por/ 页面");
+                log.info("无真登录态 cookies (cookies={}, 缺 TWFID/webvpn:SESSION)，使用 thdportal_login 入口",
+                        smartSession.getCookies().size());
             } else {
                 entryUrl = gatewayStartURL;
+                log.info("有真登录态 cookies，使用 gatewayStartURL 正常刷新");
             }
 
             // 访问入口页，自动跟随所有重定向
