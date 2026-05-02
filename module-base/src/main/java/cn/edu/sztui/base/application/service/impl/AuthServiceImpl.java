@@ -57,6 +57,9 @@ public class AuthServiceImpl implements AuthService {
     @Resource
     private ApplicationEventPublisher eventPublisher;
 
+    @Resource
+    private cn.edu.sztui.base.infrastructure.tracer.AuthFlowTracer authFlowTracer;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -111,10 +114,17 @@ public class AuthServiceImpl implements AuthService {
     public LoginResultsVo initSession() {
         log.info("初始化会话（公开）");
 
-        // 新建空会话，执行刷新
-        LoginResultsVo result = doRefreshCookies(null, null);
-
-        return result;
+        java.nio.file.Path traceDir = authFlowTracer.startOp("initSession", null);
+        try {
+            // 新建空会话，执行刷新
+            LoginResultsVo result = doRefreshCookies(null, null, traceDir);
+            authFlowTracer.finishOp(traceDir, "initSession done; logined=" + result.isLogined()
+                    + " cookiesJson.length=" + (result.getCookiesJson() == null ? 0 : result.getCookiesJson().length()));
+            return result;
+        } catch (RuntimeException e) {
+            authFlowTracer.finishOp(traceDir, "initSession FAILED: " + e.getMessage());
+            throw e;
+        }
     }
 
     /**
@@ -130,14 +140,20 @@ public class AuthServiceImpl implements AuthService {
 
         ProxySession session = buildSessionFromContext(tokenMessage);
 
-        LoginResultsVo result = doRefreshCookies(userId, session);
-        result.setUserId(userId);
-
-        // ⚠️ 不抛错：landing 在 ActionAuthChain（登录表单）是 logged-out 状态，**不是**异常。
-        // 前端按 result.logined 字段判断；result 里已经带上 loginTypes，前端可以直接用。
-        // 之前抛 BusinessException 把 result 整个丢弃，前端拿不到 loginTypes，登录页只能
-        // fallback 到默认 ['SMS']，导致用户看到的登录方式不全（"为什么只有短信，没有密码？"）。
-        return result;
+        java.nio.file.Path traceDir = authFlowTracer.startOp("refreshSession", userId);
+        if (tokenMessage != null && tokenMessage.getSchoolCookiesJson() != null) {
+            authFlowTracer.dumpAuxCookies(traceDir, "incoming-front-cookies", tokenMessage.getSchoolCookiesJson());
+        }
+        try {
+            LoginResultsVo result = doRefreshCookies(userId, session, traceDir);
+            result.setUserId(userId);
+            authFlowTracer.finishOp(traceDir, "refreshSession done; logined=" + result.isLogined());
+            // ⚠️ 不抛错：landing 在 ActionAuthChain（登录表单）是 logged-out 状态，**不是**异常。
+            return result;
+        } catch (RuntimeException e) {
+            authFlowTracer.finishOp(traceDir, "refreshSession FAILED: " + e.getMessage());
+            throw e;
+        }
     }
 
     @Override
@@ -152,12 +168,15 @@ public class AuthServiceImpl implements AuthService {
     public String getSms(String usrId) {
         log.info("📱 获取短信验证码: userId={}", usrId);
 
+        java.nio.file.Path traceDir = authFlowTracer.startOp("getSms", usrId);
+
         // ⭐ 始终创建空 session，不继承前端的旧 cookie
         // 首次成功登录：0 cookie → 正确落地 ActionAuthChain?entityId=webvpn
         // 失败案例：旧 cookie → 错误落地 idp/AuthnEngine（IDP 路由被干扰）
         try (SmartSession smartSession = smartHttpClient.newSession()) {
 
             log.info("🍪 getSms 使用全新空 session");
+            authFlowTracer.dumpHop(traceDir, 1, "sms-pre-empty-session", smartSession, null);
 
             // ⭐ 第一步：访问 WebVPN 入口，建立完整的会话链路
             // 使用 thdportal_login URL 跳过 /por/ 页面的 JS 重定向
@@ -169,6 +188,7 @@ public class AuthServiceImpl implements AuthService {
             log.debug("📍 URL: {}", thdLoginUrl);
 
             SmartResponse loginPageRes = smartHttpClient.get(thdLoginUrl, smartSession);
+            authFlowTracer.dumpHop(traceDir, 2, "sms-step1-thdportal", smartSession, loginPageRes);
 
             log.info("📍 登录页面最终 URL: {}", loginPageRes.getFinalUrl());
             log.info("🍪 收集到 {} 个 Cookie", smartSession.getCookies().size());
@@ -196,6 +216,7 @@ public class AuthServiceImpl implements AuthService {
                     smartSession,
                     headers
             );
+            authFlowTracer.dumpHop(traceDir, 3, "sms-step2-postAjax", smartSession, response);
 
             log.info("📱 短信请求响应: status={}", response.getStatusCode());
 
@@ -214,12 +235,16 @@ public class AuthServiceImpl implements AuthService {
 
             log.info("📱 短信请求完成，有 {} 个 Cookie", smartSession.getCookies().size());
 
-            return JSON.toJSONString(smartSession.getCookies());
+            String cookiesJson = JSON.toJSONString(smartSession.getCookies());
+            authFlowTracer.finishOp(traceDir, "getSms done; final cookies=" + smartSession.getCookies().size());
+            return cookiesJson;
 
         } catch (BusinessException e) {
+            authFlowTracer.finishOp(traceDir, "getSms FAILED (BusinessException): " + e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error("获取短信验证码失败: {}", e.getMessage(), e);
+            authFlowTracer.finishOp(traceDir, "getSms FAILED: " + e.getMessage());
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
                     "获取短信验证码失败: " + e.getMessage(),
@@ -231,6 +256,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResultsVo loginFrame(LoginRequestCommand cmd) {
         String userId = cmd.getUserId();
+        java.nio.file.Path traceDir = authFlowTracer.startOp("login-" + cmd.getLoginType(), userId);
 
         LoginResultsVo ret = new LoginResultsVo();
 
@@ -253,6 +279,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         log.info("📦 前端传来 cookiesJson 长度: {}", cookiesJson.length());
+        authFlowTracer.dumpAuxCookies(traceDir, "incoming-front-cookies", cookiesJson);
 
         ProxySession tempSession = new ProxySession();
         tempSession.setCookiesJson(cookiesJson);
@@ -261,6 +288,7 @@ public class AuthServiceImpl implements AuthService {
 
             List<SmartCookie> loadedCookies = smartSession.getCookies();
             log.info("🍪 SmartSession 中加载了 {} 个 Cookie", loadedCookies.size());
+            authFlowTracer.dumpHop(traceDir, 1, "login-pre-loaded", smartSession, null);
 
             for (SmartCookie c : loadedCookies) {
                 log.debug("  🍪 {}={} (domain={}, path={})",
@@ -292,6 +320,7 @@ public class AuthServiceImpl implements AuthService {
                     smartSession,
                     verifyHeaders
             );
+            authFlowTracer.dumpHop(traceDir, 2, "login-step1-ajax-verify", smartSession, ajaxRes);
 
             String ajaxBody = ajaxRes.getBody();
             log.info("📥 AJAX 响应: status={}, bodyLength={}",
@@ -349,10 +378,12 @@ public class AuthServiceImpl implements AuthService {
             log.info("📤 提交登录表单: url={}", formSubmitUrl);
 
             SmartResponse formRes = smartHttpClient.post(formSubmitUrl, loginFormData, smartSession);
+            authFlowTracer.dumpHop(traceDir, 3, "login-step2-form-submit", smartSession, formRes);
             log.info("📥 表单提交后最终 URL: {}", formRes.getFinalUrl());
 
             // ============ 第三步：访问最终页面获取用户信息 ============
             SmartResponse finalRes = smartHttpClient.get(internalNetStartURL, smartSession);
+            authFlowTracer.dumpHop(traceDir, 4, "login-step3-fetch-bmportal", smartSession, finalRes);
 
             if (finalRes.getFinalUrl().contains(internalNetStartURL)
                     || finalRes.getFinalUrl().contains("/bmportal/index.portal")) {
@@ -396,12 +427,17 @@ public class AuthServiceImpl implements AuthService {
             log.info("✅ 登录成功: userId={}", userId);
 
             ret.setLogined(true);
+            authFlowTracer.finishOp(traceDir, "login OK; userId=" + userId
+                    + " session cookies=" + smartSession.getCookies().size()
+                    + " alive returned=" + aliveCookies.size());
             return ret;
 
         } catch (BusinessException e) {
+            authFlowTracer.finishOp(traceDir, "login FAILED (BusinessException): " + e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error("❌ 登录失败: {}", e.getMessage(), e);
+            authFlowTracer.finishOp(traceDir, "login FAILED: " + e.getMessage());
             throw new BusinessException(
                     SysReturnCode.BASE_PROXY.getCode(),
                     "登录失败: " + e.getMessage(),
@@ -415,11 +451,18 @@ public class AuthServiceImpl implements AuthService {
         TokenMessage tokenMessage = UserContext.getContext();
         String userId = tokenMessage.getUserId();
 
+        java.nio.file.Path traceDir = authFlowTracer.startOp("logout", userId);
+        if (tokenMessage != null && tokenMessage.getSchoolCookiesJson() != null) {
+            authFlowTracer.dumpAuxCookies(traceDir, "incoming-front-cookies", tokenMessage.getSchoolCookiesJson());
+        }
+
         ProxySession session = buildSessionFromContext(tokenMessage);
         try (SmartSession smartSession = createSmartSession(session)) {
+            authFlowTracer.dumpHop(traceDir, 1, "logout-pre", smartSession, null);
 
             // 访问登出 URL
-            smartHttpClient.get(logoutSubmitURL, smartSession);
+            SmartResponse logoutResp = smartHttpClient.get(logoutSubmitURL, smartSession);
+            authFlowTracer.dumpHop(traceDir, 2, "logout-call", smartSession, logoutResp);
 
             // ⭐ 清 Redis cookies + schoolLoggedIn=false（cookies 由前端拥有，
             // 后端的 Redis 缓存只是给爬虫用的；登出 = 不再为这个用户做事）
@@ -431,6 +474,7 @@ public class AuthServiceImpl implements AuthService {
 
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);
+            authFlowTracer.finishOp(traceDir, "logout done; session cookies after=" + smartSession.getCookies().size());
             return ret;
 
         } catch (Exception e) {
@@ -441,6 +485,7 @@ public class AuthServiceImpl implements AuthService {
 
             LoginResultsVo ret = new LoginResultsVo();
             ret.setLogined(false);
+            authFlowTracer.finishOp(traceDir, "logout FAILED: " + e.getMessage());
             return ret;
         }
     }
@@ -523,6 +568,10 @@ public class AuthServiceImpl implements AuthService {
     // ==================== 核心：Cookie 刷新逻辑 ====================
 
     private LoginResultsVo doRefreshCookies(String userId, ProxySession session) {
+        return doRefreshCookies(userId, session, null);
+    }
+
+    private LoginResultsVo doRefreshCookies(String userId, ProxySession session, java.nio.file.Path traceDir) {
         LoginResultsVo ret = new LoginResultsVo();
         ret.setLogined(false);
 
@@ -531,6 +580,7 @@ public class AuthServiceImpl implements AuthService {
         try (SmartSession smartSession = createSmartSession(session)) {
 
             log.info("🍪 doRefreshCookies 开始时有 {} 个 Cookie", smartSession.getCookies().size());
+            authFlowTracer.dumpHop(traceDir, 1, "doRefresh-pre", smartSession, null);
 
             // ⭐ 根据是否有 Cookie 选择入口 URL：
             //   有 Cookie → gatewayStartURL（正常刷新路径）
@@ -549,6 +599,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 访问入口页，自动跟随所有重定向
             SmartResponse response = smartHttpClient.get(entryUrl, smartSession);
+            authFlowTracer.dumpHop(traceDir, 2, "doRefresh-gateway", smartSession, response);
 
             String finalUrl = response.getFinalUrl();
             String body = response.getBody();
