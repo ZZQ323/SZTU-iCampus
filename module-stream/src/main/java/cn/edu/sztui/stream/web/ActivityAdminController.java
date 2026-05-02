@@ -51,6 +51,9 @@ public class ActivityAdminController {
     @Resource
     private cn.edu.sztui.stream.application.activity.service.ActivityBackfillService backfillService;
 
+    @Resource
+    private cn.edu.sztui.stream.application.activity.service.ActivityRetryTask retryTask;
+
     @Value("${ai.activity.default-channels:announcement}")
     private List<String> defaultChannels;
 
@@ -217,6 +220,18 @@ public class ActivityAdminController {
     @Operation(summary = "查看 backfill 进度")
     public Result backfillStatus() {
         return Result.ok(backfillService.currentProgress());
+    }
+
+    @GetMapping("/retry-queue-size")
+    @Operation(summary = "看重试队列里堆了多少条文章")
+    public Result retryQueueSize() {
+        return Result.ok(java.util.Map.of("size", backfillService.retryQueueSize()));
+    }
+
+    @PostMapping("/retry-now")
+    @Operation(summary = "立即跑一轮重试（不等 15 分钟定时）")
+    public Result retryNow() {
+        return Result.ok(retryTask.runOnce());
     }
 
     @Data

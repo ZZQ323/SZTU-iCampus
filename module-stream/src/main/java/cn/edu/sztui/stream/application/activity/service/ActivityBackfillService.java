@@ -1,5 +1,10 @@
 package cn.edu.sztui.stream.application.activity.service;
 
+import cn.edu.sztui.common.cache.util.CacheUtil;
+import cn.edu.sztui.common.util.auth.UserContext;
+import cn.edu.sztui.common.util.bean.TokenMessage;
+import cn.edu.sztui.common.util.smarthttp.SmartCookieConverter;
+import cn.edu.sztui.stream.application.external.engine.CookieSourceManager;
 import cn.edu.sztui.stream.application.service.InfoService;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ContentParserResult;
 import cn.edu.sztui.stream.infrastructure.persistence.parser.strategy.ListParserResult.InfoItemMeta;
@@ -12,40 +17,44 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 活动全量补扫
+ * 活动全量补扫（自适应 + 重试队列版）
  * <p>
- * 用途：把 Redis 里所有现存公文（{@code ai.activity.default-channels} 配置的频道）走一遍 LLM 抽取流程。
- * 适用场景：
+ * 核心设计：
  * <ul>
- *   <li>首次启用活动模块（之前没开 auto-process），把历史数据一次性入索引</li>
- *   <li>升级 prompt 版本（cache-version bump）后让旧文章用新 prompt 重判</li>
- *   <li>清空 Redis 后冷启动，需要回填活动索引</li>
+ *   <li><b>每条文章先确认能拿到正文</b>：detail 缓存命中 OR cookie 池可用能拉详情</li>
+ *   <li><b>拉不到正文 → 不调 LLM</b>，避免污染 30 天缓存。文章入
+ *       Redis Set {@code activity:retry-queue}，等待 {@link ActivityRetryTask}
+ *       定时重试</li>
+ *   <li><b>不依赖 UserContext</b>（HTTP 线程才有），走
+ *       {@link CookieSourceManager#getAvailableSessionWithUser()} 的 cookie 池路径</li>
  * </ul>
  * <p>
- * 内部委托 {@link ActivityScanService#autoProcess}。后者已有规则预筛 +
- * LLM 30 天缓存，重复扫描已处理过的文章只会命中缓存，<b>不烧 token</b>。
- * 实际成本 ≈ 通过预筛的新文章数 × 单次 LLM 调用价（qwen-turbo 几分钱/百篇）。
- * <p>
- * 两种触发方式：
- * <ul>
- *   <li><b>启动自动</b>：{@code ai.activity.scan-on-startup=true}（默认 false）→
- *       应用启动 30s 后异步全量扫一次</li>
- *   <li><b>手动 admin 接口</b>：{@code POST /admin/activity/backfill} 任意时刻触发</li>
- * </ul>
+ * "彻底重来" 流程（用户操作）：
+ * <ol>
+ *   <li>清 LLM cache：{@code redis-cli --scan --pattern 'dev:sztu:cache:activity:extract:*' | xargs redis-cli del}</li>
+ *   <li>清活动索引：{@code redis-cli del dev:sztu:cache:activity:timeline dev:sztu:cache:activity:pending}</li>
+ *   <li>登录小程序，确保 WS 在线（cookie 池有数据）</li>
+ *   <li>POST {@code /admin/activity/backfill}</li>
+ *   <li>有 cookie 的部分立即被处理；其他文章入 retry queue，每 15 min 自动重试</li>
+ * </ol>
  */
 @Slf4j
 @Service
 public class ActivityBackfillService {
 
-    /** 一次从 timeline 取多少条；与 LLM 速率耦合，不要太大 */
+    /** 一次从 timeline 取多少条 */
     private static final int PAGE_SIZE = 100;
+
+    /** 重试队列 raw key（cacheUtil 自动加 dev:sztu:cache: 前缀）*/
+    static final String RETRY_QUEUE_KEY = "activity:retry-queue";
 
     @Resource
     private ActivityScanService scanService;
@@ -56,40 +65,23 @@ public class ActivityBackfillService {
     @Resource
     private InfoService infoService;
 
+    @Resource
+    private CookieSourceManager cookieSourceManager;
+
+    @Resource
+    private CacheUtil cacheUtil;
+
     @Value("${ai.activity.default-channels:announcement,job}")
     private List<String> defaultChannels;
 
-    /**
-     * 是否在 backfill 时为没有详情缓存的文章主动拉学校。
-     * <p>
-     * 背景：activity scan 走 ScanService.loadArticleText 取正文，缓存 miss 时
-     * 只回退到 meta.summary（列表页解析的摘要，<200 字，常缺时间地点）→ LLM
-     * 抽不出 startAt → 文章进 pending。{@code true} 时本服务先调
-     * {@link InfoService#getDetail} 触发详情拉取（内部已有 cache miss → 学校 GET
-     * → 入 24h cache 的逻辑），保证 LLM 拿到完整正文。
-     * <p>
-     * 默认开。代价是 backfill 首次跑会对学校发 N 次 GET（每条文章 1 次详情）；
-     * 这只在显式触发 backfill 时发生。
-     */
     @Value("${ai.activity.backfill-fetch-detail:true}")
     private boolean fetchDetailOnMiss;
 
-    /** 简单的串行守卫：避免启动自动 + admin 手动同时跑 */
     private final AtomicBoolean running = new AtomicBoolean(false);
-
-    /** 进度状态（对外暴露便于 admin 端点查询）*/
     private final ProgressState progress = new ProgressState();
 
-    /**
-     * 同步执行（阻塞）。caller 决定是否在 @Async 里调用。
-     * <p>
-     * 不支持 per-item force：要重判已扫过的文章，请 bump
-     * {@code ai.activity.cache-version}（如 v3 → v4），所有旧 cache key 自然失效。
-     * 这样比传 force 参数更干净——保留旧 prompt 的判断结果便于事后对照。
-     *
-     * @param channels 要扫的频道；null/empty 用 default-channels
-     * @return 进度快照（已完成时 stage=DONE）
-     */
+    // ==================== 公开 API ====================
+
     public ProgressSnapshot backfill(List<String> channels) {
         if (!running.compareAndSet(false, true)) {
             log.warn("[activity-backfill] 已有任务在运行，跳过");
@@ -98,15 +90,17 @@ public class ActivityBackfillService {
         try {
             List<String> targets = (channels == null || channels.isEmpty()) ? defaultChannels : channels;
             progress.reset(targets);
-            log.info("[activity-backfill] 开始全量补扫: channels={}", targets);
+            boolean cookieAvailable = cookieSourceManager.hasAvailableCookie();
+            log.info("[activity-backfill] 开始: channels={} cookieAvailable={}（{} 时无法拉详情，详情缺失文章会入 retry-queue 等待重试）",
+                    targets, cookieAvailable, cookieAvailable ? "ok" : "no");
 
             for (String channelId : targets) {
                 progress.startChannel(channelId);
                 backfillChannel(channelId);
             }
-            log.info("[activity-backfill] 完成: total={} processed={} errors={} elapsed={}ms",
+            log.info("[activity-backfill] 完成: total={} processed={} queuedRetry={} errors={} elapsed={}ms",
                     progress.totalSeen.get(), progress.processed.get(),
-                    progress.errors.get(),
+                    progress.queuedRetry.get(), progress.errors.get(),
                     System.currentTimeMillis() - progress.startTime);
             return progress.snapshot("DONE");
         } finally {
@@ -114,10 +108,59 @@ public class ActivityBackfillService {
         }
     }
 
+    public ProgressSnapshot currentProgress() {
+        return progress.snapshot(running.get() ? "RUNNING" : "IDLE");
+    }
+
+    // ==================== 给 RetryTask 用 ====================
+
+    /**
+     * 处理单条 meta 的完整流程：先 ensureDetail，OK 才调 LLM 抽取，否则入重试队列。
+     * 共享给 backfill 主流程和定时重试。
+     *
+     * @return true=成功处理；false=入了重试队列（detail 拿不到）
+     */
+    boolean processWithRetryFallback(InfoItemMeta meta) {
+        try {
+            ensureDetailCached(meta);
+            scanService.autoProcess(meta);
+            cacheUtil.sRem(RETRY_QUEUE_KEY, queueMember(meta));
+            return true;
+        } catch (DetailUnavailableException e) {
+            cacheUtil.sAdd(RETRY_QUEUE_KEY, queueMember(meta));
+            log.debug("[activity-backfill] queued for retry: {} ({})",
+                    queueMember(meta), e.getMessage());
+            return false;
+        }
+    }
+
+    Set<Object> retryQueueMembers() {
+        return cacheUtil.sMembers(RETRY_QUEUE_KEY);
+    }
+
+    public long retryQueueSize() {
+        Long n = cacheUtil.sCard(RETRY_QUEUE_KEY);
+        return n == null ? 0 : n;
+    }
+
+    InfoItemMeta resolveMetaFromQueueMember(String member) {
+        if (member == null) return null;
+        int colon = member.indexOf(':');
+        if (colon <= 0 || colon == member.length() - 1) return null;
+        String channelId = member.substring(0, colon);
+        String articleId = member.substring(colon + 1);
+        return infoCacheUtil.getMeta(channelId, articleId);
+    }
+
+    void removeFromRetryQueue(String member) {
+        cacheUtil.sRem(RETRY_QUEUE_KEY, member);
+    }
+
+    // ==================== 内部：分页扫频道 ====================
+
     private void backfillChannel(String channelId) {
         Long total = infoCacheUtil.getTotalCount(channelId);
-        long n = total == null ? 0 : total;
-        log.info("[activity-backfill] channel={} 待扫描 {} 条", channelId, n);
+        log.info("[activity-backfill] channel={} 待扫描 {} 条", channelId, total == null ? 0 : total);
 
         int page = 1;
         while (true) {
@@ -127,10 +170,9 @@ public class ActivityBackfillService {
             for (InfoItemMeta meta : items) {
                 progress.totalSeen.incrementAndGet();
                 try {
-                    // 关键：scan 之前先确保详情缓存已就位，否则 LLM 只看到 summary，抽不出时间
-                    ensureDetailCached(meta);
-                    scanService.autoProcess(meta);
-                    progress.processed.incrementAndGet();
+                    boolean ok = processWithRetryFallback(meta);
+                    if (ok) progress.processed.incrementAndGet();
+                    else progress.queuedRetry.incrementAndGet();
                 } catch (Exception e) {
                     progress.errors.incrementAndGet();
                     log.warn("[activity-backfill] failed: channel={} id={} err={}",
@@ -138,108 +180,123 @@ public class ActivityBackfillService {
                 }
             }
 
-            log.info("[activity-backfill] channel={} progress page={} total={} processed={}",
-                    channelId, page, progress.totalSeen.get(), progress.processed.get());
+            log.info("[activity-backfill] channel={} page={} total={} processed={} queued={}",
+                    channelId, page, progress.totalSeen.get(),
+                    progress.processed.get(), progress.queuedRetry.get());
 
-            if (items.size() < PAGE_SIZE) break;  // 最后一页
+            if (items.size() < PAGE_SIZE) break;
             page++;
-
-            // 喘口气，避免对 LLM/Redis 形成持续压力
             try { Thread.sleep(200); } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt(); break;
             }
         }
     }
 
+    // ==================== 详情拉取（自适应）====================
+
     /**
-     * 确保详情已落 24h 缓存，否则 LLM 看不到正文（只能用 summary）。
-     * <p>
-     * cache 命中：0 redis 调用之外的开销。
-     * miss：触发 {@link InfoService#getDetail}，会对学校发 1 次详情页 GET，
-     * 解析后入 cache。这是 backfill 唯一对学校友好性的妥协点。
+     * 确保正文已落 24h 缓存。
+     * <ul>
+     *   <li>cache 命中 → 直接返回</li>
+     *   <li>cache miss + cookie 池可用 → 走 cookie 池拉详情，写入 cache</li>
+     *   <li>cache miss + cookie 池空 → 抛 {@link DetailUnavailableException}，
+     *       backfill 上层把这条文章入 retry queue，<b>不</b>调 LLM</li>
+     * </ul>
      */
-    private void ensureDetailCached(InfoItemMeta meta) {
+    private void ensureDetailCached(InfoItemMeta meta) throws DetailUnavailableException {
         if (!fetchDetailOnMiss) return;
         if (meta.getChannelId() == null || meta.getId() == null) return;
 
         ContentParserResult cached = infoCacheUtil.getContent(meta.getChannelId(), meta.getId());
-        if (cached != null && cached.getContent() != null) {
+        if (cached != null && StringUtils.hasText(cached.getContent())) {
             return;  // 已有
         }
+
+        if (!cookieSourceManager.hasAvailableCookie()) {
+            throw new DetailUnavailableException("no cookie pool available");
+        }
+
+        // 借 cookie 池一份临时 UserContext，让 InfoService.crawlDetail 通过鉴权
+        CookieSourceManager.CookieSessionPair pair;
         try {
-            // 用 categoryCode = null 让 InfoService 内部按 meta.url 解析，避免 URL 重建错配
-            infoService.getDetail(meta.getChannelId(), meta.getId(), null);
+            pair = cookieSourceManager.getAvailableSessionWithUser();
+        } catch (CookieSourceManager.NoCookieAvailableException e) {
+            throw new DetailUnavailableException("cookie pool race: " + e.getMessage());
+        }
+
+        String cookiesJson = SmartCookieConverter.smartCookiesToJson(pair.getOriginalCookies());
+        TokenMessage ctx = new TokenMessage();
+        ctx.setSchoolCookiesJson(cookiesJson);
+        ctx.setUserId(pair.getUserId());
+        UserContext.setContext(ctx);
+        try {
+            ContentParserResult result = infoService.getDetail(meta.getChannelId(), meta.getId(), null);
+            if (result == null || !result.isSuccess() || !StringUtils.hasText(result.getContent())) {
+                throw new DetailUnavailableException("detail fetch returned empty/failed");
+            }
+        } catch (DetailUnavailableException re) {
+            throw re;
         } catch (Exception e) {
-            log.debug("[activity-backfill] ensureDetailCached miss + fetch failed: id={} err={}",
-                    meta.getId(), e.getMessage());
+            throw new DetailUnavailableException("detail fetch error: " + e.getMessage());
+        } finally {
+            UserContext.clear();
         }
     }
 
-    /** 启动自动触发：opt-in。默认关。 */
+    private static String queueMember(InfoItemMeta meta) {
+        return meta.getChannelId() + ":" + meta.getId();
+    }
+
+    // ==================== 启动自动触发 ====================
+
     @Async
     @EventListener(ApplicationReadyEvent.class)
     @ConditionalOnProperty(value = "ai.activity.scan-on-startup", havingValue = "true")
     public void onStartup() {
-        try {
-            // 等爬虫和其他 startup 任务先稳定下来
-            Thread.sleep(30_000);
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            return;
+        try { Thread.sleep(30_000); } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt(); return;
         }
         backfill(null);
     }
 
-    /** 当前进度查询（admin 用） */
-    public ProgressSnapshot currentProgress() {
-        return progress.snapshot(running.get() ? "RUNNING" : "IDLE");
-    }
+    // ==================== 内部类型 ====================
 
-    // ==================== 进度状态 ====================
+    static class DetailUnavailableException extends RuntimeException {
+        DetailUnavailableException(String message) { super(message); }
+    }
 
     private static class ProgressState {
         final AtomicLong totalSeen = new AtomicLong();
         final AtomicLong processed = new AtomicLong();
-        final AtomicLong skippedNoMatch = new AtomicLong();
-        final AtomicLong llmInvoked = new AtomicLong();
+        final AtomicLong queuedRetry = new AtomicLong();
         final AtomicLong errors = new AtomicLong();
         volatile String currentChannel = "";
         volatile List<String> channels = List.of();
         volatile long startTime = 0;
 
         synchronized void reset(List<String> chs) {
-            totalSeen.set(0);
-            processed.set(0);
-            skippedNoMatch.set(0);
-            llmInvoked.set(0);
-            errors.set(0);
-            channels = chs;
-            currentChannel = "";
-            startTime = System.currentTimeMillis();
+            totalSeen.set(0); processed.set(0); queuedRetry.set(0); errors.set(0);
+            channels = chs; currentChannel = ""; startTime = System.currentTimeMillis();
         }
-
         void startChannel(String ch) { currentChannel = ch; }
 
         ProgressSnapshot snapshot(String stage) {
             ProgressSnapshot s = new ProgressSnapshot();
-            s.stage = stage;
-            s.channels = channels;
-            s.currentChannel = currentChannel;
-            s.totalSeen = totalSeen.get();
-            s.processed = processed.get();
-            s.errors = errors.get();
+            s.stage = stage; s.channels = channels; s.currentChannel = currentChannel;
+            s.totalSeen = totalSeen.get(); s.processed = processed.get();
+            s.queuedRetry = queuedRetry.get(); s.errors = errors.get();
             s.elapsedMs = startTime == 0 ? 0 : System.currentTimeMillis() - startTime;
             return s;
         }
     }
 
-    /** 对外暴露的进度数据（lombok 不引入额外依赖，手写 getter 简化）*/
     public static class ProgressSnapshot {
         public String stage;
         public List<String> channels;
         public String currentChannel;
         public long totalSeen;
         public long processed;
+        public long queuedRetry;
         public long errors;
         public long elapsedMs;
     }
