@@ -293,33 +293,19 @@ public class InfoCacheUtil {
 
     // ==================== 热点访问管理 ====================
 
+    /**
+     * 记录访问（已禁用 LRU 淘汰）
+     * <p>
+     * <b>历史</b>：曾维护 hot-access ZSet 跟踪每频道最热 50 条详情，超阈值
+     * 异步淘汰冷门 content key。但和 24h TTL 重复——TTL 已经兜底防无界增长，
+     * LRU 让 backfill / activity scan 反复重拉详情，对学校不友好。
+     * <p>
+     * 现在保留方法签名（getContent / saveContent 还在调），但不做实际操作。
+     * 详情 cache 完全靠 24h TTL 自动过期。
+     */
     public void recordAccess(String channelId, String id) {
-        cacheUtil.zAdd(getHotAccessKey(channelId), id, System.currentTimeMillis());
-        CompletableFuture.runAsync(() -> evictColdContentIfNeeded(channelId));
-    }
-
-    private void evictColdContentIfNeeded(String channelId) {
-        try {
-            String hotKey = getHotAccessKey(channelId);
-            Long count = cacheUtil.zCard(hotKey);
-
-            if (count == null || count <= EVICT_THRESHOLD) {
-                return;
-            }
-
-            int toEvict = count.intValue() - MAX_CACHED_DETAILS;
-            Set<Object> coldIds = cacheUtil.zRange(hotKey, 0, toEvict - 1);
-
-            if (coldIds != null && !coldIds.isEmpty()) {
-                for (Object id : coldIds) {
-                    cacheUtil.del(getContentKey(channelId, id.toString()));
-                    cacheUtil.zRem(hotKey, id);
-                }
-                log.info("淘汰冷门详情缓存: channel={}, count={}", channelId, coldIds.size());
-            }
-        } catch (Exception e) {
-            log.warn("淘汰冷门缓存失败: {}", e.getMessage());
-        }
+        // 已禁用：详情缓存依赖 24h TTL 兜底，无需 LRU 淘汰。
+        // 保留方法是为了不改 saveContent / getContent 的调用方代码。
     }
 
     // ==================== 用户已读管理 ====================

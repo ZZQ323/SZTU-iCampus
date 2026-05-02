@@ -410,14 +410,14 @@ public class CrawlEngine {
         if (pair.getUserId() == null || pair.getOriginalCookies() == null) return;
         String userId = pair.getUserId();
 
-        int origCount = pair.getOriginalCookies().size();
         List<SmartCookie> currentCookies = pair.getSession().getCookies();
-        int currCount = currentCookies.size();
         boolean changed = cookiesChanged(pair.getOriginalCookies(), currentCookies);
+        if (!changed) return;  // 静默：没变就不打 log（之前每次轮询都打 INFO，刷屏）
+
         boolean online = wsSessionRegistry.isOnline(userId);
         boolean loggedIn = authSessionCacheUtil.isSchoolLoggedIn(userId);
-        log.info("[syncCookies] userId={} orig={} curr={} changed={} online={} loggedIn={} (writeback DISABLED)",
-                userId, origCount, currCount, changed, online, loggedIn);
+        log.info("[syncCookies] userId={} orig={} curr={} changed=true online={} loggedIn={} (writeback DISABLED)",
+                userId, pair.getOriginalCookies().size(), currentCookies.size(), online, loggedIn);
     }
 
     /**
