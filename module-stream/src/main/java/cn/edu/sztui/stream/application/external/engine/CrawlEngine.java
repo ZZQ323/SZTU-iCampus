@@ -74,6 +74,9 @@ public class CrawlEngine {
     private CookiePoolMetrics cookiePoolMetrics;
 
     @Resource
+    private WsPushLog wsPushLog;
+
+    @Resource
     private org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     /**
@@ -174,7 +177,7 @@ public class CrawlEngine {
         infoCacheUtil.setLatestId(channelId, newLatestId);
         infoCacheUtil.updateLastCrawlTime(sourceId);
 
-        broadcastNewContent(channelId, newItems, newLatestId);
+        broadcastNewContent("crawlIncremental", channelId, sourceId, newItems, cachedLatestId, newLatestId);
 
         // 爬取完成后检测 cookie 变化
         syncCookiesIfChanged(pair);
@@ -693,13 +696,28 @@ public class CrawlEngine {
     }
 
     private void broadcastNewContent(String channelId, List<ListParserResult.InfoItemMeta> newItems, String latestId) {
-        Map<String, Object> data = buildBroadcastPayload(channelId, newItems, latestId);
+        broadcastNewContent("crawlIncremental", channelId, null, newItems, null, latestId);
+    }
+
+    /**
+     * 完整版 broadcast：带 trigger 标签 + 推送前后 latestId 快照，便于 WsPushLog 诊断。
+     *
+     * @param trigger        触发路径标签
+     * @param sourceId       源 id（可空，仅日志用）
+     * @param latestIdBefore 推送前频道 latestId（可空）
+     * @param latestIdAfter  推送后频道 latestId
+     */
+    private void broadcastNewContent(String trigger, String channelId, String sourceId,
+                                     List<ListParserResult.InfoItemMeta> newItems,
+                                     String latestIdBefore, String latestIdAfter) {
+        Map<String, Object> data = buildBroadcastPayload(channelId, newItems, latestIdAfter);
         if (!newItems.isEmpty()) {
-            // 论文证据 1：流式推送可见日志，便于演示和答辩
             ListParserResult.InfoItemMeta head = newItems.get(0);
-            log.info("WS broadcast: channel={}, items={}, first='{}', sourceId={}",
-                    channelId, newItems.size(), head.getTitle(), head.getSourceId());
+            log.info("WS broadcast: trigger={}, channel={}, items={}, first='{}', sourceId={}",
+                    trigger, channelId, newItems.size(), head.getTitle(), head.getSourceId());
         }
+        // 诊断落盘
+        wsPushLog.record(trigger, channelId, sourceId, newItems, latestIdBefore, latestIdAfter);
         streamPublisher.publishToAll(StreamKeys.TYPE_NEW_ANNOUNCEMENTS, data);
     }
 
