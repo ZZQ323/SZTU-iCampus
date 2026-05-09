@@ -156,6 +156,66 @@ public class TestPushController {
         return Result.ok(Map.of("channelId", channelId, "removed", ids.size(), "ids", ids));
     }
 
+    /**
+     * 重推现有真实数据（论文截图首选 —— 不污染 Redis、不调学校）。
+     * <p>
+     * 从 channel timeline 顶部取 N 条**已存在的真实文章**，直接走
+     * {@code broadcastNewContent} 重推一次。前端收到 WS 推送 → badge/队列/列表
+     * 都会刷出真实条目（标题/单位/日期都是真的）。
+     * <p>
+     * <b>零副作用</b>：不改 latestId，不重写 meta，不动学校请求。
+     * 用法：
+     * <pre>
+     * curl -X POST "http://localhost:8080/admin/test/rebroadcast?channelId=announcement&count=3" \
+     *   -H "X-School-Cookies: []"
+     * </pre>
+     */
+    @PostMapping("/rebroadcast")
+    @Operation(summary = "重推现有真实数据（不污染 Redis）")
+    public Result rebroadcast(
+            @RequestParam(defaultValue = "announcement") String channelId,
+            @RequestParam(defaultValue = "3") Integer count,
+            @RequestParam(defaultValue = "0") Integer fromIndex) {
+        int n = Math.max(1, Math.min(20, count));
+        int start = Math.max(0, fromIndex);
+        // 从 timeline 倒序取 [fromIndex, fromIndex + count) 范围内的真实文章 id
+        var ids = cacheUtil.zReverseRange("info:" + channelId + ":timeline", start, start + n - 1);
+        if (ids == null || ids.isEmpty()) {
+            return Result.ok(Map.of("channelId", channelId, "count", 0, "msg", "频道无内容"));
+        }
+        List<InfoItemMeta> items = new ArrayList<>();
+        List<String> hitIds = new ArrayList<>();
+        for (Object idObj : ids) {
+            InfoItemMeta meta = infoCacheUtil.getMeta(channelId, idObj.toString());
+            if (meta != null) {
+                items.add(meta);
+                hitIds.add(meta.getId());
+            }
+        }
+        if (items.isEmpty()) {
+            return Result.ok(Map.of("channelId", channelId, "count", 0, "msg", "meta 缺失"));
+        }
+        InfoItemMeta head = items.get(0);
+        String latestId = head.getId();
+        Map<String, Object> data = new HashMap<>();
+        data.put("channelId", channelId);
+        data.put("ids", hitIds);
+        data.put("latestId", latestId);
+        data.put("latestTitle", head.getTitle());
+        data.put("sourceId", head.getSourceId());
+        data.put("items", items);
+        streamPushService.broadcastNewAnnouncements(data);
+        log.info("[test-push/rebroadcast] channel={} count={} fromIndex={} firstTitle='{}'",
+                channelId, items.size(), start, head.getTitle());
+        return Result.ok(Map.of(
+                "channelId", channelId,
+                "count", items.size(),
+                "fromIndex", start,
+                "ids", hitIds,
+                "firstTitle", head.getTitle()
+        ));
+    }
+
     private List<String> scanTestIds(String channelId) {
         // timeline ZSET 是 raw "info:{ch}:timeline"
         var members = cacheUtil.zReverseRange("info:" + channelId + ":timeline", 0, 100);
