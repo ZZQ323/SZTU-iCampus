@@ -68,11 +68,14 @@ class InfoCacheUtilScoreTest {
     }
 
     @Test
-    void missingPublishDate_fallsBackToCrawledAt() {
-        ListParserResult.InfoItemMeta m = meta("123", null);
-        m.setCrawledAt(1714435200000L);
-        double s = InfoCacheUtil.computeFeedScore(m);
-        assertEquals(1714435200000.0, s);
+    void missingPublishDate_alwaysBelowTier1_evenWithFreshCrawledAt() {
+        ListParserResult.InfoItemMeta noDateButFresh = meta("123", null);
+        noDateButFresh.setCrawledAt(System.currentTimeMillis());
+        double s = InfoCacheUtil.computeFeedScore(noDateButFresh);
+        assertTrue(s < InfoCacheUtil.TIER_PUBDATE,
+                "无 publishDate 的条目不能进 Tier 1，实际 score=" + s);
+        // 应该退到 idToScore("123") = 123.0
+        assertEquals(123.0, s);
     }
 
     @Test
@@ -89,6 +92,34 @@ class InfoCacheUtilScoreTest {
         m.setId("ext_abc123");
         double s = InfoCacheUtil.computeFeedScore(m);
         assertTrue(s < 0, "非数字 id 且无日期，score 应为负数，实际=" + s);
+    }
+
+    /**
+     * 核心 bug 回归：没 publishDate 但有 crawledAt 的"刚爬到的无日期文章"
+     * 不能排到"几年前发布的真文章"前面。
+     */
+    @Test
+    void crawledOnlyFallback_neverOutranksRealPublishDate() {
+        ListParserResult.InfoItemMeta veryOldButReal = meta("100", "2020-01-01");
+        ListParserResult.InfoItemMeta freshButNoDate = meta("ext_xxx", null);
+        freshButNoDate.setCrawledAt(System.currentTimeMillis());
+
+        double sA = InfoCacheUtil.computeFeedScore(veryOldButReal);
+        double sB = InfoCacheUtil.computeFeedScore(freshButNoDate);
+        assertTrue(sA > sB,
+                "publishDate 已知的老文章应排前面，但 score(real-old)=" + sA + " <= score(no-date-fresh)=" + sB);
+    }
+
+    @Test
+    void anyPubDate_outranksAnyNoPubDate() {
+        // 最古老的 publishDate
+        ListParserResult.InfoItemMeta oldest = meta("1", "1971-01-01");
+        // 数字最大的无日期 id
+        ListParserResult.InfoItemMeta hugeIdNoDate = meta("999999999999", null);
+
+        double s1 = InfoCacheUtil.computeFeedScore(oldest);
+        double s2 = InfoCacheUtil.computeFeedScore(hugeIdNoDate);
+        assertTrue(s1 > s2, "publishDate 已知层永远在无 publishDate 层之上");
     }
 
     // ==================== helpers ====================

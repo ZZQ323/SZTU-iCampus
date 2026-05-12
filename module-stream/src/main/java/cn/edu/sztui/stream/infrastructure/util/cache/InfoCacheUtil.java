@@ -532,34 +532,38 @@ public class InfoCacheUtil {
     /**
      * 计算 feed:timeline 的 score。
      * <p>
-     * 优先级：<code>publishDate (epoch ms at midnight) + crawledAt 时刻 tie-break</code>
-     * → 仅有 <code>crawledAt</code> → 退回 <code>idToScore</code>。
+     * <b>两层 tier</b>：
+     * <pre>
+     * Tier 1 (publishDate 已知)：TIER_PUBDATE + publishDateMs + crawledAt 天内偏移
+     * Tier 2 (publishDate 缺失)：idToScore(id)  // 一律排到 Tier 1 之下
+     * </pre>
+     * 用户语义："全部来源最新"= 按发布时间最新。无 publishDate 的条目对用户无信息量，
+     * 不参与时间排序，沉到底部即可（按各源 id 自然顺序）。
      * <p>
-     * 为何不直接用 id：不同 source 是不同 CMS 实例，id 各自自增不可比；
-     * 公文通 id 量级 5 万会霸占 ZSET 顶部，覆盖掉新建源的近期文章。
-     * publishDate 是用户语义的"最新"——发布日新就排前面。
+     * <b>不用 crawledAt 做 fallback</b>：crawledAt 是系统事件时间，"今天刚爬到"
+     * 的无日期文章数值上会接近"今天发布"的真文章。把它当 tier-2 fallback 会让
+     * 空时间项数值上盖过老 publishDate 的真文章（即使加 tier 偏移，用户看到的
+     * 还是"空白排前面真日期排后面"，与"按发布时间"语义直接冲突）。
      * <p>
-     * tie-break 策略：同一 publishDate 的文章用 <code>crawledAt % 86_400_000</code>
-     * （爬取时刻在天内的毫秒偏移）做次级排序，保证稳定性；如果 crawledAt 也没有，
-     * 退回 id 的 hash mod 86_400_000。
+     * crawledAt 仅保留作为 Tier 1 内同 publishDate 的天内 tie-break。
      */
     static double computeFeedScore(ListParserResult.InfoItemMeta meta) {
         Long pdEpochSec = parsePublishDateEpochSec(meta.getPublishDate());
         if (pdEpochSec != null) {
-            long base = pdEpochSec * 1000L;            // 当天 00:00 的 epochMillis
+            long base = pdEpochSec * 1000L;
             long offset;
             if (meta.getCrawledAt() != null) {
                 offset = Math.floorMod(meta.getCrawledAt(), 86_400_000L);
             } else {
                 offset = (long) (Math.abs(meta.getId().hashCode()) % 86_400_000);
             }
-            return (double) (base + offset);
-        }
-        if (meta.getCrawledAt() != null) {
-            return meta.getCrawledAt().doubleValue();
+            return TIER_PUBDATE + (double) (base + offset);
         }
         return idToScore(meta.getId());
     }
+
+    /** publishDate 已知层基线（远高于 epochMillis 量级，无 publishDate 的永远到不了） */
+    static final double TIER_PUBDATE = 2_000_000_000_000_000.0;
 
     /**
      * 解析 publishDate 字符串为 epoch second。

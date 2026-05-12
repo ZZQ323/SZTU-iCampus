@@ -613,14 +613,20 @@ CacheUtil API 概览（不全列）：
 公文通 id 量级 5 万会霸占顶部，新建频道沉底）。所以独立算 score：
 
 ```java
-// InfoCacheUtil.computeFeedScore(meta)
-1. parsePublishDate 成功（支持 ISO/中文/点/斜杠 + 可选时间后缀）
-   → score = publishDate 当天 00:00 epochMillis + (crawledAt % 86_400_000)  // tie-break
-2. publishDate 缺失但有 crawledAt
-   → score = crawledAt（毫秒）
-3. 两者都没（极端兜底）
-   → score = idToScore(id)
+// InfoCacheUtil.computeFeedScore(meta) —— 两层 tier
+Tier 1 publishDate 已知：TIER_PUBDATE(2e15) + pdMs + (crawledAt % 86_400_000) 天内 tie-break
+Tier 2 publishDate 缺失：idToScore(id)  // 数字 id 正、非数字 id 负，物理上永远在 Tier 1 之下
 ```
+
+**为何无 crawledAt fallback**：crawledAt 是系统事件时间，"今天刚爬到的无日期文章"
+和"今天发布的真文章"数值上同量级，把 crawledAt 当 fallback 会让无日期项盖过真日期项
+（即使分 tier 偏移，用户视觉上还是看到"空白的排前面，真日期反而排后面"——与用户预期
+"空白一律排后面"直接冲突）。crawledAt 只用作 Tier 1 内同 publishDate 的天内 tie-break。
+
+**踩坑历史**：
+- v1：直接 score=id → 公文通 id=5 万霸占顶部，新源永远沉底
+- v2：score=pdMs，无 publishDate 退回 crawledAt → "今天刚爬的空白文章" 盖过"几年前真文章"
+- v3 (现行)：publishDate 已知 → Tier 1 高位；缺失 → 退回 idToScore，**一律排在 Tier 1 之下**
 
 **迁移**：score 算法改了之后，老数据 score 还是旧值。跑一次：
 
