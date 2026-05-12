@@ -532,34 +532,42 @@ public class InfoCacheUtil {
     /**
      * 计算 feed:timeline 的 score。
      * <p>
-     * 优先级：<code>publishDate (epoch ms at midnight) + crawledAt 时刻 tie-break</code>
-     * → 仅有 <code>crawledAt</code> → 退回 <code>idToScore</code>。
+     * <b>三层 tier 设计</b>，下层永远不会盖过上层：
+     * <pre>
+     * Tier 1 (publishDate 已知)：TIER_PUBDATE + publishDateMs + crawledAt 日内偏移
+     * Tier 2 (仅有 crawledAt)：  TIER_CRAWLED + crawledAt
+     * Tier 3 (兜底)：            idToScore（可能为负）
+     * </pre>
+     * 为何分层：直接把 crawledAt 当 fallback 会让"无 publishDate 但今天刚爬到"
+     * 的条目（score ≈ 1.71e12）盖过"4 月 30 日发布"的条目（score ≈ 1.71e12 也是，
+     * 但 crawledAt 那条数值更大）。tier 偏移确保 publishDate 已知的总是排在前面，
+     * 符合用户语义"按发布时间最新"。
      * <p>
-     * 为何不直接用 id：不同 source 是不同 CMS 实例，id 各自自增不可比；
-     * 公文通 id 量级 5 万会霸占 ZSET 顶部，覆盖掉新建源的近期文章。
-     * publishDate 是用户语义的"最新"——发布日新就排前面。
-     * <p>
-     * tie-break 策略：同一 publishDate 的文章用 <code>crawledAt % 86_400_000</code>
-     * （爬取时刻在天内的毫秒偏移）做次级排序，保证稳定性；如果 crawledAt 也没有，
-     * 退回 id 的 hash mod 86_400_000。
+     * Double 精度：53-bit mantissa = 9.007e15，足以容纳 2e15 + epochMillis（1.7e12）
+     * 而不丢精度。
      */
     static double computeFeedScore(ListParserResult.InfoItemMeta meta) {
         Long pdEpochSec = parsePublishDateEpochSec(meta.getPublishDate());
         if (pdEpochSec != null) {
-            long base = pdEpochSec * 1000L;            // 当天 00:00 的 epochMillis
+            long base = pdEpochSec * 1000L;
             long offset;
             if (meta.getCrawledAt() != null) {
                 offset = Math.floorMod(meta.getCrawledAt(), 86_400_000L);
             } else {
                 offset = (long) (Math.abs(meta.getId().hashCode()) % 86_400_000);
             }
-            return (double) (base + offset);
+            return TIER_PUBDATE + (double) (base + offset);
         }
         if (meta.getCrawledAt() != null) {
-            return meta.getCrawledAt().doubleValue();
+            return TIER_CRAWLED + meta.getCrawledAt().doubleValue();
         }
         return idToScore(meta.getId());
     }
+
+    /** publishDate 已知层基线（远高于 epochMillis 量级，下层永远到不了） */
+    static final double TIER_PUBDATE = 2_000_000_000_000_000.0;
+    /** 仅 crawledAt 已知层基线 */
+    static final double TIER_CRAWLED = 1_000_000_000_000_000.0;
 
     /**
      * 解析 publishDate 字符串为 epoch second。

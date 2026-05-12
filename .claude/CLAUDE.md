@@ -613,14 +613,17 @@ CacheUtil API 概览（不全列）：
 公文通 id 量级 5 万会霸占顶部，新建频道沉底）。所以独立算 score：
 
 ```java
-// InfoCacheUtil.computeFeedScore(meta)
-1. parsePublishDate 成功（支持 ISO/中文/点/斜杠 + 可选时间后缀）
-   → score = publishDate 当天 00:00 epochMillis + (crawledAt % 86_400_000)  // tie-break
-2. publishDate 缺失但有 crawledAt
-   → score = crawledAt（毫秒）
-3. 两者都没（极端兜底）
-   → score = idToScore(id)
+// InfoCacheUtil.computeFeedScore(meta) —— 三层 tier，下层永远不会盖过上层
+Tier 1 publishDate 已知：  TIER_PUBDATE(2e15) + pdMs + (crawledAt % 86_400_000)
+Tier 2 仅 crawledAt 已知： TIER_CRAWLED(1e15) + crawledAt
+Tier 3 兜底：              idToScore(id)        // 可能为负
 ```
+
+**踩坑记录**：第一版没分 tier，Tier 2 直接 `crawledAt` 当 score。结果"无 publishDate
+但今天刚爬到"的条目（score=今天 ms ≈ 1.71e12）盖过"2026-04-30 真发布的文章"
+（score=2026-04-30 00:00 ms ≈ 1.71e12，但 crawledAt 那条数值更大几小时）→ 一堆
+空时间排在顶部。tier 偏移修复后，Tier 1 永远 ≥ 2e15，Tier 2 永远在 1e15-1.001e15
+区间，物理隔离。Double 53-bit mantissa 9e15，容纳 2e15 + epochMs 无精度丢失。
 
 **迁移**：score 算法改了之后，老数据 score 还是旧值。跑一次：
 
