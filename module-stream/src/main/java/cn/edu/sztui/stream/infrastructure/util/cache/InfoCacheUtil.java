@@ -532,19 +532,20 @@ public class InfoCacheUtil {
     /**
      * 计算 feed:timeline 的 score。
      * <p>
-     * <b>三层 tier 设计</b>，下层永远不会盖过上层：
+     * <b>两层 tier</b>：
      * <pre>
-     * Tier 1 (publishDate 已知)：TIER_PUBDATE + publishDateMs + crawledAt 日内偏移
-     * Tier 2 (仅有 crawledAt)：  TIER_CRAWLED + crawledAt
-     * Tier 3 (兜底)：            idToScore（可能为负）
+     * Tier 1 (publishDate 已知)：TIER_PUBDATE + publishDateMs + crawledAt 天内偏移
+     * Tier 2 (publishDate 缺失)：idToScore(id)  // 一律排到 Tier 1 之下
      * </pre>
-     * 为何分层：直接把 crawledAt 当 fallback 会让"无 publishDate 但今天刚爬到"
-     * 的条目（score ≈ 1.71e12）盖过"4 月 30 日发布"的条目（score ≈ 1.71e12 也是，
-     * 但 crawledAt 那条数值更大）。tier 偏移确保 publishDate 已知的总是排在前面，
-     * 符合用户语义"按发布时间最新"。
+     * 用户语义："全部来源最新"= 按发布时间最新。无 publishDate 的条目对用户无信息量，
+     * 不参与时间排序，沉到底部即可（按各源 id 自然顺序）。
      * <p>
-     * Double 精度：53-bit mantissa = 9.007e15，足以容纳 2e15 + epochMillis（1.7e12）
-     * 而不丢精度。
+     * <b>不用 crawledAt 做 fallback</b>：crawledAt 是系统事件时间，"今天刚爬到"
+     * 的无日期文章数值上会接近"今天发布"的真文章。把它当 tier-2 fallback 会让
+     * 空时间项数值上盖过老 publishDate 的真文章（即使加 tier 偏移，用户看到的
+     * 还是"空白排前面真日期排后面"，与"按发布时间"语义直接冲突）。
+     * <p>
+     * crawledAt 仅保留作为 Tier 1 内同 publishDate 的天内 tie-break。
      */
     static double computeFeedScore(ListParserResult.InfoItemMeta meta) {
         Long pdEpochSec = parsePublishDateEpochSec(meta.getPublishDate());
@@ -558,16 +559,11 @@ public class InfoCacheUtil {
             }
             return TIER_PUBDATE + (double) (base + offset);
         }
-        if (meta.getCrawledAt() != null) {
-            return TIER_CRAWLED + meta.getCrawledAt().doubleValue();
-        }
         return idToScore(meta.getId());
     }
 
-    /** publishDate 已知层基线（远高于 epochMillis 量级，下层永远到不了） */
+    /** publishDate 已知层基线（远高于 epochMillis 量级，无 publishDate 的永远到不了） */
     static final double TIER_PUBDATE = 2_000_000_000_000_000.0;
-    /** 仅 crawledAt 已知层基线 */
-    static final double TIER_CRAWLED = 1_000_000_000_000_000.0;
 
     /**
      * 解析 publishDate 字符串为 epoch second。

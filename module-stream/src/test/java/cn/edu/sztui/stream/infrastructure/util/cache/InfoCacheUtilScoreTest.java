@@ -68,15 +68,18 @@ class InfoCacheUtilScoreTest {
     }
 
     @Test
-    void missingPublishDate_fallsBackToCrawledAt_inLowerTier() {
-        ListParserResult.InfoItemMeta m = meta("123", null);
-        m.setCrawledAt(1714435200000L);
-        double s = InfoCacheUtil.computeFeedScore(m);
-        assertEquals(InfoCacheUtil.TIER_CRAWLED + 1714435200000.0, s);
+    void missingPublishDate_alwaysBelowTier1_evenWithFreshCrawledAt() {
+        ListParserResult.InfoItemMeta noDateButFresh = meta("123", null);
+        noDateButFresh.setCrawledAt(System.currentTimeMillis());
+        double s = InfoCacheUtil.computeFeedScore(noDateButFresh);
+        assertTrue(s < InfoCacheUtil.TIER_PUBDATE,
+                "无 publishDate 的条目不能进 Tier 1，实际 score=" + s);
+        // 应该退到 idToScore("123") = 123.0
+        assertEquals(123.0, s);
     }
 
     @Test
-    void missingBoth_fallsBackToIdScore_inBottomTier() {
+    void missingBoth_fallsBackToIdScore() {
         ListParserResult.InfoItemMeta m = new ListParserResult.InfoItemMeta();
         m.setId("12345");
         double s = InfoCacheUtil.computeFeedScore(m);
@@ -97,9 +100,7 @@ class InfoCacheUtilScoreTest {
      */
     @Test
     void crawledOnlyFallback_neverOutranksRealPublishDate() {
-        // A：很老的真文章，2020-01-01 发布
         ListParserResult.InfoItemMeta veryOldButReal = meta("100", "2020-01-01");
-        // B：刚刚爬到的无日期条目（publishDate 解析失败），crawledAt = 今天
         ListParserResult.InfoItemMeta freshButNoDate = meta("ext_xxx", null);
         freshButNoDate.setCrawledAt(System.currentTimeMillis());
 
@@ -110,18 +111,15 @@ class InfoCacheUtilScoreTest {
     }
 
     @Test
-    void tierOrdering_pubdate_above_crawled_above_fallback() {
-        ListParserResult.InfoItemMeta withPub = meta("1", "1971-01-01");      // 最早可能的 publishDate
-        ListParserResult.InfoItemMeta withCrawl = meta("2", null);
-        withCrawl.setCrawledAt(System.currentTimeMillis() + 999L * 365 * 86_400_000L); // 极端未来 crawledAt
-        ListParserResult.InfoItemMeta fallback = new ListParserResult.InfoItemMeta();
-        fallback.setId("99999999");
+    void anyPubDate_outranksAnyNoPubDate() {
+        // 最古老的 publishDate
+        ListParserResult.InfoItemMeta oldest = meta("1", "1971-01-01");
+        // 数字最大的无日期 id
+        ListParserResult.InfoItemMeta hugeIdNoDate = meta("999999999999", null);
 
-        double s1 = InfoCacheUtil.computeFeedScore(withPub);
-        double s2 = InfoCacheUtil.computeFeedScore(withCrawl);
-        double s3 = InfoCacheUtil.computeFeedScore(fallback);
-        assertTrue(s1 > s2, "publishDate 层 > crawledAt 层");
-        assertTrue(s2 > s3, "crawledAt 层 > 兜底层");
+        double s1 = InfoCacheUtil.computeFeedScore(oldest);
+        double s2 = InfoCacheUtil.computeFeedScore(hugeIdNoDate);
+        assertTrue(s1 > s2, "publishDate 已知层永远在无 publishDate 层之上");
     }
 
     // ==================== helpers ====================
