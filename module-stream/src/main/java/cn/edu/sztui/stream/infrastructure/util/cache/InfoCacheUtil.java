@@ -9,8 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -96,22 +100,35 @@ public class InfoCacheUtil {
     public void saveMeta(String channelId, ListParserResult.InfoItemMeta meta) {
         String metaJson = JSON.toJSONString(meta);
 
-        // 1. 频道维度
+        // 1. 频道维度 —— score=articleId（id 单调递增，latest_id / 增量查询都依赖此假设）
         cacheUtil.hset(getMetaKey(channelId), meta.getId(), metaJson);
 
-        double score = idToScore(meta.getId());
-        cacheUtil.zAdd(getTimelineKey(channelId), meta.getId(), score);
+        double idScore = idToScore(meta.getId());
+        cacheUtil.zAdd(getTimelineKey(channelId), meta.getId(), idScore);
 
         if (StringUtils.hasText(meta.getCategoryCode())) {
-            cacheUtil.zAdd(getCategoryKey(channelId, meta.getCategoryCode()), meta.getId(), score);
+            cacheUtil.zAdd(getCategoryKey(channelId, meta.getCategoryCode()), meta.getId(), idScore);
         }
 
-        // 2. 全局 feed（用 channelId:id 作为唯一键，避免跨频道 id 冲突）
+        // 2. 全局 feed —— score=publishDate epoch（跨源真正可比）
+        // 不同 source 的 id 序列各自独立，按 id 排会让 id 量级大的源霸占顶部。
+        // 按 publishDate 才是用户语义上的"最新"。
         String feedItemKey = channelId + ":" + meta.getId();
-        cacheUtil.zAdd(FEED_TIMELINE, feedItemKey, score);
+        double feedScore = computeFeedScore(meta);
+        cacheUtil.zAdd(FEED_TIMELINE, feedItemKey, feedScore);
         cacheUtil.set(FEED_META_PREFIX + feedItemKey, metaJson);
 
         log.debug("保存元数据: channel={}, id={}, title={}", channelId, meta.getId(), meta.getTitle());
+    }
+
+    /**
+     * 重算单条 feed:timeline 的 score（迁移用，不动 meta）。
+     * 给 admin 端点扫一遍历史数据时调用。
+     */
+    public void rebuildFeedScore(String channelId, ListParserResult.InfoItemMeta meta) {
+        String feedItemKey = channelId + ":" + meta.getId();
+        double feedScore = computeFeedScore(meta);
+        cacheUtil.zAdd(FEED_TIMELINE, feedItemKey, feedScore);
     }
 
     public void saveMetaBatch(String channelId, List<ListParserResult.InfoItemMeta> metas) {
@@ -409,6 +426,30 @@ public class InfoCacheUtil {
         log.info("已清除全局 feed timeline 和 {} 条 meta 数据", allKeys != null ? allKeys.size() : 0);
     }
 
+    /**
+     * 扫某频道下所有 meta，按新算法（publishDate 优先）重写 feed:timeline 的 score。
+     * <p>
+     * 不重爬学校、不动 meta、不动 info:{ch}:timeline，纯改 feed 全局聚合的排序权重。
+     * 返回处理的条目数。
+     */
+    public int rebuildFeedTimelineForChannel(String channelId) {
+        Map<Object, Object> allMetas = cacheUtil.hmget(getMetaKey(channelId));
+        if (allMetas == null || allMetas.isEmpty()) return 0;
+        int n = 0;
+        for (Object v : allMetas.values()) {
+            try {
+                ListParserResult.InfoItemMeta meta = JSON.parseObject(v.toString(), ListParserResult.InfoItemMeta.class);
+                if (meta == null || meta.getId() == null) continue;
+                rebuildFeedScore(channelId, meta);
+                n++;
+            } catch (Exception e) {
+                log.warn("[rebuild-feed] channel={} 解析 meta 失败: {}", channelId, e.getMessage());
+            }
+        }
+        log.info("[rebuild-feed] channel={} 重算 {} 条 score", channelId, n);
+        return n;
+    }
+
     /** 更新数据源最后爬取时间（按 sourceId，非 channelId） */
     public void updateLastCrawlTime(String sourceId) {
         cacheUtil.hset(getSourceSystemKey(sourceId), "lastCrawlTime", String.valueOf(System.currentTimeMillis()));
@@ -475,7 +516,7 @@ public class InfoCacheUtil {
     }
 
     /**
-     * 将 ID 转换为 ZSET score
+     * 将 ID 转换为 ZSET score（仅供频道级 timeline / category 使用）
      * <p>
      * 数字 ID：直接作为 score（保持原有排序）。
      * 非数字 ID（wx_xxx、ext_xxx）：用 hashCode 的绝对值，加负偏移避免与数字 ID 碰撞。
@@ -487,6 +528,68 @@ public class InfoCacheUtil {
             return -Math.abs((double) id.hashCode());
         }
     }
+
+    /**
+     * 计算 feed:timeline 的 score。
+     * <p>
+     * 优先级：<code>publishDate (epoch ms at midnight) + crawledAt 时刻 tie-break</code>
+     * → 仅有 <code>crawledAt</code> → 退回 <code>idToScore</code>。
+     * <p>
+     * 为何不直接用 id：不同 source 是不同 CMS 实例，id 各自自增不可比；
+     * 公文通 id 量级 5 万会霸占 ZSET 顶部，覆盖掉新建源的近期文章。
+     * publishDate 是用户语义的"最新"——发布日新就排前面。
+     * <p>
+     * tie-break 策略：同一 publishDate 的文章用 <code>crawledAt % 86_400_000</code>
+     * （爬取时刻在天内的毫秒偏移）做次级排序，保证稳定性；如果 crawledAt 也没有，
+     * 退回 id 的 hash mod 86_400_000。
+     */
+    static double computeFeedScore(ListParserResult.InfoItemMeta meta) {
+        Long pdEpochSec = parsePublishDateEpochSec(meta.getPublishDate());
+        if (pdEpochSec != null) {
+            long base = pdEpochSec * 1000L;            // 当天 00:00 的 epochMillis
+            long offset;
+            if (meta.getCrawledAt() != null) {
+                offset = Math.floorMod(meta.getCrawledAt(), 86_400_000L);
+            } else {
+                offset = (long) (Math.abs(meta.getId().hashCode()) % 86_400_000);
+            }
+            return (double) (base + offset);
+        }
+        if (meta.getCrawledAt() != null) {
+            return meta.getCrawledAt().doubleValue();
+        }
+        return idToScore(meta.getId());
+    }
+
+    /**
+     * 解析 publishDate 字符串为 epoch second。
+     * <p>
+     * 支持格式：<code>2026-04-30 / 2026-4-30 / 2026.04.30 / 2026/04/30 / 2026年4月30日</code>，
+     * 末尾可带时间（忽略）。无法解析返回 null。
+     */
+    static Long parsePublishDateEpochSec(String s) {
+        if (!StringUtils.hasText(s)) return null;
+        String normalized = s.trim()
+                .replace("年", "-")
+                .replace("月", "-")
+                .replace("日", "")
+                .replace("/", "-")
+                .replace(".", "-");
+        // 截取首段（去掉可能跟着的时间 "14:30" 等）
+        Matcher m = DATE_HEAD.matcher(normalized);
+        if (!m.find()) return null;
+        try {
+            int y = Integer.parseInt(m.group(1));
+            int mo = Integer.parseInt(m.group(2));
+            int d = Integer.parseInt(m.group(3));
+            if (y < 1970 || y > 2999 || mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+            return LocalDate.of(y, mo, d).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        } catch (NumberFormatException | java.time.DateTimeException e) {
+            return null;
+        }
+    }
+
+    private static final Pattern DATE_HEAD = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
 
     /** 安全的 ID 降序比较器（数字 ID 排前面，非数字 ID 排后面） */
     private static final Comparator<ListParserResult.InfoItemMeta> INFO_COMPARATOR = (a, b) -> {

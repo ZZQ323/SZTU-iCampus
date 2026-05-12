@@ -592,7 +592,7 @@ CacheUtil API 概览（不全列）：
 | `info:source:{sourceId}:system` | `dev:sztu:cache:info:source:{sourceId}:system` | 无 | Hash | 源级状态（initialized, lastCrawlTime）|
 | `info:global:system` | `dev:sztu:cache:info:global:system` | 无 | Hash | 全局活跃 cookie 源 userId |
 | `info:user:{userId}:read:{channelId}` | `dev:sztu:cache:info:user:{userId}:read:{channelId}` | 无 | String | 用户已读位置 |
-| `feed:timeline` | `dev:sztu:cache:feed:timeline` | 无 | ZSET | 全局聚合 timeline（不含公文通）|
+| `feed:timeline` | `dev:sztu:cache:feed:timeline` | 无 | ZSET | 全局聚合 timeline（含公文通；score=publishDate epoch ms，详见下文）|
 | `feed:meta:{channelId}:{id}` | `dev:sztu:cache:feed:meta:{channelId}:{id}` | 无 | String | 全局 feed 元数据 |
 | `activity:timeline` | `dev:sztu:cache:activity:timeline` | 无 | ZSET | 活动索引（score=epochMillis）|
 | `activity:pending` | `dev:sztu:cache:activity:pending` | 无 | Set | 时间待定的活动 |
@@ -603,6 +603,41 @@ CacheUtil API 概览（不全列）：
 | `calendar:years` | `dev:sztu:cache:calendar:years` | 7 天 | String | 校历学年列表 |
 | `calendar:{year}` | `dev:sztu:cache:calendar:{year}` | 30 天 | String | 某学年图片 URL |
 | `stream:announcement` / `stream:schedule` / `stream:calendar` | **同名（无前缀）** | 自动裁剪 | Stream | Redis Stream（**显式例外**，SDK 兼容）|
+
+### ⚠️ feed:timeline score 算法 —— publishDate 优先
+
+`info:{ch}:timeline` 单频道内用 `score=articleId`（id CMS 自增 ≈ 发布顺序，
+且 `latest_id` / `getIncrementalList` 都依赖此假设，**不能动**）。
+
+`feed:timeline` 是跨源聚合，**不同 source 的 id 不可比**（不同 CMS 实例，
+公文通 id 量级 5 万会霸占顶部，新建频道沉底）。所以独立算 score：
+
+```java
+// InfoCacheUtil.computeFeedScore(meta)
+1. parsePublishDate 成功（支持 ISO/中文/点/斜杠 + 可选时间后缀）
+   → score = publishDate 当天 00:00 epochMillis + (crawledAt % 86_400_000)  // tie-break
+2. publishDate 缺失但有 crawledAt
+   → score = crawledAt（毫秒）
+3. 两者都没（极端兜底）
+   → score = idToScore(id)
+```
+
+**迁移**：score 算法改了之后，老数据 score 还是旧值。跑一次：
+
+```bash
+curl -X POST 'http://localhost:8080/admin/info/rebuild-feed-timeline' \
+  -H 'X-School-Cookies: []'
+# 不动 meta、不重爬学校，纯扫 info:{ch}:meta 重写 feed:timeline 的 score
+# 也可加 ?channelId=announcement 只刷一个频道
+```
+
+**答辩话术**：
+> "信息流前端有两类查询：频道视图（命中 `info:{ch}:timeline`，单频道 id 自增即时间）
+> 和全部来源聚合视图（命中全局 `feed:timeline`）。全局聚合 score 用 publishDate
+> 不用 id，因为不同 source 是独立 CMS 实例 id 序列不可比；publishDate 才是用户
+> 语义的'最新'。同 publishDate 的文章用 crawledAt 做天内 tie-break 保证稳定排序。
+> publishDate 缺失（少数 CMS 列表页字段不规范）退回 crawledAt 作系统级时间兜底，
+> 都没有的极端情况才退回 id-score。"
 
 ### 重构后旧 key 的清理（manual ops）
 
