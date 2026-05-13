@@ -1,40 +1,69 @@
-HELP.md
-.gradle
+# Gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+!**/src/**/build/
+!**/src/**/main/**/build/
+!**/src/**/test/**/build/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+# Java compile output
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# Maven (in case)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+# IDE - IntelliJ
+.idea/
 *.iml
+*.iws
 *.ipr
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
-### NetBeans ###
+# IDE - Eclipse / STS
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+bin/
+!**/src/**/bin/
+!**/src/**/main/**/bin/
+!**/src/**/test/**/bin/
+
+# IDE - VS Code
+.vscode/
+
+# IDE - NetBeans
 /nbproject/private/
 /nbbuild/
-/dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
+# Logs
+logs/
+*.log
 
-main/src/main/resources/application-dev.yml
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
+# Env / local config
+*.local
+application-local.*
+application-dev-local.*
+
+# Spring Boot
+!spring-boot-*.jar
