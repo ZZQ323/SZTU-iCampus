@@ -65,5 +65,8 @@ $RECYCLE.BIN/
 application-local.*
 application-dev-local.*
 
+# Runtime trace / observability data
+infos/runtime-trace/
+
 # Spring Boot
 !spring-boot-*.jar
